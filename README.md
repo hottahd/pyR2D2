@@ -3,17 +3,10 @@ Python code for analyzing  the result of R2D2
 
 # Upgrade resolution
 
-if you want to use upgrade resolution procedure
-
-- Oakforest-PACS
+if you want to use fortran utility such as `d_x`, `d_y`, `d_z`, `interp`, and `spherical2cartesian`, compile fortran programs at `R2D2_py/R2D2/fortran_src`
 
 ```
-export FFLAGS=
-f2py --fcompiler=ifort -m regrid -c --opt='-fPIC' regrid.f90
+make
 ```
 
-- Ubuntu 18.04 server
-
-```
-f2py --fcompiler=gfortran -m regrid -c --opt='-O3' regrid.f90
-```
+We need `gfortran` compiler but you can edit `R2D2_py/R2D2/fortran_src/Makefile` so that the other compilers are used.
