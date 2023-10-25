@@ -4,6 +4,7 @@ from . import resolution
 from . import models
 from . import sync
 from . import vtk
+from . import fortran_util
 
 class R2D2_data():
     '''
