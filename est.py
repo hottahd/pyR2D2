@@ -92,7 +92,7 @@ for n in tqdm(range(n0,nd+1)):
 
     ##############################    
     if geometry == 'Cartesian':
-        fsun = 6.306e10
+        fstar = lstar/4/np.pi/rstar**2
         fe = np.average(d.vc["fe"],axis=1)/sinyym
         fd = np.average(d.vc["fd"],axis=1)/sinyym
         fk = np.average(d.vc["fk"],axis=1)/sinyym
@@ -100,7 +100,7 @@ for n in tqdm(range(n0,nd+1)):
         fm = np.average(d.vc["fm"],axis=1)/sinyym
 
     else:
-        fsun = 3.86e33/pi/4
+        fstar = lstar/4/np.pi
         j1 = jx//2 - 512
         j2 = jx//2 + 512
         #fe = np.average(d.vc["fe"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
@@ -115,7 +115,7 @@ for n in tqdm(range(n0,nd+1)):
         fm = np.average(d.vc["fm"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
         fr = np.average(d.vc["fr"]*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
     
-    xs = rsun - 2.e8
+    xs = rstar - 2.e8
     ds = 2.e7
     sr = 0.5e0*(1.e0 + np.tanh((x_flux-xs)/ds))
     SR, sry = np.meshgrid(sr,y,indexing="ij")
@@ -167,19 +167,19 @@ for n in tqdm(range(n0,nd+1)):
 
     #####################
     if geometry == 'Spherical':
-        xp = x_flux/rsun
+        xp = x_flux/rstar
         xlabel = r'$r/R_\odot$'
-        xpp = x/rsun
+        xpp = x/rstar
     else:
-        xp = (x_flux - rsun)*1.e-8
-        xpp = (x - rsun)*1.e-8
+        xp = (x_flux - rstar)*1.e-8
+        xpp = (x - rstar)*1.e-8
         xlabel = r'$x-R_\odot\ \mathrm{[Mm]}$'
         
-    ax1.plot(xp,ff/fsun,label=r'$F_\mathrm{e}$',color=R2D2.magenta)
-    ax1.plot(xp,fk/fsun,label=r'$F_\mathrm{k}$',color=R2D2.green)
-    ax1.plot(xp,fr/fsun,label=r'$F_\mathrm{r}$',color=R2D2.blue)
-    ax1.plot(xp,fm/fsun,label=r'$F_\mathrm{r}$',color=R2D2.orange)
-    ax1.plot(xp,ft/fsun,label=r'$F_\mathrm{t}$',color=R2D2.ash)
+    ax1.plot(xp,ff/fstar,label=r'$F_\mathrm{e}$',color=R2D2.magenta)
+    ax1.plot(xp,fk/fstar,label=r'$F_\mathrm{k}$',color=R2D2.green)
+    ax1.plot(xp,fr/fstar,label=r'$F_\mathrm{r}$',color=R2D2.blue)
+    ax1.plot(xp,fm/fstar,label=r'$F_\mathrm{r}$',color=R2D2.orange)
+    ax1.plot(xp,ft/fstar,label=r'$F_\mathrm{t}$',color=R2D2.ash)
 
     ax1.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color=R2D2.ash)
     ax1.set_xlabel(xlabel)
@@ -214,7 +214,7 @@ for n in tqdm(range(n0,nd+1)):
     ax3.legend()
 
     #####################
-    ax4.plot(x/rsun,semt[:,n-n0]+se0,color=R2D2.blue)
+    ax4.plot(x/rstar,semt[:,n-n0]+se0,color=R2D2.blue)
         
     if n == n0:
         fig.tight_layout()
@@ -263,7 +263,7 @@ fr = np.average(frt,axis=1)
 ft = ff + fk + fr + fm
 
 np.savez(d.p['datadir']+"est.npz"\
-             ,x=x,y=y,z=z,rsun=rsun\
+             ,x=x,y=y,z=z,rstar=rstar\
              ,ro0=ro0,pr0=pr0,te0=te0,se0=se0\
              ,vxrms=vxrms,vyrms=vyrms,vzrms=vzrms\
              ,bxrms=bxrms,byrms=byrms,bzrms=bzrms\
@@ -275,11 +275,11 @@ np.savez(d.p['datadir']+"est.npz"\
 fig2 = plt.figure(num=100,figsize=(12,5))
 ax23 = fig2.add_subplot(121)
 ax24 = fig2.add_subplot(122)
-ax23.plot(xp,ff/fsun,color=R2D2.magenta,label="$F_\mathrm{e}$")
-ax23.plot(xp,fk/fsun,color=R2D2.green,label="$F_\mathrm{k}$")
-ax23.plot(xp,fr/fsun,color=R2D2.blue,label="$F_\mathrm{r}$")
-ax23.plot(xp,ft/fsun,color=R2D2.orange,label="$F_\mathrm{t}$")
-ax23.plot(xp,fm/fsun,color=R2D2.ash,label="$F_\mathrm{m}$")
+ax23.plot(xp,ff/fstar,color=R2D2.magenta,label="$F_\mathrm{e}$")
+ax23.plot(xp,fk/fstar,color=R2D2.green,label="$F_\mathrm{k}$")
+ax23.plot(xp,fr/fstar,color=R2D2.blue,label="$F_\mathrm{r}$")
+ax23.plot(xp,ft/fstar,color=R2D2.orange,label="$F_\mathrm{t}$")
+ax23.plot(xp,fm/fstar,color=R2D2.ash,label="$F_\mathrm{m}$")
 #ax23.set_xlim(xmin/rsun,xmax/rsun)
 ax23.set_ylim(fmin,fmax)
 ax23.set_xlabel(xlabel)
@@ -291,13 +291,13 @@ ax23.annotate(text="t="+"{:.2f}".format(t/3600./24.)+" [day]"\
 
 ax23.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color='black')
 
-x_flux_c = (x_flux - rsun)*1.e-8
+x_flux_c = (x_flux - rstar)*1.e-8
 
-ax24.plot(x_flux_c,ff/fsun,color=R2D2.magenta)
-ax24.plot(x_flux_c,fk/fsun,color=R2D2.green)
-ax24.plot(x_flux_c,fr/fsun,color=R2D2.blue)
-ax24.plot(x_flux_c,ft/fsun,color=R2D2.orange)
-ax24.plot(x_flux_c,fm/fsun,color=R2D2.ash,label="$F_\mathrm{m}$")
+ax24.plot(x_flux_c,ff/fstar,color=R2D2.magenta)
+ax24.plot(x_flux_c,fk/fstar,color=R2D2.green)
+ax24.plot(x_flux_c,fr/fstar,color=R2D2.blue)
+ax24.plot(x_flux_c,ft/fstar,color=R2D2.orange)
+ax24.plot(x_flux_c,fm/fstar,color=R2D2.ash,label="$F_\mathrm{m}$")
 ax24.hlines(y=1,xmin=x_flux_c.min(),xmax=x_flux_c.max(),linestyle='--',color='black')
 ax24.set_xlim(-10,1)
 ax24.set_ylim(fmin,fmax)
