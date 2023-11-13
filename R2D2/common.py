@@ -4,7 +4,7 @@ from . import resolution
 from . import models
 from . import sync
 
-class R2D2_data():
+class R2D2_data():    
     '''
     R2D2_data is a class for reading R2D2 data
 
@@ -18,8 +18,7 @@ class R2D2_data():
 
         models (dic): Model S based stratification
     '''
-
-R2D2_data.__init__         = read.init        
+R2D2_data.__init__         = read.init
 R2D2_data.read_qq_select   = read.read_qq_select
 R2D2_data.read_qq_select_z = read.read_qq_select_z
 R2D2_data.read_qq          = read.read_qq
