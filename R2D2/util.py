@@ -1,3 +1,7 @@
+def initialize_instance(main_locals,instance):
+    if not instance in main_locals:
+        main_locals[instance] = None
+
 def caseid_select(main_locals,force_read=False):
     
     RED = '\033[31m'
@@ -14,6 +18,13 @@ def locals_define(self,main_locals):
     for key, value in self.p.items():
         main_locals[key] = value    
     return
+
+def define_n0(self,main_locals,nd_type='nd'):
+    if 'n0' not in main_locals:
+        main_locals['n0'] = 0
+    if main_locals['n0'] > self.p[nd_type]:
+        main_locals['n0'] = self.p[nd_type]
+    
 
 def show_information(self):
     import numpy as np
@@ -53,5 +64,6 @@ def show_information(self):
     print('')
     print(RED + '### calculation time ###' + END)
     print('time step (nd) =',self.p['nd'])
+    print('time step (nd_tau) =',self.p['nd_tau'])
     t = self.read_time(self.p['nd'])
     print('time =','{:.2f}'.format(t/3600),' [hour]')
