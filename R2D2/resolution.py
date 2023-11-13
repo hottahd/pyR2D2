@@ -311,13 +311,13 @@ def upgrade_resolution(
         cstep = str(n)
     f.write('Output step: '+cstep+'\n')
 
-    value = self.p['xmin'] - self.p['rsun']
-    f.write('xmin = rsun '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
-            +'{:.3f}'.format(self.p['xmin']/self.p['rsun'])+'*rsun'
+    value = self.p['xmin'] - self.p['rstar']
+    f.write('xmin = rstar '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
+            +'{:.3f}'.format(self.p['xmin']/self.p['rstar'])+'*rstar'
             +change_judge(xmin,self,'xmin',enp=False)+'\n')
-    value = self.p['xmax'] - self.p['rsun']
-    f.write('xmax = rsun '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
-            +'{:.3f}'.format(self.p['xmax']/self.p['rsun'])+'*rsun'
+    value = self.p['xmax'] - self.p['rstar']
+    f.write('xmax = rstar '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
+            +'{:.3f}'.format(self.p['xmax']/self.p['rstar'])+'*rstar'
             +change_judge(xmax,self,'xmax',enp=False)+'\n')
     if self.p['geometry'] == 'Spherical':
         print(self.p['ymin']/np.pi*180)
@@ -357,13 +357,13 @@ def upgrade_resolution(
     f.write('### Upgrade data ###')
     f.write('\n\n')
 
-    value = xmin - self.p['rsun']
-    f.write('xmin = rsun '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
-            +'{:.3f}'.format(xmin/self.p['rsun'])+'*rsun'
+    value = xmin - self.p['rstar']
+    f.write('xmin = rstar '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
+            +'{:.3f}'.format(xmin/self.p['rstar'])+'*rstar'
             +change_judge(xmin,self,'xmin',enp=False)+'\n')
-    value = xmax - self.p['rsun']
-    f.write('xmax = rsun '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
-            +'{:.3f}'.format(xmax/self.p['rsun'])+'*rsun'
+    value = xmax - self.p['rstar']
+    f.write('xmax = rstar '+sign_judge(value)+'{:.4e}'.format(abs(value))+' or '
+            +'{:.3f}'.format(xmax/self.p['rstar'])+'*rstar'
             +change_judge(xmax,self,'xmax',enp=False)+'\n')
 
     if self.p['geometry'] == 'Spherical':
@@ -404,13 +404,13 @@ def upgrade_resolution(
     print('caseid is \033[31m'+caseid+'\033[0m')
     print(' ')
         
-    value = xmin - self.p['rsun']
-    print('xmin = rsun '+sign_judge(value),'{:.4e}'.format(abs(value)),' or '
-          ,'{:.3f}'.format(xmin/self.p['rsun'])+'*rsun'
+    value = xmin - self.p['rstar']
+    print('xmin = rstar '+sign_judge(value),'{:.4e}'.format(abs(value)),' or '
+          ,'{:.3f}'.format(xmin/self.p['rstar'])+'*rstar'
           ,change_judge(xmin,self,'xmin'))
-    value = xmax - self.p['rsun']
-    print('xmax = rsun '+sign_judge(value),'{:.4e}'.format(abs(value)),' or '
-          ,'{:.3f}'.format(xmax/self.p['rsun'])+'*rsun'
+    value = xmax - self.p['rstar']
+    print('xmax = rstar '+sign_judge(value),'{:.4e}'.format(abs(value)),' or '
+          ,'{:.3f}'.format(xmax/self.p['rstar'])+'*rstar'
           ,change_judge(xmax,self,'xmax'))
 
     if self.p['geometry'] == 'Spherical':
