@@ -1,4 +1,4 @@
-def init(self, datadir):
+def init(self, datadir, verbose=False):
     '''
     This method reads basic data for calculation setting
     The data is stored in self.p dictionary
@@ -6,6 +6,7 @@ def init(self, datadir):
     Parameters:
         datadir (str): location of data
     '''
+    import R2D2
     import numpy as np
     import os,sys
 
@@ -23,7 +24,7 @@ def init(self, datadir):
     self.q2 = {}
     self.t = {}
     self.vc = {}
-        
+            
     self.p['datadir'] = datadir 
 
     # read basic parameters
@@ -134,8 +135,7 @@ def init(self, datadir):
         elif back[key].size == kxg:
             self.p[key] = back[key].reshape((kxg),order="F")[self.p["margin"]:kxg-self.p["margin"]]
             
-    self.p["rsun"] = 6.9598947e+10
-    self.p["xr"] = self.p["x"]/self.p["rsun"]
+    self.p["xr"] = self.p["x"]/self.p["rstar"]
 
     if self.p["geometry"] == 'YinYang':
         self.p['jx_yy'] = self.p['jx']
@@ -300,6 +300,8 @@ def init(self, datadir):
     else:
         self.p['origin'] = 'N/A'
             
+    if verbose:
+        R2D2.util.show_information(self)
         
 ##############################
 def read_qq_select(self,xs,n,silent=False):
