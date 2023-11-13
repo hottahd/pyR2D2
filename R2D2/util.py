@@ -1,9 +1,9 @@
-def caseid_select(main_locals):
+def caseid_select(main_locals,force_read=False):
     
     RED = '\033[31m'
     END = '\033[0m'
 
-    if 'caseid' in main_locals:
+    if 'caseid' in main_locals and not force_read:
         caseid = main_locals['caseid']
     else:
        caseid = 'd'+str(input(RED + "input caseid id (3 digit): " + END)).zfill(3)
