@@ -1,8 +1,6 @@
-######################################################
-######################################################
-######################################################
-### for initialize google spread sheet
-
+'''
+    Functions for push information to Google Spreadsheet
+'''
 def init_gspread(json_key,project):
     '''
     This function initialize the utility of google spread 
@@ -26,7 +24,7 @@ def init_gspread(json_key,project):
 
     cells = wks.range('A1:T1')
     keys = [ 'Case ID' \
-             ,'Server' \
+             ,'Mstar' \
              ,'(ix,jx,kx)' \
              ,'xmin [Mm]' \
              ,'xmax [Mm]' \
@@ -34,17 +32,19 @@ def init_gspread(json_key,project):
              ,'ymax' \
              ,'zmin' \
              ,'zmax' \
-             ,'uiform' \
+             ,'uni' \
              ,'dx [km]' \
              ,'m ray' \
              ,'dtout [s]' \
              ,'dtout_tau [s]' \
-             ,'alpha' \
+             ,'al' \
              ,'RSST' \
-             ,'Omega[Sun]' \
+             ,'Om' \
              ,'Gemetry' \
+             ,'origin'
              ,'update time' \
-             ,'origin']
+             ,'Server'
+             ]
 
     for cell, key in zip(cells,keys):
         cell.value = key
@@ -68,6 +68,7 @@ def out_gspread(self,caseid,json_key,project):
     import datetime
     import gspread
     import numpy as np
+    import R2D2
     
     from oauth2client.service_account import ServiceAccountCredentials
 
@@ -81,10 +82,10 @@ def out_gspread(self,caseid,json_key,project):
     cells = wks.range('A'+str_id+':'+'T'+str_id)
 
     keys = [caseid]
-    keys.append(self.p['server'])
+    keys.append('{:.2f}'.format(self.p['mstar']/R2D2.msun))
     keys.append(str(self.p['ix'])+' '+str(self.p['jx'])+' '+str(self.p['kx']))
-    keys.append( '{:6.2f}'.format((self.p['xmin']-self.p['rsun'])*1.e-8))
-    keys.append( '{:6.2f}'.format((self.p['xmax']-self.p['rsun'])*1.e-8))
+    keys.append( '{:6.2f}'.format((self.p['xmin']-self.p['rstar'])*1.e-8))
+    keys.append( '{:6.2f}'.format((self.p['xmax']-self.p['rstar'])*1.e-8))
     
 
     if self.p['geometry'] == 'Cartesian':
@@ -106,11 +107,16 @@ def out_gspread(self,caseid,json_key,project):
         keys.append( '180 [deg]')
         keys.append( '-180 [deg]')
         keys.append( '180 [deg]')
-        
-    if ((self.p['x'][1] - self.p['x'][0]) == (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])):
-        keys.append('T')
-    else:
+    
+    if self.p['ununiform_flag']:
         keys.append('F')
+    else:
+        keys.append('T')
+    
+    # if ((self.p['x'][1] - self.p['x'][0]) == (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])):
+    #     keys.append('T')
+    # else:
+    #     keys.append('F')
     dx0 = (self.p['x'][1] - self.p['x'][0])*1.e-5
     dx1 = (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])*1.e-5
     keys.append( '{:6.2f}'.format(dx0)+' '+'{:6.2f}'.format(dx1))
@@ -125,8 +131,9 @@ def out_gspread(self,caseid,json_key,project):
 
     keys.append( '{:5.1f}'.format(self.p['omfac']))
     keys.append(self.p['geometry'])
-    keys.append(str(datetime.datetime.now()).split('.')[0])
     keys.append(self.p['origin'])
+    keys.append(str(datetime.datetime.now()).split('.')[0])
+    keys.append(self.p['server'])
     
     for cell, key in zip(cells,keys):
         cell.value = key
