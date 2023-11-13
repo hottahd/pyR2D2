@@ -1,4 +1,4 @@
-def init(self, datadir, verbose=False):
+def init(self, datadir, verbose=False, self_old=None):
     '''
     This method reads basic data for calculation setting
     The data is stored in self.p dictionary
@@ -9,21 +9,29 @@ def init(self, datadir, verbose=False):
     import R2D2
     import numpy as np
     import os,sys
-
-    self.p = {}
-    self.qs = {}
-    self.qz = {}
-    self.qq = {}
-    self.qv = {}
-    self.qt = {}
-    self.qt_yin = {}
-    self.qt_yan = {}
-    self.ql = {}
-    self.ql_yin = {}
-    self.ql_yan = {}
-    self.q2 = {}
-    self.t = {}
-    self.vc = {}
+    
+    initialize_flag = True
+    if self_old is not None:
+        if self_old.p['datadir'] == datadir:
+            initialize_flag = False
+          
+    if initialize_flag:  
+        self.p = {}
+        self.qs = {}
+        self.qz = {}
+        self.qq = {}
+        self.qv = {}
+        self.qt = {}
+        self.qt_yin = {}
+        self.qt_yan = {}
+        self.ql = {}
+        self.ql_yin = {}
+        self.ql_yan = {}
+        self.q2 = {}
+        self.t = {}
+        self.vc = {}
+    else:   
+        self.__dict__.update(vars(self_old))
             
     self.p['datadir'] = datadir 
 
@@ -39,7 +47,7 @@ def init(self, datadir, verbose=False):
     self.p['nd_tau'] = nd_tau
 
     ## version check
-    R2D2_py_ver = 1.2
+    R2D2_py_ver = 2.0
     f = open(self.p['datadir']+"param/params.dac","r")
     line = f.readline().split()
     if R2D2_py_ver != float(line[2]):
