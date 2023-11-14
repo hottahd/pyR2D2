@@ -15,7 +15,7 @@ def d_x(x,qq):
     import os
     
     mddir = os.path.dirname(__file__)
-    libfile = 'derv.so'    
+    libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
         lib.d_x.argtypes = derv_array()
@@ -52,7 +52,7 @@ def d_y(y,qq):
     import os
     
     mddir = os.path.dirname(__file__)
-    libfile = 'derv.so'
+    libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
         lib.d_y.argtypes = derv_array()
@@ -89,7 +89,7 @@ def d_z(z,qq):
     import os
     
     mddir = os.path.dirname(__file__)
-    libfile = 'derv.so'
+    libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):    
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
         lib.d_z.argtypes = derv_array()
