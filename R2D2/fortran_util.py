@@ -140,7 +140,7 @@ def interp(x,y,z,xu,yu,zu,qq):
     import numpy as np
     import os
     mddir = os.path.dirname(__file__)
-    libfile = 'regrid.so'
+    libfile = 'fortran_src/regrid.so'
     if os.path.isfile(mddir+'/'+libfile):
         lib = np.ctypeslib.load_library('regrid.so',mddir+'/fortran_src')
         lib.interp.argtypes = [
@@ -201,7 +201,7 @@ def spherical2cartesian(rr,th,ph,qqs,ixc,jxc,kxc):
     import numpy as np
     import os    
     mddir = os.path.dirname(__file__)
-    libfile = 'regrid.so'
+    libfile = 'fortran_src/regrid.so'
     if os.path.isfile(mddir+'/'+libfile):    
         lib = np.ctypeslib.load_library('geometry_convert.so',mddir+'/fortran_src')    
         lib.spherical2cartesian.argtypes = [
