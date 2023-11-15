@@ -88,8 +88,8 @@ for n in tqdm(range(n0,nd+1)):
     for ax in [ax3,ax4]:
         ax.set_ylim((max(xmax-yran,xmin)-rstar)*lfac,(xmax-rstar)*lfac)
     
-    titles = ['Emergent intensity'+r' $\mathrm{[10^{10}~erg~cm^{-2}~ster^{-1}~s^{-1}]}$',
-              r"LOS magnetic field at $\tau=1~\mathrm{[G]}$",
+    titles = ['Emergent intensity\n'+r' $\mathrm{[10^{10}~erg~cm^{-2}~ster^{-1}~s^{-1}]}$',
+              "LOS magnetic field\n"+r"at $\tau=1~\mathrm{[G]}$",
               r"$\left(s-\langle s\rangle\right)/s_\mathrm{RMS}$",
               r"$|B|~\mathrm{[G]}$"
     ]
