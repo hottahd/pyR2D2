@@ -115,7 +115,7 @@ for n in tqdm(range(n0,nd+1)):
     for ax, im in zip([ax1,ax2,ax3,ax4],[im1,im2,im3,im4]):
         box = ax.get_position().bounds
         cax = fig.add_axes([box[0]+ box[2] - color_bar_width
-                        ,box[1] + box[3] + hei3/4.5
+                        ,box[1] + box[3] + color_bar_height*4
                         ,color_bar_width
                         ,color_bar_height
                         ])
