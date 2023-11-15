@@ -33,6 +33,10 @@ xran = min(xmax-xmin,zran)
 xsize = 18
 ysize = xsize*(yran + xran)/2/zran
 ysize = ysize + min(xsize/ysize/1.5,2)
+ysize_limit = 11
+if ysize > ysize_limit:
+    xsize = xsize/ysize*ysize_limit
+    ysize = ysize_limit
 fig = plt.figure(num=1,figsize=(xsize,ysize))
 
 grid = GridSpec(2,2,height_ratios=[yran,xran])
@@ -91,7 +95,7 @@ for n in tqdm(range(n0,nd+1)):
     ]
     for ax, title in zip([ax1,ax2,ax3,ax4],titles):
         title = ax.set_title(title)
-        title.set_position([0.02,1.02])
+        title.set_position([0.01,1.02])
         title.set_ha('left')
         
     if(n == n0):
@@ -105,8 +109,8 @@ for n in tqdm(range(n0,nd+1)):
     box3 = ax3.get_position().bounds
     wid3, hei3 = box3[2], box3[3]
     
-    color_bar_width = wid3/4
-    color_bar_height = hei3/10
+    color_bar_width = 0.12
+    color_bar_height = 0.08/ysize
     
     for ax, im in zip([ax1,ax2,ax3,ax4],[im1,im2,im3,im4]):
         box = ax.get_position().bounds
