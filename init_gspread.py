@@ -7,9 +7,6 @@ datadir="../run/"+caseid+"/data/"
 
 d = R2D2.R2D2_data(datadir,verbose=True)
 
-json_key = glob.glob(os.environ['HOME']+'/json/*')[0]
-project = os.getcwd().split('/')[-2]
-
-R2D2.google.init_gspread(json_key,project)
-R2D2.google.out_gspread(d,caseid,json_key,project)
+R2D2.google.set_top_line()
+d.set_cells_gspread()
 print('\n### Google SpreadSheet write finished ###')

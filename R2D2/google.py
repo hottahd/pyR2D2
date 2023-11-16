@@ -1,7 +1,9 @@
 '''
     Functions for push information to Google Spreadsheet
 '''
-def init_gspread(json_key,project):
+import glob, os
+
+def init_gspread(json_key, project):
     '''
     This function initialize the utility of google spread 
 
@@ -10,8 +12,9 @@ def init_gspread(json_key,project):
         projet (str): project name, typically name of upper directory
 
     Returnes:
-        None
+        gc (instance): Google API instance
     '''
+
     import gspread
     from oauth2client.service_account import ServiceAccountCredentials
 
@@ -20,6 +23,44 @@ def init_gspread(json_key,project):
 
     credentials = ServiceAccountCredentials.from_json_keyfile_name(json_key, scope)
     gc = gspread.authorize(credentials)
+    
+    return gc
+################################################################################
+def fetch_URL_gspread(
+    json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+    project=__file__.split('/')[-4],    
+    ):
+    '''
+    fetch corresponding URL for google spreadsheet
+
+    Parameters:
+        json_key (str): file of json key to access Google API
+        projet (str): project name, typically name of upper directory
+
+    Returnes:
+        URL (str): Google spreadsheet URL
+    '''
+    
+    gid = init_gspread(json_key,project).open(project).id
+    
+    return 'https://docs.google.com/spreadsheets/d/'+gid
+################################################################################
+
+def set_top_line(
+    json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+    project=__file__.split('/')[-4],
+    ):
+    '''
+    This function set top line of google spreadsheet
+
+    Parameters:
+        json_key (str): file of json key to access Google API
+        projet (str): project name, typically name of upper directory
+
+    Returnes:
+        None
+    '''
+    gc = init_gspread(json_key,project)
     wks = gc.open(project).sheet1
 
     cells = wks.range('A1:T1')
@@ -51,32 +92,30 @@ def init_gspread(json_key,project):
 
     wks.update_cells(cells)
         
-######################################################
-######################################################
-def out_gspread(self,caseid,json_key,project):
+################################################################################
+def set_cells_gspread(self,
+                json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+                project=__file__.split('/')[-4],
+                caseid=None):
     '''
     This function output parameters to 
     Google spread sheet
 
     Parameters:
-        caseid (str): caseid
+        self (R2D2_data): instance of R2D2_data class
         json_key (str): file of json key to access Google API
         projet (str): project name, typically name of upper directory
-        d (R2D2_data): instance of R2D2_data class
+        caseid (str): caseid
     
     '''
     import datetime
-    import gspread
     import numpy as np
     import R2D2
+
+    if caseid is None:
+        caseid = self.p['datadir'].split('/')[-3]
     
-    from oauth2client.service_account import ServiceAccountCredentials
-
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_key, scope)
-    gc = gspread.authorize(credentials)
+    gc = init_gspread(json_key,project)
     wks = gc.open(project).sheet1
     str_id = str(int(caseid[1:])+1)
     cells = wks.range('A'+str_id+':'+'T'+str_id)
@@ -113,10 +152,6 @@ def out_gspread(self,caseid,json_key,project):
     else:
         keys.append('T')
     
-    # if ((self.p['x'][1] - self.p['x'][0]) == (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])):
-    #     keys.append('T')
-    # else:
-    #     keys.append('F')
     dx0 = (self.p['x'][1] - self.p['x'][0])*1.e-5
     dx1 = (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])*1.e-5
     keys.append( '{:6.2f}'.format(dx0)+' '+'{:6.2f}'.format(dx1))
@@ -139,3 +174,4 @@ def out_gspread(self,caseid,json_key,project):
         cell.value = key
     
     wks.update_cells(cells)
+

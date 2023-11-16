@@ -30,7 +30,7 @@ R2D2_data.read_qq_check    = read.read_qq_check
 R2D2_data.read_qq_2d       = read.read_qq_2d
 R2D2_data.read_qq_slice    = read.read_qq_slice
 
-R2D2_data.out_gspread    = google.out_gspread
+R2D2_data.set_cells_gspread  = google.set_cells_gspread
 R2D2_data.upgrade_resolution = resolution.upgrade_resolution
 
 R2D2_data.models_init       = models.init
