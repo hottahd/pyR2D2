@@ -3,224 +3,178 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from tqdm import tqdm
 import R2D2
-import sys
+import sys, os
+import pickle
 
-try:
-    caseid
-except NameError:
-    print("input caseid id (3 digit)")
-    caseid = 0
-    caseid = input()
-    caseid = "d"+caseid.zfill(3)
-
+caseid = R2D2.util.caseid_select(locals())
 datadir="../run/"+caseid+"/data/"
+
 pngdir="../figs/"+caseid+"/est/"
 os.makedirs(pngdir,exist_ok=True)
 
-d = R2D2.R2D2_data(datadir)
-for key in d.p:
-    exec('%s = %s%s%s' % (key, 'd.p["',key,'"]'))
+R2D2.util.initialize_instance(locals(),'d')
+d = R2D2.R2D2_data(datadir,self_old=d)
+R2D2.util.locals_define(d,locals())
 
-try:
-    n0
-except NameError:
-    n0 = 0
-if  n0 > d.p["nd"]:
-    n0 = d.p["nd"]
+R2D2.util.define_n0(d,locals())
 
-print("Maximum time step= ",nd," time ="\
-      ,dtout*float(nd)/3600./24.," [day]")
+print("Maximum time step= ",d.p['nd']," time ="\
+      ,d.p['dtout']*float(d.p['nd'])/3600./24.," [day]")
 
 plt.close('all')
 
-if geometry == 'Cartesian':
+if d.p['geometry'] == 'Cartesian':
     sinyy = 1
     sinyym = 1.
 else:
     xx,yy = np.meshgrid(x,y,indexing='ij')
-    sinyy = sin(yy)
+    sinyy = np.sin(yy)
     sinyym = np.average(sinyy,axis=1)
 
     xx,yy_flux = np.meshgrid(x_flux,y,indexing='ij')
-    sinyy_flux = sin(yy_flux)
+    sinyy_flux = np.sin(yy_flux)
     sinyym_flux = np.average(sinyy_flux,axis=1)
 
-#n0 = 4
-#nd = n0
+md = {}
+# RMS and mean values
+vls = ['vxrmst', 'vyrmst', 'vzrmst', 
+        'bxrmst', 'byrmst', 'bzrmst',
+        'rormst', 'sermst', 'prrmst', 'termst',
+        'romt', 'semt', 'prmt', 'temt'
+        ]
+for vl in vls:
+    md[vl] = np.zeros((ix, nd-n0+1))
 
-#nd = 10
+# mean magnetic field
+vls = ['vxmt', 'vymt', 'vzmt', 'bxmt', 'bymt', 'bzmt']
+for vl in vls:
+    md[vl] =  np.zeros((ix,jx,nd-n0+1))
 
-vxrmst = np.zeros((ix,nd-n0+1))
-vyrmst = np.zeros((ix,nd-n0+1))
-vzrmst = np.zeros((ix,nd-n0+1))
+# energy fluxes
+vls = ['fet','fmt','fdt','fkt','frt','ftt','fft']
+for vl in vls:
+    md[vl] = np.zeros((ix+1,nd-n0+1))
 
-bxmt = np.zeros((ix,jx,nd-n0+1))
-bymt = np.zeros((ix,jx,nd-n0+1))
-bzmt = np.zeros((ix,jx,nd-n0+1))
-
-bxrmst = np.zeros((ix,nd-n0+1))
-byrmst = np.zeros((ix,nd-n0+1))
-bzrmst = np.zeros((ix,nd-n0+1))
-
-rormst = np.zeros((ix,nd-n0+1))
-sermst = np.zeros((ix,nd-n0+1))
-prrmst = np.zeros((ix,nd-n0+1))
-termst = np.zeros((ix,nd-n0+1))
-
-romt = np.zeros((ix,nd-n0+1))
-semt = np.zeros((ix,nd-n0+1))
-prmt = np.zeros((ix,nd-n0+1))
-temt = np.zeros((ix,nd-n0+1))
-
-fet = np.zeros((ix+1,nd-n0+1))
-fmt = np.zeros((ix+1,nd-n0+1))
-fdt = np.zeros((ix+1,nd-n0+1))
-fkt = np.zeros((ix+1,nd-n0+1))
-frt = np.zeros((ix+1,nd-n0+1))
-ftt = np.zeros((ix+1,nd-n0+1))
-
-
+# mean value dictionary
 for n in tqdm(range(n0,nd+1)):
-    #print(n)
+    print(f"\r n = {n} ", end='', flush=True)
     ##############################
-    # read time
-    t = d.read_time(n)
-    
-    ##############################
-    # read value
+    t = d.read_time(n)    
     d.read_vc(n,silent=True)
 
     ##############################    
-    if geometry == 'Cartesian':
-        fstar = lstar/4/np.pi/rstar**2
-        fe = np.average(d.vc["fe"],axis=1)/sinyym
-        fd = np.average(d.vc["fd"],axis=1)/sinyym
-        fk = np.average(d.vc["fk"],axis=1)/sinyym
-        fr = np.average(d.vc["fr"],axis=1)/sinyym
-        fm = np.average(d.vc["fm"],axis=1)/sinyym
-
+    if d.p['geometry'] == 'Cartesian':
+        fstar = d.p['lstar']/4/np.pi/d.p['rstar']**2
+        vls = ['fe','fd','fk','fr','fm']
+        for vl in vls:
+            md[vl] = np.average(d.vc[vl],axis=1)/sinyym
     else:
-        fstar = lstar/4/np.pi
-        j1 = jx//2 - 512
-        j2 = jx//2 + 512
-        #fe = np.average(d.vc["fe"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
-        #fd = np.average(d.vc["fd"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
-
-        sinyym_flux0 = np.average(sinyy_flux[:,j1:j2],axis=1)
-        
-        fe = np.average(d.vc["fe"][:,j1:j2]*sinyy_flux[:,j1:j2],axis=1)/sinyym_flux0*x_flux**2
-        fd = np.average(d.vc["fd"][:,j1:j2]*sinyy_flux[:,j1:j2],axis=1)/sinyym_flux0*x_flux**2
-        
-        fk = np.average(d.vc["fk"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
-        fm = np.average(d.vc["fm"]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
-        fr = np.average(d.vc["fr"]*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
+        fstar = d['lstar']/4/np.pi
+        vls = ['fe','fd','fk','fm']
+        for vl in vls:
+            md[vl] = np.average(d.vc[vl]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2
+        md['fr'] = np.average(d.vc["fr"]*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
     
-    xs = rstar - 2.e8
-    ds = 2.e7
-    sr = 0.5e0*(1.e0 + np.tanh((x_flux-xs)/ds))
-    SR, sry = np.meshgrid(sr,y,indexing="ij")
+    serms = np.sqrt(np.average(d.vc['serms']**2*sinyy,axis=1)/sinyym)/d.p['se0']
+    sermsm = 0.5*(np.append(serms,serms[-1]) + np.insert(serms,0,serms[0]))
+    sr = 0.5*(1 + np.sign(sermsm - 1.e-3))
     
-    ff = fd*sr + fe*(1.e0-sr)
-    #ff = fe
-    #ff = fd
-    ft = ff + fk + fr + fm
+    # fe: linear expression
+    # fd: full expression
+    md['ff'] = md['fd']*sr + md['fe']*(1.e0-sr)
+    md['ft'] = md['ff'] + md['fk'] + md['fr'] + md['fm']
 
-    vxrmst[:,n-n0] = np.sqrt(np.average(d.vc["vxrms"]**2*sinyy,axis=1)/sinyym)
-    vyrmst[:,n-n0] = np.sqrt(np.average(d.vc["vyrms"]**2*sinyy,axis=1)/sinyym)
-    vzrmst[:,n-n0] = np.sqrt(np.average(d.vc["vzrms"]**2*sinyy,axis=1)/sinyym)
+    # RMS values
+    vls = ['vxrms','vyrms','vzrms','bxrms','byrms','bzrms','rorms','serms','prrms','terms']
+    for vl in vls:
+        md[vl+'t'][:,n-n0] = np.sqrt(np.average(d.vc[vl]**2*sinyy,axis=1)/sinyym)
 
-    bxrmst[:,n-n0] = np.sqrt(np.average(d.vc["bxrms"]**2*sinyy,axis=1)/sinyym)
-    byrmst[:,n-n0] = np.sqrt(np.average(d.vc["byrms"]**2*sinyy,axis=1)/sinyym)
-    bzrmst[:,n-n0] = np.sqrt(np.average(d.vc["bzrms"]**2*sinyy,axis=1)/sinyym)
+    # energy flux
+    vls = ['fe','fm','fd','fk','fr','ft','ff']
+    for vl in vls:
+        md[vl+'t'][:,n-n0] = md[vl]
+        
+    # mean magnetic field
+    vls = ['vxm','vym','vzm','bxm','bym','bzm']
+    for vl in vls:
+        md[vl+'t'][:,:,n-n0] = d.vc[vl]
 
-    bxmt[:,:,n-n0] = d.vc['bxm']
-    bymt[:,:,n-n0] = d.vc['bym']
-    bzmt[:,:,n-n0] = d.vc['bzm']
-
-    rormst[:,n-n0] = np.sqrt(np.average(d.vc["rorms"]**2*sinyy,axis=1)/sinyym)
-    sermst[:,n-n0] = np.sqrt(np.average(d.vc["serms"]**2*sinyy,axis=1)/sinyym)
-    prrmst[:,n-n0] = np.sqrt(np.average(d.vc["prrms"]**2*sinyy,axis=1)/sinyym)
-    termst[:,n-n0] = np.sqrt(np.average(d.vc["terms"]**2*sinyy,axis=1)/sinyym)
-
-    romt[:,n-n0] = np.average(d.vc["rom"]*sinyy,axis=1)/sinyym
-    semt[:,n-n0] = np.average(d.vc["sem"]*sinyy,axis=1)/sinyym
-    prmt[:,n-n0] = np.average(d.vc["prm"]*sinyy,axis=1)/sinyym
-    temt[:,n-n0] = np.average(d.vc["tem"]*sinyy,axis=1)/sinyym
-
-    fet[:,n-n0] = fe
-    fmt[:,n-n0] = fm
-    fdt[:,n-n0] = fd
-    fkt[:,n-n0] = fk
-    frt[:,n-n0] = fr
-    ftt[:,n-n0] = ft
+    # 平均量の取得
+    vls = ['rom','sem','prm','tem']
+    for vl in vls:
+        md[vl+'t'][:,n-n0] = np.average(d.vc[vl]*sinyy,axis=1)/sinyym
 
     fontsize = 12
     fmax = 2.0
     fmin = -1.0
 
-    fig = plt.figure(num='est',figsize=(12,8))
-    ax1 = fig.add_subplot(221)
-    ax2 = fig.add_subplot(222)
-    ax3 = fig.add_subplot(223)
-    ax4 = fig.add_subplot(224)
-
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, num='est', figsize=(12, 8))
 
     #####################
-    if geometry == 'Spherical':
+    if d.p['geometry'] == 'Spherical':
         xp = x_flux/rstar
-        xlabel = r'$r/R_\odot$'
+        xlabel = r'$r/R_*$'
         xpp = x/rstar
     else:
         xp = (x_flux - rstar)*1.e-8
         xpp = (x - rstar)*1.e-8
-        xlabel = r'$x-R_\odot\ \mathrm{[Mm]}$'
+        xlabel = r'$x-R_*~\mathrm{[Mm]}$'
         
-    ax1.plot(xp,ff/fstar,label=r'$F_\mathrm{e}$',color=R2D2.magenta)
-    ax1.plot(xp,fk/fstar,label=r'$F_\mathrm{k}$',color=R2D2.green)
-    ax1.plot(xp,fr/fstar,label=r'$F_\mathrm{r}$',color=R2D2.blue)
-    ax1.plot(xp,fm/fstar,label=r'$F_\mathrm{r}$',color=R2D2.orange)
-    ax1.plot(xp,ft/fstar,label=r'$F_\mathrm{t}$',color=R2D2.ash)
+        
+    if d.p['deep_flag'] == 0:
+        text = r"$t="+"{:.2f}".format(t/60.)+"\mathrm{~[min]}$"
+    else:
+        text = r"$t="+"{:.2f}".format(t/3600./24.)+"\mathrm{~[day]}$"
+    #####################
+    # drawing
+    vls = ['ff','fk','fr','fm','ft']
+    colors = [R2D2.magenta,R2D2.green,R2D2.blue,R2D2.orange,R2D2.ash]
+    labels = ['$F_\mathrm{e}$',r'$F_\mathrm{k}$',r'$F_\mathrm{r}$',r'$F_\mathrm{m}$',r'$F_\mathrm{t}$']
+    for vl, color, label in zip(vls, colors, labels):
+        ax1.plot(xp,md[vl]/fstar,label=label,color=color)
 
     ax1.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color=R2D2.ash)
-    ax1.set_xlabel(xlabel)
-    ax1.set_ylabel("$F/F_{\odot}$")
-    ax1.set_title("Energy fluxes")
-    #ax1.legend()
 
     #####################
-    vxrms = vxrmst[:,n-n0]
-    vhrms = np.sqrt(vyrmst[:,n-n0]**2 + vzrmst[:,n-n0]**2)
-    vrms = np.sqrt(vxrms**2 + vhrms**2)
-    ax2.plot(xpp,vxrms*1.e-5,label=r'$v_{x\mathrm{(rms)}}$',color=R2D2.blue)
-    ax2.plot(xpp,vhrms*1.e-5,label=r'$v_\mathrm{h(rms)}$',color=R2D2.magenta)
-    ax2.plot(xpp,vrms*1.e-5,label=r'$v_\mathrm{(rms)}$',color=R2D2.green)
-    ax2.set_xlabel(xlabel)
-    ax2.set_ylabel(r"velocities [km/s]")
-    ax2.set_label('RMS velocities')
-    if deep_flag == 0:
+    md['vxrms'] = md['vxrmst'][:,n-n0]
+    md['vhrms'] = np.sqrt(md['vyrmst'][:,n-n0] + md['vzrmst'][:,n-n0]**2)
+    md['vvrms'] = np.sqrt(md['vxrms']**2 + md['vhrms']**2)
+    vls = ['vxrms','vhrms','vvrms']
+    colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+    labels = [r'$v_{x\mathrm{(rms)}}$',r'$v_\mathrm{h(rms)}$',r'$v_\mathrm{(rms)}$']
+    for vl, color, label in zip(vls, colors, labels):
+        ax2.plot(xpp,md[vl]*1.e-5,label=label,color=color)
+
+    if d.p['deep_flag'] == 0:
         ax2.set_yscale('log')
-    ax2.legend()
 
     #####################
-    bxrms = bxrmst[:,n-n0]
-    bhrms = np.sqrt(byrmst[:,n-n0]**2 + bzrmst[:,n-n0]**2)
-    brms = np.sqrt(bxrms**2 + bhrms**2)
-    ax3.plot(xpp,bxrms,label=r'$B_{x\mathrm{(rms)}}$',color=R2D2.blue)
-    ax3.plot(xpp,bhrms,label=r'$B_\mathrm{h(rms)}$',color=R2D2.magenta)
-    ax3.plot(xpp,brms,label=r'$B_\mathrm{(rms)}$',color=R2D2.green)
-    ax3.set_xlabel(xlabel)
-    ax3.set_ylabel(r"Magnetic field [G]")
-    ax3.set_label('RMS magnetic field')
-    ax3.legend()
+    md['bxrms'] = md['bxrmst'][:,n-n0]
+    md['bhrms'] = np.sqrt(md['byrmst'][:,n-n0]**2 + md['bzrmst'][:,n-n0]**2)
+    md['bbrms'] = np.sqrt(md['bxrms']**2 + md['bhrms']**2)
+    vls = ['bxrms','bhrms','bbrms']
+    colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+    labels = [r'$B_{x\mathrm{(rms)}}$',r'$B_\mathrm{h(rms)}$',r'$B_\mathrm{(rms)}$']
+    for vl, color, label in zip(vls, colors, labels):
+        ax3.plot(xpp,md[vl]*1.e-5,label=label,color=color)
+    
 
     #####################
-    ax4.plot(x/rstar,semt[:,n-n0]+se0,color=R2D2.blue)
-        
+    ax4.plot(xpp,md['semt'][:,n-n0]+d.p['se0'],color=R2D2.blue,label=r'$s$')
+    ax4.plot(xpp,d.p['se0'],color=R2D2.blue,ls='--',label=r'$s_0$')
+
+    titles = ['Energy fluxes','RMS velocity','RMS magnetic field','Entropy']
+    ylabels = [r"$F/F_*$",r"velocities$\mathrm{~[km/s]}$",r"Magnetic field [G]",r'$\mathrm{erg/g/K}$']
+    for ax, ylabel, title in zip([ax1,ax2,ax3,ax4],ylabels,titles):
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend(frameon=False,ncol=3,loc='upper left')
+
     if n == n0:
         fig.tight_layout()
 
-    ax3.annotate(text="t="+"{:.2f}".format(t/3600./24.)+" [day]"\
-                     ,xy=[0.01,0.01],xycoords="figure fraction",fontsize=18)
+    ax3.annotate(text=text,xy=[0.01,0.01],xycoords="figure fraction",fontsize=18)
 
     plt.pause(0.001)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
@@ -234,77 +188,68 @@ for n in tqdm(range(n0,nd+1)):
     ###############################################################################
     ###############################################################################
 
-vxrms = np.sqrt(np.average(vxrmst**2,axis=1))
-vyrms = np.sqrt(np.average(vyrmst**2,axis=1))
-vzrms = np.sqrt(np.average(vzrmst**2,axis=1))
+vls = ['vxrms','vyrms','vzrms',
+       'bxrms','byrms','bzrms',
+       'rorms','serms','prrms','terms'
+       ]
+for vl in vls:
+    md[vl] = np.sqrt(np.average(md[vl+'t']**2,axis=1))
 
-bxrms = np.sqrt(np.average(bxrmst**2,axis=1))
-byrms = np.sqrt(np.average(byrmst**2,axis=1))
-bzrms = np.sqrt(np.average(bzrmst**2,axis=1))
+vls = ['rom','sem','prm','tem']
+for vl in vls:
+    md[vl] = np.average(md[vl+'t'],axis=1)
 
-rorms = np.sqrt(np.average(rormst**2,axis=1))
-serms = np.sqrt(np.average(sermst**2,axis=1))
-prrms = np.sqrt(np.average(prrmst**2,axis=1))
-terms = np.sqrt(np.average(termst**2,axis=1))
+vls = ['fe','fd','ff','fk','fr','ft']
+for vl in vls:
+    md[vl] = np.average(md[vl+'t'],axis=1)
 
-rom = np.average(romt,axis=1)
-sem = np.average(semt,axis=1)
-prm = np.average(prmt,axis=1)
-tem = np.average(temt,axis=1)
+with open(d.p['datadir']+'est.pkl','wb') as f:
+    pickle.dump([d.p,md], f)    
 
-fe = np.average(fet,axis=1)
-fd = np.average(fdt,axis=1)
+fig2, ((ax21, ax22), (ax23, ax24)) = plt.subplots(2, 2, num='est_mean', figsize=(12, 8))
 
-ff = fd*sr + fe*(1.e0-sr)
-#ff = fd
+#####################
+# drawing
+vls = ['ff','fk','fr','fm','ft']
+colors = [R2D2.magenta,R2D2.green,R2D2.blue,R2D2.orange,R2D2.ash]
+labels = ['$F_\mathrm{e}$',r'$F_\mathrm{k}$',r'$F_\mathrm{r}$',r'$F_\mathrm{m}$',r'$F_\mathrm{t}$']
+for vl, color, label in zip(vls, colors, labels):
+    ax21.plot(xp,md[vl]/fstar,label=label,color=color)
 
-fk = np.average(fkt,axis=1)
-fr = np.average(frt,axis=1)
-ft = ff + fk + fr + fm
+ax21.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color=R2D2.ash)
 
-np.savez(d.p['datadir']+"est.npz"\
-             ,x=x,y=y,z=z,rstar=rstar\
-             ,ro0=ro0,pr0=pr0,te0=te0,se0=se0\
-             ,vxrms=vxrms,vyrms=vyrms,vzrms=vzrms\
-             ,bxrms=bxrms,byrms=byrms,bzrms=bzrms\
-             ,rorms=rorms,prrms=prrms,serms=serms,terms=terms\
-             ,rom=rom,prm=prm,sem=sem,tem=tem\
-             ,ff=ff,fk=fk,fr=fr,ft=ft\
-             )
-         
-fig2 = plt.figure(num=100,figsize=(12,5))
-ax23 = fig2.add_subplot(121)
-ax24 = fig2.add_subplot(122)
-ax23.plot(xp,ff/fstar,color=R2D2.magenta,label="$F_\mathrm{e}$")
-ax23.plot(xp,fk/fstar,color=R2D2.green,label="$F_\mathrm{k}$")
-ax23.plot(xp,fr/fstar,color=R2D2.blue,label="$F_\mathrm{r}$")
-ax23.plot(xp,ft/fstar,color=R2D2.orange,label="$F_\mathrm{t}$")
-ax23.plot(xp,fm/fstar,color=R2D2.ash,label="$F_\mathrm{m}$")
-#ax23.set_xlim(xmin/rsun,xmax/rsun)
-ax23.set_ylim(fmin,fmax)
-ax23.set_xlabel(xlabel)
-ax23.set_ylabel("$F/F_{\odot}$")
-ax23.set_title("Full convection zone")
-ax23.legend(loc='upper left',prop={'size': 15})
-ax23.annotate(text="t="+"{:.2f}".format(t/3600./24.)+" [day]"\
-                 ,xy=[0.01,0.01],xycoords="figure fraction",fontsize=18)
+#####################
+md['vhrms'] = np.sqrt(md['vyrms'] + md['vzrms']**2)
+md['vvrms'] = np.sqrt(md['vxrms']**2 + md['vhrms']**2)
+vls = ['vxrms','vhrms','vvrms']
+colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+labels = [r'$v_{x\mathrm{(rms)}}$',r'$v_\mathrm{h(rms)}$',r'$v_\mathrm{(rms)}$']
+for vl, color, label in zip(vls, colors, labels):
+    ax22.plot(xpp,md[vl]*1.e-5,label=label,color=color)
 
-ax23.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color='black')
+if d.p['deep_flag'] == 0:
+    ax22.set_yscale('log')
 
-x_flux_c = (x_flux - rstar)*1.e-8
+#####################
+md['bhrms'] = np.sqrt(md['byrms']**2 + md['bzrms']**2)
+md['bbrms'] = np.sqrt(md['bxrms']**2 + md['bhrms']**2)
+vls = ['bxrms','bhrms','bbrms']
+colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+labels = [r'$B_{x\mathrm{(rms)}}$',r'$B_\mathrm{h(rms)}$',r'$B_\mathrm{(rms)}$']
+for vl, color, label in zip(vls, colors, labels):
+    ax23.plot(xpp,md[vl]*1.e-5,label=label,color=color)
 
-ax24.plot(x_flux_c,ff/fstar,color=R2D2.magenta)
-ax24.plot(x_flux_c,fk/fstar,color=R2D2.green)
-ax24.plot(x_flux_c,fr/fstar,color=R2D2.blue)
-ax24.plot(x_flux_c,ft/fstar,color=R2D2.orange)
-ax24.plot(x_flux_c,fm/fstar,color=R2D2.ash,label="$F_\mathrm{m}$")
-ax24.hlines(y=1,xmin=x_flux_c.min(),xmax=x_flux_c.max(),linestyle='--',color='black')
-ax24.set_xlim(-10,1)
-ax24.set_ylim(fmin,fmax)
-ax24.set_xlabel("$x - R_{\odot} \ [\mathrm{Mm}]$")
-ax24.set_ylabel("$F/F_{\odot}$")
-ax24.set_title("Around photosphere")
+
+#####################
+ax24.plot(xpp,md['sem']+d.p['se0'],color=R2D2.blue,label=r'$s$')
+ax24.plot(xpp,d.p['se0'],color=R2D2.blue,ls='--',label=r'$s_0$')
+
+titles = ['Energy fluxes','RMS velocity','RMS magnetic field','Entropy']
+ylabels = [r"$F/F_*$",r"velocities$\mathrm{~[km/s]}$",r"Magnetic field [G]",r'$\mathrm{erg/g/K}$']
+for ax, ylabel, title in zip([ax21,ax22,ax23,ax24],ylabels,titles):
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.legend(frameon=False,ncol=3,loc='upper left')
+
 fig2.tight_layout()
-plt.pause(0.001)
-plt.ion()
-    
