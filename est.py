@@ -69,7 +69,7 @@ for n in tqdm(range(n0,nd+1)):
         for vl in vls:
             md[vl] = np.average(d.vc[vl],axis=1)/sinyym
     else:
-        fstar = d['lstar']/4/np.pi
+        fstar = d.p['lstar']/4/np.pi
         vls = ['fe','fd','fk','fm']
         for vl in vls:
             md[vl] = np.average(d.vc[vl]*sinyy_flux,axis=1)/sinyym_flux*x_flux**2

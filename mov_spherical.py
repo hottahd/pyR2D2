@@ -140,4 +140,4 @@ for n in range(n0,nd+1):
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
 
     if(n != nd):
-        clf()
+        plt.clf()
