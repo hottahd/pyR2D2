@@ -27,7 +27,7 @@ if d.p['geometry'] == 'Cartesian':
     sinyy = 1
     sinyym = 1.
 else:
-    xx,yy = np.meshgrid(x,y,indexing='ij')
+    xx,yy = np.meshgrid(d.p['x'],d.p['y'],indexing='ij')
     sinyy = np.sin(yy)
     sinyym = np.average(sinyy,axis=1)
 
