@@ -34,8 +34,8 @@ print("Maximum time step= ",nd," time ="\
 plt.close('all')
 
 X, Y = np.meshgrid(x,y,indexing='ij')
-SINY = sin(Y)
-SINYM = sin(Y).sum(axis=1)
+SINY = np.sin(Y)
+SINYM = np.sin(Y).sum(axis=1)
 
 plt.rcParams['font.size'] = 16
 # read time
@@ -66,12 +66,12 @@ for j in range(1,jx):
 RA, TH = np.meshgrid(x,y,indexing='ij')
 
 RAE, THE = np.meshgrid(xe,ye,indexing='ij')
-XX, YY = RAE*cos(THE), RAE*sin(THE)
+XX, YY = RAE*np.cos(THE), RAE*np.sin(THE)
 
 zz,yy = np.meshgrid(z,y-0.5*np.pi)
 
-yc = y/pi*180 - 90
-zc = z/pi*180
+yc = y/np.pi*180 - 90
+zc = z/np.pi*180
 
 YC, ZC = np.meshgrid(yc,zc,indexing='ij')
 
@@ -98,7 +98,7 @@ for n in range(n0,nd+1):
     ax3 = fig.add_subplot(223,aspect='equal')
     ax4 = fig.add_subplot(224,aspect='equal')
 
-    if xmax > rsun:
+    if xmax > rstar:
         d.read_qq_tau(n*int(ifac),silent=True)
         ax1.pcolormesh(zz,yy,d.qt['vx'],shading='auto')
         ax2.pcolormesh(zz,yy,d.qt['bx'],shading='auto')
@@ -119,9 +119,9 @@ for n in range(n0,nd+1):
             ax.set_yticklabels('')
         
     sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,y,indexing='ij')
-    serms, tmp = np.meshgrid(sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),y,indexing='ij')
-    bbp = sqrt(d.vc['bx_xy']**2 + d.vc['by_xy']**2 + d.vc['bz_xy']**2)
-    om = d.vc['vzm']/RA/sin(TH)
+    serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),y,indexing='ij')
+    bbp = np.sqrt(d.vc['bx_xy']**2 + d.vc['by_xy']**2 + d.vc['bz_xy']**2)
+    om = d.vc['vzm']/RA/np.sin(TH)
     bzm = d.vc['bzm']
     
     if serms.max() != 0:
@@ -129,7 +129,7 @@ for n in range(n0,nd+1):
     else:
         se_plot = np.zeros((ix,jx))
 
-    lfac = 1/rsun
+    lfac = 1/rstar
     ax3.pcolormesh(XX.T*lfac,YY.T*lfac,se_plot.T,vmin=-2.,vmax=2.,shading='auto')
     ax4.pcolormesh(XX.T*lfac,YY.T*lfac,bzm.T,shading='auto',vmin=-8000.,vmax=8000)
     

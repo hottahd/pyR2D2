@@ -26,12 +26,9 @@ for key in d.p:
 try:
     n0
 except NameError:
-    n0 = 1720
+    n0 = 0
 if  n0 > d.p["nd_tau"]:
     n0 = d.p["nd_tau"]
-
-if n0 < 1720:
-    n0 = 1720
 
 print("Maximum time step (nd_tau) = ",nd_tau," time ="\
           ,dtout*float(nd)/3600./24.," [day]")
@@ -45,7 +42,7 @@ xsize = 16
 ysize = 8
 fig = plt.figure('mov_photo',figsize=(xsize,ysize))
 
-n0_shift = 1720
+n0_shift = 0
 #n0 = 1720
 #nd_tau = n0
 
