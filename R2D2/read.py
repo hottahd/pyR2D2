@@ -43,7 +43,7 @@ def init(self, datadir, verbose=False, self_old=None):
     f.close()
     
     self.p['nd'] = nd
-    nd_tau = max(len(os.listdir(datadir+'tau')) - 1,nd_tau)
+    nd_tau = max(len(os.listdir(datadir+'time/tau')) - 1,nd_tau)
     self.p['nd_tau'] = nd_tau
 
     ## version check
