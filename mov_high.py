@@ -4,6 +4,8 @@ import R2D2
 import sys, os
 import matplotlib.pyplot as plt
 import mov_util
+import cartopy.crs as ccrs
+
 
 caseid = R2D2.util.caseid_select(locals())
 datadir="../run/"+caseid+"/data/"
@@ -91,40 +93,39 @@ for n in tqdm(range(n0,d.p['nd_tau']+1)):
 
         mov_util.mov_cartesian_photo_2x2(d,t-t0,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.read_qq_select(xmax,n,silent=True)
-        vxrms = np.sqrt((d.qs['vx']**2).mean())
-        bxrms = np.sqrt((bx**2).mean())
+        d.read_qq_slice(np.argmin(abs(d.p['x_slice'] - d.p['xmax'])),'x',n,silent=True) # xmaxに一番近いところ
+        vxrms = np.sqrt((d.ql_yin['vx']**2).mean())
+        bxrms = np.sqrt((d.ql_yin['bx']**2).mean())
         
-        sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,d.p['y'],indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),d.p['y'],indexing='ij')
+        #qq_yan = d.ql_yan['vx'][margin:jxg_yy-margin,margin:kxg_yy-margin]
+        #qq_yin = d.ql_yin['vx'][margin:jxg_yy-margin,margin:kxg_yy-margin]
         
-        if serms.max() != 0:
-            se_value = (d.vc['se_xy']-sem)/serms
-        else:
-            se_value = np.zeros((ix,jx))
+        vmax = vxrms
+        vmin = -vmax
+        var = 'vx'
+        shading = 'gouraud'
+        fig = plt.figure(1)
+        ax = fig.add_subplot(111,projection=ccrs.Orthographic(central_longitude=0,central_latitude=np.pi))
+        #ax = fig.add_subplot(111,projection='mollweide')
         
-        vls = [d.qs['vx']*1.e-2,
-               d.qs['bx']*1.e-3,
-               se_value,
-               d.vc['bzm']
-               ]
-        vmaxs = [2*vxrms*1.e-2, # radial velocity
-                 2*bxrms*1.e-3, # radial magnetic field
-                 2., # entropy
-                 8000, # magnetic field strength
-                 ]
-        vmins = [-vmaxs[0], # radial velocity
-                 -vmaxs[1], # radial magnetic field
-                 -2., # entropy
-                 -8000 # magnetic field strength
-                 ]
-        titles = [r'Radial velocity $v_r~[\mathrm{m~s^{-1}}]$',
-                  r'Radial magnetic field $B_r~[\mathrm{kG}]$',
-                  r"$\left(s-\langle s\rangle\right)/s_\mathrm{RMS}$",
-                  r"$\langle B_\phi\rangle~\mathrm{[G]}$"
-                ]
+        #ax.pcolormesh((zo_yy[jx_yy//2:jx_yy,:])*rad2deg,(yo_yy[jx_yy//2:jx_yy,:]-0.5*pi)*rad2deg,qq_yan[jx_yy//2:jx_yy,:],transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading,cmap='gray')
+        #ax.pcolormesh(zo_yy[0:jx_yy//2,:]*rad2deg,(yo_yy[0:jx_yy//2,:]-0.5*pi)*rad2deg,qq_yan[0:jx_yy//2,:],transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading)
+        #ax.pcolormesh((zz_yy)*rad2deg,(yy_yy-0.5*pi)*rad2deg,qq_yin,transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading)
+
+        #ax.pcolormesh(zog_yy,yog_yy-0.5*pi,d.ql_yan[var]
+        #          ,vmin=vmin,vmax=vmax,shading=shading,transform=ccrs.PlateCarree())
+    
+        #ax.pcolormesh(zog_yy[0:jxg_yy//2,:],yog_yy[0:jxg_yy//2,:]-0.5*np.pi,d.ql_yan[var][0:jxg_yy//2,:]
+        #            ,vmin=vmin,vmax=vmax,shading=shading)
+         
+        rad2deg = 180/np.pi
+       
+        ax.pcolormesh(zz_yy*rad2deg,(yy_yy-0.5*np.pi)*rad2deg,d.ql_yin[var][margin:jxg_yy-margin,margin:kxg_yy-margin],vmin=vmin,vmax=vmax,shading=shading,transform=ccrs.PlateCarree())
+        
+        ax.set_xticklabels('')
+        ax.set_yticklabels('')
                 
-        mov_util.mov_spherical_2x2(d,t-t0,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
+                        
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
     if(n != d.p['nd_tau']):
