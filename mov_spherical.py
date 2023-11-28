@@ -66,7 +66,7 @@ for j in range(1,jx):
 RA, TH = np.meshgrid(x,y,indexing='ij')
 
 RAE, THE = np.meshgrid(xe,ye,indexing='ij')
-XX, YY = RAE*np.cos(THE), RAE*np.sin(THE)
+XX, YY = RA*np.cos(THE), RAE*np.sin(THE)
 
 zz,yy = np.meshgrid(z,y-0.5*np.pi)
 
