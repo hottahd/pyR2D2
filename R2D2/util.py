@@ -25,6 +25,7 @@ def define_n0(self,main_locals,nd_type='nd'):
     if main_locals['n0'] > self.p[nd_type]:
         main_locals['n0'] = self.p[nd_type]
     
+    return main_locals['n0']
 
 def show_information(self):
     import numpy as np
