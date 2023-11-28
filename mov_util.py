@@ -16,7 +16,7 @@ def add_color_bar_2x2(fig,axes,ims,ysize):
         cbar = fig.colorbar(im,cax=cax,orientation='horizontal')
         cbar.ax.tick_params(labelsize=12)
 
-def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=True):
+def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
 
@@ -45,12 +45,12 @@ def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=True):
     
     ims = []
     axes = [ax1,ax2,ax3,ax4]
-    # pcolormesh    
-    for ax, vl, vmax, vmin in zip(axes[:2],vls[:2],vmaxs[:2],vmins[:2]):
-        ims.append(ax.pcolormesh(d.p['z']*lfac,d.p['y']*lfac,vl,cmap='inferno',vmax=vmax,vmin=vmin,shading=shading))
+    # pcolormesh
+    for ax, vl, cmap, vmax, vmin in zip(axes[:2],vls[:2],cmaps[:2],vmaxs[:2],vmins[:2]):
+        ims.append(ax.pcolormesh(d.p['z']*lfac,d.p['y']*lfac,vl,cmap=cmap,vmax=vmax,vmin=vmin,shading=shading))
     
-    for ax, vl, vmax, vmin in zip(axes[2:],vls[2:],vmaxs[2:],vmins[2:]):
-        ims.append(ax.pcolormesh(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,vl,vmin=vmin,vmax=vmax,shading=shading))
+    for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
+        ims.append(ax.pcolormesh(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,vl,cmap=cmap,vmin=vmin,vmax=vmax,shading=shading))
         ax.contour(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,d.vc['tu_xz'],levels=[1.],colors="w")
     
     for ax in [ax1,ax2]:
@@ -80,10 +80,10 @@ def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=True):
     # add color bar
     add_color_bar_2x2(fig,axes,ims,ysize)
 
-def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=True):
+def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
-    
+        
     xsize = 16
     ysize = 9
     fig = plt.figure(num=1,figsize=(xsize,ysize))
@@ -105,13 +105,13 @@ def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=True):
         title.set_ha('left')
         
                 
-    for ax, vl, vmax, vmin in zip(axes[:2],vls[:2],vmaxs[:2],vmins[:2]):
-        ims.append(ax.pcolormesh(d.p['zz'],d.p['yy'],vl,shading=shading,cmap='inferno',vmax=vmax,vmin=vmin))
+    for ax, vl, cmap, vmax, vmin in zip(axes[:2],vls[:2],cmaps[:2],vmaxs[:2],vmins[:2]):
+        ims.append(ax.pcolormesh(d.p['zz'],d.p['yy'],vl,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
         ax.set_xticklabels('')
         ax.set_yticklabels('')
     
-    for ax, vl, vmax, vmin in zip(axes[2:],vls[2:],vmaxs[2:],vmins[2:]):
-        ims.append(ax.pcolormesh(d.p['XX'].T*lfac,d.p['YY'].T*lfac,vl.T,shading=shading,cmap='inferno',vmax=vmax,vmin=vmin))
+    for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
+        ims.append(ax.pcolormesh(d.p['XX'].T*lfac,d.p['YY'].T*lfac,vl.T,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
         ax.set_xlabel(r'$z/R_*$')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)

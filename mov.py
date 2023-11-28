@@ -15,7 +15,7 @@ R2D2.util.locals_define(d,locals())
 pngdir="../figs/"+caseid+"/mov/"
 os.makedirs(pngdir,exist_ok=True)
 
-R2D2.util.define_n0(d,locals())
+n0 = R2D2.util.define_n0(d,locals(),nd_type='nd')
 
 print("Maximum time step= ",nd," time ="\
           ,dtout*float(nd)/3600./24.," [day]")
@@ -87,8 +87,8 @@ for n in tqdm(range(n0,nd+1)):
                   r"$\left(s-\langle s\rangle\right)/s_\mathrm{RMS}$",
                   r"$|B|~\mathrm{[G]}$"
                 ]
-        mov_util.mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag)
-    else:
+        mov_util.mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
+    else: # Spherical geometry including Yin-Yang
         d.read_qq_select(xmax,n,silent=True)
         vxrms = np.sqrt((d.qs['vx']**2).mean())
         bxrms = np.sqrt((bx**2).mean())
@@ -122,7 +122,7 @@ for n in tqdm(range(n0,nd+1)):
                   r"$\langle B_\phi\rangle~\mathrm{[G]}$"
                 ]
                 
-        mov_util.mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag)
+        mov_util.mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
     if(n != nd):
