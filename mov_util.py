@@ -16,7 +16,7 @@ def add_color_bar_2x2(fig,axes,ims,ysize):
         cbar = fig.colorbar(im,cax=cax,orientation='horizontal')
         cbar.ax.tick_params(labelsize=12)
 
-def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
+def mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
 
@@ -51,7 +51,8 @@ def mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','infern
     
     for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
         ims.append(ax.pcolormesh(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,vl,cmap=cmap,vmin=vmin,vmax=vmax,shading=shading))
-        ax.contour(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,d.vc['tu_xz'],levels=[1.],colors="w")
+        ax.plot(d.p['z']*lfac,(tu_height-d.p['rstar'])*lfac,color="w")
+        #ax.contour(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,d.vc['tu_xz'],levels=[1.],colors="w")
     
     for ax in [ax1,ax2]:
         ax.tick_params(labelbottom=False)
