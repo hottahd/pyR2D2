@@ -2,7 +2,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 from tqdm import tqdm
 import R2D2
 import sys, os
