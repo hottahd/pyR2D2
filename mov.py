@@ -17,8 +17,8 @@ os.makedirs(pngdir,exist_ok=True)
 
 n0 = R2D2.util.define_n0(d,locals(),nd_type='nd')
 
-print("Maximum time step= ",nd," time ="\
-          ,dtout*float(nd)/3600./24.," [day]")
+print("Maximum time step= ",d.p['nd']," time ="\
+          ,d.p['dtout']*float(d.p['nd'])/3600./24.," [day]")
 
 plt.close('all')
 
@@ -44,7 +44,7 @@ if not d.p['geometry'] == 'Cartesian':
 # read initial time
 t0 = d.read_time(0,silent=True)
 
-for n in tqdm(range(n0,nd+1)):
+for n in tqdm(range(n0,d.p['nd']+1)):
     # read data
     t = d.read_time(n,silent=True) 
     d.read_vc(n,silent=True)
@@ -57,7 +57,9 @@ for n in tqdm(range(n0,nd+1)):
         tight_layout_flag = False
     
     if d.p['geometry'] == 'Cartesian':
-        d.read_qq_tau(n*int(d.p['ifac']),silent=True)        
+        d.read_qq_tau(n*int(d.p['ifac']),silent=True)
+        tu_height = d.qt['he'][d.p['jc'],:]
+        
         inm = d.qt['in'].mean() # mean intensity
         inrms = np.sqrt(((d.qt['in'] - inm)**2).mean()) # RMS intensity
         frms = 2.
@@ -87,11 +89,11 @@ for n in tqdm(range(n0,nd+1)):
                   r"$\left(s-\langle s\rangle\right)/s_\mathrm{RMS}$",
                   r"$|B|~\mathrm{[G]}$"
                 ]
-        mov_util.mov_cartesian_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
+        mov_util.mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.read_qq_select(xmax,n,silent=True)
+        d.read_qq_select(d.p['xmax'],n,silent=True)
         vxrms = np.sqrt((d.qs['vx']**2).mean())
-        bxrms = np.sqrt((bx**2).mean())
+        bxrms = np.sqrt((d.qs['bx']**2).mean())
         
         sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,d.p['y'],indexing='ij')
         serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),d.p['y'],indexing='ij')
@@ -99,7 +101,7 @@ for n in tqdm(range(n0,nd+1)):
         if serms.max() != 0:
             se_value = (d.vc['se_xy']-sem)/serms
         else:
-            se_value = np.zeros((ix,jx))
+            se_value = np.zeros((d.p['ix'],d.p['jx']))
         
         vls = [d.qs['vx']*1.e-2,
                d.qs['bx']*1.e-3,
@@ -125,7 +127,7 @@ for n in tqdm(range(n0,nd+1)):
         mov_util.mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
-    if(n != nd):
+    if(n != d.p['nd']):
         plt.clf()
         
 
