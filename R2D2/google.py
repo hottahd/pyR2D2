@@ -27,7 +27,7 @@ def init_gspread(json_key, project):
     return gc
 ################################################################################
 def fetch_URL_gspread(
-    json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+    json_key=None,
     project=__file__.split('/')[-4],    
     ):
     '''
@@ -41,13 +41,15 @@ def fetch_URL_gspread(
         URL (str): Google spreadsheet URL
     '''
     
+    if json_key == None:
+        json_key = glob.glob(os.environ['HOME']+'/json/*')[0]
     gid = init_gspread(json_key,project).open(project).id
     
     return 'https://docs.google.com/spreadsheets/d/'+gid
 ################################################################################
 
 def set_top_line(
-    json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+    json_key=None,
     project=__file__.split('/')[-4],
     ):
     '''
@@ -60,6 +62,8 @@ def set_top_line(
     Returnes:
         None
     '''
+    if json_key == None:
+        json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
     gc = init_gspread(json_key,project)
     wks = gc.open(project).sheet1
 
@@ -94,7 +98,7 @@ def set_top_line(
         
 ################################################################################
 def set_cells_gspread(self,
-                json_key=glob.glob(os.environ['HOME']+'/json/*')[0],
+                json_key=None,
                 project=__file__.split('/')[-4],
                 caseid=None):
     '''
@@ -111,6 +115,9 @@ def set_cells_gspread(self,
     import datetime
     import numpy as np
     import R2D2
+
+    if json_key == None:
+        json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
 
     if caseid is None:
         caseid = self.p['datadir'].split('/')[-3]
