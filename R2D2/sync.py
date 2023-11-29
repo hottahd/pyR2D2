@@ -97,13 +97,14 @@ def sync_select(self,xs,server,project=os.getcwd().split('/')[-2]):
         par_dir = str(int(ns)//1000).zfill(5)+'/'
         chi_dir = str(int(ns)).zfill(8)+'/'
         
+        os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)        
         os.system('rsync -avP ' \
             +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.*.'+ns \
                 +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
         
 def sync_vc(self,server,project=os.getcwd().split('/')[-2]):
     '''
-    This method downloads pre analysed data
+    This method downloads pre analyzed data
 
     Parameters:
         server (str): name of remote server
@@ -141,9 +142,14 @@ def sync_check(self,n,server,project=os.getcwd().split('/')[-2],end_step=False):
             step = 'o'
     
     caseid = self.p['datadir'].split('/')[-3]
-    os.system('rsync -avP ' \
-              +server+':work/'+project+'/run/'+caseid+'/data/qq/qq.dac.'+step+' ' \
-              +self.p['datadir']+'qq/' )
+    for ns in range(self.p['npe']):
+        par_dir = str(int(ns)//1000).zfill(5)+'/'
+        chi_dir = str(int(ns)).zfill(8)+'/'
+
+        os.makedirs(self.p['datadir']+'qq/'+par_dir+chi_dir,exist_ok=True)
+        os.system('rsync -avP ' \
+              +server+':work/'+project+'/run/'+caseid+'/data/qq/'+par_dir+chi_dir+'qq.dac.'+step+'.'+str(int(ns)).zfill(8)+' ' \
+              +self.p['datadir']+'qq/'+par_dir+chi_dir )
 
 def sync_slice(self,n,server,project=os.getcwd().split('/')[-2]):
     '''
