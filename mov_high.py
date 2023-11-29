@@ -4,7 +4,6 @@ import R2D2
 import sys, os
 import matplotlib.pyplot as plt
 import mov_util
-import cartopy.crs as ccrs
 
 
 caseid = R2D2.util.caseid_select(locals())
@@ -95,37 +94,29 @@ for n in tqdm(range(n0,d.p['nd_tau']+1)):
     else: # Spherical geometry including Yin-Yang
         d.read_qq_slice(np.argmin(abs(d.p['x_slice'] - d.p['xmax'])),'x',n,silent=True) # xmaxに一番近いところ
         vxrms = np.sqrt((d.ql_yin['vx']**2).mean())
-        bxrms = np.sqrt((d.ql_yin['bx']**2).mean())
-        
-        #qq_yan = d.ql_yan['vx'][margin:jxg_yy-margin,margin:kxg_yy-margin]
-        #qq_yin = d.ql_yin['vx'][margin:jxg_yy-margin,margin:kxg_yy-margin]
-        
-        vmax = vxrms
-        vmin = -vmax
-        var = 'vx'
-        shading = 'gouraud'
-        fig = plt.figure(1)
-        ax = fig.add_subplot(111,projection=ccrs.Orthographic(central_longitude=0,central_latitude=np.pi))
-        #ax = fig.add_subplot(111,projection='mollweide')
-        
-        #ax.pcolormesh((zo_yy[jx_yy//2:jx_yy,:])*rad2deg,(yo_yy[jx_yy//2:jx_yy,:]-0.5*pi)*rad2deg,qq_yan[jx_yy//2:jx_yy,:],transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading,cmap='gray')
-        #ax.pcolormesh(zo_yy[0:jx_yy//2,:]*rad2deg,(yo_yy[0:jx_yy//2,:]-0.5*pi)*rad2deg,qq_yan[0:jx_yy//2,:],transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading)
-        #ax.pcolormesh((zz_yy)*rad2deg,(yy_yy-0.5*pi)*rad2deg,qq_yin,transform=ccrs.PlateCarree(),vmin=vmin,vmax=vmax,shading=shading)
-
-        #ax.pcolormesh(zog_yy,yog_yy-0.5*pi,d.ql_yan[var]
-        #          ,vmin=vmin,vmax=vmax,shading=shading,transform=ccrs.PlateCarree())
+        bxrms = max(np.sqrt((d.ql_yin['bx']**2).mean()),1e-2)
     
-        #ax.pcolormesh(zog_yy[0:jxg_yy//2,:],yog_yy[0:jxg_yy//2,:]-0.5*np.pi,d.ql_yan[var][0:jxg_yy//2,:]
-        #            ,vmin=vmin,vmax=vmax,shading=shading)
-         
-        rad2deg = 180/np.pi
-       
-        ax.pcolormesh(zz_yy*rad2deg,(yy_yy-0.5*np.pi)*rad2deg,d.ql_yin[var][margin:jxg_yy-margin,margin:kxg_yy-margin],vmin=vmin,vmax=vmax,shading=shading,transform=ccrs.PlateCarree())
+        vfac = 1.e-2
+        bfac = 1.e-3
+    
+        vls = [
+            {'Yin': d.ql_yin['vx']*vfac, 'Yan': d.ql_yan['vx']*vfac},
+            {'Yin': d.ql_yin['bx']*bfac, 'Yan': d.ql_yan['bx']*bfac},
+        ]
         
-        ax.set_xticklabels('')
-        ax.set_yticklabels('')
-                
-                        
+        vmaxs = [
+            2*vxrms*vfac,
+            2*bxrms*bfac,
+        ]
+        
+        vmins = [
+            -vmaxs[0],
+            -vmaxs[1]
+        ]
+        
+        titles = [r'Radial velocity $v_r~\mathrm{[m~s^{-1}]}$', r'Radial magnetic field $B_r~\mathrm{[kG]}$']
+        mov_util.mov_yinyang_2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
+        
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
     if(n != d.p['nd_tau']):

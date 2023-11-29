@@ -16,13 +16,13 @@ def add_color_bar_2x2(fig,axes,ims,ysize):
         cbar = fig.colorbar(im,cax=cax,orientation='horizontal')
         cbar.ax.tick_params(labelsize=12)
 
-def mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
+def mov_cartesian_photo_2x2(R2D2_data,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
 
-    zran = d.p['zmax'] - d.p['zmin']
-    yran = d.p['ymax'] - d.p['ymin']
-    xran = min(d.p['xmax']-d.p['xmin'],zran)
+    zran = R2D2_data.p['zmax'] - R2D2_data.p['zmin']
+    yran = R2D2_data.p['ymax'] - R2D2_data.p['ymin']
+    xran = min(R2D2_data.p['xmax']-R2D2_data.p['xmin'],zran)
 
     xsize = 18
     ysize = xsize*(yran + xran)/2/zran
@@ -47,11 +47,11 @@ def mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno
     axes = [ax1,ax2,ax3,ax4]
     # pcolormesh
     for ax, vl, cmap, vmax, vmin in zip(axes[:2],vls[:2],cmaps[:2],vmaxs[:2],vmins[:2]):
-        ims.append(ax.pcolormesh(d.p['z']*lfac,d.p['y']*lfac,vl,cmap=cmap,vmax=vmax,vmin=vmin,shading=shading))
+        ims.append(ax.pcolormesh(R2D2_data.p['z']*lfac,R2D2_data.p['y']*lfac,vl,cmap=cmap,vmax=vmax,vmin=vmin,shading=shading))
     
     for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
-        ims.append(ax.pcolormesh(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,vl,cmap=cmap,vmin=vmin,vmax=vmax,shading=shading))
-        ax.plot(d.p['z']*lfac,(tu_height-d.p['rstar'])*lfac,color="w")
+        ims.append(ax.pcolormesh(R2D2_data.p['z']*lfac,(R2D2_data.p['x']-R2D2_data.p['rstar'])*lfac,vl,cmap=cmap,vmin=vmin,vmax=vmax,shading=shading))
+        ax.plot(R2D2_data.p['z']*lfac,(tu_height-R2D2_data.p['rstar'])*lfac,color="w")
         #ax.contour(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,d.vc['tu_xz'],levels=[1.],colors="w")
     
     for ax in [ax1,ax2]:
@@ -64,7 +64,8 @@ def mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno
     ax3.set_ylabel('$x$ [Mm]')
     
     for ax in [ax3,ax4]:
-        ax.set_ylim((max(d.p['xmax']-yran,d.p['xmin'])-d.p['rstar'])*lfac,(d.p['xmax']-d.p['rstar'])*lfac)
+        ax.set_ylim((max(R2D2_data.p['xmax']-yran,R2D2_data.p['xmin'])-R2D2_data.p['rstar'])*lfac,
+                    (R2D2_data.p['xmax']-R2D2_data.p['rstar'])*lfac)
     
     for ax, title in zip([ax1,ax2,ax3,ax4],titles):
         title = ax.set_title(title)
@@ -81,7 +82,7 @@ def mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['inferno
     # add color bar
     add_color_bar_2x2(fig,axes,ims,ysize)
 
-def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
+def mov_spherical_2x2(R2D2_data,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inferno','gray'],tight_layout_flag=True):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
         
@@ -98,7 +99,7 @@ def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','infern
     ims = []
     axes = [ax1,ax2,ax3,ax4]
     
-    lfac = 1/d.p['rstar']
+    lfac = 1/R2D2_data.p['rstar']
     
     for ax, title in zip(axes,titles):
         title = ax.set_title(title)
@@ -107,12 +108,13 @@ def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','infern
         
                 
     for ax, vl, cmap, vmax, vmin in zip(axes[:2],vls[:2],cmaps[:2],vmaxs[:2],vmins[:2]):
-        ims.append(ax.pcolormesh(d.p['zz'],d.p['yy'],vl,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
+        ims.append(ax.pcolormesh(R2D2_data.p['zz'],R2D2_data.p['yy'],vl,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
         ax.set_xticklabels('')
         ax.set_yticklabels('')
     
     for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
-        ims.append(ax.pcolormesh(d.p['XX'].T*lfac,d.p['YY'].T*lfac,vl.T,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
+        ims.append(ax.pcolormesh(R2D2_data.p['XX'].T*lfac,R2D2_data.p['YY'].T*lfac,vl.T
+                                 ,shading=shading,cmap=cmap,vmax=vmax,vmin=vmin))
         ax.set_xlabel(r'$z/R_*$')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -128,3 +130,56 @@ def mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','infern
     
     # add color bar
     add_color_bar_2x2(fig,axes,ims,ysize)
+    
+def mov_yinyang_2(R2D2_data,t,vls,vmaxs,vmins,titles,
+                  cmaps=['inferno','gray'],
+                  central_longitude=0,
+                  central_latitude=30,
+                  tight_layout_flag=True):
+    import matplotlib.pyplot as plt
+    import cartopy.crs as ccrs
+    import numpy as np
+
+    R2D2_data.YinYangSet()
+    
+    xsize = 16
+    ysize = 9
+    fig = plt.figure(num=1,figsize=(xsize,ysize))
+            
+    ax1 = fig.add_subplot(121,
+                          projection=ccrs.Orthographic(central_longitude=central_longitude,central_latitude=central_latitude))
+    ax2 = fig.add_subplot(122,
+                          projection=ccrs.Orthographic(central_longitude=central_longitude,central_latitude=central_latitude))
+    
+    rad2deg = 180/np.pi
+    axes = [ax1,ax2]
+    ims = []
+    for vl, ax, cmap, vmax, vmin, title in zip(vls, axes, cmaps, vmaxs, vmins, titles):
+        for z, y, YinYang in zip(['Zog_yy', 'Zg_yy'],['Yog_yy', 'Yg_yy'],['Yan', 'Yin']):
+            ax.pcolormesh(R2D2_data.p[z]*rad2deg,(R2D2_data.p[y]-0.5*np.pi)*rad2deg,vl[YinYang],transform=ccrs.PlateCarree(), cmap=cmap, vmax=vmax, vmin=vmin)
+        ims.append(ax.collections[0])
+        ax.set_title(title)
+        ax.set_xticklabels('')
+        ax.set_yticklabels('')
+
+    if tight_layout_flag:
+        fig.tight_layout()
+        
+    # add color bar
+    
+    color_bar_width = 0.12
+    color_bar_height = 0.08/ysize
+    
+    for ax, im in zip(axes,ims):
+        box = ax.get_position().bounds
+        cax = fig.add_axes([box[0]+ box[2] - color_bar_width
+                        ,box[1] + color_bar_height
+                        ,color_bar_width
+                        ,color_bar_height
+                        ])
+        cbar = fig.colorbar(im,cax=cax,orientation='horizontal')
+        cbar.ax.tick_params(labelsize=12)
+        
+    ax1.annotate(text="$t="+"{:.2f}".format((t)/60/60/24)+"~\mathrm{[day]}$"\
+            ,xy=[0.01,0.02],xycoords="figure fraction"\
+            ,color='black',fontsize=25)
