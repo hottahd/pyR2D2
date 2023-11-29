@@ -146,6 +146,8 @@ def init(self, datadir, verbose=False, self_old=None):
     self.p["xr"] = self.p["x"]/self.p["rstar"]
 
     if self.p["geometry"] == 'YinYang':
+        
+        # original geometry in Yin-Yang grid
         self.p['jx_yy'] = self.p['jx']
         self.p['kx_yy'] = self.p['kx']
 
@@ -158,39 +160,7 @@ def init(self, datadir, verbose=False, self_old=None):
         self.p['yg_yy'] = self.p['yg']
         self.p['zg_yy'] = self.p['zg']
         
-        zz_yy, yy_yy = np.meshgrid(self.p['z_yy'],self.p['y_yy'])
-        zzg_yy, yyg_yy = np.meshgrid(self.p['zg_yy'],self.p['yg_yy'])
-
-        self.p['yy_yy'] = yy_yy
-        self.p['zz_yy'] = zz_yy
-
-        self.p['yyg_yy'] = yyg_yy
-        self.p['zzg_yy'] = zzg_yy
-        
-        self.p['yo_yy'] = np.arccos(np.sin(self.p['yy_yy'])*np.sin(self.p['zz_yy']))
-        self.p['zo_yy'] = np.arcsin(np.cos(self.p['yy_yy'])/np.sin(self.p['yo_yy']))
-        
-        self.p['yog_yy'] = np.arccos(np.sin(self.p['yyg_yy'])*np.sin(self.p['zzg_yy']))
-        self.p['zog_yy'] = np.arcsin(np.cos(self.p['yyg_yy'])/np.sin(self.p['yog_yy']))
-        
-        sct =  np.sin(self.p['yy_yy'])*np.cos(self.p['zz_yy'])
-        sco = -np.sin(self.p['yo_yy'])*np.cos(self.p['zo_yy'])
-
-        sctg =  np.sin(self.p['yyg_yy'])*np.cos(self.p['zzg_yy'])
-        scog = -np.sin(self.p['yog_yy'])*np.cos(self.p['zog_yy'])
-        
-        tmp = sct*sco < 0
-        self.p['zo_yy'][tmp] = np.sign(self.p['zo_yy'][tmp])*np.pi - self.p['zo_yy'][tmp]
-
-        self.p['coss_yy'] = -np.sin(self.p['zo_yy'])*np.sin(self.p['zz_yy'])
-        self.p['sins_yy'] =  np.cos(self.p['zo_yy'])/np.sin(self.p['yy_yy'])
-
-        tmp = sctg*scog < 0
-        self.p['zog_yy'][tmp] = np.sign(self.p['zog_yy'][tmp])*np.pi - self.p['zog_yy'][tmp]
-
-        self.p['cossg_yy'] = -np.sin(self.p['zog_yy'])*np.sin(self.p['zzg_yy'])
-        self.p['sinsg_yy'] =  np.cos(self.p['zog_yy'])/np.sin(self.p['yyg_yy'])
-        
+        # converted spherical geometry
         self.p['jx'] = self.p['jx']*2
         self.p['kx'] = self.p['jx']*2
 
@@ -1014,4 +984,34 @@ def read_qq_2d(self,n,silent=False):
     if not silent :
         print('### variales are stored in self.q2 ###')
 
-        
+def YinYangSet(self):
+    import numpy as np
+    if self.p['geometry'] == 'YinYang':
+        if not 'Z_yy' in self.p:
+            print('Yes')
+            self.p['Z_yy'] , self.p['Y_yy']  = np.meshgrid(self.p['z_yy'],self.p['y_yy'])
+            self.p['Zg_yy'], self.p['Yg_yy'] = np.meshgrid(self.p['zg_yy'],self.p['yg_yy'])
+
+            # Geometry in Yang grid        
+            self.p['Yo_yy'] = np.arccos(np.sin(self.p['Y_yy'])*np.sin(self.p['Z_yy']))
+            self.p['Zo_yy'] = np.arcsin(np.cos(self.p['Y_yy'])/np.sin(self.p['Yo_yy']))
+            
+            self.p['Yog_yy'] = np.arccos(np.sin(self.p['Yg_yy'])*np.sin(self.p['Zg_yy']))
+            self.p['Zog_yy'] = np.arcsin(np.cos(self.p['Yg_yy'])/np.sin(self.p['Yog_yy']))
+            
+            sct =  np.sin(self.p['Y_yy'])*np.cos(self.p['Z_yy'])
+            sco = -np.sin(self.p['Yo_yy'])*np.cos(self.p['Zo_yy'])
+
+            sctg =  np.sin(self.p['Yg_yy'])*np.cos(self.p['Zg_yy'])
+            scog = -np.sin(self.p['Yog_yy'])*np.cos(self.p['Zog_yy'])
+            
+            tmp = sct*sco < 0
+            self.p['Zo_yy'][tmp] = np.sign(self.p['Zo_yy'][tmp])*np.pi - self.p['Zo_yy'][tmp]
+
+            tmp = sctg*scog < 0
+            self.p['Zog_yy'][tmp] = np.sign(self.p['Zog_yy'][tmp])*np.pi - self.p['Zog_yy'][tmp]
+
+            # self.p['coss_yy'] = -np.sin(self.p['zo_yy'])*np.sin(self.p['zz_yy'])
+            # self.p['sins_yy'] =  np.cos(self.p['zo_yy'])/np.sin(self.p['yy_yy'])
+            # self.p['cossg_yy'] = -np.sin(self.p['zog_yy'])*np.sin(self.p['zzg_yy'])
+            # self.p['sinsg_yy'] =  np.cos(self.p['zog_yy'])/np.sin(self.p['yyg_yy'])
