@@ -188,7 +188,3 @@ def sync_all(self,server,project=os.getcwd().split('/')[-2],dist='../run/'):
     os.system('rsync -avP ' \
               +server+':work/'+project+'/run/'+caseid+' ' \
               +dist)
-
-
-    
-    
