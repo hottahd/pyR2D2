@@ -60,8 +60,8 @@ for n in tqdm(range(n0,d.p['nd_tau']+1)):
     
     if d.p['geometry'] == 'Cartesian':
         d.read_qq_tau(n,silent=True)
-        d.read_qq_slice(1,'y',n,silent=True)
-        tu_height = d.qt['he'][np.argmax(d.p['y'] > d.p['y_slice'][1]),:]
+        d.read_qq_slice(np.argmin(abs(d.p['y_slice'] - 0.5*ymax)),'y',n,silent=True)
+        tu_height = d.qt['he'][np.argmax(d.p['y'] > d.p['y_slice'][np.argmin(abs(d.p['y_slice'] - 0.5*ymax))]),:]
                 
         inm = d.qt['in'].mean() # mean intensity
         inrms = np.sqrt(((d.qt['in'] - inm)**2).mean()) # RMS intensity
