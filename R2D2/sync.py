@@ -23,7 +23,8 @@ def set(server,caseid,project=os.getcwd().split('/')[-2],dist='../run/'):
               +' --exclude="data/remap/vl/vl*" ' \
               +' --exclude="data/slice/qq*" ' \
               +' --exclude="data/tau/qq*" ' \
-              +' --exclude="data/time/tau" ' \
+              +' --exclude="data/time/tau/*" ' \
+              +' --exclude="output.*" ' \
               +server+':work/'+project+'/run/'+caseid+' '+dist)
     
 def sync_tau(self,server,project=os.getcwd().split('/')[-2]):
@@ -46,6 +47,31 @@ def sync_tau(self,server,project=os.getcwd().split('/')[-2]):
               +' --exclude="time/mhd" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/ '+self.p['datadir'] )
     
+def sync_remap_qq(self,n,server,project=os.getcwd().split('/')[-2]):
+    '''
+    This method downloads full 3D remap data
+
+    Parameters:
+        n (int): time step
+        server (str): name of remote server
+        project (str): name of project such as 'R2D2'
+    '''
+    import os
+    import numpy as np
+    
+    caseid = self.p['datadir'].split('/')[-3]
+    
+    # remapを行ったMPIランクの洗い出し
+    nps = np.char.zfill(self.p['np_ijr'].flatten().astype(str),8)
+    for ns in nps:
+        par_dir = str(int(ns)//1000).zfill(5)+'/'
+        chi_dir = str(int(ns)).zfill(8)+'/'
+        
+        os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)
+        os.system('rsync -avP ' \
+            +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.'+str(n).zfill(8)+'.'+ns \
+                +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
+    
 def sync_select(self,xs,server,project=os.getcwd().split('/')[-2]):
     '''
     This method downloads data at certain height
@@ -62,19 +88,19 @@ def sync_select(self,xs,server,project=os.getcwd().split('/')[-2]):
     i0 = np.argmin(np.abs(self.p["x"]-xs))
     ir0 = self.p["i2ir"][i0]
     
-    nps = np.char.zfill(self.p['np_ijr'][ir0-1,:].astype(np.str),8)
+    nps = np.char.zfill(self.p['np_ijr'][ir0-1,:].astype(str),8)
 
     files = ''
     caseid = self.p['datadir'].split('/')[-3]
 
     for ns in nps:
-        files = files + server+':work/'+project+'/run/'+caseid \
-                +'/data/remap/qq/qq.dac.' + '"*".' + ns + " "
-    
-    os.system('rsync -avP ' \
-          +files \
-          +' '+self.p['datadir']+'remap/qq/' )
-
+        par_dir = str(int(ns)//1000).zfill(5)+'/'
+        chi_dir = str(int(ns)).zfill(8)+'/'
+        
+        os.system('rsync -avP ' \
+            +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.*.'+ns \
+                +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
+        
 def sync_vc(self,server,project=os.getcwd().split('/')[-2]):
     '''
     This method downloads pre analysed data

@@ -36,6 +36,7 @@ R2D2_data.upgrade_resolution = resolution.upgrade_resolution
 
 R2D2_data.models_init       = models.init
 
+R2D2_data.sync_remap_qq = sync.sync_remap_qq
 R2D2_data.sync_tau = sync.sync_tau
 R2D2_data.sync_select = sync.sync_select
 R2D2_data.sync_vc = sync.sync_vc
