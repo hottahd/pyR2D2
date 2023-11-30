@@ -329,50 +329,17 @@ def read_qq_select(self,xs,n,silent=False):
         self.qs["op"] = np.zeros((jx,kx))
     for jr0 in range(1,self.p["jxr"]+1):
         np0 = self.p["np_ijr"][ir0-1,jr0-1]
-        dtyp=np.dtype([ \
-                ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-        ])        
-        cnou = '{0:05d}'.format(np0//1000)
-        cno  = '{0:08d}'.format(np0)
-        f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
-        qqq = np.fromfile(f,dtype=dtyp,count=1)
-        if(order_3D == 1):
-            index = [mtype, iixl[np0], jjxl[np0], kx]
-            self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[0,i0-iss[np0],:,:] 
-            self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[1,i0-iss[np0],:,:] 
-            self.qs["vy"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[2,i0-iss[np0],:,:] 
-            self.qs["vz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[3,i0-iss[np0],:,:] 
-            self.qs["bx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[4,i0-iss[np0],:,:] 
-            self.qs["by"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[5,i0-iss[np0],:,:] 
-            self.qs["bz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[6,i0-iss[np0],:,:] 
-            self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[7,i0-iss[np0],:,:] 
-            self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[8,i0-iss[np0],:,:] 
-        if(order_3D == 2):            
-            index = [iixl[np0], mtype, jjxl[np0], kx]
-            self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],0,:,:] 
-            self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],1,:,:] 
-            self.qs["vy"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],2,:,:] 
-            self.qs["vz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],3,:,:] 
-            self.qs["bx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],4,:,:] 
-            self.qs["by"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],5,:,:] 
-            self.qs["bz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],6,:,:] 
-            self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],7,:,:] 
-            self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],8,:,:] 
-        if(order_3D == 3):
-            index = [iixl[np0], jjxl[np0], mtype, kx]
-            self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,0,:] 
-            self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,1,:] 
-            self.qs["vy"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,2,:] 
-            self.qs["vz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,3,:] 
-            self.qs["bx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,4,:] 
-            self.qs["by"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,5,:] 
-            self.qs["bz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,6,:] 
-            self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,7,:] 
-            self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,8,:] 
-        if(order_3D == 4):
+        if jr0 == self.p['jr'][np0]:
+            dtype=np.dtype([ \
+                    ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+            ])        
+            cnou = '{0:05d}'.format(np0//1000)
+            cno  = '{0:08d}'.format(np0)
+            f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
+            qqq = np.fromfile(f,dtype=dtype,count=1)
             index = [iixl[np0], jjxl[np0], kx, mtype]
             self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,0] 
             self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,1] 
@@ -384,14 +351,14 @@ def read_qq_select(self,xs,n,silent=False):
             self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,7] 
             self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,8]
 
-            
-        self.qs["pr"][jss[np0]:jee[np0]+1,:] = qqq["pr"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
-        self.qs["te"][jss[np0]:jee[np0]+1,:] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
-        self.qs["op"][jss[np0]:jee[np0]+1,:] = qqq["op"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
-        info = {}
-        info['xs'] = self.p['x'][i0]
-        self.qs['info'] = info
-        f.close()
+                
+            self.qs["pr"][jss[np0]:jee[np0]+1,:] = qqq["pr"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
+            self.qs["te"][jss[np0]:jee[np0]+1,:] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
+            self.qs["op"][jss[np0]:jee[np0]+1,:] = qqq["op"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
+            info = {}
+            info['xs'] = self.p['x'][i0]
+            self.qs['info'] = info
+            f.close()
         
     if not silent :
         print('### variales are stored in self.qs ###')
@@ -521,12 +488,12 @@ def read_qq(self,n,value,silent=False):
     if type(value) == list:
         values_input = value
 
-#    if value not in values:
-#        print('######')
-#        print('value =',value)
-#        print('value should be one of ',values)
-#        print('return')
-#        return
+    if value not in values:
+        print('######')
+        print('value =',value)
+        print('value should be one of ',values)
+        print('return')
+        return
     
     ### Only when memory is not allocated 
     ### and the size of array is different
@@ -542,27 +509,28 @@ def read_qq(self,n,value,silent=False):
     for ir0 in range(1,self.p["ixr"]+1):
         for jr0 in range(1,self.p["jxr"]+1):
             np0 = self.p["np_ijr"][ir0-1,jr0-1]
-            dtyp=np.dtype([ \
-                ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-                ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
-            ])
+            if ir0 == self.p['ir'][np0] and jr0 == self.p['jr'][np0]:
+                dtype=np.dtype([ \
+                    ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                ])
 
-            cnou = '{0:05d}'.format(np0//1000)
-            cno  = '{0:08d}'.format(np0)
-            f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')            
-            #f = open(self.p['datadir']+"remap/qq/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
-            qqq = np.fromfile(f,dtype=dtyp,count=1)
+                cnou = '{0:05d}'.format(np0//1000)
+                cno  = '{0:08d}'.format(np0)
+                f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')            
+                #f = open(self.p['datadir']+"remap/qq/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
+                qqq = np.fromfile(f,dtype=dtype,count=1)
 
-            for value in values_input:
-                if value in values[:-3]:
-                    m = values.index(value)
-                    self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,m]
-                else:
-                    qqq = qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")
-                    self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq
-            f.close()
+                for value in values_input:
+                    if value in values[:-3]:
+                        m = values.index(value)
+                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,m]
+                    else:
+                        qqq = qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")
+                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq
+                f.close()
 
     if not silent :
         print('### variales are stored in self.qq ###')
