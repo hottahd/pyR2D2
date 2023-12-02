@@ -24,7 +24,7 @@ def set(server,caseid,project=os.getcwd().split('/')[-2],dist='../run/'):
               +' --exclude="data/slice/qq*" ' \
               +' --exclude="data/tau/qq*" ' \
               +' --exclude="output.*" ' \
-              +server+':work/'+project+'/run/'+caseid+' '+dist)
+              +server+':work/'+project+'/run/'+caseid+'/'+' '+dist+caseid+'/')
     
 def sync_tau(self,server,project=os.getcwd().split('/')[-2]):
     '''
