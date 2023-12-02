@@ -5,11 +5,14 @@ def init(self, datadir, verbose=False, self_old=None):
 
     Parameters:
         datadir (str): location of data
+        verbose (bool): True shows the information of data
+        self_old (R2D2_data): if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
     '''
     import R2D2
     import numpy as np
     import os,sys
     
+    # check if the data is already read
     initialize_flag = True
     if self_old is not None:
         if self_old.p['datadir'] == datadir:
@@ -35,14 +38,15 @@ def init(self, datadir, verbose=False, self_old=None):
             
     self.p['datadir'] = datadir 
 
-    # read basic parameters
+    # read basic parameters from param directory
     f = open(self.p['datadir']+"param/nd.dac","r")
     nn = f.read().split()
-    nd = int(nn[0])
-    nd_tau = int(nn[1])
+    nd = int(nn[0]) # current maximum time step
+    nd_tau = int(nn[1]) # current maximum time step for tau
     f.close()
     
     self.p['nd'] = nd
+    # data/time/tau のファイルの数を数え、nd_tauと比較して大きい方をnd_tauとする
     nd_tau = max(len(os.listdir(datadir+'time/tau')) - 1,nd_tau)
     self.p['nd_tau'] = nd_tau
 
@@ -62,11 +66,11 @@ def init(self, datadir, verbose=False, self_old=None):
         
     line = f.readline()
     while line:
-        if line.split()[2] == 'i':
+        if line.split()[2] == 'i': # integer
             self.p[line.split()[1]] = int(line.split()[0])
-        if line.split()[2] == 'd':
+        if line.split()[2] == 'd': # double
             self.p[line.split()[1]] = float(line.split()[0])
-        if line.split()[2] == 'c':
+        if line.split()[2] == 'c': # character
             self.p[line.split()[1]] = line.split()[0]
         if line.split()[2] == 'l':
             if line.split()[0] == 'F':
@@ -92,6 +96,7 @@ def init(self, datadir, verbose=False, self_old=None):
     jxg = self.p["jx"] + 2*self.p["margin"]*(self.p["ydcheck"]-1)
     kxg = self.p["kx"] + 2*self.p["margin"]*(self.p["zdcheck"]-1)
         
+    # read background variables
     endian = self.p["endian"]
     dtyp=np.dtype([ \
                     ("head",endian+"i",),\
@@ -204,7 +209,7 @@ def init(self, datadir, verbose=False, self_old=None):
         f.close()
 
         ##############################
-        # read mpi information
+        # read mpi information for remap
         npe = self.p["npe"]
         dtyp=np.dtype([ \
                     ("iss",endian+str(npe)+"i4"),\
@@ -342,17 +347,16 @@ def read_qq_select(self,xs,n,silent=False):
             f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
             qqq = np.fromfile(f,dtype=dtype,count=1)
             index = [iixl[np0], jjxl[np0], kx, mtype]
-            self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,0] 
-            self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,1] 
-            self.qs["vy"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,2] 
-            self.qs["vz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,3] 
-            self.qs["bx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,4] 
-            self.qs["by"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,5] 
-            self.qs["bz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,6] 
-            self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,7] 
-            self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[i0-iss[np0],:,:,8]
-
-                
+            self.qs["ro"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,0] 
+            self.qs["vx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,1] 
+            self.qs["vy"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,2] 
+            self.qs["vz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,3] 
+            self.qs["bx"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,4] 
+            self.qs["by"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,5] 
+            self.qs["bz"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,6] 
+            self.qs["se"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,7] 
+            self.qs["ph"][jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[i0-iss[np0],:,:,8]
+   
             self.qs["pr"][jss[np0]:jee[np0]+1,:] = qqq["pr"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
             self.qs["te"][jss[np0]:jee[np0]+1,:] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
             self.qs["op"][jss[np0]:jee[np0]+1,:] = qqq["op"].reshape((iixl[np0],jjxl[np0],kx),order="F")[i0-iss[np0],:,:]
@@ -362,7 +366,7 @@ def read_qq_select(self,xs,n,silent=False):
             f.close()        
 
     if not silent :
-        print('### variales are stored in self.qs ###')
+        print('### variables are stored in self.qs ###')
 
 ##############################
 def read_qq_select_z(self,zs,n,silent=False):
@@ -372,7 +376,7 @@ def read_qq_select_z(self,zs,n,silent=False):
 
     Parameters:
         zs (float): a selected z for data
-        n (int): a setected time step for data
+        n (int): a selected time step for data
         silent (bool): True suppresses a message of store
         
     '''
@@ -426,15 +430,15 @@ def read_qq_select_z(self,zs,n,silent=False):
             qqq = np.fromfile(f,dtype=dtyp,count=1)
             if(order_3D == 4):
                 index = [iixl[np0], jjxl[np0], kx, mtype]
-                self.qz["ro"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,0] 
-                self.qz["vx"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,1] 
-                self.qz["vy"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,2]
-                self.qz["vz"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,3]
-                self.qz["bx"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,4]
-                self.qz["by"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,5]
-                self.qz["bz"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,6]
-                self.qz["se"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,7]
-                self.qz["ph"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((index[0],index[1],index[2],index[3]),order="F")[:,:,k0,8]
+                self.qz["ro"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,0] 
+                self.qz["vx"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,1] 
+                self.qz["vy"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,2]
+                self.qz["vz"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,3]
+                self.qz["bx"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,4]
+                self.qz["by"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,5]
+                self.qz["bz"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,6]
+                self.qz["se"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,7]
+                self.qz["ph"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["qq"].reshape((iixl[np0], jjxl[np0], kx, mtype), order="F")[:,:,k0,8]
             
                 self.qz["pr"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["pr"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,k0]
                 self.qz["te"][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,k0]
@@ -447,7 +451,7 @@ def read_qq_select_z(self,zs,n,silent=False):
         self.qz['info'] = info
         
     if not silent :
-        print('### variales are stored in self.qz ###')
+        print('### variables are stored in self.qz ###')
         
 ##############################
 def read_qq(self,n,value,silent=False):
@@ -534,7 +538,7 @@ def read_qq(self,n,value,silent=False):
                 f.close()
 
     if not silent :
-        print('### variales are stored in self.qq ###')
+        print('### variables are stored in self.qq ###')
 ##############################
 def read_qq_all(self,n,silent=False):
     '''
@@ -557,7 +561,7 @@ def read_qq_tau(self,n,silent=False):
     In this version the selected optical depth is 1, 0.1, and 0.01
 
     Parameters:
-        n (int): a setected time step for data
+        n (int): a selected time step for data
         silent (bool): True suppresses a message of store
     '''
     import numpy as np
@@ -628,9 +632,9 @@ def read_qq_tau(self,n,silent=False):
 
     if not silent :
         if self.p['geometry'] == 'YinYang':
-            print('### variales are stored in self.qt_yin and self.qt_yan ###')
+            print('### variables are stored in self.qt_yin and self.qt_yan ###')
         else:
-            print('### variales are stored in self.qt ###')
+            print('### variables are stored in self.qt ###')
                 
 ##############################
 def read_time(self,n,tau=False,silent=True):
@@ -711,7 +715,7 @@ def read_vc(self,n,silent=False):
             self.vc[self.p["cl"][m+self.p["m2d_xy"]+self.p['m2d_xz']+self.p['m2d_flux']]] = vl[:,:,m]
             
     if not silent :
-        print('### variales are stored in self.vc ###')
+        print('### variables are stored in self.vc ###')
 
 ##############################
 def read_qq_check(self,n,silent=False,end_step=False):
@@ -720,7 +724,7 @@ def read_qq_check(self,n,silent=False,end_step=False):
     The data is stored in self.qc dictionary
 
     Parameters:
-        n (int): a setected time step for data
+        n (int): a selected time step for data
         silent (bool): True suppresses a message of store
         end_step (bool): If true, checkpoint of end step is read.
     '''
@@ -759,7 +763,7 @@ def read_qq_check(self,n,silent=False,end_step=False):
     f.close()
     
     if not silent :
-        print('### variales are stored in self.qc ###')
+        print('### variables are stored in self.qc ###')
 
 ##############################
 def read_qq_slice(self,n_slice,direc,n,silent=False):
@@ -823,9 +827,9 @@ def read_qq_slice(self,n_slice,direc,n,silent=False):
         
     if not silent :
         if self.p['geometry'] == 'YinYang':
-            print('### variales are stored in self.ql_yin and self.ql_yan ###')
+            print('### variables are stored in self.ql_yin and self.ql_yan ###')
         else:
-            print('### variales are stored in self.ql ###')
+            print('### variables are stored in self.ql ###')
     
 ##############################
 def read_qq_2d(self,n,silent=False):
@@ -885,9 +889,19 @@ def read_qq_2d(self,n,silent=False):
     f.close()
 
     if not silent :
-        print('### variales are stored in self.q2 ###')
+        print('### variables are stored in self.q2 ###')
 
 def YinYangSet(self):
+    '''
+    YinYangSet function sets up the YinYang geometry for
+    YinYang direct plot. 
+
+    Parameters:
+        self (object): R2D2 class instance
+
+    Returns:
+        None
+    '''
     import numpy as np
     if self.p['geometry'] == 'YinYang':
         if not 'Z_yy' in self.p:
