@@ -24,7 +24,7 @@ print("Maximum time step= ",d.p['nd_tau']," time ="\
 plt.close('all')
 
 if d.p['geometry'] == 'Cartesian':
-    TE0, tmp = np.meshgrid(d.p['te0'],d.p['y'],indexing='ij')
+    TE0, tmp = np.meshgrid(d.p['te0'],d.p['z'],indexing='ij')
 else:
     d.p['zz'],d.p['yy'] = np.meshgrid(d.p['z'],d.p['y']-0.5*np.pi)
     
