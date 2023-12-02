@@ -23,7 +23,6 @@ def set(server,caseid,project=os.getcwd().split('/')[-2],dist='../run/'):
               +' --exclude="data/remap/vl/vl*" ' \
               +' --exclude="data/slice/qq*" ' \
               +' --exclude="data/tau/qq*" ' \
-              +' --exclude="data/time/tau/*" ' \
               +' --exclude="output.*" ' \
               +server+':work/'+project+'/run/'+caseid+' '+dist)
     
