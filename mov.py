@@ -41,6 +41,10 @@ if not d.p['geometry'] == 'Cartesian':
     RAE, THE = np.meshgrid(xe,ye,indexing='ij')
     d.p['XX'], d.p['YY'] = RAE*np.cos(THE), RAE*np.sin(THE)
 
+    X, Y = np.meshgrid(x,y,indexing='ij')
+    SINY = np.sin(Y)
+    SINYM = SINY.sum(axis=1)
+
 # read initial time
 t0 = d.read_time(0,silent=True)
 
