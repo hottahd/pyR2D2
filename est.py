@@ -143,7 +143,7 @@ for n in tqdm(range(n0,nd+1)):
         fstar = d.p['lstar']/4/np.pi/d.p['rstar']**2
         vls = ['fe','fd','fk','fr','fm']
         for vl in vls:
-            md[vl] = np.average(d.vc[vl],axis=1)/sinyym
+            md[vl] = np.average(d.vc[vl],axis=1)
     else:
         fstar = d.p['lstar']/4/np.pi
         vls = ['fe','fd','fk','fm']
@@ -154,7 +154,7 @@ for n in tqdm(range(n0,nd+1)):
     # linear と full　の判別のためのRMSエントロピーの計算
     serms = np.sqrt(np.average(d.vc['serms']**2*sinyy,axis=1)/sinyym)/d.p['se0']
     sermsm = 0.5*(np.append(serms,serms[-1]) + np.insert(serms,0,serms[0]))
-    sr = 0.5*(1 + np.sign(sermsm - 1.e-3))
+    sr = 0.5*(1 + np.sign(sermsm - 1.e-4))
     
     # fe: linear expression
     # fd: full expression
