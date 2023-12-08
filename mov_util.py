@@ -1,4 +1,10 @@
 def add_color_bar_2x2(fig,axes,ims,ysize):
+    '''
+    put color bar
+    fig: figure instance
+    axes: 
+    ims: output of pcolormesh
+    '''
     # add color bar
     box3 = axes[2].get_position().bounds
     wid3, hei3 = box3[2], box3[3]
