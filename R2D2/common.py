@@ -22,6 +22,7 @@ R2D2_data.__init__         = read.init
 R2D2_data.read_qq_select   = read.read_qq_select
 R2D2_data.read_qq_select_z = read.read_qq_select_z
 R2D2_data.read_qq          = read.read_qq
+R2D2_data.read_qq_all          = read.read_qq_all
 R2D2_data.read_qq_tau      = read.read_qq_tau
 R2D2_data.read_time        = read.read_time
 R2D2_data.read_vc          = read.read_vc
