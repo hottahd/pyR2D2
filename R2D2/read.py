@@ -493,12 +493,13 @@ def read_qq(self,n,value,silent=False):
     if type(value) == list:
         values_input = value
 
-    if value not in values:
-        print('######')
-        print('value =',value)
-        print('value should be one of ',values)
-        print('return')
-        return
+    for value in values_input:
+        if value not in values:
+            print('######')
+            print('value =',value)
+            print('value should be one of ',values)
+            print('return')
+            return
     
     ### Only when memory is not allocated 
     ### and the size of array is different
@@ -533,8 +534,8 @@ def read_qq(self,n,value,silent=False):
                         m = values.index(value)
                         self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,m]
                     else:
-                        qqq = qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")
-                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq
+                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = \
+                            qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")
                 f.close()
 
     if not silent :
