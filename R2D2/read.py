@@ -534,7 +534,6 @@ def read_qq(self,n,value,silent=False):
                         m = values.index(value)
                         self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,m]
                     else:
-                        print(value,qqq.shape)
                         self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = \
                 f.close()
 
