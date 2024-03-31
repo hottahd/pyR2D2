@@ -23,6 +23,7 @@ def init(self, datadir, verbose=False, self_old=None):
         self.qs = {}
         self.qz = {}
         self.qq = {}
+        self.qr = {}
         self.qv = {}
         self.qt = {}
         self.qt_yin = {}
@@ -539,6 +540,95 @@ def read_qq(self,n,value,silent=False):
 
     if not silent :
         print('### variables are stored in self.qq ###')
+        
+##############################
+def read_qq_restricted(self,n,value,x0,x1,y0,y1,z0,z1,silent=False):
+    '''
+    This method reads 3D restricted-area data
+    The data is stored in self.qr dictionary
+
+    Parameters:
+        n (int): a selected time step for data
+        value (char): kind of value
+        "ro": density
+        "vx", "vy", "vz": velocity
+        "bx", "by", "bz": magnetic field
+        "se": entropy
+        "ph": div B cleaning
+        "te": temperature
+        "op": Opacity        
+        x0, y0, z0 (float): minimum x, y, z
+        x1, y1, z1 (float): maximum x, y, z
+        silent (bool): True suppresses a message of store
+    '''
+    import numpy as np
+    
+    mtype = self.p["mtype"]
+    iixl, jjxl = self.p["iixl"], self.p["jjxl"]
+    iss, iee = self.p["iss"], self.p["iee"]
+    jss, jee = self.p["jss"], self.p["jee"]
+    ix,jx,kx = self.p["ix"],self.p["jx"],self.p["kx"]
+    x,y,z = self.p['x'],self.p['y'],self.p['z']
+    
+    i0, i1 = np.argmin(abs(x-x0)), np.argmin(abs(x-x1))
+    j0, j1 = np.argmin(abs(y-y0)), np.argmin(abs(y-y1))
+    k0, k1 = np.argmin(abs(z-z0)), np.argmin(abs(z-z1))
+    ixr = i1 - i0 + 1
+    jxr = j1 - j0 + 1
+    kxr = k1 - k0 + 1
+    
+    values = ['ro','vx','vy','vz','bx','by','bz','se','ph','pr','te','op']
+
+    if type(value) == str:
+        values_input = [value]
+    if type(value) == list:
+        values_input = value
+    
+    for value in values_input:
+        self.qr[value] = np.zeros((ixr,jxr,kxr),dtype=np.float32)
+        
+    for ir0 in range(1,self.p["ixr"]+1):        
+        for jr0 in range(1,self.p["jxr"]+1):
+            np0 = self.p["np_ijr"][ir0-1,jr0-1]
+            
+            if(not (iss[np0] > i1 or iee[np0] < i0 or jss[np0] > j1 or jee[np0] < j0) ):
+                
+                dtyp=np.dtype([ \
+                    ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                    ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                ])
+
+                cnou = '{0:05d}'.format(np0//1000)
+                cno  = '{0:08d}'.format(np0)
+                f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')            
+                #f = open(self.p['datadir']+"remap/qq/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
+                qqq = np.fromfile(f,dtype=dtyp,count=1)
+
+                for value in values_input:
+                    if value in values[:-3]:
+                        m = values.index(value)
+                        isrt_rcv = max([0  ,iss[np0]-i0  ])
+                        iend_rcv = min([ixr,iee[np0]-i0+1])
+                        jsrt_rcv = max([0  ,jss[np0]-j0  ])
+                        jend_rcv = min([jxr,jee[np0]-j0+1])
+                        
+                        isrt_snd = isrt_rcv - (iss[np0]-i0)
+                        iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
+                        jsrt_snd = jsrt_rcv - (jss[np0]-j0)
+                        jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+
+                        self.qr[value][isrt_rcv:iend_rcv,jsrt_rcv:jend_rcv,:] = \
+                            qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[isrt_snd:iend_snd,jsrt_snd:jend_snd,k0:k1+1,m]
+                    else:
+                        self.qr[value][isrt_rcv:iend_rcv,jsrt_rcv:jend_rcv,:] = \
+                            qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")[isrt_snd:iend_snd,jsrt_snd:jend_snd,k0:k1+1]                         
+                f.close()
+
+    if not silent :
+        print('### variales are stored in self.qr ###')
+
 ##############################
 def read_qq_all(self,n,silent=False):
     '''
