@@ -22,7 +22,7 @@ def d_x(x,qq):
         lib.d_x.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
-        qqd = np.empty((ix,jx,kx),dtype=np.float32,order='F')
+        qqd = np.zeros((ix,jx,kx),dtype=np.float32,order='F')
         lib.d_x(
             np.copy(qq,order='F').astype(np.float32),
             x.astype(np.float32),
@@ -37,7 +37,7 @@ def d_x(x,qq):
 
 def d_y(y,qq):
     '''
-    Return x derivative with fourth order
+    Return y derivative with fourth order
     Inhomogeneous grid applicable
     
     Parameters:
@@ -59,7 +59,7 @@ def d_y(y,qq):
         lib.d_y.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
-        qqd = np.empty((ix,jx,kx),dtype=np.float32,order='F')
+        qqd = np.zeros((ix,jx,kx),dtype=np.float32,order='F')
         lib.d_y(
             np.copy(qq,order='F').astype(np.float32),
             y.astype(np.float32),
@@ -74,7 +74,7 @@ def d_y(y,qq):
 
 def d_z(z,qq):
     '''
-    Return x derivative with fourth order
+    Return z derivative with fourth order
     Inhomogeneous grid applicable
     
     Parameters:
@@ -96,7 +96,7 @@ def d_z(z,qq):
         lib.d_z.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
-        qqd = np.empty((ix,jx,kx),dtype=np.float32,order='F')
+        qqd = np.zeros((ix,jx,kx),dtype=np.float32,order='F')
         lib.d_z(
             np.copy(qq,order='F').astype(np.float32),
             z.astype(np.float32),
