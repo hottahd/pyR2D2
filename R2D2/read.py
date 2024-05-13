@@ -535,7 +535,7 @@ def read_qq(self,n,value,silent=False):
                         m = values.index(value)
                         self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,m]
                     else:
-                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = \
+                        self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
                 f.close()
 
     if not silent :
@@ -602,7 +602,7 @@ def read_qq_restricted(self,n,value,x0,x1,y0,y1,z0,z1,silent=False):
 
                 cnou = '{0:05d}'.format(np0//1000)
                 cno  = '{0:08d}'.format(np0)
-                f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')            
+                f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')      
                 #f = open(self.p['datadir']+"remap/qq/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
                 qqq = np.fromfile(f,dtype=dtyp,count=1)
 
