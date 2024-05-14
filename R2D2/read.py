@@ -64,7 +64,8 @@ def init(self, datadir, verbose=False, self_old=None):
         print("#######################################################")
         print("#######################################################")
         sys.exit()
-        
+    
+    # Basic parameterの読み込み
     line = f.readline()
     while line:
         if line.split()[2] == 'i': # integer
@@ -130,10 +131,12 @@ def init(self, datadir, verbose=False, self_old=None):
     back = np.fromfile(f,dtype=dtyp,count=1)
     f.close()
 
+    # marginも含んだ座標
     self.p['xg'] = back['x'].reshape((ixg),order='F')
     self.p['yg'] = back['y'].reshape((jxg),order='F')
     self.p['zg'] = back['z'].reshape((kxg),order='F')
 
+    # fluxはi+1/2で定義するので、そのための座標を定義
     self.p['x_flux'] = np.zeros(self.p["ix"]+1)
     for i in range(0,self.p["ix"]+1):
         self.p['x_flux'][i] = 0.5*(self.p['xg'][i+self.p['margin']] + self.p['xg'][i+self.p['margin']-1])
@@ -277,6 +280,23 @@ def init(self, datadir, verbose=False, self_old=None):
     else:
         order_3D = 1
         
+    # read equation of state
+    eosdir = datadir[:-5]+'input_data/'
+    if os.path.exists(eosdir+'eos_table_sero.npz'):
+        eos_d = np.load(eosdir+'eos_table_sero.npz')
+        self.p['log_ro_e'] = eos_d['ro'] # density is defined in logarithmic scale
+        self.p['se_e'] = eos_d['se']
+        self.p['ix_e'] = len(self.p['log_ro_e'])
+        self.p['jx_e'] = len(self.p['se_e'])
+        
+        self.p['log_pr_e'] = np.log(eos_d['pr']+ 1.e-200)
+        self.p['log_en_e'] = np.log(eos_d['en']+ 1.e-200)
+        self.p['log_te_e'] = np.log(eos_d['te']+ 1.e-200)
+        self.p['log_op_e'] = np.log(eos_d['op']+ 1.e-200)
+        
+        self.p['dlogro_e'] = self.p['log_ro_e'][1] - self.p['log_ro_e'][0]
+        self.p['dse_e'] = self.p['se_e'][1] - self.p['se_e'][0]
+                
     # read original data
     if os.path.exists(datadir+'cont_log.txt'):
         f = open(datadir+'cont_log.txt')
