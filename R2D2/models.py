@@ -44,3 +44,35 @@ def init(self,):
     for key in back.dtype.names:
         if back[key].size == ix:
             self.models[key] = back[key].reshape((ix),order='F')
+
+def eos(self,ro,se,var):
+    '''
+    This method returns the Table equation of state.
+    
+    Parameters:
+        ro (float): density
+        se (float): entropy
+        var (str): variable name, pr, te, en, op
+    
+    Returns:
+       qq (float): corresponding variable
+       
+    Warning:
+       This method is very slow for large numpy array. Please consider using fortraun code.
+    '''
+    
+    import numpy as np
+    
+    iro = int((np.log(ro) - self.p['log_ro_e'][0])//self.p['dlogro_e'])
+    ise = int((       se  - self.p['se_e'][0]    )//self.p['dse_e'])
+    
+    dlogro = np.log(ro) - self.p['log_ro_e'][iro]
+    dse = se - self.p['se_e'][ise]
+    
+    qq = np.exp((\
+        + self.p['log_'+var+'_e'][iro  ,ise  ]*(self.p['dlogro_e'] - dlogro)*(self.p['dse_e'] - dse) \
+        + self.p['log_'+var+'_e'][iro+1,ise  ]*(                     dlogro)*(self.p['dse_e'] - dse) \
+        + self.p['log_'+var+'_e'][iro  ,ise+1]*(self.p['dlogro_e'] - dlogro)*(                  dse) \
+        + self.p['log_'+var+'_e'][iro+1,ise+1]*(                     dlogro)*(                  dse) \
+        )/self.p['dlogro_e']/self.p['dse_e'])    
+    return qq

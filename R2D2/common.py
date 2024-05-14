@@ -36,6 +36,7 @@ R2D2_data.set_cells_gspread  = google.set_cells_gspread
 R2D2_data.upgrade_resolution = resolution.upgrade_resolution
 
 R2D2_data.models_init       = models.init
+R2D2_data.eos               = models.eos
 
 R2D2_data.sync_remap_qq = sync.sync_remap_qq
 R2D2_data.sync_tau = sync.sync_tau
