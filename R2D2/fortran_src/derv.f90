@@ -2,6 +2,7 @@
 subroutine d_x(qq,x,ix,jx,kx,qqd) bind(c)
 !===================================================
   use iso_c_binding
+  use omp_lib
   implicit none
 
   integer :: i,j,k
@@ -27,6 +28,7 @@ subroutine d_x(qq,x,ix,jx,kx,qqd) bind(c)
      rk4(i) = (a*(b-c) - b*c)/(c-d)/(a+d)/(b+d)
   enddo
   
+  !$omp parallel do private(i,j,k)
   do k = 1,kx
   do j = 1,jx
   do i = 1+margin,ix-margin
@@ -38,6 +40,7 @@ subroutine d_x(qq,x,ix,jx,kx,qqd) bind(c)
   enddo
   enddo
   enddo
+  !$omp end parallel do
      
   return
 end subroutine d_x
@@ -47,6 +50,7 @@ end subroutine d_x
 subroutine d_y(qq,y,ix,jx,kx,qqd) bind(c)
 !===================================================
   use iso_c_binding
+  use omp_lib
   implicit none
 
   integer :: i,j,k
@@ -72,6 +76,7 @@ subroutine d_y(qq,y,ix,jx,kx,qqd) bind(c)
      rk4(j) = (a*(b-c) - b*c)/(c-d)/(a+d)/(b+d)
   enddo
   
+  !$omp parallel do private(i,j,k)
   do k = 1,kx
   do j = 1+margin,jx-margin
   do i = 1,ix
@@ -83,6 +88,7 @@ subroutine d_y(qq,y,ix,jx,kx,qqd) bind(c)
   enddo
   enddo
   enddo
+  !$omp end parallel do
      
   return
 end subroutine d_y
@@ -92,6 +98,7 @@ end subroutine d_y
 subroutine d_z(qq,z,ix,jx,kx,qqd) bind(c)
 !===================================================
   use iso_c_binding
+  use omp_lib
   implicit none
 
   integer :: i,j,k
@@ -118,8 +125,9 @@ subroutine d_z(qq,z,ix,jx,kx,qqd) bind(c)
      rk4(k) = (a*(b-c) - b*c)/(c-d)/(a+d)/(b+d)
   enddo
   
-  do k = 1+margin,kx-margin
+  !$omp parallel do private(i,j,k)
   do j = 1,jx
+  do k = 1+margin,kx-margin
   do i = 1,ix
      qqd(i,j,k) = &
           & + rk1(k)*qq(i,j,k+2) &
@@ -129,7 +137,10 @@ subroutine d_z(qq,z,ix,jx,kx,qqd) bind(c)
   enddo
   enddo
   enddo
-     
+  !$omp end parallel do
+  
+
+
   return
 end subroutine d_z
 
