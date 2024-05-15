@@ -185,5 +185,5 @@ def sync_all(self,server,project=os.getcwd().split('/')[-2],dist='../run/'):
     
     caseid = self.p['datadir'].split('/')[-3]
     os.system('rsync -avP ' \
-              +server+':work/'+project+'/run/'+caseid+' ' \
-              +dist)
+              +server+':work/'+project+'/run/'+caseid+'/ ' \
+              +dist+caseid)
