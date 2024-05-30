@@ -105,3 +105,96 @@ def show_information(self):
     print('time step (nd_tau) =',self.p['nd_tau'])
     t = self.read_time(self.p['nd'])
     print('time =','{:.2f}'.format(t/3600),' [hour]')
+
+    return
+
+def get_best_unit(size, unit_multipliers):
+    for unit in reversed(['B', 'kB', 'MB', 'GB', 'TB', 'PB']):
+        if size >= unit_multipliers[unit]:
+            return unit
+    return 'B'
+
+def get_total_file_size(directory, unit=None):
+    '''
+    Evaluate total size of files in directory.
+    
+    Parameters:
+       directory (str): directory path
+       unit (str): unit of file size. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'.
+    Returns:
+       total_size (int): total size of files in directory in bytes
+    '''
+    import os
+    
+    unit_multipliers = {
+        'B': 1,
+        'kB': 1024,
+        'MB': 1024**2,
+        'GB': 1024**3,
+        'TB': 1024**4,
+        'PB': 1024**5
+    }
+    
+    if unit is not None and unit not in unit_multipliers:
+        raise ValueError(f"Invalid unit: {unit}. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'.")
+    
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            try:
+                total_size += os.path.getsize(filepath)
+                
+                if unit is None:
+                    display_unit = get_best_unit(total_size, unit_multipliers)
+                else:
+                    display_unit = unit
+                converted_size = total_size / unit_multipliers[display_unit]
+                print(f"\r{' '*50}\rCurrent total size: {converted_size:.2f} {display_unit}", end='', flush=True)
+                #print(f"\rCurrent total size: {converted_size:.2f} {display_unit} ", end='', flush=True)
+            except FileNotFoundError:
+                # ファイルが見つからない場合は無視
+                continue
+    
+    if unit is None:
+        unit = get_best_unit(total_size, unit_multipliers)
+        
+    final_size = total_size / unit_multipliers[unit]
+    print(f"\nFinal total size: {final_size:.2f} {unit}")    
+            
+    return final_size, unit
+
+def update_results_file(file_path, directory_size, caseid):
+    '''
+    Update the results file with the size of a directory.
+    
+    Parameters:
+       file_path (str): path to the results file
+       directory_size (str): size of the directory
+       caseid (str): the case ID of the directory
+    '''
+    import os
+    
+    # 既存のデータを読み込む
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            existing_data = f.readlines()
+    else:
+        existing_data = []
+    
+    # データを辞書に変換
+    existing_dict = {}
+    for line in existing_data:
+        parts = line.strip().split()
+        if len(parts) >= 2:
+            existing_caseid = parts[0]
+            size = " ".join(parts[1:])  # サイズ部分を連結
+            existing_dict[existing_caseid] = size
+    
+    # ディレクトリサイズの情報を更新
+    existing_dict[caseid] = directory_size
+    
+    # 更新されたデータを書き込む
+    with open(file_path, 'w') as f:
+        for caseid in sorted(existing_dict):
+            f.write(f"{caseid} {existing_dict[caseid]}\n")
