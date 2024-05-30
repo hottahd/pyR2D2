@@ -1,8 +1,23 @@
 def initialize_instance(main_locals,instance):
+    '''
+    Initialize arbitrary instance of R2D2_data object in main program.
+        
+    Parameters:
+       main_locals (dictionary): locals() in main program, which include local variables
+       instance (str): name of instance of R2D2_data object
+    '''
     if not instance in main_locals:
         main_locals[instance] = None
 
 def caseid_select(main_locals,force_read=False):
+    '''
+    Choose caseid from input or from user input.
+    
+    Parameters:
+        main_locals (dictionary): locals() in main program, which include local variables
+        force_read (bool): if True, force to read caseid from user input, 
+                           if False, read caseid from main_locals if exists
+    '''
     
     RED = '\033[31m'
     END = '\033[0m'
@@ -15,11 +30,26 @@ def caseid_select(main_locals,force_read=False):
     return caseid
 
 def locals_define(self,main_locals):
+    '''
+    Substitute selp.p to main_locals in main program.
+    
+    Parameters:
+       self (R2D2_data): instance of R2D2_data object
+       main_locals (dictionary): locals() in main program, which include local variables
+    '''
     for key, value in self.p.items():
         main_locals[key] = value    
     return
 
 def define_n0(self,main_locals,nd_type='nd'):
+    '''
+    Define n0 in main_locals if not exists.
+    
+    Parameters:
+       self (R2D2_data): instance of R2D2_data object
+       main_locals (dictionary): locals() in main program, which include local variables
+       nd_type (str): type of nd. 'nd' for MHD output, 'nd_tau' for high cadence output.
+    '''
     if 'n0' not in main_locals:
         main_locals['n0'] = 0
     if main_locals['n0'] > self.p[nd_type]:
@@ -28,6 +58,13 @@ def define_n0(self,main_locals,nd_type='nd'):
     return main_locals['n0']
 
 def show_information(self):
+    '''
+    Show data information
+    
+    Parameters:
+       self (R2D2_data): instance of R2D2_data object
+    '''
+    
     import numpy as np
     import R2D2
     
