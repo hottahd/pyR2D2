@@ -164,16 +164,21 @@ def get_total_file_size(directory, unit=None):
             
     return final_size, unit
 
-def update_results_file(file_path, directory_size, caseid):
+def update_results_file(file_path, total_size, unit, caseid):
     '''
     Update the results file with the size of a directory.
     
     Parameters:
        file_path (str): path to the results file
-       directory_size (str): size of the directory
+       total_size (float): total size of the directory
+       unit (str): unit of the file size
        caseid (str): the case ID of the directory
     '''
     import os
+    from datetime import datetime
+
+    # 現在の日時を取得
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # 既存のデータを読み込む
     if os.path.exists(file_path):
@@ -185,16 +190,20 @@ def update_results_file(file_path, directory_size, caseid):
     # データを辞書に変換
     existing_dict = {}
     for line in existing_data:
-        parts = line.strip().split()
-        if len(parts) >= 2:
+        parts = line.strip().rsplit(maxsplit=2)
+        if len(parts) == 3:
             existing_caseid = parts[0]
-            size = " ".join(parts[1:])  # サイズ部分を連結
-            existing_dict[existing_caseid] = size
+            size = parts[1]
+            timestamp = parts[2]
+            existing_dict[existing_caseid] = f"{size} {timestamp}"
     
     # ディレクトリサイズの情報を更新
-    existing_dict[caseid] = directory_size
+    directory_size_str = f"{total_size:6.2f} {unit}"
+    existing_dict[caseid] = f"{directory_size_str} {now}"
     
     # 更新されたデータを書き込む
     with open(file_path, 'w') as f:
         for caseid in sorted(existing_dict):
-            f.write(f"{caseid} {existing_dict[caseid]}\n")
+            size_timestamp = existing_dict[caseid]
+            # フォーマット: ディレクトリ名、右揃えで6桁、小数点2桁、単位
+            f.write(f"{caseid:<10} {size_timestamp}\n")

@@ -14,5 +14,4 @@ results_file_path = '../run/filesize.txt'
 for caseid in directories:
     print(caseid)
     total_size, unit = R2D2.util.get_total_file_size(os.path.join(base_path, caseid))
-    directory_size_str = f"{total_size:.2f} {unit}"
-    R2D2.util.update_results_file(results_file_path, directory_size_str, caseid)
+    R2D2.util.update_results_file(results_file_path, total_size, unit, caseid)
