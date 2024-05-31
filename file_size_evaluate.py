@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # run以下のディレクトリのサイズを計算し、filesize.txtに保存する
 
 import R2D2
