@@ -13,5 +13,6 @@ results_file_path = '../run/filesize.txt'
 # ディレクトリサイズの計算と結果の保存
 for caseid in directories:
     print(caseid)
-    total_size, unit = R2D2.util.get_total_file_size(os.path.join(base_path, caseid))
-    R2D2.util.update_results_file(results_file_path, total_size, unit, caseid)
+    dir_path = os.path.join(base_path, caseid)
+    total_size, unit = R2D2.util.get_total_file_size(dir_path)
+    R2D2.util.update_results_file(results_file_path, total_size, unit, caseid, dir_path)

@@ -164,7 +164,8 @@ def get_total_file_size(directory, unit=None):
             
     return final_size, unit
 
-def update_results_file(file_path, total_size, unit, caseid):
+
+def update_results_file(file_path, total_size, unit, caseid, dir_path):
     '''
     Update the results file with the size of a directory.
     
@@ -173,12 +174,18 @@ def update_results_file(file_path, total_size, unit, caseid):
        total_size (float): total size of the directory
        unit (str): unit of the file size
        caseid (str): the case ID of the directory
+       dir_path (str): the directory path
     '''
     import os
     from datetime import datetime
-
     # 現在の日時を取得
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+     # シンボリックリンクの場合の実体パスを取得
+    if os.path.islink(dir_path):
+        real_path = os.path.abspath(os.readlink(dir_path))
+    else:
+        real_path = os.path.abspath(dir_path)
     
     # 既存のデータを読み込む
     if os.path.exists(file_path):
@@ -190,20 +197,21 @@ def update_results_file(file_path, total_size, unit, caseid):
     # データを辞書に変換
     existing_dict = {}
     for line in existing_data:
-        parts = line.strip().rsplit(maxsplit=2)
-        if len(parts) == 3:
+        parts = line.strip().rsplit(maxsplit=3)
+        if len(parts) == 4:
             existing_caseid = parts[0]
             size = parts[1]
             timestamp = parts[2]
-            existing_dict[existing_caseid] = f"{size} {timestamp}"
+            path = parts[3]
+            existing_dict[existing_caseid] = f"{size} {timestamp} {path}"
     
     # ディレクトリサイズの情報を更新
     directory_size_str = f"{total_size:6.2f} {unit}"
-    existing_dict[caseid] = f"{directory_size_str} {now}"
+    existing_dict[caseid] = f"{directory_size_str} {now} {real_path}"
     
     # 更新されたデータを書き込む
     with open(file_path, 'w') as f:
         for caseid in sorted(existing_dict):
-            size_timestamp = existing_dict[caseid]
+            size_timestamp_realpath = existing_dict[caseid]
             # フォーマット: ディレクトリ名、右揃えで6桁、小数点2桁、単位
-            f.write(f"{caseid:<10} {size_timestamp}\n")
+            f.write(f"{caseid:<10} {size_timestamp_realpath}\n")
