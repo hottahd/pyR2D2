@@ -10,6 +10,7 @@ def init(self, datadir, verbose=False, self_old=None):
     '''
     import R2D2
     import numpy as np
+    from scipy.io import FortranFile
     import os,sys
     
     # check if the data is already read
@@ -89,6 +90,11 @@ def init(self, datadir, verbose=False, self_old=None):
     else:
         self.p["endian"] = ">"
 
+   # MPI information
+    f = FortranFile(self.p['datadir']+'param/xyz.dac','r')
+    shape = (self.p['ix0']*self.p['jx0']*self.p['kx0'],3)
+    self.p['xyz'] = f.read_reals(dtype=np.int32).reshape(shape,order='F')
+    
     ## number of grid in each direction
     self.p["ix"] = self.p["ix0"]*self.p["nx"]
     self.p["jx"] = self.p["jx0"]*self.p["ny"]
