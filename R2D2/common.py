@@ -30,6 +30,7 @@ R2D2_data.read_vc            = read.read_vc
 R2D2_data.read_qq_check      = read.read_qq_check
 R2D2_data.read_qq_2d         = read.read_qq_2d
 R2D2_data.read_qq_slice      = read.read_qq_slice
+R2D2_data.read_qq_ixr        = read.read_qq_ixr
 R2D2_data.YinYangSet         = read.YinYangSet
 
 R2D2_data.set_cells_gspread  = google.set_cells_gspread

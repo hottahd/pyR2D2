@@ -27,6 +27,7 @@ def init(self, datadir, verbose=False, self_old=None):
         self.qr = {}
         self.qv = {}
         self.qt = {}
+        self.qi = {}
         self.qt_yin = {}
         self.qt_yan = {}
         self.ql = {}
@@ -751,7 +752,79 @@ def read_qq_tau(self,n,silent=False):
             print('### variables are stored in self.qt_yin and self.qt_yan ###')
         else:
             print('### variables are stored in self.qt ###')
-                
+          
+##############################
+def read_qq_ixr(self,ixrt,n,silent=False):
+    '''
+    This method reads 3D data at a selected x-region
+    corrensponding to ixr-th region in remap coordinate
+    
+    Parameters:
+        ixrt (int): a selected x-region (0<=ixrt<=ixr)
+        n (int): a selected time step for data
+        silent (bool): True suppresses a message of store
+    '''
+    
+    import numpy as np
+    mtype = self.p["mtype"]
+    iixl, jjxl = self.p["iixl"], self.p["jjxl"]
+    jss, jee = self.p["jss"], self.p["jee"]
+    jx, kx = self.p['jx'], self.p['kx']
+    
+    # corresponding MPI process
+    nps = np.where(self.p['ir'] - 1 == ixrt)[0]
+    # correnponding i range
+    i_ixrt = np.where(self.p['i2ir'] - 1 == ixrt)[0]
+    
+    self.
+    ### Only when memory is not allocated 
+    ### and the size of array is different
+    ### memory is allocated
+    memflag = True
+    if 'ro' in self.qi:
+        memflag = not self.qi['ro'].shape == (jx,kx)
+    if 'ro' not in self.qi or memflag:
+        print('memory is newly allocated')
+        self.qi["ro"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["vx"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["vy"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["vz"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["bx"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["by"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["bz"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["se"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["ph"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["pr"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["te"] = np.zeros((len(i_ixrt),jx,kx))
+        self.qi["op"] = np.zeros((len(i_ixrt),jx,kx))
+    
+    for np0 in nps:
+        dtype=np.dtype([ \
+                ("qq",self.p["endian"]+str(mtype*iixl[np0]*jjxl[np0]*kx)+"f"),\
+                ("pr",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                ("te",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+                ("op",self.p["endian"]+str(iixl[np0]*jjxl[np0]*kx)+"f"),\
+        ])
+        cnou = '{0:05d}'.format(np0//1000)
+        cno  = '{0:08d}'.format(np0)
+        f = open(self.p['datadir']+"remap/qq/"+cnou+"/"+cno+"/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0),'rb')
+        qqq = np.fromfile(f,dtype=dtype,count=1)
+        self.qi["ro"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,0] 
+        self.qi["vx"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,1] 
+        self.qi["vy"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,2] 
+        self.qi["vz"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,3] 
+        self.qi["bx"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,4] 
+        self.qi["by"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,5] 
+        self.qi["bz"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,6] 
+        self.qi["se"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,7] 
+        self.qi["ph"][:,jss[np0]:jee[np0]+1,:] = qqq["qq"].reshape((iixl[np0],jjxl[np0],kx,mtype),order="F")[:,:,:,8] 
+
+        self.qi["pr"][:,jss[np0]:jee[np0]+1,:] = qqq["pr"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
+        self.qi["te"][:,jss[np0]:jee[np0]+1,:] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
+        self.qi["op"][:,jss[np0]:jee[np0]+1,:] = qqq["op"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
+            
+    if not silent:
+        print('### variables are stored in self.qi ###')
 ##############################
 def read_time(self,n,tau=False,silent=True):
     '''
