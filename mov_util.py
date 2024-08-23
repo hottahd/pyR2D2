@@ -57,7 +57,10 @@ def mov_cartesian_photo_2x2(R2D2_data,t,vls,tu_height,vmaxs,vmins,titles,cmaps=[
     
     for ax, vl, cmap, vmax, vmin in zip(axes[2:],vls[2:],cmaps[2:],vmaxs[2:],vmins[2:]):
         ims.append(ax.pcolormesh(R2D2_data.p['z']*lfac,(R2D2_data.p['x']-R2D2_data.p['rstar'])*lfac,vl,cmap=cmap,vmin=vmin,vmax=vmax,shading=shading))
-        ax.plot(R2D2_data.p['z']*lfac,(tu_height-R2D2_data.p['rstar'])*lfac,color="w")
+        # to deal with older version of R2D2
+        if tu_height.max() > 0.8*R2D2_data.p['rstar']:
+            tu_height = tu_height - R2D2_data.p['rstar']
+        ax.plot(R2D2_data.p['z']*lfac,tu_height*lfac,color="w")
         #ax.contour(d.p['z']*lfac,(d.p['x']-d.p['rstar'])*lfac,d.vc['tu_xz'],levels=[1.],colors="w")
     
     for ax in [ax1,ax2]:
