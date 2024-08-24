@@ -776,7 +776,7 @@ def read_qq_ixr(self,ixrt,n,silent=False):
     # correnponding i range
     i_ixrt = np.where(self.p['i2ir'] - 1 == ixrt)[0]
     
-    self.
+    self.qi['i_ixrt'] = i_ixrt
     ### Only when memory is not allocated 
     ### and the size of array is different
     ### memory is allocated
