@@ -1,12 +1,13 @@
 import os
 
-def set(server,caseid,project=os.getcwd().split('/')[-2],dist='../run/'):
+def set(server,caseid,ssh='ssh',project=os.getcwd().split('/')[-2],dist='../run/'):
     '''
     This method downloads setting data from remote server
 
     Parameters:
         server (str): name of remote server
         caseid (str): caseid format of 'd001'
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
         dist (str): distination of data directory
     '''
@@ -24,14 +25,16 @@ def set(server,caseid,project=os.getcwd().split('/')[-2],dist='../run/'):
               +' --exclude="data/slice/qq*" ' \
               +' --exclude="data/tau/qq*" ' \
               +' --exclude="output.*" ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/'+' '+dist+caseid+'/')
     
-def sync_tau(self,server,project=os.getcwd().split('/')[-2]):
+def sync_tau(self,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
     '''
     This method downloads data at constant optical depth
 
     Parameters:
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
     '''
 
@@ -44,9 +47,10 @@ def sync_tau(self,server,project=os.getcwd().split('/')[-2]):
               +' --exclude="remap" ' \
               +' --exclude="slice" ' \
               +' --exclude="time/mhd" ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/ '+self.p['datadir'] )
     
-def sync_remap_qq(self,n,server,project=os.getcwd().split('/')[-2]):
+def sync_remap_qq(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
     '''
     This method downloads full 3D remap data
 
@@ -54,6 +58,7 @@ def sync_remap_qq(self,n,server,project=os.getcwd().split('/')[-2]):
         n (int): time step
         server (str): name of remote server
         project (str): name of project such as 'R2D2'
+        ssh (str): type of ssh command
     '''
     import os
     import numpy as np
@@ -68,16 +73,18 @@ def sync_remap_qq(self,n,server,project=os.getcwd().split('/')[-2]):
         
         os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)
         os.system('rsync -avP ' \
+            +' -e "'+ssh+'" ' \
             +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.'+str(n).zfill(8)+'.'+ns \
                 +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
     
-def sync_select(self,xs,server,project=os.getcwd().split('/')[-2]):
+def sync_select(self,xs,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
     '''
     This method downloads data at certain height
 
     Parameters:
         xs (float): height to be downloaded
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
     '''
 
@@ -98,15 +105,17 @@ def sync_select(self,xs,server,project=os.getcwd().split('/')[-2]):
         
         os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)        
         os.system('rsync -avP ' \
+            +' -e "'+ssh+'" ' \
             +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.*.'+ns \
                 +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
         
-def sync_vc(self,server,project=os.getcwd().split('/')[-2]):
+def sync_vc(self,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
     '''
     This method downloads pre analyzed data
 
     Parameters:
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
     '''
 
@@ -116,16 +125,18 @@ def sync_vc(self,server,project=os.getcwd().split('/')[-2]):
     set(server,caseid,project=project)
     os.system('rsync -avP' \
               +' --exclude="time/mhd" ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/remap/vl '
               +self.p['datadir']+'remap/' )
     
-def sync_check(self,n,server,project=os.getcwd().split('/')[-2],end_step=False):
+def sync_check(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2],end_step=False):
     '''
     This method downloads checkpoint data
 
     Parameters:
         n (int): step to be downloaded
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
         end_step (bool): If true, checkpoint of end step is read
     '''
@@ -147,16 +158,18 @@ def sync_check(self,n,server,project=os.getcwd().split('/')[-2],end_step=False):
 
         os.makedirs(self.p['datadir']+'qq/'+par_dir+chi_dir,exist_ok=True)
         os.system('rsync -avP ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/qq/'+par_dir+chi_dir+'qq.dac.'+step+'.'+str(int(ns)).zfill(8)+' ' \
               +self.p['datadir']+'qq/'+par_dir+chi_dir )
 
-def sync_slice(self,n,server,project=os.getcwd().split('/')[-2]):
+def sync_slice(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
     '''
     This method downloads slice data
 
     Parameters:
         n (int): step to be downloaded
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
     '''
     import numpy as np
@@ -166,18 +179,21 @@ def sync_slice(self,n,server,project=os.getcwd().split('/')[-2]):
     
     caseid = self.p['datadir'].split('/')[-3]
     os.system('rsync -avP ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/slice/slice.dac ' \
               +self.p['datadir']+'/slice' )
     os.system('rsync -avP ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/data/slice/qq"*".dac.'+step+'."*" ' \
               +self.p['datadir']+'/slice' )
         
-def sync_all(self,server,project=os.getcwd().split('/')[-2],dist='../run/'):
+def sync_all(self,server,ssh='ssh',project=os.getcwd().split('/')[-2],dist='../run/'):
     '''
     This method downloads all the data
 
     Parameters:
         server (str): name of remote server
+        ssh (str): type of ssh command
         project (str): name of project such as 'R2D2'
         dist (str): distination of data directory
     '''
@@ -185,5 +201,6 @@ def sync_all(self,server,project=os.getcwd().split('/')[-2],dist='../run/'):
     
     caseid = self.p['datadir'].split('/')[-3]
     os.system('rsync -avP ' \
+              +' -e "'+ssh+'" ' \
               +server+':work/'+project+'/run/'+caseid+'/ ' \
               +dist+caseid)
