@@ -2,7 +2,8 @@ __pycache__
 *.so
 *.c
 *.o
-build
+build/
 .vscode
 a.out
 *.vtk
+.DS_Store
