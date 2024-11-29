@@ -3,12 +3,17 @@ def d_x(x,qq):
     Return x derivative with fourth order
     Inhomogeneous grid applicable
     
-    Parameters:
-        x (float): x coordinate (1D array)
-        qq (float): variable (3D array)
+    Parameters
+    ----------
+    x : numpy.ndarray, float
+        x coordinate (1D)
+    qq : numpy.ndarray, float
+        variable (3D)
     
-    Return:
-        qqd (np.float32): derivative (3D array)
+    Returns
+    -------
+        qqd : numpy.ndarray, numpy.float32
+            derivative (3D)
     '''
     import ctypes
     import numpy as np
@@ -18,7 +23,7 @@ def d_x(x,qq):
     libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
-        lib.d_x.argtypes = derv_array()
+        lib.d_x.argtypes = _derv_array()
         lib.d_x.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
@@ -33,19 +38,24 @@ def d_x(x,qq):
         )
         return qqd
     else:
-        warning(mddir,d_x.__name__)
+        _warning(mddir,d_x.__name__)
 
 def d_y(y,qq):
     '''
     Return y derivative with fourth order
     Inhomogeneous grid applicable
     
-    Parameters:
-        y (float): y coordinate (1D array)
-        qq (float): variable (3D array)
+    Parameters
+    ----------
+    y : numpy.ndarray, float
+        y coordinate (1D)
+    qq : numpy.ndarray, float
+        variable (3D)
     
-    Return:
-        qqd (np.float32): derivative (3D array)
+    Returns
+    -------
+        qqd : numpy.ndarray, numpy.float32
+            derivative (3D)
     '''
     import ctypes
     import numpy as np
@@ -55,7 +65,7 @@ def d_y(y,qq):
     libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
-        lib.d_y.argtypes = derv_array()
+        lib.d_y.argtypes = _derv_array()
         lib.d_y.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
@@ -70,19 +80,24 @@ def d_y(y,qq):
         )
         return qqd
     else:
-        warning(mddir,d_y.__name__)
+        _warning(mddir,d_y.__name__)
 
 def d_z(z,qq):
     '''
     Return z derivative with fourth order
     Inhomogeneous grid applicable
     
-    Parameters:
-        z (float): z coordinate (1D array)
-        qq (float): variable (3D array)
+    Parameters
+    ----------
+    z : numpy.ndarray, float
+        z coordinate (1D)
+    qq : numpy.ndarray, float
+        variable (3D)
     
-    Return:
-        qqd (np.float32): derivative (3D array)
+    Returns
+    -------
+        qqd : numpy.ndarray, numpy.float32
+            derivative (3D)
     '''
     import ctypes
     import numpy as np
@@ -92,7 +107,7 @@ def d_z(z,qq):
     libfile = 'fortran_src/derv.so'
     if os.path.isfile(mddir+'/'+libfile):    
         lib = np.ctypeslib.load_library('derv.so',mddir+'/fortran_src')
-        lib.d_z.argtypes = derv_array()
+        lib.d_z.argtypes = _derv_array()
         lib.d_z.restype = ctypes.c_void_p
         ix, jx, kx = qq.shape
         
@@ -107,9 +122,13 @@ def d_z(z,qq):
         )
         return qqd
     else:
-        warning(mddir,d_z.__name__)
+        _warning(mddir,d_z.__name__)
 
-def derv_array():
+def  _derv_array():
+    """
+    Initialize argument types for derv.so
+    
+    """
     import ctypes
     import numpy as np
     
@@ -126,15 +145,29 @@ def derv_array():
 
 def interp(x,y,z,xu,yu,zu,qq):
     '''
-    Return x derivative with fourth order
-    Inhomogeneous grid applicable
+    Interpolation of variable qq to xu,yu,zu from x,y,z
     
-    Parameters:
-        z (float): z coordinate (1D array)
-        qq (float): variable (3D array)
+    Parameters
+    ----------
+    x : numpy.ndarray, float
+        original x coordinate (1D)
+    y : numpy.ndarray, float
+        original y coordinate (1D)
+    z : numpy.ndarray, float
+        original z coordinate (1D)
+    xu : numpy.ndarray, float
+        target x coordinate (1D)
+    yu : numpy.ndarray, float
+        target y coordinate (1D)
+    zu : numpy.ndarray, float
+        target z coordinate (1D)
+    qq : numpy.ndarray, float
+        variable defined on x,y, z(3D)
     
-    Return:
-        qqd (np.float32): derivative (3D array)
+    Returns
+    -------
+        qqd : numpy.ndarray
+            interpolated derivative (3D array)
     '''
     import ctypes
     import numpy as np
@@ -177,25 +210,45 @@ def interp(x,y,z,xu,yu,zu,qq):
         )
         return qqu
     else:
-        warning(mddir,interp.__name__)
+        _warning(mddir,interp.__name__)
     
 def spherical2cartesian(rr,th,ph,qqs,ixc,jxc,kxc):
     '''
     data in spherical geometry is converted to uniform cartesian geometry
     
-    Parameters:
-        rr (float): radius (1D array)
-        th (float): colatitude (1D array)
-        ph (float): longitude (1D array)
-        qqs (float): variable in spherical geometry (3D array)
-        ixc (int): No. of grid in converted x coordinate
-        jxc (int): No. of grid in converted y coordinate
-        kxc (int): No. of grid in converted z coordinate
-    Return:
-        qqc (np.float64): converted variable (3D array)
-        xc (np.flaot64): converted x coordinate (1D array)
-        yc (np.flaot64): converted y coordinate (1D array)
-        zc (np.flaot64): converted z coordinate (1D array)
+    Parameters
+    ----------
+        rr : numpy.ndarray, float
+            radius (1D)
+        th : numpy.ndarray, float
+            colatitude (1D)
+        ph : numpy.ndarray, float
+            longitude (1D)
+        qqs : numpy.ndarray, float
+            variable in spherical geometry (3D)
+        ixc : int
+            No. of grid in converted x coordinate
+        jxc : int
+            No. of grid in converted y coordinate
+        kxc : int
+            No. of grid in converted z coordinate
+    
+    Return
+    ------
+        qqc : numpy.ndarray, float
+            converted variable (3D, ixc, jxc, kxc)
+        xc : numpy.ndarray, float
+            converted x coordinate (1D, ixc)
+        yc : numpy.ndarray, float
+            converted y coordinate (1D, jxc)
+        zc : numpy.ndarray, float
+            converted z coordinate (1D array, kxc)
+        
+    Notes
+    -----
+    The cartesian coordinate is automatically generated with considerging
+    the computational domain size.
+
     '''    
     import ctypes
     import numpy as np
@@ -240,9 +293,24 @@ def spherical2cartesian(rr,th,ph,qqs,ixc,jxc,kxc):
         )
         return qqc,xc,yc,zc
     else:
-        warning(mddir,spherical2cartesian.__name__)
+        _warning(mddir,spherical2cartesian.__name__)
     
-def warning(mddir,funcname):
+def _warning(mddir,funcname):
+    '''
+    Warning message for uninstalled function
+    
+    Parameters
+    ----------
+    mddir : str
+        directory of the module
+    
+    funcname : str
+        function name
+        
+    Returns
+    -------
+    None
+    '''
     print('This function '+funcname+' has not been installed')
     print('Please make at '+mddir+'/fortran_src')
     return

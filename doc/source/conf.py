@@ -24,6 +24,9 @@ author = 'Hideyuki Hotta'
 # The full version, including alpha/beta/rc tags
 release = '1.3'
 
+import sys, os
+sys.path.insert(0, os.path.abspath('../../'))
+import R2D2
 
 # -- General configuration ---------------------------------------------------
 
@@ -73,7 +76,6 @@ html_theme = 'sphinx_book_theme'
 #html_theme = 'sphinx_material'
 #html_theme = 'sphinx_rtd_theme'
 #html_theme = "pydata_sphinx_theme"
-html_theme_options = {'maincolor' : "#696969"}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -98,6 +100,7 @@ autodoc_default_options = {
 }
 
 napoleon_include_init_with_doc = True
-napoleon_use_ivar = True
+#napoleon_use_ivar = True
 
 automodapi_inheritance_diagram = False
+autosummary_generate = True  # autosummaryでファイルを生成

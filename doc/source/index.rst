@@ -32,6 +32,7 @@ R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の�
    artdif.rst
    io.rst
    paraview.rst
+   api_reference.rst
    notation.rst
    sphinx.rst
 	     

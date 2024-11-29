@@ -6,17 +6,34 @@ from . import sync
 
 class R2D2_data():    
     '''
-    R2D2_data is a class for reading R2D2 data
+    Class for managing R2D2_data
 
-    Attributes:
-        p (dic): basic parameters
-        qs (dic): 2D data at selected height
-        qq (dic): 3D full data 
-        qt (dic): 2D data at constant optical depths
-        t (float): time
-        vc (dic): data of on the fly analysis
+    Attributes
+    ----------
+        p : dict
+            basic parameters.
+            
+            .. seealso ::
+                :class:`R2D2.R2D2_data.__init__`
+        qs : dict
+            2D data at selected height.
+            See :class:`R2D2.R2D2_data.read_qq_select`
+        qq : dict
+            3D full data.
+            See :class:`R2D2.R2D2_data.read_qq`
+        qt : dict
+            2D data at constant optical depths.
+            See :class:`R2D2.R2D2_data.read_qq_tau`
+        t : float
+            time
+            See :class:`R2D2.R2D2_data.read_time`
+        vc : dict
+            data of on the fly analysis
+            See :class:`R2D2.R2D2_data.read_vc`
 
-        models (dic): Model S based stratification
+        models : dict
+            Model S based stratification
+            See :class:`R2D2.R2D2_data.models_init`
     '''
 R2D2_data.__init__           = read.init
 R2D2_data.read_qq_select     = read.read_qq_select
