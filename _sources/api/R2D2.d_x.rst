@@ -1,0 +1,6 @@
+d_x
+===
+
+.. currentmodule:: R2D2
+
+.. autofunction:: d_x

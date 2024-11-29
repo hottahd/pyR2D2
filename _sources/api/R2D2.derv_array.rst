@@ -1,0 +1,6 @@
+derv_array
+==========
+
+.. currentmodule:: R2D2
+
+.. autofunction:: derv_array

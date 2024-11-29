@@ -1,58 +1,333 @@
 
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="./">
+
+<html lang="en" data-content_root="./" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Paraviewを用いた3Dデータ表示 &#8212; R2D2 1.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=834bc31f" />
-    
-    <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=b1f56dee"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/bizstyle.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'paraview';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="R2D2 pythonでのキーワードの説明" href="notation.html" />
+    <link rel="next" title="API Reference" href="api_reference.html" />
     <link rel="prev" title="出力と読込" href="io.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <!--[if lt IE 9]>
-    <script src="_static/css3-mediaqueries.js"></script>
-    <![endif]-->
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="notation.html" title="R2D2 pythonでのキーワードの説明"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="io.html" title="出力と読込"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Paraviewを用いた3Dデータ表示</a></li> 
-      </ul>
-    </div>  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">R2D2 1.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equation.html">方程式</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">コード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheme.html">数値スキーム</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter.html">パラメータ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boundary.html">境界条件</a></li>
+<li class="toctree-l1"><a class="reference internal" href="artdif.html">人工粘性</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">出力と読込</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_x.html">d_x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_y.html">d_y</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_z.html">d_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.interp.html">interp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.spherical2cartesian.html">spherical2cartesian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D.html">write_3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D_vector.html">write_3D_vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_optical_surface.html">write_optical_surface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.R2D2_data.html">R2D2_data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/paraview.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Paraviewを用いた3Dデータ表示</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">データ準備</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_3D"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_3D()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_vtk.write_3D_vector"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_vtk.write_3D_vector()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_optical_surface"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_optical_surface()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paraview3">Paraviewを用いて3次元表示</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="paraview3d">
-<h1>Paraviewを用いた3Dデータ表示<a class="headerlink" href="#paraview3d" title="Link to this heading">¶</a></h1>
+<h1>Paraviewを用いた3Dデータ表示<a class="headerlink" href="#paraview3d" title="Link to this heading">#</a></h1>
 <p>ここでは、Paraviewを用いてR2D2の計算結果を三次元表示する方法を説明する。</p>
 <section id="id1">
-<h2>データ準備<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2>データ準備<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>すでに計算を実行していて、何らかのデータが準備できている状況を想定する。
 データをParaviewで扱うためにVTKフォーマットに変換する。
 変換後に用意するべきデータは</p>
@@ -63,17 +338,17 @@
 <p>それぞれのデータのためにR2D2 Pythonでは以下の関数が用意してある。</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="R2D2.vtk.write_3D">
-<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.</span></span><span class="sig-name descname"><span class="pre">write_3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_3D" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.</span></span><span class="sig-name descname"><span class="pre">write_3D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_3D" title="Link to this definition">#</a></dt>
 <dd><p>3次元のスカラー量をVTKフォーマットで出力するための関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qq</strong> (<em>float</em>) – 出力したい物理量の3次元numpy配列</p></li>
-<li><p><strong>x</strong> (<em>float</em>) – x方向の座標</p></li>
-<li><p><strong>y</strong> (<em>float</em>) – y方向の座標</p></li>
-<li><p><strong>z</strong> (<em>float</em>) – z方向の座標</p></li>
-<li><p><strong>file</strong> (<em>str</em>) – 出力先のVTKフォーマットの名前</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
+<li><p><strong>qq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – 出力したい物理量の3次元numpy配列</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – x方向の座標</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – y方向の座標</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – z方向の座標</p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – 出力先のVTKフォーマットの名前</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
 </ul>
 </dd>
 </dl>
@@ -81,19 +356,19 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="R2D2.vtk.write_vtk.write_3D_vector">
-<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.write_vtk.</span></span><span class="sig-name descname"><span class="pre">write_3D_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_vtk.write_3D_vector" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.write_vtk.</span></span><span class="sig-name descname"><span class="pre">write_3D_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_vtk.write_3D_vector" title="Link to this definition">#</a></dt>
 <dd><p>３次元のベクトル量をVTKフォーマットで出力するための関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qx</strong> (<em>float</em>) – x方向のベクトルの3次元numpy配列</p></li>
-<li><p><strong>qy</strong> (<em>float</em>) – y方向のベクトルの3次元numpy配列</p></li>
-<li><p><strong>qz</strong> (<em>float</em>) – z方向のベクトルの3次元numpy配列</p></li>
-<li><p><strong>x</strong> (<em>float</em>) – x方向の座標</p></li>
-<li><p><strong>y</strong> (<em>float</em>) – y方向の座標</p></li>
-<li><p><strong>z</strong> (<em>float</em>) – z方向の座標</p></li>
-<li><p><strong>file</strong> (<em>str</em>) – 出力先のVTKフォーマットの名前</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
+<li><p><strong>qx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – x方向のベクトルの3次元numpy配列</p></li>
+<li><p><strong>qy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – y方向のベクトルの3次元numpy配列</p></li>
+<li><p><strong>qz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – z方向のベクトルの3次元numpy配列</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – x方向の座標</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – y方向の座標</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – z方向の座標</p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – 出力先のVTKフォーマットの名前</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
 </ul>
 </dd>
 </dl>
@@ -101,17 +376,17 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="R2D2.vtk.write_optical_surface">
-<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.</span></span><span class="sig-name descname"><span class="pre">write_optical_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_optical_surface" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">R2D2.vtk.</span></span><span class="sig-name descname"><span class="pre">write_optical_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.vtk.write_optical_surface" title="Link to this definition">#</a></dt>
 <dd><p><img class="math" src="_images/math/0765a4962991d8ac1a8c00d3c3bd6cf5ee6ebdfc.svg" alt="\tau=1"/> での2次元データを出力するための関数</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>qq</strong> (<em>float</em>) – 出力したい物理量の2次元配列</p></li>
-<li><p><strong>height</strong> (<em>float</em>) – <img class="math" src="_images/math/0765a4962991d8ac1a8c00d3c3bd6cf5ee6ebdfc.svg" alt="\tau=1"/> の高さの情報。<code class="code docutils literal notranslate"><span class="pre">self.qt['he']</span></code> を出力することが想定されている。</p></li>
-<li><p><strong>y</strong> (<em>float</em>) – y方向の座標</p></li>
-<li><p><strong>z</strong> (<em>float</em>) – z方向の座標</p></li>
-<li><p><strong>file</strong> (<em>str</em>) – 出力先VTKフォーマットの名前</p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
+<li><p><strong>qq</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – 出力したい物理量の2次元配列</p></li>
+<li><p><strong>height</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – <img class="math" src="_images/math/0765a4962991d8ac1a8c00d3c3bd6cf5ee6ebdfc.svg" alt="\tau=1"/> の高さの情報。<code class="code docutils literal notranslate"><span class="pre">self.qt['he']</span></code> を出力することが想定されている。</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – y方向の座標</p></li>
+<li><p><strong>z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – z方向の座標</p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – 出力先VTKフォーマットの名前</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Paraviewで管理するために用いる出力した物理量の名前</p></li>
 </ul>
 </dd>
 </dl>
@@ -131,7 +406,7 @@
 </div>
 </section>
 <section id="paraview3">
-<h2>Paraviewを用いて3次元表示<a class="headerlink" href="#paraview3" title="Link to this heading">¶</a></h2>
+<h2>Paraviewを用いて3次元表示<a class="headerlink" href="#paraview3" title="Link to this heading">#</a></h2>
 <p><a class="reference external" href="https://www.paraview.org/download/">Paraviewのサイト</a> からParaviewをダウンロード。Windows, Linux, macOSのそれぞれのソフトウェアがあるのでインストール方法は各自確認すること。ここでは、macOSでの利用方法を示すが、確認している限りは、Linuxでもほとんど同じ。ここでは非常に簡単にParaviewの使い方を説明する。詳しくはParaviewの公式マニュアルなどを読むこと。</p>
 <ol class="arabic">
 <li><p>まず右上のファイルアイコンをクリック</p>
@@ -176,81 +451,110 @@
 </section>
 
 
-            <div class="clearer"></div>
-          </div>
-        </div>
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="io.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">出力と読込</p>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Paraviewを用いた3Dデータ表示</a><ul>
-<li><a class="reference internal" href="#id1">データ準備</a><ul>
-<li><a class="reference internal" href="#R2D2.vtk.write_3D"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_3D()</span></code></a></li>
-<li><a class="reference internal" href="#R2D2.vtk.write_vtk.write_3D_vector"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_vtk.write_3D_vector()</span></code></a></li>
-<li><a class="reference internal" href="#R2D2.vtk.write_optical_surface"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_optical_surface()</span></code></a></li>
+    </a>
+    <a class="right-next"
+       href="api_reference.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">データ準備</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_3D"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_3D()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_vtk.write_3D_vector"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_vtk.write_3D_vector()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.vtk.write_optical_surface"><code class="docutils literal notranslate"><span class="pre">R2D2.vtk.write_optical_surface()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#paraview3">Paraviewを用いて3次元表示</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#paraview3">Paraviewを用いて3次元表示</a></li>
 </ul>
-</li>
-</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Hideyuki Hotta
+</p>
 
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="io.html"
-                          title="previous chapter">出力と読込</a></p>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2024, Hideyuki Hotta.
+      <br/>
+    
+  </p>
+
   </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="notation.html"
-                          title="next chapter">R2D2 pythonでのキーワードの説明</a></p>
+  
+  <div class="footer-item">
+    
   </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/paraview.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
     </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="notation.html" title="R2D2 pythonでのキーワードの説明"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="io.html" title="出力と読込"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Paraviewを用いた3Dデータ表示</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2020-2024, Hideyuki Hotta.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

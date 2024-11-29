@@ -1,0 +1,6 @@
+write_optical_surface
+=====================
+
+.. currentmodule:: R2D2
+
+.. autofunction:: write_optical_surface

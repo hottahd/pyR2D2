@@ -1,0 +1,6 @@
+write_3D_vector
+===============
+
+.. currentmodule:: R2D2
+
+.. autofunction:: write_3D_vector

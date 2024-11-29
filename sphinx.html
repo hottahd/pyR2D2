@@ -1,60 +1,344 @@
 
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="./">
+
+<html lang="en" data-content_root="./" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Sphinx使用の覚書 &#8212; R2D2 1.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
-    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=834bc31f" />
-    
-    <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="_static/documentation_options.js?v=b1f56dee"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/bizstyle.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'sphinx';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="R2D2 pythonでのキーワードの説明" href="notation.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <!--[if lt IE 9]>
-    <script src="_static/css3-mediaqueries.js"></script>
-    <![endif]-->
-  </head><body>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="notation.html" title="R2D2 pythonでのキーワードの説明"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Sphinx使用の覚書</a></li> 
-      </ul>
-    </div>  
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">R2D2 1.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="equation.html">方程式</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">コード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheme.html">数値スキーム</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameter.html">パラメータ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boundary.html">境界条件</a></li>
+<li class="toctree-l1"><a class="reference internal" href="artdif.html">人工粘性</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">出力と読込</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_x.html">d_x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_y.html">d_y</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_z.html">d_z</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.interp.html">interp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.spherical2cartesian.html">spherical2cartesian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D.html">write_3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D_vector.html">write_3D_vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_optical_surface.html">write_optical_surface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/R2D2.R2D2_data.html">R2D2_data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Sphinx使用の覚書</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/sphinx.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Sphinx使用の覚書</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">はじめに</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">インストール</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#html">HTMLファイルの生成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs-code">VS codeの利用</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">環境設定</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">記法</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">リンク</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">コード</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">画像</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">数式</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-do">To DO</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="sphinx">
-<h1>Sphinx使用の覚書<a class="headerlink" href="#sphinx" title="Link to this heading">¶</a></h1>
+<h1>Sphinx使用の覚書<a class="headerlink" href="#sphinx" title="Link to this heading">#</a></h1>
 <section id="id1">
-<h2>はじめに<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2>はじめに<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>Sphinxは、reStructuredTextからHTMLやLatexなどの
 文章を生成するソフトウェアである。
 <a class="reference external" href="https://www.sphinx-doc.org/ja/master/index.html">Sphinxの公式サイト</a>
 最近ではMarkdownでも記述できるが、結局最後のところはreStructuredTextで記述することになるので、現状では、Markdownは使用していない。このウェブサイトもSphinxで生成しているので、覚書をここに記す。</p>
 </section>
 <section id="id3">
-<h2>インストール<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<h2>インストール<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
 <p>ここではAnacondaがすでにインストールしてあるMac
 にSphinxをインストールすることを考える。
 基本的には以下のコマンドを実行するのみである。</p>
@@ -67,7 +351,7 @@
 </div>
 </section>
 <section id="html">
-<h2>HTMLファイルの生成<a class="headerlink" href="#html" title="Link to this heading">¶</a></h2>
+<h2>HTMLファイルの生成<a class="headerlink" href="#html" title="Link to this heading">#</a></h2>
 <p>適当なディレクトリを作成(ここでは <code class="docutils literal notranslate"><span class="pre">test</span></code> )とする。
 そこで、 <code class="docutils literal notranslate"><span class="pre">sphinx-quickstart</span></code> コマンドによりSphinxで作るドキュメントの
 初期設定を行う。</p>
@@ -84,7 +368,7 @@ sphinx-quickstart
 </ul>
 </section>
 <section id="vs-code">
-<h2>VS codeの利用<a class="headerlink" href="#vs-code" title="Link to this heading">¶</a></h2>
+<h2>VS codeの利用<a class="headerlink" href="#vs-code" title="Link to this heading">#</a></h2>
 <p>VS codeを利用すると快適にreStructuredTextを作成することができる。
 <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> ファイルをVS codeで開くと自動で確認されるが、以下のプラグインをインストールする。</p>
 <a class="reference internal image-reference" href="_images/restructuredtext_vs.png"><img alt="_images/restructuredtext_vs.png" src="_images/restructuredtext_vs.png" style="width: 500px;" />
@@ -92,7 +376,7 @@ sphinx-quickstart
 <p><code class="docutils literal notranslate"><span class="pre">Cmd+k</span> <span class="pre">Cmd+r</span></code> で画面を分割してプレビューできる。正しい <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> の場所を設定する必要がある。</p>
 </section>
 <section id="id4">
-<h2>環境設定<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<h2>環境設定<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
 <p>デフォルトの設定では、数式を書く時にMathjaxを使用するようで、数式の太字が意図するように表示されなかったのでsvgで出力することにした。
 以下のように　<code class="docutils literal notranslate"><span class="pre">conf.py</span></code> に追記する。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">extensions</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;sphinx.ext.imgmath&#39;</span><span class="p">]</span>
@@ -111,9 +395,9 @@ sphinx-quickstart
 <p>今後変更の余地あり。</p>
 </section>
 <section id="id6">
-<h2>記法<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<h2>記法<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
 <section id="id7">
-<h3>リンク<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<h3>リンク<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>外部ウェブサイト</p></li>
 </ul>
@@ -139,7 +423,7 @@ sphinx-quickstart
 <p>とリンクが生成される。</p>
 </section>
 <section id="id8">
-<h3>コード<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h3>
+<h3>コード<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
 <p>Sphinxでは、コードを直接記載することができる。また、言語に合わせてハイライトも可能。
 コードの表記に選択できる言語は <a class="reference external" href="https://pygments.org/docs/lexers/">Pygments</a> にまとめてある。</p>
 <div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">code</span><span class="p">::</span> <span class="k">fortran</span>
@@ -163,7 +447,7 @@ sphinx-quickstart
 </div>
 </section>
 <section id="id9">
-<h3>画像<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<h3>画像<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <p>画像の挿入には <code class="docutils literal notranslate"><span class="pre">image</span></code> ディレクティブを使う。オプションで、画像サイズなどを調整できる。堀田はだいたいwidthで調整している。</p>
 <div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">image</span><span class="p">::</span> figs/R2D2_logo.png
     <span class="nc">:width:</span> 350 px
@@ -174,7 +458,7 @@ sphinx-quickstart
 </a>
 </section>
 <section id="id10">
-<h3>数式<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h3>
+<h3>数式<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <p>SphinxではLatexを用いて数式を記述することができる。
 1行の独立した数式を取り扱うときは</p>
 <div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span>  <span class="ow">math</span><span class="p">::</span>
@@ -198,7 +482,7 @@ sphinx-quickstart
 <p>と表示される。</p>
 </section>
 <section id="to-do">
-<h3>To DO<a class="headerlink" href="#to-do" title="Link to this heading">¶</a></h3>
+<h3>To DO<a class="headerlink" href="#to-do" title="Link to this heading">#</a></h3>
 <p>To Doを書いておきたい場所に</p>
 <div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">todo</span><span class="p">::</span> 方程式を書く
 </pre></div>
@@ -214,79 +498,107 @@ sphinx-quickstart
 </section>
 
 
-            <div class="clearer"></div>
-          </div>
-        </div>
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="notation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">R2D2 pythonでのキーワードの説明</p>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="Main">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Sphinx使用の覚書</a><ul>
-<li><a class="reference internal" href="#id1">はじめに</a></li>
-<li><a class="reference internal" href="#id3">インストール</a></li>
-<li><a class="reference internal" href="#html">HTMLファイルの生成</a></li>
-<li><a class="reference internal" href="#vs-code">VS codeの利用</a></li>
-<li><a class="reference internal" href="#id4">環境設定</a></li>
-<li><a class="reference internal" href="#id6">記法</a><ul>
-<li><a class="reference internal" href="#id7">リンク</a></li>
-<li><a class="reference internal" href="#id8">コード</a></li>
-<li><a class="reference internal" href="#id9">画像</a></li>
-<li><a class="reference internal" href="#id10">数式</a></li>
-<li><a class="reference internal" href="#to-do">To DO</a></li>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">はじめに</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">インストール</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#html">HTMLファイルの生成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vs-code">VS codeの利用</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">環境設定</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">記法</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">リンク</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">コード</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">画像</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">数式</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-do">To DO</a></li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Hideyuki Hotta
+</p>
 
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="notation.html"
-                          title="previous chapter">R2D2 pythonでのキーワードの説明</a></p>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2024, Hideyuki Hotta.
+      <br/>
+    
+  </p>
+
   </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/sphinx.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
     </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="Related">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="notation.html" title="R2D2 pythonでのキーワードの説明"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Sphinx使用の覚書</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2020-2024, Hideyuki Hotta.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
