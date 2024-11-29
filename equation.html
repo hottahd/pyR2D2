@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>方程式 &#8212; R2D2 1.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=834bc31f" />
+    
+    <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="コード" href="code.html" />
+    <link rel="prev" title="典型的計算例" href="typical_case.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="コード"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="typical_case.html" title="典型的計算例"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">方程式</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>方程式<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>R2D2で解く方程式は以下である。現状では、デカルト座標 <img class="math" src="_images/math/58c4ab2db5c272c148bd28b42a1ca90ffc89755a.svg" alt="(x,y,z)"/>  と球座標 <img class="math" src="_images/math/5fa8bb967c930d4b3061b024437c89f673715784.svg" alt="(r,\theta,\phi)"/> を提供している。球座標を使う場合は、Yin-Yang格子を用いることもできる。数値計算コードの中では、<img class="math" src="_images/math/59c149a85ae807e4562b4fdf14c5731abf607b34.svg" alt="x"/> を重力方向(鉛直方向、動径方向)に取っているが、論文を書く際は各自適切に判断されたい。</p>
+<section id="id2">
+<h2>磁気流体力学<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>R2D2で解いている磁気流体力学の方程式は以下である。</p>
+<div class="math">
+<p><img src="_images/math/d57389f7ad453663261bf0d3e345141235ae2fb1.svg" alt="\frac{\partial \rho_1}{\partial t} &amp;= - \frac{1}{\xi^2}\nabla\cdot
+\left(\rho \boldsymbol{v}\right) \\
+\frac{\partial}{\partial t}\left(\rho \boldsymbol{v}\right) &amp;=
+-\nabla\cdot\left(\rho\boldsymbol{vv}\right)
+- \nabla p_1 - \rho_1 g\boldsymbol{e}_x
++\frac{1}{4\pi}\left(\nabla\times\boldsymbol{B}\right)
+\times\boldsymbol{B} \\
+\frac{\partial \boldsymbol{B}}{\partial t} &amp;=
+\nabla\times\left(\boldsymbol{v\times B}\right)
+\\
+\rho T \frac{\partial s_1}{\partial t} &amp;= -\rho T
+\left(\boldsymbol{v}\cdot\nabla\right) s + Q_\mathrm{rad} \\
+p_1 &amp;= p_1(\rho_1,s_1,x)"/></p>
+</div><p>ここで <img class="math" src="_images/math/a73b398c5433c38ddf69a9655ff386da03e500ea.svg" alt="\rho"/> は密度、<img class="math" src="_images/math/bb1af9ef38806d85749e02d6a370313a5aab7fed.svg" alt="\boldsymbol{v}"/> は流体速度、<img class="math" src="_images/math/7588316dd2615476d6e36a04e380d3f75c0f790b.svg" alt="\boldsymbol{B}"/> は磁場、 <img class="math" src="_images/math/22e2f93590d61c3ca96c88b3d810ff095aa3243d.svg" alt="s"/> はエントロピー、<img class="math" src="_images/math/0e0d8c5ae5b345d97d21f055157cc1d37d326917.svg" alt="p"/> は圧力、 <img class="math" src="_images/math/d698c8144935773c2aca9f16ee18636bb599da01.svg" alt="T"/> は温度、 <img class="math" src="_images/math/7741286c5ef6f2052025cae3194e717f1914a5b4.svg" alt="g"/> は重力加速度、 <img class="math" src="_images/math/43e5b2effd1ee0aca79279ae5096c47d742cb26c.svg" alt="Q_\mathrm{rad}"/> は輻射による加熱率である。</p>
+<p>R2D2では熱力学量を以下のように時間的に一定で <img class="math" src="_images/math/59c149a85ae807e4562b4fdf14c5731abf607b34.svg" alt="x"/> 方向の依存性のみを持つ0次の量とそこから擾乱の1次の量に分けている。</p>
+<div class="math">
+<p><img src="_images/math/1c84623d2f461ae03c3383a18400eea93b453e08.svg" alt="\rho &amp;= \rho_0 + \rho_1 \\
+p &amp;= p_0 + p_1 \\
+s &amp;= s_0 + s_1 \\
+T &amp;= T_0 + T_1 \\"/></p>
+</div><p>太陽内部では、<img class="math" src="_images/math/f0337ec7b5b76280af1e0530f47cd40060ae11ce.svg" alt="\rho_1 \ll \rho_0"/> などが成り立っているが、太陽表面では熱対流による擾乱と背景場は同程度となるので、R2D2の中では <img class="math" src="_images/math/f0337ec7b5b76280af1e0530f47cd40060ae11ce.svg" alt="\rho_1 \ll \rho_0"/> などは仮定しない。0次の量はModel Sを参考にして計算をしている。<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.494.2523H/abstract">Hotta &amp; Iijima2020</a> や <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2022ApJ...933..199H/abstract">Hotta, Kusano and Shimada, 2022</a> を参照されたい。</p>
+</section>
+<section id="id3">
+<h2>輻射輸送<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<div class="admonition-todo admonition" id="id4">
+<p class="admonition-title">Todo</p>
+<p>輻射輸送の方程式</p>
+</div>
+<p>最終更新日：Nov 29, 2024</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">方程式</a><ul>
+<li><a class="reference internal" href="#id2">磁気流体力学</a></li>
+<li><a class="reference internal" href="#id3">輻射輸送</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="typical_case.html"
+                          title="previous chapter">典型的計算例</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="code.html"
+                          title="next chapter">コード</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/equation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="コード"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="typical_case.html" title="典型的計算例"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">R2D2 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">方程式</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2020-2024, Hideyuki Hotta.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

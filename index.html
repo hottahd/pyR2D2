@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>R2D2マニュアル &#8212; R2D2 1.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=649a27d8" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=834bc31f" />
+    
+    <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="R2D2を使い始めるには" href="start.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="start.html" title="R2D2を使い始めるには"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">R2D2 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">R2D2マニュアル</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="r2d2">
+<h1>R2D2マニュアル<a class="headerlink" href="#r2d2" title="Link to this heading">¶</a></h1>
+<p>このページは太陽のための輻射磁気流体コードR2D2 (RSST and Radiation for Deep Dynamics)
+のマニュアルである。</p>
+<p><a class="reference external" href="https://github.com/hottahd/R2D2-manual/raw/master/_build/latex/r2d2.pdf">PDF版はこちら</a></p>
+<p>R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の人工粘性を用いて高精度かつ安定に解く。R2D2では、太陽表面付近では現実的に輻射輸送を解き、太陽深部では微小擾乱を正確に解く手法を取ることで、太陽内部から表面までを一貫して解くことができる。</p>
+<a class="reference internal image-reference" href="_images/R2D2_logo_red.png"><img alt="_images/R2D2_logo_red.png" src="_images/R2D2_logo_red.png" style="width: 350px;" />
+</a>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="start.html">R2D2を使い始めるには</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id1">ディレクトリ構造の準備</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id2">コンパイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id3">初期条件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id4">追加条件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id5">スーパーコンピュータでのシェルスクリプト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#id6">初期条件データを受け取った場合</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="environment.html#fortran">Fortranコードの環境設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.html#python">Pythonコードの環境設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="environment.html#idl">IDLコードの環境設定</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="typical_case.html#id2">デカルト座標</a></li>
+<li class="toctree-l2"><a class="reference internal" href="typical_case.html#yin-yang">球座標(Yin-Yang格子含む)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="typical_case.html#id11">2次元計算</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="equation.html">方程式</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="equation.html#id2">磁気流体力学</a></li>
+<li class="toctree-l2"><a class="reference internal" href="equation.html#id3">輻射輸送</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">コード</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code.html#id2">コーディングルール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#id4">コード構造</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="scheme.html">数値スキーム</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scheme.html#mhd">MHDスキーム</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameter.html">パラメータ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#id2">一様グリッド</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html#id3">非一様グリッド</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="boundary.html">境界条件</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="boundary.html#id2">上部境界</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundary.html#id4">下部境界</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="artdif.html">人工粘性</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io.html">出力と読込</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="io.html#id2">出力</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#id3">読込</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html#id8">バージョン履歴</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="paraview.html#id1">データ準備</a></li>
+<li class="toctree-l2"><a class="reference internal" href="paraview.html#paraview3">Paraviewを用いて3次元表示</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notation.html#self-p-dictionary">self.p [dictionary]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notation.html#self-qs-dictionary">self.qs [dictionary]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notation.html#self-qq-dictionary">self.qq [dictionary]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notation.html#self-qt-dictionary">self.qt [dictionary]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notation.html#self-vc-dictionary">self.vc [dictionary]</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#id1">はじめに</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#id3">インストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#html">HTMLファイルの生成</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#vs-code">VS codeの利用</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#id4">環境設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sphinx.html#id6">記法</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="id1">
+<h2>ライセンス<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>R2D2は公開ソフトウェアではなく、再配布も禁じている。
+共同研究者のみが使って良いというルールになっており、R2D2の使用には、以下の規約を守る必要がある。</p>
+<ul class="simple">
+<li><p>再配布しない</p></li>
+<li><p>改変は許されるが、その時の実行結果について堀田は責任を持たない</p></li>
+<li><p>R2D2で実行する計算は、堀田と議論する必要がある。パラメタ変更などの細かい変更には相談する必要はないが、新しいプロジェクトを開始するときはその都度相談すること。堀田自身のプロジェクト、堀田の指導学生のプロジェクトとの重複を避けるためである。</p></li>
+<li><p>R2D2を用いた論文を出版するときは <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019SciA....5.2307H/abstract">Hotta et al., 2019</a>, <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.494.2523H/abstract">Hotta and Iijima, 2020</a> を引用すること。</p></li>
+<li><p>R2D2を用いた研究を発表するときは、<a class="reference external" href="https://hottahd.github.io/R2D2-manual/_images/R2D2_logo_red.png">R2D2のロゴ</a> の使用が推奨される(強制ではない)。</p></li>
+</ul>
+<p>改訂履歴</p>
+</section>
+<section id="id3">
+<h2>出版論文<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>R2D2を用いた研究で出版された論文は以下です。</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019SciA....5.2307H/abstract">Hotta, Iijima, and Kusano, 2019, Science Advances, 5, eaau2307</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ApJ...886L..21T/abstract">Toriumi and Hotta, 2019, ApJ, 886, L21</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.494.2523H/abstract">Hotta and Iijima, 2020, MNRAS, 494, 2523</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.498.2925H/abstract">Hotta and Toriumi, 2020, MNRAS, 498, 2925</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.3610T/abstract">Takahata, Hotta, Iida, and Oba, MNRAS, 503, 3610</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2021NatAs...5.1100H/abstract">Hotta and Kusano, 2021, Nature Astronomy, 5, 1100</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2022ApJ...933..199H/abstract">Hotta, Kusano, and Shimada, 2022, ApJ, 933, 2</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.519.3091M/abstract">Mori and Hotta, 2023, MNRAS, 519, 3091</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2022MNRAS.517.2775K/abstract">Kaneko, Hotta, Toriumi and Kusano, 2022, MNRAS, 517, 2775</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.524.4746M/abstract">Mori and Hotta, 2023, MNRAS, 524, 4746</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023NatSR..13.8994T/abstract">Toriumi, Hotta and Kusano, 2023, Scientific Report, 13, 8994</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023PASJ..tmp...76M/abstract">Masaki, Hotta, Katsukawa and Ishikawa, 2023, PASJ,</a></p></li>
+<li><p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2023ApJ...948L..24S/abstract">Silva et al., 2023, ApJ, 948, L24</a></p></li>
+</ol>
+</section>
+<section id="id4">
+<h2>賞<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.hpci-c.jp/hrdevelop/award.html">HPCI ソフトウェア賞</a></p></li>
+</ul>
+</section>
+<section id="id5">
+<h2>索引と検索ページ<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+<section id="todo">
+<h2>TODOリスト<a class="headerlink" href="#todo" title="Link to this heading">¶</a></h2>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>人工粘性</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="artdif.html#id2"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/artdif.rst, line 4.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>コーディングルール</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="code.html#id3"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/code.rst, line 6.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>コード構造</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="code.html#id5"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/code.rst, line 10.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>輻射輸送の方程式</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="equation.html#id4"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/equation.rst, line 43.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>パラメータ。どのグローバル変数がどのモジュールで定義されているかを整理する。</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="parameter.html#id2"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/parameter.rst, line 4.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>数値スキーム(時間積分)</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="scheme.html#id4"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/scheme.rst, line 23.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>数値スキーム(輻射輸送)</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="scheme.html#id6"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/scheme.rst, line 28.)</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>全対流層計算の設定例</p>
+</div>
+<p class="todo-source">(The <a class="reference internal" href="typical_case.html#id8"><em>original entry</em></a> is located in /Users/hotta/R2D2_py/doc/source/typical_case.rst, line 331.)</p>
+<p>最終更新日：Nov 29, 2024</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">R2D2マニュアル</a><ul>
+<li><a class="reference internal" href="#id1">ライセンス</a></li>
+<li><a class="reference internal" href="#id3">出版論文</a></li>
+<li><a class="reference internal" href="#id4">賞</a></li>
+<li><a class="reference internal" href="#id5">索引と検索ページ</a></li>
+<li><a class="reference internal" href="#todo">TODOリスト</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="start.html"
+                          title="next chapter">R2D2を使い始めるには</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="start.html" title="R2D2を使い始めるには"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">R2D2 1.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">R2D2マニュアル</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2020-2024, Hideyuki Hotta.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>
