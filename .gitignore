@@ -8,3 +8,5 @@ a.out
 *.vtk
 .DS_Store
 doc/source/api/
+*.h5
+*.ipynb
