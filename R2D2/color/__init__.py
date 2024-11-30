@@ -1,1 +1,1 @@
-from .Color import *
+from .color import *
