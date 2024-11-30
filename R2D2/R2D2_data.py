@@ -64,17 +64,6 @@ R2D2_data.sync_check = sync.sync_check
 R2D2_data.sync_slice = sync.sync_slice
 R2D2_data.sync_all = sync.sync_all
 
-# color blind color set
-# Obtained from https://github.com/matplotlib/matplotlib/issues/9460
-blue    = '#7b85d4'
-orange  = '#f37738'
-green   = '#83c995'
-magenta = '#d7369e'
-gray    = '#c4c9d8'
-ash     = '#859795'
-yellow  = '#e9d943'
-brown   = '#ad5d50'
-
 # Solar parameters
 msun = 1.988e33 # g
 rsun = 6.957e10 # cm
