@@ -63,9 +63,3 @@ R2D2_data.sync_vc = sync.sync_vc
 R2D2_data.sync_check = sync.sync_check
 R2D2_data.sync_slice = sync.sync_slice
 R2D2_data.sync_all = sync.sync_all
-
-# Solar parameters
-msun = 1.988e33 # g
-rsun = 6.957e10 # cm
-lsun = 3.828e33 # erg/s
-asun = 4.570e9 # yr
