@@ -103,7 +103,7 @@ def show_information(self):
     print(RED + '### calculation time ###' + END)
     print('time step (nd) =',self.p['nd'])
     print('time step (nd_tau) =',self.p['nd_tau'])
-    t = self.read_time(self.p['nd'])
+    t = self.time(self.p['nd'])
     print('time =','{:.2f}'.format(t/3600),' [hour]')
 
     return

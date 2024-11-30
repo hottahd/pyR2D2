@@ -1,4 +1,4 @@
-from .R2D2_data import *
+from .r2d2_data import *
 from .color.color import *
 from .constant.constant import *
 from .fortran_util import *
