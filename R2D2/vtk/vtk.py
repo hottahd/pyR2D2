@@ -1,17 +1,22 @@
-######################################################
-######################################################
 def write_3D(qq,x,y,z,file,name):
     '''
-    This function outputs the 3D scalar data in 
+    Outputs the 3D scalar data in 
     VTK format especially for Paraview
 
-    Parameters:
-        qq (float) [ix,jx,kx]: output 3D array
-        x (float) [ix]: x coordinate
-        y (float) [jx]: y coordinate
-        z (float) [kx]: z coordinate
-        file (str): File name for output
-        name (str): Name of the variable    
+    Parameters
+    ----------
+    qq : numpy.ndarray, float
+        Output 3D array size of (ix,jx,kx)
+    x : numpy.ndarray, float 
+        x coordinate size of (ix)
+    y : numpy.ndarray, float 
+        y coordinate size of (jx)
+    z : numpy.ndarray, float
+        z coordinate size of (kx)
+    file : str
+        File name for output
+    name : str
+        Name of the variable
     '''
     import os
 
@@ -45,17 +50,23 @@ def write_3D(qq,x,y,z,file,name):
 ######################################################
 def write_optical_surface(qq,height,y,z,file,name):
     '''
-    This function outputs the 2D scalar data in 
+    Outputs the 2D scalar data in 
     VTK format especially for Paraview
 
-    Parameters:
-        qq (float) [jx,kx]: output 3D array
-        height (float) [jx,kx]: height of optical surface
-                                store in self.qt['he']
-        y (float) [jx]: y coordinate
-        z (float) [kx]: z coordinate
-        file (str): File name for output
-        name (str): Name of the variable    
+    Parameters
+    ----------
+    qq : numpy.ndarray, float 
+        Output 3D array size of (jx,kx)
+    height : numpy.ndarray, float
+        height of optical surface size of (jx,kx) stored in self.qt['he']
+    y : numpy.ndarray, float
+        y coordinate size of (jx)
+    z : numpy.ndarray, float
+        z coordinate size of (kx)
+    file : str
+        File name for output
+    name : str
+        Name of the variable    
     '''
     import os
     import numpy as np
@@ -68,7 +79,6 @@ def write_optical_surface(qq,height,y,z,file,name):
     xyz[0,:] = height.reshape([jx*kx],order='F')
     xyz[1,:] = Y.reshape([jx*kx],order='F')
     xyz[2,:] = Z.reshape([jx*kx],order='F')
-    
     
     f = open(file,mode='w')
     f.write('# vtk DataFile Version 3.0\n')
@@ -99,18 +109,22 @@ def write_optical_surface(qq,height,y,z,file,name):
 ######################################################
 def write_3D_vector(qx,qy,qz,x,y,z,file,name):
     '''
-    This function outputs the 3D vector data in 
+    Outputs the 3D vector data in 
     VTK format especially for Paraview
 
-    Parameters:
-        qx (float) [ix,jx,kx]: x-component vector
-        qy (float) [ix,jx,kx]: y-component vector
-        qz (float) [ix,jx,kx]: z-component vector
-        x (float) [ix]: x coordinate
-        y (float) [jx]: y coordinate
-        z (float) [kx]: z coordinate
-        file (str): File name for output
-        name (str): Name of the variable    
+    Parameters
+    ----------
+    qx : numpy.ndarray,float
+        x-component vector size of (ix,jx,kx)
+    qy : numpy.ndarray, float
+        y-component vector size of (ix,jx,kx)
+    qz : numpy.ndarray, float
+        z-component vector size of (ix,jx,kx)
+    x (float) [ix]: x coordinate
+    y (float) [jx]: y coordinate
+    z (float) [kx]: z coordinate
+    file (str): File name for output
+    name (str): Name of the variable    
     '''
     import os
     import numpy as np

@@ -101,7 +101,33 @@ autodoc_default_options = {
 }
 
 napoleon_include_init_with_doc = True
-#napoleon_use_ivar = True
+napoleon_use_ivar = True
 
 automodapi_inheritance_diagram = False
 autosummary_generate = True  # autosummaryでファイルを生成
+
+# Sphinx autodoc hook for adding alias information to methods of R2D2_read and R2D2_sync
+# This hook modifies the docstrings of R2D2_read and R2D2_sync methods to include an alias 
+# indicating how they are accessed through R2D2_data.read or R2D2_data.sync.
+# Example: R2D2_read.qq_select -> R2D2_data.read.qq_select
+
+def autodoc_process_docstring(app, what, name, obj, options, lines):
+    # Mapping of alias names (e.g., 'read', 'sync') to their respective classes
+    target_classes = {
+        "read": "R2D2.R2D2_read",
+        "sync": "R2D2.R2D2_sync"
+    }
+
+    for alias, target_class in target_classes.items():
+        if name.startswith(target_class):
+            # Add a note indicating how the method is accessed
+            method_name = name.split(".")[-1]
+            alias_name = f"R2D2.R2D2_data.{alias}.{method_name}"
+            lines.append("")
+            lines.append(f".. important:: This method is accessible as `{alias_name}`.")
+            lines.append("")
+            break  # No need to check further classes
+
+def setup(app):
+    # Connect the hook to the autodoc event in Sphinx
+    app.connect("autodoc-process-docstring", autodoc_process_docstring)
