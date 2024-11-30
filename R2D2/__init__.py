@@ -1,7 +1,7 @@
-from .r2d2_data import *
-from .color.color import *
-from .constant.constant import *
-from .fortran_util import *
+from . import r2d2_data
+from . import color
+from . import constant
+from . import fortran_util
 from .vtk import *
 from . import util
 

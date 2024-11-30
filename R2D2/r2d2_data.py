@@ -1,8 +1,8 @@
 from .r2d2_read import R2D2_read
+from .r2d2_sync import R2D2_sync
 from . import google
 from . import resolution
 from . import models
-from . import sync
 
 class R2D2_data:    
     '''
@@ -14,7 +14,9 @@ class R2D2_data:
 
     Attributes
     ----------
-        Read : R2D2.R2D2_read
+        read : R2D2.R2D2_read
+            Instance of R2D2.R2D2_read
+        sync : R2D2.R2D2_sync
         
         p : dict
             basic parameters.
@@ -44,10 +46,12 @@ class R2D2_data:
         Initialize R2D2_data
         '''
         self.read = R2D2_read(datadir,verbose=verbose,self_old=self_old)
+        self.sync = R2D2_sync(self.read)
 
     def __getattr__(self, name):
         if hasattr(self.read, name):
             return getattr(self.read, name)
+
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
 # R2D2_data.read_time = read.read_time
@@ -56,11 +60,3 @@ R2D2_data.set_cells_gspread  = google.set_cells_gspread
 R2D2_data.upgrade_resolution = resolution.upgrade_resolution
 R2D2_data.models_init       = models.init
 R2D2_data.eos               = models.eos
-
-R2D2_data.sync_remap_qq = sync.sync_remap_qq
-R2D2_data.sync_tau = sync.sync_tau
-R2D2_data.sync_select = sync.sync_select
-R2D2_data.sync_vc = sync.sync_vc
-R2D2_data.sync_check = sync.sync_check
-R2D2_data.sync_slice = sync.sync_slice
-R2D2_data.sync_all = sync.sync_all

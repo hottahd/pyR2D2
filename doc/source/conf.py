@@ -27,6 +27,7 @@ release = '1.3'
 import sys, os
 sys.path.insert(0, os.path.abspath('../../'))
 import R2D2
+import R2D2.fortran_util
 
 # -- General configuration ---------------------------------------------------
 
