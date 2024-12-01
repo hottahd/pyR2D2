@@ -47,6 +47,14 @@ class R2D2_data:
         '''
         self.read = R2D2_read(datadir,verbose=verbose,self_old=self_old)
         self.sync = R2D2_sync(self.read)
+        
+    def summary(self):
+        """
+        Rapper of :function:`R2D2.R2D2_read.summary`
+        
+        """
+        R2D2_read.summary(self.read)
+
 
     def __getattr__(self, name):
         if hasattr(self.read, name):

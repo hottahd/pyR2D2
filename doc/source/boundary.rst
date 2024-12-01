@@ -15,7 +15,7 @@
 
 また、対称・反対称とは以下のような状況を表す。
 
-.. image:: figs/bc_sym.png
+.. image:: _static/figs/bc_sym.png
    :width: 450 px
 
 

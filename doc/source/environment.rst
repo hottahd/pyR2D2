@@ -149,12 +149,12 @@ oauth2clientのインストール
 
 ウェブブラウザで https://console.developers.google.com/cloud-resource-manager?pli=1 にアクセス。
 
-.. image:: figs/google/gen_project1.png
+.. image:: _static/figs/google/gen_project1.png
     :width: 350 px
 
 「プロジェクトを作成」として、プロジェクトを作成
 
-.. image:: figs/google/gen_project2.png
+.. image:: _static/figs/google/gen_project2.png
     :width: 400 px
 
 プロジェクト名はR2D2, 場所は組織なしとする。
@@ -162,22 +162,22 @@ oauth2clientのインストール
 API有効化
 ||||||||||||||||||||||||||||||
 
-.. image:: figs/google/google_drive1.png
+.. image:: _static/figs/google/google_drive1.png
     :width: 400 px
 
 次に検索窓にGoogle Driveと打ち込んで、Google DriveのAPIを検索
 
-.. image:: figs/google/google_drive2.png
+.. image:: _static/figs/google/google_drive2.png
     :width: 400 px
 
 Google Drive APIを有効にする。
 
-.. image:: figs/google/google_sheet1.png
+.. image:: _static/figs/google/google_sheet1.png
     :width: 400 px
 
 同様にGoogle Sheetsと検索
 
-.. image:: figs/google/google_sheet2.png
+.. image:: _static/figs/google/google_sheet2.png
     :width: 400 px
 
 Google Sheets APIを有効化
@@ -185,22 +185,22 @@ Google Sheets APIを有効化
 サービスアカウント作成
 ||||||||||||||||||||||||||||||
 
-.. image:: figs/google/service_account1.png
+.. image:: _static/figs/google/service_account1.png
     :width: 400 px
 
 Google APIロゴ → 認証情報 → サービスアカウントとたどる。
 
-.. image:: figs/google/service_account2.png
+.. image:: _static/figs/google/service_account2.png
     :width: 400 px
 
 サービスアカウント名はR2D2とする
 
-.. image:: figs/google/service_account3.png
+.. image:: _static/figs/google/service_account3.png
     :width: 400 px
 
 役割は編集者を選択
 
-.. image:: figs/google/service_account4.png
+.. image:: _static/figs/google/service_account4.png
     :width: 400 px
 
 キーの生成ではJSONを選択し、キーを生成する。
@@ -214,12 +214,12 @@ https://docs.google.com/spreadsheets/create
 
 名前はプロジェクト名とする。R2D2では、pyディレクトリの上のディレクトリ名を読みそれをスプレッドシートの名前として情報を送るので、ディレクトリと同じ名前にする。
 
-.. image:: figs/google/spread_sheet1.png
+.. image:: _static/figs/google/spread_sheet1.png
     :width: 400 px
 
 講習会ではR2D2としておく。
 
-.. image:: figs/google/spread_sheet2.png
+.. image:: _static/figs/google/spread_sheet2.png
     :width: 400 px
 
 共有をクリックし、ダウンロードしたjsonファイルの中のclient_email行のEメールアドレスをコピーして、貼り付け。ここまでで、R2D2からGoogleスプレッドシートにアクセスできるようになる。

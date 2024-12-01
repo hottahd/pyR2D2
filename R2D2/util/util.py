@@ -1,22 +1,51 @@
-def initialize_instance(main_locals,instance):
-    '''
-    Initialize arbitrary instance of R2D2_data object in main program.
+import sys
+sys.path.append('../../') 
+from R2D2.r2d2_data import R2D2_data
+
+def init(main_locals,instance_name='d'):
+    """
+    This is a pen.
+    
+    Examples
+    --------
+    .. code-block:: python
+
+        import R2D2
+        R2D2.util.init(locals())
         
-    Parameters:
-       main_locals (dictionary): locals() in main program, which include local variables
-       instance (str): name of instance of R2D2_data object
+    """
+    
+    main_locals['caseid'] = caseid_select(main_locals)
+    datadir = "../run/"+main_locals['caseid']+"/data/"
+    
+    initialize_instance(main_locals,instance_name)
+    main_locals[instance_name] = R2D2_data(datadir)
+    
+def initialize_instance(main_locals,instance_name):
     '''
-    if not instance in main_locals:
-        main_locals[instance] = None
+    Initializes arbitrary instance of R2D2_data object in main program.
+        
+    Parameters
+    ----------
+    main_locals : dict
+        locals() in main program, which include local variables
+    instance_name : str
+        name of instance of R2D2_data object
+    '''
+    if not instance_name in main_locals:
+        main_locals[instance_name] = None
 
 def caseid_select(main_locals,force_read=False):
     '''
     Choose caseid from input or from user input.
     
-    Parameters:
-        main_locals (dictionary): locals() in main program, which include local variables
-        force_read (bool): if True, force to read caseid from user input, 
-                           if False, read caseid from main_locals if exists
+    Parameters
+    ----------
+    main_locals : dict 
+        locals() in main program, which include local variables
+    force_read : bool
+        If True, force to read caseid from user input.
+        If False, read caseid from main_locals if exists
     '''
     
     RED = '\033[31m'
@@ -29,86 +58,52 @@ def caseid_select(main_locals,force_read=False):
        
     return caseid
 
-def locals_define(self,main_locals):
+def locals_define(r2d2_data,main_locals):
     '''
     Substitute selp.p to main_locals in main program.
     
-    Parameters:
-       self (R2D2_data): instance of R2D2_data object
-       main_locals (dictionary): locals() in main program, which include local variables
+    Parameters
+    ----------
+    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read
+        Instance of R2D2_data object
+    main_locals : dict
+        locals() in main program, which include local variables
     '''
-    for key, value in self.p.items():
+    for key, value in r2d2_data.p.items():
         main_locals[key] = value    
     return
 
-def define_n0(self,main_locals,nd_type='nd'):
+def define_n0(r2d2_data,main_locals,nd_type='nd'):
     '''
     Define n0 in main_locals if not exists.
     
-    Parameters:
-       self (R2D2_data): instance of R2D2_data object
-       main_locals (dictionary): locals() in main program, which include local variables
-       nd_type (str): type of nd. 'nd' for MHD output, 'nd_tau' for high cadence output.
+    Parameters
+    ----------
+    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read
+        instance of R2D2_data object
+    main_locals : dict
+        locals() in main program, which include local variables
+    nd_type : str
+        type of nd. 'nd' for MHD output, 'nd_tau' for high cadence output.
     '''
     if 'n0' not in main_locals:
         main_locals['n0'] = 0
-    if main_locals['n0'] > self.p[nd_type]:
-        main_locals['n0'] = self.p[nd_type]
+    if main_locals['n0'] > r2d2_data.p[nd_type]:
+        main_locals['n0'] = r2d2_data.p[nd_type]
     
     return main_locals['n0']
 
-def show_information(self):
-    '''
-    Show data information
-    
-    Parameters:
-       self (R2D2_data): instance of R2D2_data object
-    '''
-    
-    import numpy as np
-    import R2D2
-    
-    RED = '\033[31m'
-    END = '\033[0m'
-
-    print(RED + '### Star information ###' + END)
-    print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.msun)+' msun')    
-    print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
-
-    print('')
-    if self.p['geometry'] == 'Cartesian':
-        print(RED + '### calculation domain ###' + END)
-        print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm], xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
-        print('ymax         = ', '{:6.2f}'.format(self.p['ymax']*1.e-8)       ,'[Mm], ymin         = ', '{:6.2f}'.format(self.p['ymin']*1.e-8),'[Mm]' )
-        print('zmax         = ', '{:6.2f}'.format(self.p['zmax']*1.e-8)       ,'[Mm], zmin         = ', '{:6.2f}'.format(self.p['zmin']*1.e-8),'[Mm]' )
-
-    if self.p['geometry'] == 'Spherical':
-        pi2rad = 180/np.pi
-        print('### calculation domain ###')
-        print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm],  xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
-        print('ymax        = ', '{:6.2f}'.format(self.p['ymax']*pi2rad)        ,'[rad], ymin        = ', '{:6.2f}'.format(self.p['ymin']*pi2rad),'[rad]' )
-        print('zmax        = ', '{:6.2f}'.format(self.p['zmax']*pi2rad)        ,'[rad], zmin        = ', '{:6.2f}'.format(self.p['zmin']*pi2rad),'[rad]' )
-
-    if self.p['geometry'] == 'YinYang':
-        pi2rad = 180/np.pi
-        print('### calculation domain ###')
-        print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm],  xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
-        print('Yin-Yang grid is used to cover the whole sphere')
-
-    print('')
-    print(RED + '### number of grid ###' + END)
-    print('(ix,jx,kx)=(',self.p['ix'],',',self.p['jx'],',',self.p['kx'],')')
-
-    print('')
-    print(RED + '### calculation time ###' + END)
-    print('time step (nd) =',self.p['nd'])
-    print('time step (nd_tau) =',self.p['nd_tau'])
-    t = self.time(self.p['nd'])
-    print('time =','{:.2f}'.format(t/3600),' [hour]')
-
-    return
-
 def get_best_unit(size, unit_multipliers):
+    """
+    Get the best unit for displaying the size.
+
+    Parameters
+    ----------
+    size : int
+        size of the file
+    unit_multipliers : dict
+        dictionary of unit multipliers
+    """
     for unit in reversed(['B', 'kB', 'MB', 'GB', 'TB', 'PB']):
         if size >= unit_multipliers[unit]:
             return unit
@@ -167,14 +162,21 @@ def get_total_file_size(directory, unit=None):
 
 def update_results_file(file_path, total_size, unit, caseid, dir_path):
     '''
-    Update the results file with the size of a directory.
+    Updates the results file with the size of a directory.
     
-    Parameters:
-       file_path (str): path to the results file
-       total_size (float): total size of the directory
-       unit (str): unit of the file size
-       caseid (str): the case ID of the directory
-       dir_path (str): the directory path
+    Parameters
+    ----------
+    file_path : str
+        Path to the results file
+    total_size : float
+        Total size of the directory
+    unit : str
+        Unit of the file size
+    caseid : str
+        The case ID of the directory
+    dir_path : str
+        The directory path
+        
     '''
     import os
     from datetime import datetime

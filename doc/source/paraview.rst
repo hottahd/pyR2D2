@@ -69,32 +69,32 @@ Paraviewを用いて3次元表示
 
 1. まず右上のファイルアイコンをクリック
 
-    .. image:: figs/paraview/paraview01.png
+    .. image:: _static/figs/paraview/paraview01.png
         :width: 600 px
 
 2. Pythonで生成したファイルを選択。2次元, ３次元ファイルどちらも選択する。一個一個選択しても良いし、一度に選択しても良い。時系列データの時は、すべてを一度に選択するとアニメーションを作りやすい。
 
-    .. image:: figs/paraview/paraview02.png
+    .. image:: _static/figs/paraview/paraview02.png
         :width: 600 px
 
 3. Applyをクリック。選択した二つのデータが表示される。
 
-    .. image:: figs/paraview/paraview03.png
+    .. image:: _static/figs/paraview/paraview03.png
         :width: 600 px
 
 4. 2次元データの方は、すぐに面として表示されるが、三次元データは表示方法を選ぶ必要がある。
 
-    .. image:: figs/paraview/paraview04.png
+    .. image:: _static/figs/paraview/paraview04.png
         :width: 600 px
 
 5. 三次元データのボリュームレンダリングが行いたいので、Volumeを選ぶ。
 
-    .. image:: figs/paraview/paraview05.png
+    .. image:: _static/figs/paraview/paraview05.png
         :width: 600 px
 
 6. 三次元データのボリュームレンダリングが表示されるので、便宜描画を回転させるなどして、解析する。
 
-    .. image:: figs/paraview/paraview06.png
+    .. image:: _static/figs/paraview/paraview06.png
         :width: 600 px
 
 最終更新日：|today|

@@ -1,3 +1,7 @@
+import sys
+import R2D2
+import numpy as np
+
 class R2D2_read:
     def __init__(self, datadir, verbose=False, self_old=None):
         '''
@@ -12,10 +16,8 @@ class R2D2_read:
             self_old : R2D2.R2D2_data
                 if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
         '''
-        import R2D2
-        import numpy as np
         from scipy.io import FortranFile
-        import os,sys
+        import os
         
         # check if the data is already read
         initialize_flag = True
@@ -306,7 +308,7 @@ class R2D2_read:
             self.p['origin'] = 'N/A'
                 
         if verbose:
-            R2D2.util.show_information(self)
+            self.summary()
             
     ##############################
     def qq_select(self,xs,n,silent=False):
@@ -327,7 +329,6 @@ class R2D2_read:
         The data is stored in self.qs dictionary
         '''
 
-        import numpy as np
         i0 = np.argmin(np.abs(self.p["x"]-xs))
         ir0 = self.p["i2ir"][i0]
         mtype = self.p["mtype"]
@@ -412,7 +413,6 @@ class R2D2_read:
             
         '''
 
-        import numpy as np
         k0 = np.argmin(np.abs(self.p["z"]-zs))
         mtype = self.p["mtype"]
         iixl = self.p["iixl"]
@@ -504,7 +504,6 @@ class R2D2_read:
             silent : bool
                 True suppresses a message of store
         '''
-        import numpy as np
         
         mtype = self.p["mtype"]
         iixl = self.p["iixl"]
@@ -592,7 +591,6 @@ class R2D2_read:
             silent : bool
                 True suppresses a message of store
         '''
-        import numpy as np
         
         mtype = self.p["mtype"]
         iixl, jjxl = self.p["iixl"], self.p["jjxl"]
@@ -692,7 +690,6 @@ class R2D2_read:
                 True suppresses a message of store
                 
         '''
-        import numpy as np
 
         if self.p['geometry'] == 'YinYang':
             files = ['_yin','_yan']
@@ -780,7 +777,6 @@ class R2D2_read:
                 True suppresses a message of store
         '''
         
-        import numpy as np
         mtype = self.p["mtype"]
         iixl, jjxl = self.p["iixl"], self.p["jjxl"]
         jss, jee = self.p["jss"], self.p["jee"]
@@ -861,8 +857,6 @@ class R2D2_read:
                 time at a selected time step
         '''
 
-        import numpy as np
-
         if tau:
             f = open(self.p['datadir']+"time/tau/t.dac."+'{0:08d}'.format(n),"rb")
             self.t = np.fromfile(f,self.p['endian']+'d',1).reshape((1),order='F')[0]            
@@ -889,8 +883,6 @@ class R2D2_read:
             silent : bool
                 True suppresses a message of store
         '''
-
-        import numpy as np
 
         # read xy plane data
         f = open(self.p['datadir']+"remap/vl/vl_xy.dac."+'{0:08d}'.format(n),"rb")
@@ -948,8 +940,6 @@ class R2D2_read:
                 If true, checkpoint of end step is read.
         '''
 
-        import numpy as np
-
         mtype = self.p['mtype']
         ix = self.p['ix']
         jx = self.p['jx']
@@ -992,8 +982,6 @@ class R2D2_read:
             silent : bool
                 True suppresses a message of store
         '''
-        import numpy as np
-
         mtype = self.p['mtype']
 
         if self.p['geometry'] == 'YinYang':
@@ -1059,8 +1047,6 @@ class R2D2_read:
             silent : bool
                 True suppresses a message of store
         '''
-        import numpy as np
-        
         mtype = self.p["mtype"]
         ix = self.p["ix"]
         jx = self.p["jx"]
@@ -1114,7 +1100,6 @@ class R2D2_read:
         YinYangSet function sets up the YinYang geometry for
         YinYang direct plot.
         '''
-        import numpy as np
         if self.p['geometry'] == 'YinYang':
             if not 'Z_yy' in self.p:
                 print('Yes')
@@ -1144,3 +1129,46 @@ class R2D2_read:
                 # self.p['sins_yy'] =  np.cos(self.p['zo_yy'])/np.sin(self.p['yy_yy'])
                 # self.p['cossg_yy'] = -np.sin(self.p['zog_yy'])*np.sin(self.p['zzg_yy'])
                 # self.p['sinsg_yy'] =  np.cos(self.p['zog_yy'])/np.sin(self.p['yyg_yy'])
+    
+    def summary(self):
+        '''
+        Show R2D2_read summary        
+        '''
+            
+        RED = '\033[31m'
+        END = '\033[0m'
+
+        print(RED + '### Star information ###' + END)
+        print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.Constant.msun)+' msun')
+        print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
+
+        print('')
+        if self.p['geometry'] == 'Cartesian':
+            print(RED + '### calculation domain ###' + END)
+            print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm], xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
+            print('ymax         = ', '{:6.2f}'.format(self.p['ymax']*1.e-8)       ,'[Mm], ymin         = ', '{:6.2f}'.format(self.p['ymin']*1.e-8),'[Mm]' )
+            print('zmax         = ', '{:6.2f}'.format(self.p['zmax']*1.e-8)       ,'[Mm], zmin         = ', '{:6.2f}'.format(self.p['zmin']*1.e-8),'[Mm]' )
+
+        if self.p['geometry'] == 'Spherical':
+            pi2rad = 180/np.pi
+            print('### calculation domain ###')
+            print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm],  xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
+            print('ymax        = ', '{:6.2f}'.format(self.p['ymax']*pi2rad)        ,'[rad], ymin        = ', '{:6.2f}'.format(self.p['ymin']*pi2rad),'[rad]' )
+            print('zmax        = ', '{:6.2f}'.format(self.p['zmax']*pi2rad)        ,'[rad], zmin        = ', '{:6.2f}'.format(self.p['zmin']*pi2rad),'[rad]' )
+
+        if self.p['geometry'] == 'YinYang':
+            pi2rad = 180/np.pi
+            print('### calculation domain ###')
+            print('xmax - rstar = ', '{:6.2f}'.format((self.p['xmax'] - self.p['rstar'])*1.e-8),'[Mm],  xmin - rstar = ', '{:6.2f}'.format((self.p['xmin'] - self.p['rstar'])*1.e-8),'[Mm]')
+            print('Yin-Yang grid is used to cover the whole sphere')
+
+        print('')
+        print(RED + '### number of grid ###' + END)
+        print('(ix,jx,kx)=(',self.p['ix'],',',self.p['jx'],',',self.p['kx'],')')
+
+        print('')
+        print(RED + '### calculation time ###' + END)
+        print('time step (nd) =',self.p['nd'])
+        print('time step (nd_tau) =',self.p['nd_tau'])
+        t = self.time(self.p['nd'])
+        print('time =','{:.2f}'.format(t/3600),' [hour]')
