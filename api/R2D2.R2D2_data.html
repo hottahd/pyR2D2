@@ -1,144 +1,50 @@
 
+
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R2D2_data &mdash; R2D2 Document 1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
 
-<html lang="en" data-content_root="../" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>R2D2_data &#8212; R2D2 1.3 documentation</title>
   
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
-
-    <script src="../_static/documentation_options.js?v=b1f56dee"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api/R2D2.R2D2_data';</script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="R2D2 pythonでのキーワードの説明" href="../notation.html" />
-    <link rel="prev" title="write_optical_surface" href="R2D2.write_optical_surface.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="next" title="R2D2_read" href="R2D2.R2D2_read.html" />
+    <link rel="prev" title="Constant" href="R2D2.Constant.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-  
-  <dialog id="pst-search-dialog">
-    
-<form class="bd-search d-flex align-items-center"
-      action="../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search..."
-         aria-label="Search..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-    
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">R2D2 1.3 documentation</p>
-  
-</a></div>
-        <div class="sidebar-primary-item">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button></div>
-        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item navbar-nav active">
-        <ul class="current nav bd-sidenav">
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../start.html">R2D2を使い始めるには</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
@@ -151,397 +57,95 @@
 <li class="toctree-l1"><a class="reference internal" href="../artdif.html">人工粘性</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io.html">出力と読込</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="R2D2.d_x.html">d_x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.d_y.html">d_y</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.d_z.html">d_z</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.interp.html">interp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.spherical2cartesian.html">spherical2cartesian</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.write_3D.html">write_3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.write_3D_vector.html">write_3D_vector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.write_optical_surface.html">write_optical_surface</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">R2D2_data</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#module-R2D2">R2D2 Package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../api_reference.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="R2D2.Color.html">Color</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.Constant.html">Constant</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">R2D2_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.R2D2_read.html">R2D2_read</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.R2D2_sync.html">R2D2_sync</a></li>
 </ul>
-</details></li>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.util">R2D2.util Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.fortran_util">R2D2.fortran_util Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.vtk">R2D2.vtk Package</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
 </ul>
 
-    </div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-
-<div class="sbt-scroll-pixel-helper"></div>
-
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <span class="fa-solid fa-bars"></span>
-</button></div>
-      
-    </div>
-  
-  
-    <div class="header-article-items__end">
-      
-        <div class="header-article-item">
-
-<div class="article-header-buttons">
-
-
-
-
-
-<div class="dropdown dropdown-download-buttons">
-  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
-    <i class="fas fa-download"></i>
-  </button>
-  <ul class="dropdown-menu">
-      
-      
-      
-      <li><a href="../_sources/api/R2D2.R2D2_data.rst" target="_blank"
-   class="btn btn-sm btn-download-source-button dropdown-item"
-   title="Download source file"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="btn__text-container">.rst</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li>
-<button onclick="window.print()"
-  class="btn btn-sm btn-download-pdf-button dropdown-item"
-  title="Print to PDF"
-  data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="btn__text-container">.pdf</span>
-</button>
-</li>
-      
-  </ul>
-</div>
-
-
-
-
-<button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
-  title="Fullscreen mode"
-  data-bs-placement="bottom" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-expand"></i>
-  </span>
-
-</button>
-
-
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
-
-
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-</button>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
-</div></div>
-      
-    </div>
-  
-</div>
-</div>
-              
-              
-
-<div id="jb-print-docs-body" class="onlyprint">
-    <h1>R2D2_data</h1>
-    <!-- Table of contents -->
-    <div id="print-main-content">
-        <div id="jb-print-toc">
-            
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data"><code class="docutils literal notranslate"><span class="pre">R2D2_data</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.p"><code class="docutils literal notranslate"><span class="pre">R2D2_data.p</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qs"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qs</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qq</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qt"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qt</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.t"><code class="docutils literal notranslate"><span class="pre">R2D2_data.t</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.vc</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.models"><code class="docutils literal notranslate"><span class="pre">R2D2_data.models</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.YinYangSet"><code class="docutils literal notranslate"><span class="pre">R2D2_data.YinYangSet()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.eos"><code class="docutils literal notranslate"><span class="pre">R2D2_data.eos()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.models_init"><code class="docutils literal notranslate"><span class="pre">R2D2_data.models_init()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_2d"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_2d()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_all"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_all()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_check"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_check()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_ixr"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_ixr()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_restricted"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_restricted()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_select"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_select()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_select_z"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_select_z()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_slice"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_slice()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_tau"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_tau()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_time"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_time()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_vc()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.set_cells_gspread"><code class="docutils literal notranslate"><span class="pre">R2D2_data.set_cells_gspread()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_all"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_all()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_check"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_check()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_remap_qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_remap_qq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_select"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_select()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_slice"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_slice()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_tau"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_tau()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_vc()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.upgrade_resolution"><code class="docutils literal notranslate"><span class="pre">R2D2_data.upgrade_resolution()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.__init__"><code class="docutils literal notranslate"><span class="pre">R2D2_data.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-            </nav>
         </div>
-    </div>
-</div>
+      </div>
+    </nav>
 
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API Reference</a></li>
+      <li class="breadcrumb-item active">R2D2_data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/R2D2.R2D2_data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="r2d2-data">
-<h1>R2D2_data<a class="headerlink" href="#r2d2-data" title="Link to this heading">#</a></h1>
+<h1>R2D2_data<a class="headerlink" href="#r2d2-data" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="R2D2.R2D2_data">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">R2D2.</span></span><span class="sig-name descname"><span class="pre">R2D2_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/common.html#R2D2_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">R2D2.</span></span><span class="sig-name descname"><span class="pre">R2D2_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_data.html#R2D2_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_data" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for managing R2D2_data</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.p">
-<span class="sig-name descname"><span class="pre">p</span></span><a class="headerlink" href="#R2D2.R2D2_data.p" title="Link to this definition">#</a></dt>
-<dd><p>basic parameters.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#R2D2.R2D2_data.__init__" title="R2D2.R2D2_data.__init__"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.__init__</span></code></a></p>
-</div>
+<p class="rubric">Notes</p>
+<p>self.read is an instance of R2D2.R2D2_read</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>read</strong> (<a class="reference internal" href="R2D2.R2D2_read.html#R2D2.R2D2_read" title="R2D2.R2D2_read"><em>R2D2.R2D2_read</em></a>) – Instance of R2D2.R2D2_read</p></li>
+<li><p><strong>sync</strong> (<a class="reference internal" href="R2D2.R2D2_sync.html#R2D2.R2D2_sync" title="R2D2.R2D2_sync"><em>R2D2.R2D2_sync</em></a>) – Instance of R2D2.R2D2_sync</p></li>
+<li><p><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – Model S based stratification.
+See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.models_init</span></code></p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.qs">
-<span class="sig-name descname"><span class="pre">qs</span></span><a class="headerlink" href="#R2D2.R2D2_data.qs" title="Link to this definition">#</a></dt>
-<dd><p>2D data at selected height.
-See <a class="reference internal" href="#R2D2.R2D2_data.read_qq_select" title="R2D2.R2D2_data.read_qq_select"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.read_qq_select</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.qq">
-<span class="sig-name descname"><span class="pre">qq</span></span><a class="headerlink" href="#R2D2.R2D2_data.qq" title="Link to this definition">#</a></dt>
-<dd><p>3D full data.
-See <a class="reference internal" href="#R2D2.R2D2_data.read_qq" title="R2D2.R2D2_data.read_qq"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.read_qq</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.qt">
-<span class="sig-name descname"><span class="pre">qt</span></span><a class="headerlink" href="#R2D2.R2D2_data.qt" title="Link to this definition">#</a></dt>
-<dd><p>2D data at constant optical depths.
-See <a class="reference internal" href="#R2D2.R2D2_data.read_qq_tau" title="R2D2.R2D2_data.read_qq_tau"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.read_qq_tau</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.t">
-<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#R2D2.R2D2_data.t" title="Link to this definition">#</a></dt>
-<dd><p>time
-See <a class="reference internal" href="#R2D2.R2D2_data.read_time" title="R2D2.R2D2_data.read_time"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.read_time</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.vc">
-<span class="sig-name descname"><span class="pre">vc</span></span><a class="headerlink" href="#R2D2.R2D2_data.vc" title="Link to this definition">#</a></dt>
-<dd><p>data of on the fly analysis
-See <a class="reference internal" href="#R2D2.R2D2_data.read_vc" title="R2D2.R2D2_data.read_vc"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.read_vc</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.models">
-<span class="sig-name descname"><span class="pre">models</span></span><a class="headerlink" href="#R2D2.R2D2_data.models" title="Link to this definition">#</a></dt>
-<dd><p>Model S based stratification
-See <a class="reference internal" href="#R2D2.R2D2_data.models_init" title="R2D2.R2D2_data.models_init"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_data.models_init</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <p class="rubric">Methods Summary</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.YinYangSet" title="R2D2.R2D2_data.YinYangSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YinYangSet</span></code></a>()</p></td>
-<td><p>YinYangSet function sets up the YinYang geometry for YinYang direct plot.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.eos" title="R2D2.R2D2_data.eos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eos</span></code></a>(ro, se, var)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.eos" title="R2D2.R2D2_data.eos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eos</span></code></a>(ro, se, var)</p></td>
 <td><p>This method returns the Table equation of state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.models_init" title="R2D2.R2D2_data.models_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models_init</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.models_init" title="R2D2.R2D2_data.models_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models_init</span></code></a>()</p></td>
 <td><p>This method read Model S based stratification.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq" title="R2D2.R2D2_data.read_qq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq</span></code></a>(n, value[, silent])</p></td>
-<td><p>This method reads 3D full data The data is stored in self.qq dictionary</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_2d" title="R2D2.R2D2_data.read_qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_2d</span></code></a>(n[, silent])</p></td>
-<td><p>This method reads full data of 2D calculation The data is stored in self.q2 dictionary</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_all" title="R2D2.R2D2_data.read_qq_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_all</span></code></a>(n[, silent])</p></td>
-<td><p>This method reads 3D full data all The data is stored in self.qq dictionary</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_check" title="R2D2.R2D2_data.read_qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_check</span></code></a>(n[, silent, end_step])</p></td>
-<td><p>This method reads 3D full data for checkpoint The data is stored in self.qc dictionary</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_ixr" title="R2D2.R2D2_data.read_qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_ixr</span></code></a>(ixrt, n[, silent])</p></td>
-<td><p>This method reads 3D data at a selected x-region corrensponding to ixr-th region in remap coordinate</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_restricted" title="R2D2.R2D2_data.read_qq_restricted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_restricted</span></code></a>(n, value, x0, x1, y0, y1, ...)</p></td>
-<td><p>This method reads 3D restricted-area data The data is stored in self.qr dictionary</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_select" title="R2D2.R2D2_data.read_qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_select</span></code></a>(xs, n[, silent])</p></td>
-<td><p>This method reads 2D slice data at a selected height.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_select_z" title="R2D2.R2D2_data.read_qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_select_z</span></code></a>(zs, n[, silent])</p></td>
-<td><p>This method reads 2D slice data at a selected height.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_slice" title="R2D2.R2D2_data.read_qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_slice</span></code></a>(n_slice, direc, n[, silent])</p></td>
-<td><p>This method reads 2D data of slice.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_qq_tau" title="R2D2.R2D2_data.read_qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qq_tau</span></code></a>(n[, silent])</p></td>
-<td><p>This method reads 2D data at certain optical depths.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_time" title="R2D2.R2D2_data.read_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_time</span></code></a>(n[, tau, silent])</p></td>
-<td><p>This method reads time at a selected time step The data is stored in self.t</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.read_vc" title="R2D2.R2D2_data.read_vc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_vc</span></code></a>(n[, silent])</p></td>
-<td><p>This method reads on the fly analysis data from fortran.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.set_cells_gspread" title="R2D2.R2D2_data.set_cells_gspread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cells_gspread</span></code></a>([json_key, project, caseid])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.set_cells_gspread" title="R2D2.R2D2_data.set_cells_gspread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cells_gspread</span></code></a>([json_key, project, caseid])</p></td>
 <td><p>This function output parameters to Google spread sheet</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_all" title="R2D2.R2D2_data.sync_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_all</span></code></a>(server[, ssh, project, dist])</p></td>
-<td><p>This method downloads all the data</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.summary" title="R2D2.R2D2_data.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>()</p></td>
+<td><p>Rapper of <a class="reference internal" href="R2D2.R2D2_read.html#R2D2.R2D2_read.summary" title="R2D2.R2D2_read.summary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.R2D2_read.summary()</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_check" title="R2D2.R2D2_data.sync_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_check</span></code></a>(n, server[, ssh, project, end_step])</p></td>
-<td><p>This method downloads checkpoint data</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_remap_qq" title="R2D2.R2D2_data.sync_remap_qq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_remap_qq</span></code></a>(n, server[, ssh, project])</p></td>
-<td><p>This method downloads full 3D remap data</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_select" title="R2D2.R2D2_data.sync_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_select</span></code></a>(xs, server[, ssh, project])</p></td>
-<td><p>This method downloads data at certain height</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_slice" title="R2D2.R2D2_data.sync_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_slice</span></code></a>(n, server[, ssh, project])</p></td>
-<td><p>This method downloads slice data</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_tau" title="R2D2.R2D2_data.sync_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_tau</span></code></a>(server[, ssh, project])</p></td>
-<td><p>This method downloads data at constant optical depth</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.sync_vc" title="R2D2.R2D2_data.sync_vc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync_vc</span></code></a>(server[, ssh, project])</p></td>
-<td><p>This method downloads pre analyzed data</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_data.upgrade_resolution" title="R2D2.R2D2_data.upgrade_resolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade_resolution</span></code></a>(caseid, n, xmin, xmax, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_data.upgrade_resolution" title="R2D2.R2D2_data.upgrade_resolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upgrade_resolution</span></code></a>(caseid, n, xmin, xmax, ...)</p></td>
 <td><p>This function chabges the resolution and output for the next calculation.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
 <p class="rubric">Methods Documentation</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.YinYangSet">
-<span class="sig-name descname"><span class="pre">YinYangSet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.YinYangSet" title="Link to this definition">#</a></dt>
-<dd><p>YinYangSet function sets up the YinYang geometry for
-YinYang direct plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><em>object</em></a>) – R2D2 class instance</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="R2D2.R2D2_data.eos">
-<span class="sig-name descname"><span class="pre">eos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ro</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.eos" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">eos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ro</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.eos" title="Link to this definition"></a></dt>
 <dd><p>This method returns the Table equation of state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -566,227 +170,13 @@ YinYang direct plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="R2D2.R2D2_data.models_init">
-<span class="sig-name descname"><span class="pre">models_init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.models_init" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">models_init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.models_init" title="Link to this definition"></a></dt>
 <dd><p>This method read Model S based stratification.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq">
-<span class="sig-name descname"><span class="pre">read_qq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 3D full data
-The data is stored in self.qq dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>value</strong> (<em>char</em>) – kind of value
-“ro”: density
-“vx”, “vy”, “vz”: velocity
-“bx”, “by”, “bz”: magnetic field
-“se”: entropy
-“ph”: div B cleaning
-“te”: temperature
-“op”: Opacity</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_2d">
-<span class="sig-name descname"><span class="pre">read_qq_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_2d" title="Link to this definition">#</a></dt>
-<dd><p>This method reads full data of 2D calculation
-The data is stored in self.q2 dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_all">
-<span class="sig-name descname"><span class="pre">read_qq_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_all" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 3D full data all
-The data is stored in self.qq dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_check">
-<span class="sig-name descname"><span class="pre">read_qq_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_check" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 3D full data for checkpoint
-The data is stored in self.qc dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-<li><p><strong>end_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If true, checkpoint of end step is read.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_ixr">
-<span class="sig-name descname"><span class="pre">read_qq_ixr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ixrt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_ixr" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 3D data at a selected x-region
-corrensponding to ixr-th region in remap coordinate</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ixrt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected x-region (0&lt;=ixrt&lt;=ixr)</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_restricted">
-<span class="sig-name descname"><span class="pre">read_qq_restricted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_restricted" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 3D restricted-area data
-The data is stored in self.qr dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>value</strong> (<em>char</em>) – kind of value</p></li>
-<li><p><strong>&quot;ro&quot;</strong> – density</p></li>
-<li><p><strong>&quot;vx&quot;</strong> – velocity</p></li>
-<li><p><strong>&quot;vy&quot;</strong> – velocity</p></li>
-<li><p><strong>&quot;vz&quot;</strong> – velocity</p></li>
-<li><p><strong>&quot;bx&quot;</strong> – magnetic field</p></li>
-<li><p><strong>&quot;by&quot;</strong> – magnetic field</p></li>
-<li><p><strong>&quot;bz&quot;</strong> – magnetic field</p></li>
-<li><p><strong>&quot;se&quot;</strong> – entropy</p></li>
-<li><p><strong>&quot;ph&quot;</strong> – div B cleaning</p></li>
-<li><p><strong>&quot;te&quot;</strong> – temperature</p></li>
-<li><p><strong>&quot;op&quot;</strong> – Opacity</p></li>
-<li><p><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – minimum x, y, z</p></li>
-<li><p><strong>y0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – minimum x, y, z</p></li>
-<li><p><strong>z0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – minimum x, y, z</p></li>
-<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – maximum x, y, z</p></li>
-<li><p><strong>y1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – maximum x, y, z</p></li>
-<li><p><strong>z1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – maximum x, y, z</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_select">
-<span class="sig-name descname"><span class="pre">read_qq_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_select" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 2D slice data at a selected height.
-The data is stored in self.qs dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – a selected height for data</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a setected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_select_z">
-<span class="sig-name descname"><span class="pre">read_qq_select_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_select_z" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 2D slice data at a selected height.
-The data is stored in self.qs dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>zs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – a selected z for data</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_slice">
-<span class="sig-name descname"><span class="pre">read_qq_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_slice" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 2D data of slice.
-The data is stored in self.ql dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n_slice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – index of slice</p></li>
-<li><p><strong>direc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – slice direction. ‘x’, ‘y’, or ‘z’</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_qq_tau">
-<span class="sig-name descname"><span class="pre">read_qq_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_qq_tau" title="Link to this definition">#</a></dt>
-<dd><p>This method reads 2D data at certain optical depths.
-The data is stored in self.qt dictionary.
-In this version the selected optical depth is 1, 0.1, and 0.01</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_time">
-<span class="sig-name descname"><span class="pre">read_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_time" title="Link to this definition">#</a></dt>
-<dd><p>This method reads time at a selected time step
-The data is stored in self.t</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – if True time for optical depth</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.read_vc">
-<span class="sig-name descname"><span class="pre">read_vc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.read_vc" title="Link to this definition">#</a></dt>
-<dd><p>This method reads on the fly analysis data from fortran.
-The data is stored in self.vc dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="R2D2.R2D2_data.set_cells_gspread">
-<span class="sig-name descname"><span class="pre">set_cells_gspread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hotta'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caseid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.set_cells_gspread" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_cells_gspread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'star'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caseid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.set_cells_gspread" title="Link to this definition"></a></dt>
 <dd><p>This function output parameters to
 Google spread sheet</p>
 <dl class="field-list simple">
@@ -802,119 +192,14 @@ Google spread sheet</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_all">
-<span class="sig-name descname"><span class="pre">sync_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'../run/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_all" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads all the data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-<li><p><strong>dist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – distination of data directory</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_check">
-<span class="sig-name descname"><span class="pre">sync_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_check" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads checkpoint data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – step to be downloaded</p></li>
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-<li><p><strong>end_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If true, checkpoint of end step is read</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_remap_qq">
-<span class="sig-name descname"><span class="pre">sync_remap_qq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_remap_qq" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads full 3D remap data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – time step</p></li>
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_select">
-<span class="sig-name descname"><span class="pre">sync_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_select" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads data at certain height</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – height to be downloaded</p></li>
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_slice">
-<span class="sig-name descname"><span class="pre">sync_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_slice" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads slice data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – step to be downloaded</p></li>
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_tau">
-<span class="sig-name descname"><span class="pre">sync_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_tau" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads data at constant optical depth</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.R2D2_data.sync_vc">
-<span class="sig-name descname"><span class="pre">sync_vc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ssh'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'doc'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.sync_vc" title="Link to this definition">#</a></dt>
-<dd><p>This method downloads pre analyzed data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of remote server</p></li>
-<li><p><strong>ssh</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – type of ssh command</p></li>
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – name of project such as ‘R2D2’</p></li>
-</ul>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="R2D2.R2D2_data.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_data.html#R2D2_data.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_data.summary" title="Link to this definition"></a></dt>
+<dd><p>Rapper of <a class="reference internal" href="R2D2.R2D2_read.html#R2D2.R2D2_read.summary" title="R2D2.R2D2_read.summary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.R2D2_read.summary()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="R2D2.R2D2_data.upgrade_resolution">
-<span class="sig-name descname"><span class="pre">upgrade_resolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caseid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_saving</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix_ununi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx00</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4800000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_ununif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.upgrade_resolution" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">upgrade_resolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caseid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_saving</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ix_ununi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx00</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4800000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_ununif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.upgrade_resolution" title="Link to this definition"></a></dt>
 <dd><p>This function chabges the resolution and output for the next
 calculation.</p>
 <dl class="field-list simple">
@@ -949,18 +234,8 @@ in memory separately for saving memory</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="R2D2.R2D2_data.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#R2D2.R2D2_data.__init__" title="Link to this definition">#</a></dt>
-<dd><p>This method reads basic data for calculation setting
-The data is stored in self.p dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>datadir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – location of data</p></li>
-<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True shows the information of data</p></li>
-<li><p><strong>self_old</strong> (<a class="reference internal" href="#R2D2.R2D2_data" title="R2D2.R2D2_data"><em>R2D2_data</em></a>) – if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old</p></li>
-</ul>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_data.html#R2D2_data.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_data.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize R2D2_data</p>
 </dd></dl>
 
 </dd></dl>
@@ -968,138 +243,34 @@ The data is stored in self.p dictionary</p>
 </section>
 
 
-                </article>
-              
-
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="R2D2.write_optical_surface.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">write_optical_surface</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="../notation.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">R2D2 pythonでのキーワードの説明</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data"><code class="docutils literal notranslate"><span class="pre">R2D2_data</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.p"><code class="docutils literal notranslate"><span class="pre">R2D2_data.p</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qs"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qs</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qq</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.qt"><code class="docutils literal notranslate"><span class="pre">R2D2_data.qt</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.t"><code class="docutils literal notranslate"><span class="pre">R2D2_data.t</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.vc</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.models"><code class="docutils literal notranslate"><span class="pre">R2D2_data.models</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.YinYangSet"><code class="docutils literal notranslate"><span class="pre">R2D2_data.YinYangSet()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.eos"><code class="docutils literal notranslate"><span class="pre">R2D2_data.eos()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.models_init"><code class="docutils literal notranslate"><span class="pre">R2D2_data.models_init()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_2d"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_2d()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_all"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_all()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_check"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_check()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_ixr"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_ixr()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_restricted"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_restricted()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_select"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_select()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_select_z"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_select_z()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_slice"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_slice()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_qq_tau"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_qq_tau()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_time"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_time()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.read_vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.read_vc()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.set_cells_gspread"><code class="docutils literal notranslate"><span class="pre">R2D2_data.set_cells_gspread()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_all"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_all()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_check"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_check()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_remap_qq"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_remap_qq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_select"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_select()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_slice"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_slice()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_tau"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_tau()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.sync_vc"><code class="docutils literal notranslate"><span class="pre">R2D2_data.sync_vc()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.upgrade_resolution"><code class="docutils literal notranslate"><span class="pre">R2D2_data.upgrade_resolution()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#R2D2.R2D2_data.__init__"><code class="docutils literal notranslate"><span class="pre">R2D2_data.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-</div></div>
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-<div class="bd-footer-content__inner container">
-  
-  <div class="footer-item">
-    
-<p class="component-author">
-By Hideyuki Hotta
-</p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-
-  <p class="copyright">
-    
-      © Copyright 2020-2024, Hideyuki Hotta.
-      <br/>
-    
-  </p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-  </div>
-  
-  <div class="footer-item">
-    
-  </div>
-  
-</div>
-          </footer>
-        
-
-      </main>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="R2D2.Constant.html" class="btn btn-neutral float-left" title="Constant" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="R2D2.R2D2_read.html" class="btn btn-neutral float-right" title="R2D2_read" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
-  <footer class="bd-footer">
-  </footer>
-  </body>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

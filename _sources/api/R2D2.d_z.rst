@@ -1,6 +1,0 @@
-d_z
-===
-
-.. currentmodule:: R2D2
-
-.. autofunction:: d_z

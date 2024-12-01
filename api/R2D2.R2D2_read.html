@@ -1,0 +1,516 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R2D2_read &mdash; R2D2 Document 1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="R2D2_sync" href="R2D2.R2D2_sync.html" />
+    <link rel="prev" title="R2D2_data" href="R2D2.R2D2_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../equation.html">方程式</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">コード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scheme.html">数値スキーム</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter.html">パラメータ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boundary.html">境界条件</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../artdif.html">人工粘性</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">出力と読込</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#module-R2D2">R2D2 Package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../api_reference.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="R2D2.Color.html">Color</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.Constant.html">Constant</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.R2D2_data.html">R2D2_data</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">R2D2_read</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.R2D2_sync.html">R2D2_sync</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.util">R2D2.util Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.fortran_util">R2D2.fortran_util Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.vtk">R2D2.vtk Package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notation.html">R2D2 pythonでのキーワードの説明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API Reference</a></li>
+      <li class="breadcrumb-item active">R2D2_read</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/R2D2.R2D2_read.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="r2d2-read">
+<h1>R2D2_read<a class="headerlink" href="#r2d2-read" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="R2D2.R2D2_read">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">R2D2.</span></span><span class="sig-name descname"><span class="pre">R2D2_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – basic parameters.
+See <a class="reference internal" href="#R2D2.R2D2_read.__init__" title="R2D2.R2D2_read.__init__"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.__init__</span></code></a></p></li>
+<li><p><strong>qs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D data at selected height.
+See <a class="reference internal" href="#R2D2.R2D2_read.qq_select" title="R2D2.R2D2_read.qq_select"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.qq_select</span></code></a></p></li>
+<li><p><strong>qq</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 3D full data.
+See <a class="reference internal" href="#R2D2.R2D2_read.qq_3d" title="R2D2.R2D2_read.qq_3d"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.qq_3d</span></code></a></p></li>
+<li><p><strong>qt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D data at constant optical depths.
+See <a class="reference internal" href="#R2D2.R2D2_read.qq_tau" title="R2D2.R2D2_read.qq_tau"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.qq_tau</span></code></a></p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – time. See <a class="reference internal" href="#R2D2.R2D2_read.time" title="R2D2.R2D2_read.time"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.time</span></code></a></p></li>
+<li><p><strong>vc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – data of on the fly analysis.
+See <a class="reference internal" href="#R2D2.R2D2_read.vc" title="R2D2.R2D2_read.vc"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.R2D2_read.vc</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.YinYangSet" title="R2D2.R2D2_read.YinYangSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YinYangSet</span></code></a>()</p></td>
+<td><p>YinYangSet function sets up the YinYang geometry for YinYang direct plot.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_2d" title="R2D2.R2D2_read.qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_2d</span></code></a>(n[, silent])</p></td>
+<td><p>Reads full data of 2D calculation The data is stored in self.q2 dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_3d" title="R2D2.R2D2_read.qq_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d</span></code></a>(n, value[, silent])</p></td>
+<td><p>Reads 3D full data The data is stored in self.qq dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_3d_all" title="R2D2.R2D2_read.qq_3d_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_all</span></code></a>(n[, silent])</p></td>
+<td><p>This method reads 3D full data all The data is stored in self.qq dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_3d_restricted" title="R2D2.R2D2_read.qq_3d_restricted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_restricted</span></code></a>(n, value, x0, x1, y0, y1, ...)</p></td>
+<td><p>Reads 3D restricted-area data The data is stored in self.qr dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_check" title="R2D2.R2D2_read.qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_check</span></code></a>(n[, silent, end_step])</p></td>
+<td><p>Reads 3D full data for checkpoint The data is stored in self.qc dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_ixr" title="R2D2.R2D2_read.qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_ixr</span></code></a>(ixrt, n[, silent])</p></td>
+<td><p>Reads 3D data at a selected x-region corrensponding to ixr-th region in remap coordinate</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_select" title="R2D2.R2D2_read.qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select</span></code></a>(xs, n[, silent])</p></td>
+<td><p>Reads 2D slice data at a selected height.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_select_z" title="R2D2.R2D2_read.qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select_z</span></code></a>(zs, n[, silent])</p></td>
+<td><p>Reads 2D slice data at constant z The data is stored in self.qz dictionary</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_slice" title="R2D2.R2D2_read.qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_slice</span></code></a>(n_slice, direc, n[, silent])</p></td>
+<td><p>Reads 2D data of slice.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.qq_tau" title="R2D2.R2D2_read.qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_tau</span></code></a>(n[, silent])</p></td>
+<td><p>Reads 2D data at certain optical depths.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.summary" title="R2D2.R2D2_read.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>()</p></td>
+<td><p>Show R2D2_read summary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.R2D2_read.time" title="R2D2.R2D2_read.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>(n[, tau, silent])</p></td>
+<td><p>Reads time at a selected time step The data is stored in self.t</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.R2D2_read.vc" title="R2D2.R2D2_read.vc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vc</span></code></a>(n[, silent])</p></td>
+<td><p>Reads on the fly analysis data from fortran.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.YinYangSet">
+<span class="sig-name descname"><span class="pre">YinYangSet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.YinYangSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.YinYangSet" title="Link to this definition"></a></dt>
+<dd><p>YinYangSet function sets up the YinYang geometry for
+YinYang direct plot.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.YinYangSet</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_2d">
+<span class="sig-name descname"><span class="pre">qq_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_2d" title="Link to this definition"></a></dt>
+<dd><p>Reads full data of 2D calculation
+The data is stored in self.q2 dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_2d</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_3d">
+<span class="sig-name descname"><span class="pre">qq_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_3d" title="Link to this definition"></a></dt>
+<dd><p>Reads 3D full data
+The data is stored in self.qq dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – <dl class="simple">
+<dt>Kind of value. Options are:</dt><dd><ul>
+<li><p>”ro” : density</p></li>
+<li><p>”vx”, “vy”, “vz”: velocity</p></li>
+<li><p>”bx”, “by”, “bz”: magnetic field</p></li>
+<li><p>”se”: entropy</p></li>
+<li><p>”ph”: div B cleaning</p></li>
+<li><p>”te”: temperature</p></li>
+<li><p>”op”: Opacity</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_3d</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_3d_all">
+<span class="sig-name descname"><span class="pre">qq_3d_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_3d_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_3d_all" title="Link to this definition"></a></dt>
+<dd><p>This method reads 3D full data all
+The data is stored in self.qq dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_3d_all</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_3d_restricted">
+<span class="sig-name descname"><span class="pre">qq_3d_restricted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_3d_restricted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_3d_restricted" title="Link to this definition"></a></dt>
+<dd><p>Reads 3D restricted-area data
+The data is stored in self.qr dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_3d()</span></code> for options</p></li>
+<li><p><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Minimum x, y, z</p></li>
+<li><p><strong>y0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Minimum x, y, z</p></li>
+<li><p><strong>z0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Minimum x, y, z</p></li>
+<li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
+<li><p><strong>y1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
+<li><p><strong>z1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_3d_restricted</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_check">
+<span class="sig-name descname"><span class="pre">qq_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_check" title="Link to this definition"></a></dt>
+<dd><p>Reads 3D full data for checkpoint
+The data is stored in self.qc dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+<li><p><strong>end_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If true, checkpoint of end step is read.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_check</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_ixr">
+<span class="sig-name descname"><span class="pre">qq_ixr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ixrt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_ixr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_ixr" title="Link to this definition"></a></dt>
+<dd><p>Reads 3D data at a selected x-region
+corrensponding to ixr-th region in remap coordinate</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ixrt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Aselected x-region (0&lt;=ixrt&lt;=ixr)</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_ixr</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_select">
+<span class="sig-name descname"><span class="pre">qq_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_select" title="Link to this definition"></a></dt>
+<dd><p>Reads 2D slice data at a selected height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – A selected height for data</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A setected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The data is stored in self.qs dictionary</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_select</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_select_z">
+<span class="sig-name descname"><span class="pre">qq_select_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_select_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_select_z" title="Link to this definition"></a></dt>
+<dd><p>Reads 2D slice data at constant z
+The data is stored in self.qz dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – A selected z for data</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_select_z</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_slice">
+<span class="sig-name descname"><span class="pre">qq_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_slice" title="Link to this definition"></a></dt>
+<dd><p>Reads 2D data of slice.
+The data is stored in self.ql dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_slice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – index of slice</p></li>
+<li><p><strong>direc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – slice direction. ‘x’, ‘y’, or ‘z’</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_slice</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.qq_tau">
+<span class="sig-name descname"><span class="pre">qq_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.qq_tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.qq_tau" title="Link to this definition"></a></dt>
+<dd><p>Reads 2D data at certain optical depths.
+The data is stored in self.qt dictionary.
+In this version the selected optical depth is 1, 0.1, and 0.01</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.qq_tau</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.summary" title="Link to this definition"></a></dt>
+<dd><p>Show R2D2_read summary.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.summary</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.time">
+<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.time" title="Link to this definition"></a></dt>
+<dd><p>Reads time at a selected time step
+The data is stored in self.t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – selected time step for data</p></li>
+<li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – if True time for optical depth (high cadence)</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>time</strong> – time at a selected time step</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a></p>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.time</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.vc">
+<span class="sig-name descname"><span class="pre">vc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.vc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.vc" title="Link to this definition"></a></dt>
+<dd><p>Reads on the fly analysis data from fortran.
+The data is stored in self.vc dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>silent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True suppresses a message of store</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.vc</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.R2D2_read.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/r2d2_read/r2d2_read.html#R2D2_read.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.R2D2_read.__init__" title="Link to this definition"></a></dt>
+<dd><p>This method reads basic data for calculation setting
+The data is stored in self.p dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datadir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – directory of data</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – True shows the information of data</p></li>
+<li><p><strong>self_old</strong> (<a class="reference internal" href="R2D2.R2D2_data.html#R2D2.R2D2_data" title="R2D2.R2D2_data"><em>R2D2.R2D2_data</em></a>) – if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This method is accessible as <cite>R2D2.R2D2_data.read.__init__</cite>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="R2D2.R2D2_data.html" class="btn btn-neutral float-left" title="R2D2_data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="R2D2.R2D2_sync.html" class="btn btn-neutral float-right" title="R2D2_sync" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

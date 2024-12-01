@@ -1,145 +1,59 @@
 
+
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R2D2を使い始めるには &mdash; R2D2 Document 1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
 
-<html lang="en" data-content_root="./" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>R2D2を使い始めるには &#8212; R2D2 1.3 documentation</title>
   
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
-
-    <script src="_static/documentation_options.js?v=b1f56dee"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'start';</script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="R2D2を使うための環境設定" href="environment.html" />
-    <link rel="prev" title="R2D2マニュアル" href="index.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
-  </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+    <link rel="prev" title="R2D2マニュアル" href="index.html" /> 
+</head>
 
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-  
-  <dialog id="pst-search-dialog">
-    
-<form class="bd-search d-flex align-items-center"
-      action="search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search..."
-         aria-label="Search..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
-
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+          
+          
+          <a href="index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-    
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">R2D2 1.3 documentation</p>
-  
-</a></div>
-        <div class="sidebar-primary-item">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button></div>
-        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item navbar-nav active">
-        <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">R2D2を使い始めるには</a></li>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">R2D2を使い始めるには</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">ディレクトリ構造の準備</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">コンパイル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">初期条件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">追加条件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">スーパーコンピュータでのシェルスクリプト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">初期条件データを受け取った場合</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="equation.html">方程式</a></li>
@@ -151,181 +65,39 @@
 <li class="toctree-l1"><a class="reference internal" href="artdif.html">人工粘性</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io.html">出力と読込</a></li>
 <li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_x.html">d_x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_y.html">d_y</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.d_z.html">d_z</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.interp.html">interp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.spherical2cartesian.html">spherical2cartesian</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D.html">write_3D</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_3D_vector.html">write_3D_vector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.write_optical_surface.html">write_optical_surface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/R2D2.R2D2_data.html">R2D2_data</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
 </ul>
 
-    </div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-  </div>
-  
-  <div id="rtd-footer-container"></div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-
-<div class="sbt-scroll-pixel-helper"></div>
-
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <span class="fa-solid fa-bars"></span>
-</button></div>
-      
-    </div>
-  
-  
-    <div class="header-article-items__end">
-      
-        <div class="header-article-item">
-
-<div class="article-header-buttons">
-
-
-
-
-
-<div class="dropdown dropdown-download-buttons">
-  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
-    <i class="fas fa-download"></i>
-  </button>
-  <ul class="dropdown-menu">
-      
-      
-      
-      <li><a href="_sources/start.rst" target="_blank"
-   class="btn btn-sm btn-download-source-button dropdown-item"
-   title="Download source file"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="btn__text-container">.rst</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li>
-<button onclick="window.print()"
-  class="btn btn-sm btn-download-pdf-button dropdown-item"
-  title="Print to PDF"
-  data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="btn__text-container">.pdf</span>
-</button>
-</li>
-      
-  </ul>
-</div>
-
-
-
-
-<button onclick="toggleFullScreen()"
-  class="btn btn-sm btn-fullscreen-button"
-  title="Fullscreen mode"
-  data-bs-placement="bottom" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-expand"></i>
-  </span>
-
-</button>
-
-
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
-
-
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-</button>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
-</div></div>
-      
-    </div>
-  
-</div>
-</div>
-              
-              
-
-<div id="jb-print-docs-body" class="onlyprint">
-    <h1>R2D2を使い始めるには</h1>
-    <!-- Table of contents -->
-    <div id="print-main-content">
-        <div id="jb-print-toc">
-            
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">ディレクトリ構造の準備</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">コンパイル</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">初期条件</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">追加条件</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">スーパーコンピュータでのシェルスクリプト</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">初期条件データを受け取った場合</a></li>
-</ul>
-            </nav>
         </div>
-    </div>
-</div>
+      </div>
+    </nav>
 
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">R2D2を使い始めるには</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/start.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="r2d2">
-<h1>R2D2を使い始めるには<a class="headerlink" href="#r2d2" title="Link to this heading">#</a></h1>
+<h1>R2D2を使い始めるには<a class="headerlink" href="#r2d2" title="Link to this heading"></a></h1>
 <section id="id1">
-<h2>ディレクトリ構造の準備<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h2>ディレクトリ構造の準備<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p>R2D2は公開していないので、各自 <code class="code docutils literal notranslate"><span class="pre">R2D2.zip</span></code> のようなファイルを受け取るはずである。研究を実施する際には、以下のようなディレクトリ構造を構成することを推奨する。</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>project_name/
            ├─ run/
@@ -529,7 +301,7 @@
 </ul>
 </section>
 <section id="id2">
-<h2>コンパイル<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<h2>コンパイル<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
 <p>コンパイルはR2D2のディクレトリで</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make
 </pre></div>
@@ -554,11 +326,11 @@
 </ul>
 </section>
 <section id="id3">
-<h2>初期条件<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<h2>初期条件<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <p>初期条件は、 <code class="docutils literal notranslate"><span class="pre">src/all/model_init.F90</span></code> で設定している。基本的な光球計算などは、鉛直速度にランダムな値を入れて計算を始めている。</p>
 </section>
 <section id="id4">
-<h2>追加条件<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<h2>追加条件<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
 <p>ある程度計算を行った後に、続きの計算として少し設定を変えたい場合の手続きを示す。
 例えば、磁場なしの熱対流計算を行った後に、磁場を加える場合などに有効である。</p>
 <p><code class="code docutils literal notranslate"><span class="pre">run/d001</span></code> での計算を <code class="code docutils literal notranslate"><span class="pre">run/d002</span></code> に移す場合について説明する。
@@ -607,7 +379,7 @@
 <p>と書かれている部分があるので、 <code class="code docutils literal notranslate"><span class="pre">call</span> <span class="pre">model_add</span></code> の部分のコメントアウトを外す。 <code class="code docutils literal notranslate"><span class="pre">ns</span></code> は現在の計算のステップ数(続きの計算では引き継がれない)、 <code class="code docutils literal notranslate"><span class="pre">nd</span></code> は計算全体のデータアウトプット回数(続きの計算で引き継がれる)。この二つの変数が0の時は、計算の一番はじめもしくは、データを引き継いだ時のみなので、その時のみ追加条件が発動する。</p>
 </section>
 <section id="id5">
-<h2>スーパーコンピュータでのシェルスクリプト<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<h2>スーパーコンピュータでのシェルスクリプト<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
 <p>いくつかのスーパーコンピュータでジョブを投入するためのシェルスクリプトも <code class="docutils literal notranslate"><span class="pre">sh</span></code> ディレクトリに用意している。
 使用コア数などを変えたい時は、それぞれのスーパーコンピュータの使用説明書などを参照すること。
 今後使うことのできるものだけをあげる。</p>
@@ -619,118 +391,43 @@
 </ul>
 </section>
 <section id="id6">
-<h2>初期条件データを受け取った場合<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<h2>初期条件データを受け取った場合<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
 <p>熱対流が統計的定常に達するまでは非常に時間がかかるために、この計算が非常に困難になる。そのため、堀田がデータを提供することがある。堀田は <code class="code docutils literal notranslate"><span class="pre">data</span></code> ディレクトリを丸ごと提供する。</p>
 <p>このディレクトリに <code class="code docutils literal notranslate"><span class="pre">cont_log.txt</span></code> というファイルがあるので、そこに示されている計算設定の情報を見て同じようになるように計算を設定する。</p>
 <p>このディレクトリを書く実行のディレクトリの配下におき、実行すると続きの計算が始まる。</p>
-<p>最終更新日：Nov 29, 2024</p>
+<p>最終更新日：Dec 01, 2024</p>
 </section>
 </section>
 
 
-                </article>
-              
-
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">R2D2マニュアル</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="environment.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">R2D2を使うための環境設定</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">ディレクトリ構造の準備</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">コンパイル</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">初期条件</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">追加条件</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">スーパーコンピュータでのシェルスクリプト</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">初期条件データを受け取った場合</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
-              
-            
+           </div>
           </div>
-          <footer class="bd-footer-content">
-            
-<div class="bd-footer-content__inner container">
-  
-  <div class="footer-item">
-    
-<p class="component-author">
-By Hideyuki Hotta
-</p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-
-  <p class="copyright">
-    
-      © Copyright 2020-2024, Hideyuki Hotta.
-      <br/>
-    
-  </p>
-
-  </div>
-  
-  <div class="footer-item">
-    
-  </div>
-  
-  <div class="footer-item">
-    
-  </div>
-  
-</div>
-          </footer>
-        
-
-      </main>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="R2D2マニュアル" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="environment.html" class="btn btn-neutral float-right" title="R2D2を使うための環境設定" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
-  <footer class="bd-footer">
-  </footer>
-  </body>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

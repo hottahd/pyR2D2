@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>get_best_unit &mdash; R2D2 Document 1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="get_total_file_size" href="R2D2.util.get_total_file_size.html" />
+    <link rel="prev" title="define_n0" href="R2D2.util.define_n0.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../equation.html">方程式</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">コード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scheme.html">数値スキーム</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter.html">パラメータ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../boundary.html">境界条件</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../artdif.html">人工粘性</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io.html">出力と読込</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2">R2D2 Package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#module-R2D2.util">R2D2.util Package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../api_reference.html#functions">Functions</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.caseid_select.html">caseid_select</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.define_n0.html">define_n0</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">get_best_unit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.get_total_file_size.html">get_total_file_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.init.html">init</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.initialize_instance.html">initialize_instance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.locals_define.html">locals_define</a></li>
+<li class="toctree-l4"><a class="reference internal" href="R2D2.util.update_results_file.html">update_results_file</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.fortran_util">R2D2.fortran_util Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.vtk">R2D2.vtk Package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../notation.html">R2D2 pythonでのキーワードの説明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API Reference</a></li>
+      <li class="breadcrumb-item active">get_best_unit</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/R2D2.util.get_best_unit.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="get-best-unit">
+<h1>get_best_unit<a class="headerlink" href="#get-best-unit" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="R2D2.util.get_best_unit">
+<span class="sig-prename descclassname"><span class="pre">R2D2.util.</span></span><span class="sig-name descname"><span class="pre">get_best_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_multipliers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/util/util.html#get_best_unit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.util.get_best_unit" title="Link to this definition"></a></dt>
+<dd><p>Get the best unit for displaying the size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – size of the file</p></li>
+<li><p><strong>unit_multipliers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – dictionary of unit multipliers</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="R2D2.util.define_n0.html" class="btn btn-neutral float-left" title="define_n0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="R2D2.util.get_total_file_size.html" class="btn btn-neutral float-right" title="get_total_file_size" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

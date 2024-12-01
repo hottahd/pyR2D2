@@ -1,6 +1,0 @@
-warning
-=======
-
-.. currentmodule:: R2D2
-
-.. autofunction:: warning

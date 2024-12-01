@@ -1,0 +1,6 @@
+spherical2cartesian
+===================
+
+.. currentmodule:: R2D2.fortran_util
+
+.. autofunction:: spherical2cartesian

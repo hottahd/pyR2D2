@@ -1,6 +1,0 @@
-spherical2cartesian
-===================
-
-.. currentmodule:: R2D2
-
-.. autofunction:: spherical2cartesian
