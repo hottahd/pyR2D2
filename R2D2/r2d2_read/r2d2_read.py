@@ -3,18 +3,42 @@ import R2D2
 import numpy as np
 
 class R2D2_read:
+    '''
+    
+    Attributes
+    ----------
+    p : dict
+        basic parameters.
+        See :class:`R2D2.R2D2_read.__init__`            
+    qs : dict
+        2D data at selected height.
+        See :class:`R2D2.R2D2_read.qq_select`
+    qq : dict
+        3D full data.
+        See :class:`R2D2.R2D2_read.qq_3d`
+    qt : dict
+        2D data at constant optical depths.
+        See :class:`R2D2.R2D2_read.qq_tau`
+    t : float
+        time. See :class:`R2D2.R2D2_read.time`
+    vc : dict
+        data of on the fly analysis.
+        See :class:`R2D2.R2D2_read.vc`
+    
+    '''
     def __init__(self, datadir, verbose=False, self_old=None):
         '''
         This method reads basic data for calculation setting
         The data is stored in self.p dictionary
 
-        Parameters:
-            datadir : str
-                directory of data
-            verbose : bool
-                True shows the information of data
-            self_old : R2D2.R2D2_data
-                if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
+        Parameters
+        ----------
+        datadir : str
+            directory of data
+        verbose : bool
+            True shows the information of data
+        self_old : R2D2.R2D2_data
+            if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
         '''
         from scipy.io import FortranFile
         import os
@@ -28,11 +52,11 @@ class R2D2_read:
         if initialize_flag:  
             self.p = {}
             self.qs = {}
-            self.qz = {}
             self.qq = {}
+            self.qt = {}
+            self.qz = {}
             self.qr = {}
             self.qv = {}
-            self.qt = {}
             self.qi = {}
             self.qt_yin = {}
             self.qt_yan = {}
@@ -1132,7 +1156,7 @@ class R2D2_read:
     
     def summary(self):
         '''
-        Show R2D2_read summary        
+        Show R2D2_read summary.
         '''
             
         RED = '\033[31m'

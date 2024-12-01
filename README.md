@@ -1,12 +1,21 @@
 # R2D2_py
-Python code for analyzing  the result of R2D2
+Python code for analyzing results of R2D2 simulation.
 
-# Upgrade resolution
+## Quick start
+You can generate `R2D2.R2D2_data` class instance as:
 
-if you want to use fortran utility such as `d_x`, `d_y`, `d_z`, `interp`, and `spherical2cartesian`, compile fortran programs at `R2D2_py/R2D2/fortran_src`
-
+```python
+import R2D2
+datadir = '../run/d001/'
+d = R2D2.R2D2_data(datadir)
 ```
-make
-```
 
-We need `gfortran` compiler but you can edit `R2D2_py/R2D2/fortran_src/Makefile` so that the other compilers are used.
+## Utilities by Fortran
+
+`R2D2_py` provides several utilities written in Fortran language.
+
+You need to `make` at `R2D2/` directory to use these utilities.
+
+## Documentation
+
+https://hottahd.github.io/R2D2_py/

@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'R2D2'
+project = 'R2D2 Document'
 copyright = '2020-2024, Hideyuki Hotta'
 author = 'Hideyuki Hotta'
 
@@ -71,17 +71,22 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # a list of builtin themes.
 #
 html_theme = 'bizstyle'
-html_theme = 'sphinx_book_theme'
+#html_theme = 'sphinx_book_theme'
 #html_theme = 'alabaster'
 #html_theme = 'sphinx_material'
-#html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_rtd_theme'
 #html_theme = "pydata_sphinx_theme"
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_logo = '_static/figs/R2D2_logo_red.png'
+html_theme_options = {
+    "logo_only": False,  # サイドバーにロゴだけ表示
+#    "style_nav_header_background": "#2980B9",  # ナビゲーションヘッダーの色を変更（任意）
+}
 
 todo_include_todos = True
 
@@ -111,12 +116,15 @@ autosummary_generate = True  # autosummaryでファイルを生成
 # indicating how they are accessed through R2D2_data.read or R2D2_data.sync.
 # Example: R2D2_read.qq_select -> R2D2_data.read.qq_select
 
+import inspect
+
 def autodoc_process_docstring(app, what, name, obj, options, lines):
     # Mapping of alias names (e.g., 'read', 'sync') to their respective classes
     target_classes = {
-        "read": "R2D2.R2D2_read",
-        "sync": "R2D2.R2D2_sync"
+        "read": "R2D2.R2D2_read.",
+        "sync": "R2D2.R2D2_sync."
     }
+
 
     for alias, target_class in target_classes.items():
         if name.startswith(target_class):

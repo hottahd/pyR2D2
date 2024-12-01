@@ -17,25 +17,8 @@ class R2D2_data:
         read : R2D2.R2D2_read
             Instance of R2D2.R2D2_read
         sync : R2D2.R2D2_sync
-        
-        p : dict
-            basic parameters.
-            See :class:`R2D2.R2D2_read.__init__`            
-        qs : dict
-            2D data at selected height.
-            See :class:`R2D2.R2D2_read.qq_select`
-        qq : dict
-            3D full data.
-            See :class:`R2D2.R2D2_read.qq_3d`
-        qt : dict
-            2D data at constant optical depths.
-            See :class:`R2D2.R2D2_read.qq_tau`
-        t : float
-            time. See :class:`R2D2.R2D2_read.time`
-        vc : dict
-            data of on the fly analysis.
-            See :class:`R2D2.R2D2_read.vc`
-
+            Instance of R2D2.R2D2_sync
+    
         models : dict
             Model S based stratification.
             See :class:`R2D2.R2D2_read.models_init`
@@ -50,7 +33,7 @@ class R2D2_data:
         
     def summary(self):
         """
-        Rapper of :function:`R2D2.R2D2_read.summary`
+        Rapper of :meth:`R2D2.R2D2_read.summary`
         
         """
         R2D2_read.summary(self.read)
@@ -58,7 +41,9 @@ class R2D2_data:
 
     def __getattr__(self, name):
         if hasattr(self.read, name):
-            return getattr(self.read, name)
+            attr = getattr(self.read, name)
+            if not callable(attr):
+                return attr
 
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
