@@ -41,7 +41,8 @@ extensions = [
     'sphinx.ext.intersphinx',  # 他のドキュメントへのリンク       
     'sphinx.ext.todo',
     'sphinx.ext.autosummary',
-    'sphinx_automodapi.automodapi',    
+    'sphinx_automodapi.automodapi',
+    'sphinx.ext.imgmath',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,6 +51,7 @@ templates_path = ['_templates']
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),  # NumPy のドキュメントへのリンクを追加
+    'gspread': ('https://docs.gspread.org/en/latest/', None),  # gspred のドキュメントへのリンクを追加
     # 他のプロジェクトのドキュメントへのリンクを追加する場合はここに記述
 }
 
@@ -65,6 +67,11 @@ language = 'en'
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -77,20 +84,30 @@ html_theme = 'bizstyle'
 html_theme = 'sphinx_rtd_theme'
 #html_theme = "pydata_sphinx_theme"
 
+# autodoc_member_order = 'bysource'
+# autodoc_default_options = {
+#     'special-members': '__init__',
+#     'members': False,
+# }
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+napoleon_include_init_with_doc = True
+napoleon_use_ivar = True
+
+automodapi_inheritance_diagram = False
+autosummary_generate = False  # autosummaryでファイルを生成
+
+##############################
+# Logo setting
 html_logo = '_static/figs/R2D2_logo_red.png'
 html_theme_options = {
     "logo_only": False,  # サイドバーにロゴだけ表示
 #    "style_nav_header_background": "#2980B9",  # ナビゲーションヘッダーの色を変更（任意）
 }
 
+##############################
 todo_include_todos = True
 
-extensions += ['sphinx.ext.imgmath']
+#extensions += ['sphinx.ext.imgmath']
 imgmath_image_format = 'svg'
 pngmath_latex='platex'
 imgmath_font_size = 12 # 数式のフォントサイズ
@@ -99,17 +116,6 @@ imgmath_latex_preamble = r'\usepackage{color}'
 latex_elements = { \
 'extraclassoptions': 'report', 
 }
-
-# autodoc_member_order = 'bysource'
-autodoc_default_options = {
-    'special-members': '__init__',
-}
-
-napoleon_include_init_with_doc = True
-napoleon_use_ivar = True
-
-automodapi_inheritance_diagram = False
-autosummary_generate = True  # autosummaryでファイルを生成
 
 # Sphinx autodoc hook for adding alias information to methods of R2D2_read and R2D2_sync
 # This hook modifies the docstrings of R2D2_read and R2D2_sync methods to include an alias 
@@ -124,7 +130,6 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
         "read": "R2D2.R2D2_read.",
         "sync": "R2D2.R2D2_sync."
     }
-
 
     for alias, target_class in target_classes.items():
         if name.startswith(target_class):

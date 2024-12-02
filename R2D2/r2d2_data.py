@@ -1,8 +1,8 @@
 from .r2d2_read import R2D2_read
 from .r2d2_sync import R2D2_sync
-from . import google
-from . import resolution
-from . import models
+# from . import google
+# from . import resolution
+# from . import models
 
 class R2D2_data:    
     '''
@@ -38,18 +38,19 @@ class R2D2_data:
         """
         R2D2_read.summary(self.read)
 
-
     def __getattr__(self, name):
+        '''
+        When an attribute is not found in R2D2_data, it is searched in R2D2_data.read        
+        '''
         if hasattr(self.read, name):
             attr = getattr(self.read, name)
-            if not callable(attr):
-                return attr
+            return attr
 
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
 # R2D2_data.read_time = read.read_time
 
-R2D2_data.set_cells_gspread  = google.set_cells_gspread
-R2D2_data.upgrade_resolution = resolution.upgrade_resolution
-R2D2_data.models_init       = models.init
-R2D2_data.eos               = models.eos
+# R2D2_data.set_cells_gspread  = google.set_cells_gspread
+# R2D2_data.upgrade_resolution = resolution.upgrade_resolution
+# R2D2_data.models_init       = models.init
+# R2D2_data.eos               = models.eos

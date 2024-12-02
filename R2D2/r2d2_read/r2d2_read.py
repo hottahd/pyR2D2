@@ -26,6 +26,7 @@ class R2D2_read:
         See :class:`R2D2.R2D2_read.vc`
     
     '''
+    p = None
     def __init__(self, datadir, verbose=False, self_old=None):
         '''
         This method reads basic data for calculation setting

@@ -7,12 +7,17 @@ def init_gspread(json_key, project):
     '''
     This function initialize the utility of google spread 
 
-    Parameters:
-        json_key (str): file of json key to access Google API
-        projet (str): project name, typically name of upper directory
+    Parameters
+    ----------
+    json_key : str
+        file of json key to access Google API
+    project : str
+        Project name, typically name of upper directory
 
-    Returnes:
-        gc (instance): Google API instance
+    Returns
+    -------
+    gc : gspread.client.Client
+        Instance of Google API
     '''
 
     import gspread
@@ -31,14 +36,19 @@ def fetch_URL_gspread(
     project=__file__.split('/')[-4],    
     ):
     '''
-    fetch corresponding URL for google spreadsheet
+    Fetchs corresponding URL for google spreadsheet
 
-    Parameters:
-        json_key (str): file of json key to access Google API
-        projet (str): project name, typically name of upper directory
+    Parameters
+    ----------
+    json_key : str 
+        File of json key to access Google API
+    projet : str
+        Project name, typically name of upper directory
 
-    Returnes:
-        URL (str): Google spreadsheet URL
+    Returns
+    -------
+    URL : str
+        Google spreadsheet URL
     '''
     
     if json_key == None:
@@ -55,11 +65,15 @@ def set_top_line(
     '''
     This function set top line of google spreadsheet
 
-    Parameters:
-        json_key (str): file of json key to access Google API
-        projet (str): project name, typically name of upper directory
+    Parameters
+    ----------
+    json_key : str
+        File of json key to access Google API
+    projet : str
+        Project name, typically name of upper directory
 
-    Returnes:
+    Returns
+    -------
         None
     '''
     if json_key == None:
@@ -97,19 +111,22 @@ def set_top_line(
     wks.update_cells(cells)
         
 ################################################################################
-def set_cells_gspread(self,
+def set_cells_gspread(r2d2_data,
                 json_key=None,
                 project=__file__.split('/')[-4],
                 caseid=None):
     '''
-    This function output parameters to 
-    Google spread sheet
+    Outputs parameters to Google spreadsheet
 
-    Parameters:
-        self (R2D2_data): instance of R2D2_data class
-        json_key (str): file of json key to access Google API
-        projet (str): project name, typically name of upper directory
-        caseid (str): caseid
+    Parameters
+    ----------
+    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read
+        instance of R2D2_data or R2D2_read classes
+    json_key : str
+        File of json key to access Google API
+    project : str
+        Project name, typically name of upper directory
+    caseid : str): caseid
     
     '''
     import datetime
@@ -120,7 +137,7 @@ def set_cells_gspread(self,
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
 
     if caseid is None:
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = r2d2_data.p['datadir'].split('/')[-3]
     
     gc = init_gspread(json_key,project)
     wks = gc.open(project).sheet1
@@ -128,54 +145,54 @@ def set_cells_gspread(self,
     cells = wks.range('A'+str_id+':'+'T'+str_id)
 
     keys = [caseid]
-    keys.append('{:.2f}'.format(self.p['mstar']/R2D2.msun))
-    keys.append(str(self.p['ix'])+' '+str(self.p['jx'])+' '+str(self.p['kx']))
-    keys.append( '{:6.2f}'.format((self.p['xmin']-self.p['rstar'])*1.e-8))
-    keys.append( '{:6.2f}'.format((self.p['xmax']-self.p['rstar'])*1.e-8))
+    keys.append('{:.2f}'.format(r2d2_data.p['mstar']/R2D2.Constant.msun))
+    keys.append(str(r2d2_data.p['ix'])+' '+str(r2d2_data.p['jx'])+' '+str(r2d2_data.p['kx']))
+    keys.append( '{:6.2f}'.format((r2d2_data.p['xmin']-r2d2_data.p['rstar'])*1.e-8))
+    keys.append( '{:6.2f}'.format((r2d2_data.p['xmax']-r2d2_data.p['rstar'])*1.e-8))
     
 
-    if self.p['geometry'] == 'Cartesian':
-        keys.append( '{:6.2f}'.format(self.p['ymin']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(self.p['ymax']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(self.p['zmin']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(self.p['zmax']*1.e-8)+' [Mm]')
+    if r2d2_data.p['geometry'] == 'Cartesian':
+        keys.append( '{:6.2f}'.format(r2d2_data.p['ymin']*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['ymax']*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['zmin']*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['zmax']*1.e-8)+' [Mm]')
 
-    if self.p['geometry'] == 'Spherical':
+    if r2d2_data.p['geometry'] == 'Spherical':
         pi2rad = 180/np.pi
-        keys.append( '{:6.2f}'.format(self.p['ymin']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(self.p['ymax']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(self.p['zmin']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(self.p['zmax']*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['ymin']*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['ymax']*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['zmin']*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(r2d2_data.p['zmax']*pi2rad)+' [deg]')
 
-    if self.p['geometry'] == 'YinYang':
+    if r2d2_data.p['geometry'] == 'YinYang':
         pi2rad = 180/np.pi
         keys.append( '0 [deg]')
         keys.append( '180 [deg]')
         keys.append( '-180 [deg]')
         keys.append( '180 [deg]')
     
-    if self.p['ununiform_flag']:
+    if r2d2_data.p['ununiform_flag']:
         keys.append('F')
     else:
         keys.append('T')
     
-    dx0 = (self.p['x'][1] - self.p['x'][0])*1.e-5
-    dx1 = (self.p['x'][self.p['ix']-1] - self.p['x'][self.p['ix']-2])*1.e-5
+    dx0 = (r2d2_data.p['x'][1] - r2d2_data.p['x'][0])*1.e-5
+    dx1 = (r2d2_data.p['x'][r2d2_data.p['ix']-1] - r2d2_data.p['x'][r2d2_data.p['ix']-2])*1.e-5
     keys.append( '{:6.2f}'.format(dx0)+' '+'{:6.2f}'.format(dx1))
-    keys.append( self.p['rte'])
-    keys.append( '{:6.2f}'.format(self.p['dtout']))
-    keys.append( '{:6.2f}'.format(self.p['dtout_tau']))
-    keys.append( '{:5.2f}'.format(self.p['potential_alpha']))
-    if self.p['xi'].max() == 1.0:
+    keys.append( r2d2_data.p['rte'])
+    keys.append( '{:6.2f}'.format(r2d2_data.p['dtout']))
+    keys.append( '{:6.2f}'.format(r2d2_data.p['dtout_tau']))
+    keys.append( '{:5.2f}'.format(r2d2_data.p['potential_alpha']))
+    if r2d2_data.p['xi'].max() == 1.0:
         keys.append('F')
     else:
         keys.append('T')
 
-    keys.append( '{:5.1f}'.format(self.p['omfac']))
-    keys.append(self.p['geometry'])
-    keys.append(self.p['origin'])
+    keys.append( '{:5.1f}'.format(r2d2_data.p['omfac']))
+    keys.append(r2d2_data.p['geometry'])
+    keys.append(r2d2_data.p['origin'])
     keys.append(str(datetime.datetime.now()).split('.')[0])
-    keys.append(self.p['server'])
+    keys.append(r2d2_data.p['server'])
     
     for cell, key in zip(cells,keys):
         cell.value = key

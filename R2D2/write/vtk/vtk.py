@@ -120,11 +120,16 @@ def write_3D_vector(qx,qy,qz,x,y,z,file,name):
         y-component vector size of (ix,jx,kx)
     qz : numpy.ndarray, float
         z-component vector size of (ix,jx,kx)
-    x (float) [ix]: x coordinate
-    y (float) [jx]: y coordinate
-    z (float) [kx]: z coordinate
-    file (str): File name for output
-    name (str): Name of the variable    
+    x : numpy.ndarray, float
+        x coordinate size of (ix)
+    y : numpy.ndarray, float
+        y coordinate size of (jx)
+    z : numpy.ndarray, float
+        z coordinate size of (kx)
+    file : str
+        File name for output
+    name : str
+        Name of the variable    
     '''
     import os
     import numpy as np

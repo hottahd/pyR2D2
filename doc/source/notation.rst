@@ -181,6 +181,7 @@ self.vc [dictionary]
     * bxm (float) [ix,jx] -- x方向の磁場 [G]
     * bym (float) [ix,jx] -- y方向の磁場 [G]
     * bzm (float) [ix,jx] -- z方向の磁場 [G]
-* `**rms`と表されるものは、経度に対するRMS量
+    
+.. * ``**rms``と表されるものは、経度に対するRMS量
 
 最終更新日：|today|

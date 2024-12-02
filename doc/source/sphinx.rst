@@ -50,7 +50,7 @@ VS codeの利用
 VS codeを利用すると快適にreStructuredTextを作成することができる。
 ``*.rst`` ファイルをVS codeで開くと自動で確認されるが、以下のプラグインをインストールする。
 
-.. image:: figs/restructuredtext_vs.png
+.. image:: _static/figs/restructuredtext_vs.png
     :width: 500 px
 
 ``Cmd+k Cmd+r`` で画面を分割してプレビューできる。正しい ``conf.py`` の場所を設定する必要がある。
@@ -147,12 +147,12 @@ Sphinxでは、コードを直接記載することができる。また、言�
 
 .. code:: restructuredtext
 
-    .. image:: figs/R2D2_logo.png
+    .. image:: _static/figs/R2D2_logo.png
         :width: 350 px
 
 とすると下記のように画像が挿入される。
 
-.. image:: figs/R2D2_logo.png
+.. image:: _static/figs/R2D2_logo.png
     :width: 350 px        
 
 

@@ -150,7 +150,7 @@
 - 計算結果
     以下のような計算が得られる。
 
-    .. image:: figs/photosphere.png
+    .. image:: _static/figs/photosphere.png
         :width: 500 px
 
 中規模黒点計算
@@ -159,7 +159,7 @@
 `Rempel, 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...750...62R/abstract>`_ で行われている中規模光球計算の設定を説明する。
 
 - Makefileのオプション
-    光球のみ一様グリッドで計算するので, :code:`PPC:= -Ddeep`を設定していないかチェック。
+    光球のみ一様グリッドで計算するので, :code:`PPC:= -Ddeep` を設定していないかチェック。
 
 - 計算領域・解像度
     計算領域は鉛直方向(R2D2ではx方向)にrsun から700 km上から5.444 Mm下までをとる。水平方向(R2D2ではyとz方向)には、49.152 Mmずつとる。
