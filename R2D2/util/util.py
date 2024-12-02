@@ -1,11 +1,23 @@
-import sys
-sys.path.append('../../') 
-from R2D2.r2d2_data import R2D2_data
+import R2D2
 
 def init(main_locals,instance_name='d'):
     """
-    This is a pen.
+    Initialize R2D2.Data instance in main program.
     
+    Parameters
+    ----------
+    main_locals : dict
+        locals() in main program, which include local variables
+    instance_name : str
+        name of instance of R2D2.Data object
+
+    
+    Notes
+    -----
+    1. Select caseid from existing caseid in main_locals or from user input.
+    2. Initialize instance of R2D2.Data object in main program.
+    3. Assign the R2D2.Data.p dictionary keys to main_locals.
+        
     Examples
     --------
     .. code-block:: python
@@ -19,18 +31,18 @@ def init(main_locals,instance_name='d'):
     datadir = "../run/"+main_locals['caseid']+"/data/"
     
     initialize_instance(main_locals,instance_name)
-    main_locals[instance_name] = R2D2_data(datadir)
+    main_locals[instance_name] = R2D2.Data(datadir)
     
 def initialize_instance(main_locals,instance_name):
     '''
-    Initializes arbitrary instance of R2D2_data object in main program.
+    Initializes arbitrary instance of R2D2.Data object in main program.
         
     Parameters
     ----------
     main_locals : dict
         locals() in main program, which include local variables
     instance_name : str
-        name of instance of R2D2_data object
+        name of instance of R2D2.Data object
     '''
     if not instance_name in main_locals:
         main_locals[instance_name] = None
@@ -58,29 +70,29 @@ def caseid_select(main_locals,force_read=False):
        
     return caseid
 
-def locals_define(r2d2_data,main_locals):
+def locals_define(data,main_locals):
     '''
     Substitute selp.p to main_locals in main program.
     
     Parameters
     ----------
-    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read
-        Instance of R2D2_data object
+    data : R2D2.Data, or, R2D2.Read
+        Instance of R2D2.Data or R2D2.Read classes
     main_locals : dict
         locals() in main program, which include local variables
     '''
-    for key, value in r2d2_data.p.items():
+    for key, value in data.p.items():
         main_locals[key] = value    
     return
 
-def define_n0(r2d2_data,main_locals,nd_type='nd'):
+def define_n0(data,main_locals,nd_type='nd'):
     '''
     Define n0 in main_locals if not exists.
     
     Parameters
     ----------
-    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read
-        instance of R2D2_data object
+    data : R2D2.Data, or, R2D2.Read
+        instance of R2D2.Data or R2D2.Read classes
     main_locals : dict
         locals() in main program, which include local variables
     nd_type : str
@@ -88,8 +100,8 @@ def define_n0(r2d2_data,main_locals,nd_type='nd'):
     '''
     if 'n0' not in main_locals:
         main_locals['n0'] = 0
-    if main_locals['n0'] > r2d2_data.p[nd_type]:
-        main_locals['n0'] = r2d2_data.p[nd_type]
+    if main_locals['n0'] > data.p[nd_type]:
+        main_locals['n0'] = data.p[nd_type]
     
     return main_locals['n0']
 

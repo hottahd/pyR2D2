@@ -12,8 +12,8 @@ def d_x(x,qq):
     
     Returns
     -------
-        qqd : numpy.ndarray, numpy.float32
-            derivative (3D)
+        qqd : numpy.ndarray, float
+            differentiated quantity (3D)
     '''
     import ctypes
     import numpy as np
@@ -54,8 +54,8 @@ def d_y(y,qq):
     
     Returns
     -------
-        qqd : numpy.ndarray, numpy.float32
-            derivative (3D)
+        qqd : numpy.ndarray, float
+            differentiated quantity (3D)
     '''
     import ctypes
     import numpy as np
@@ -96,8 +96,8 @@ def d_z(z,qq):
     
     Returns
     -------
-        qqd : numpy.ndarray, numpy.float32
-            derivative (3D)
+        qqd : numpy.ndarray, float
+            differentiated quantity (3D)
     '''
     import ctypes
     import numpy as np
@@ -167,7 +167,7 @@ def interp(x,y,z,xu,yu,zu,qq):
     Returns
     -------
         qqd : numpy.ndarray
-            interpolated derivative (3D array)
+            Interpolated quantity (3D)
     '''
     import ctypes
     import numpy as np
@@ -218,35 +218,36 @@ def spherical2cartesian(rr,th,ph,qqs,ixc,jxc,kxc):
     
     Parameters
     ----------
-        rr : numpy.ndarray, float
-            radius (1D)
-        th : numpy.ndarray, float
-            colatitude (1D)
-        ph : numpy.ndarray, float
-            longitude (1D)
-        qqs : numpy.ndarray, float
-            variable in spherical geometry (3D)
-        ixc : int
-            No. of grid in converted x coordinate
-        jxc : int
-            No. of grid in converted y coordinate
-        kxc : int
-            No. of grid in converted z coordinate
-    
-    Return
-    ------
-        qqc : numpy.ndarray, float
-            converted variable (3D, ixc, jxc, kxc)
-        xc : numpy.ndarray, float
-            converted x coordinate (1D, ixc)
-        yc : numpy.ndarray, float
-            converted y coordinate (1D, jxc)
-        zc : numpy.ndarray, float
-            converted z coordinate (1D array, kxc)
+    rr : numpy.ndarray, float
+        radius (1D)
+    th : numpy.ndarray, float
+        colatitude (1D)
+    ph : numpy.ndarray, float
+        longitude (1D)
+    qqs : numpy.ndarray, float
+        variable in spherical geometry (3D)
+    ixc : int
+        No. of grid in converted x coordinate
+    jxc : int
+        No. of grid in converted y coordinate
+    kxc : int
+        No. of grid in converted z coordinate
+   
+    Returns
+    -------
+    qqc : numpy.ndarray, float
+        converted variable (3D, ixc, jxc, kxc)
+    xc : numpy.ndarray, float
+        converted x coordinate (1D, ixc)
+    yc : numpy.ndarray, float
+        converted y coordinate (1D, jxc)
+    zc : numpy.ndarray, float
+        converted z coordinate (1D array, kxc)
         
+
     Notes
     -----
-    The cartesian coordinate is automatically generated with considerging
+    The cartesian coordinate is automatically generated with considering
     the computational domain size.
 
     '''    

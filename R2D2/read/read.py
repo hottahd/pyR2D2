@@ -2,31 +2,30 @@ import sys
 import R2D2
 import numpy as np
 
-class R2D2_read:
+class Read:
     '''
     
     Attributes
     ----------
     p : dict
         basic parameters.
-        See :class:`R2D2.R2D2_read.__init__`            
+        See :class:`R2D2.Read.__init__`
     qs : dict
         2D data at selected height.
-        See :class:`R2D2.R2D2_read.qq_select`
+        See :class:`R2D2.Read.qq_select`
     qq : dict
         3D full data.
-        See :class:`R2D2.R2D2_read.qq_3d`
+        See :class:`R2D2.Read.qq_3d`
     qt : dict
         2D data at constant optical depths.
-        See :class:`R2D2.R2D2_read.qq_tau`
+        See :class:`R2D2.Read.qq_tau`
     t : float
-        time. See :class:`R2D2.R2D2_read.time`
+        time. See :class:`R2D2.Read.time`
     vc : dict
         data of on the fly analysis.
-        See :class:`R2D2.R2D2_read.vc`
+        See :class:`R2D2.Read.vc`
     
     '''
-    p = None
     def __init__(self, datadir, verbose=False, self_old=None):
         '''
         This method reads basic data for calculation setting
@@ -38,7 +37,7 @@ class R2D2_read:
             directory of data
         verbose : bool
             True shows the information of data
-        self_old : R2D2.R2D2_data
+        self_old : R2D2.Data
             if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
         '''
         from scipy.io import FortranFile
@@ -88,15 +87,15 @@ class R2D2_read:
         R2D2_py_ver = 2.0
         f = open(self.p['datadir']+"param/params.dac","r")
         line = f.readline().split()
-        if R2D2_py_ver != float(line[2]):
-            print("#######################################################")
-            print("#######################################################")
-            print("### Current R2D2 Python version is ",R2D2_py_ver,".")
-            print("### You use the data from R2D2 version ",float(line[2]),".")
-            print("### Please use the same version of fortran R2D2.")
-            print("#######################################################")
-            print("#######################################################")
-            sys.exit()
+        # if R2D2_py_ver != float(line[2]):
+        #     print("#######################################################")
+        #     print("#######################################################")
+        #     print("### Current R2D2 Python version is ",R2D2_py_ver,".")
+        #     print("### You use the data from R2D2 version ",float(line[2]),".")
+        #     print("### Please use the same version of fortran R2D2.")
+        #     print("#######################################################")
+        #     print("#######################################################")
+        #     sys.exit()
         
         # Basic parameterの読み込み
         line = f.readline()
@@ -1157,15 +1156,17 @@ class R2D2_read:
     
     def summary(self):
         '''
-        Show R2D2_read summary.
+        Show R2D2.Read summary.
         '''
             
         RED = '\033[31m'
         END = '\033[0m'
 
         print(RED + '### Star information ###' + END)
-        print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.Constant.msun)+' msun')
-        print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
+        if 'mstar' in self.p:
+            print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.Constant.msun)+' msun')
+        if 'astar' in self.p:
+            print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
 
         print('')
         if self.p['geometry'] == 'Cartesian':

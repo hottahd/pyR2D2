@@ -1,14 +1,14 @@
 import os
 
-class R2D2_sync:
+class Sync:
     def __init__(self, read):
         """
-        Initialize R2D2_sync
+        Initialize R2D2.Sync
         
         Parameters
         ----------
-        read : R2D2.R2D2_read
-            Instance of R2D2.R2D2_read
+        read : R2D2.read
+            Instance of R2D2.read
         """
         self.read = read
         
