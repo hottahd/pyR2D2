@@ -1,11 +1,9 @@
 """
-R2D2 package
-
-Deals with R2D2 data.
+This is a package for dealing with R2D2 simulation data.
 
 Example
 -------
-A R2D2.Data instance can be created as follows:
+A :class:`R2D2.Data` instance can be created as follows:
 
 .. code-block:: python
 
@@ -15,9 +13,11 @@ A R2D2.Data instance can be created as follows:
         
 """
 from .data import Data
-from .read import Read
-from .sync import Sync
-from .color import Color
-from .constant import Constant
+from .read.read import Read
+from .sync.sync import Sync
+from .color import color
+from .constant import constant
 from . import write
 from . import util
+
+__all__ = ['Data','Read','Sync','color','constant','write','util']

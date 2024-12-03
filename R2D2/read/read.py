@@ -1,9 +1,13 @@
-import sys
 import R2D2
 import numpy as np
 
+"""
+This is
+"""
+
 class Read:
     '''
+    Class for reading R2D2 data
     
     Attributes
     ----------
@@ -26,6 +30,7 @@ class Read:
         See :class:`R2D2.Read.vc`
     
     '''
+    
     def __init__(self, datadir, verbose=False, self_old=None):
         '''
         This method reads basic data for calculation setting
@@ -335,7 +340,7 @@ class Read:
             self.summary()
             
     ##############################
-    def qq_select(self,xs,n,silent=False):
+    def qq_select(self,xs,n,verpose=True):
         '''
         Reads 2D slice data at a selected height.
 
@@ -345,8 +350,8 @@ class Read:
             A selected height for data
         n : int 
             A setected time step for data
-        silent : bool
-            True suppresses a message of store
+        verpose : bool
+            False suppresses a message of store
             
         Notes
         -----
@@ -417,23 +422,23 @@ class Read:
                 self.qs['info'] = info
                 f.close()        
 
-        if not silent :
+        if verpose:
             print('### variables are stored in self.qs ###')
 
     ##############################
-    def qq_select_z(self,zs,n,silent=False):
+    def qq_select_z(self,zs,n,verpose=True):
         '''
         Reads 2D slice data at constant z
         The data is stored in self.qz dictionary
 
         Parameters
         ----------
-            zs : float
-                A selected z for data
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        zs : float
+            A selected z for data
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
             
         '''
 
@@ -503,30 +508,30 @@ class Read:
             info['zs'] = self.p['z'][k0]
             self.qz['info'] = info
             
-        if not silent :
+        if verpose:
             print('### variables are stored in self.qz ###')
             
     ##############################
-    def qq_3d(self,n,value,silent=False):
+    def qq_3d(self,n,value,verpose=True):
         '''
         Reads 3D full data
         The data is stored in self.qq dictionary
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            value : str
-                Kind of value. Options are:
-                    - "ro" : density
-                    - "vx", "vy", "vz": velocity
-                    - "bx", "by", "bz": magnetic field
-                    - "se": entropy
-                    - "ph": div B cleaning
-                    - "te": temperature
-                    - "op": Opacity
-            silent : bool
-                True suppresses a message of store
+        n : int
+            A selected time step for data
+        value : str
+            Kind of value. Options are:
+                - "ro" : density
+                - "vx", "vy", "vz": velocity
+                - "bx", "by", "bz": magnetic field
+                - "se": entropy
+                - "ph": div B cleaning
+                - "te": temperature
+                - "op": Opacity
+        verpose : bool
+            False suppresses a message of store
         '''
         
         mtype = self.p["mtype"]
@@ -592,28 +597,28 @@ class Read:
                             self.qq[value][iss[np0]:iee[np0]+1,jss[np0]:jee[np0]+1,:] = qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
                     f.close()
 
-        if not silent :
+        if verpose:
             print('### variables are stored in self.qq ###')
             
     ##############################
-    def qq_3d_restricted(self,n,value,x0,x1,y0,y1,z0,z1,silent=False):
+    def qq_3d_restricted(self,n,value,x0,x1,y0,y1,z0,z1,verpose=True):
         '''
         Reads 3D restricted-area data
         The data is stored in self.qr dictionary
 
         Parameters
         ----------
-            n : int 
-                A selected time step for data
-            value : str
-                See :meth:`R2D2.Read.qq_3d` for options
-       
-            x0, y0, z0 : float
-                Minimum x, y, z
-            x1, y1, z1 : float
-                Maximum x, y, z
-            silent : bool
-                True suppresses a message of store
+        n : int 
+            A selected time step for data
+        value : str
+            See :meth:`R2D2.Read.qq_3d` for options
+    
+        x0, y0, z0 : float
+            Minimum x, y, z
+        x1, y1, z1 : float
+            Maximum x, y, z
+        verpose : bool
+            False suppresses a message of store
         '''
         
         mtype = self.p["mtype"]
@@ -679,28 +684,28 @@ class Read:
                                 qqq[value].reshape((iixl[np0],jjxl[np0],kx),order="F")[isrt_snd:iend_snd,jsrt_snd:jend_snd,k0:k1+1]                         
                     f.close()
 
-        if not silent :
+        if verpose:
             print('### variales are stored in self.qr ###')
 
     ##############################
-    def qq_3d_all(self,n,silent=False):
+    def qq_3d_all(self,n,verpose=True):
         '''
         This method reads 3D full data all
         The data is stored in self.qq dictionary
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
         '''
         value = ['ro','vx','vy','vz','bx','by','bz','se','ph','pr','te','op']
-        qq_3d(self,n,value,silent=silent)
+        qq_3d(self,n,value,verpose=verpose)
 
 
     ##############################
-    def qq_tau(self,n,silent=False):
+    def qq_tau(self,n,verpose=True):
         '''
         Reads 2D data at certain optical depths.
         The data is stored in self.qt dictionary.
@@ -708,10 +713,10 @@ class Read:
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
                 
         '''
 
@@ -779,26 +784,26 @@ class Read:
             qt["he001"] = np.reshape(qq_in0,(m_tu,m_in,jx,kx),order="F")[2,11,:,:]
             qt["fr001"] = np.reshape(qq_in0,(m_tu,m_in,jx,kx),order="F")[2,12,:,:]
 
-        if not silent :
+        if verpose:
             if self.p['geometry'] == 'YinYang':
                 print('### variables are stored in self.qt_yin and self.qt_yan ###')
             else:
                 print('### variables are stored in self.qt ###')
             
     ##############################
-    def qq_ixr(self,ixrt,n,silent=False):
+    def qq_ixr(self,ixrt,n,verpose=True):
         '''
         Reads 3D data at a selected x-region
         corrensponding to ixr-th region in remap coordinate
         
         Parameters
         ----------
-            ixrt : int
-                Aselected x-region (0<=ixrt<=ixr)
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        ixrt : int
+            Aselected x-region (0<=ixrt<=ixr)
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
         '''
         
         mtype = self.p["mtype"]
@@ -858,27 +863,27 @@ class Read:
             self.qi["te"][:,jss[np0]:jee[np0]+1,:] = qqq["te"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
             self.qi["op"][:,jss[np0]:jee[np0]+1,:] = qqq["op"].reshape((iixl[np0],jjxl[np0],kx),order="F")[:,:,:]
                 
-        if not silent:
+        if verpose:
             print('### variables are stored in self.qi ###')
     ##############################
-    def time(self,n,tau=False,silent=True):
+    def time(self,n,tau=False,verpose=False):
         '''
         Reads time at a selected time step
         The data is stored in self.t
 
         Parameters
         ----------
-            n : int
-                selected time step for data
-            tau : bool
-                if True time for optical depth (high cadence)
-            silent : bool
-                True suppresses a message of store
+        n : int
+            selected time step for data
+        tau : bool
+            if True time for optical depth (high cadence)
+        verpose : bool
+            False suppresses a message of store
                 
         Returns
         -------
-            time : float
-                time at a selected time step
+        time : float
+            time at a selected time step
         '''
 
         if tau:
@@ -890,22 +895,22 @@ class Read:
             self.t = np.fromfile(f,self.p['endian']+'d',1).reshape((1),order='F')[0]            
             f.close()    
         
-        if not silent :
+        if verpose:
             print('### variales are stored in self.t ###')
 
         return self.t
     ##############################
-    def vc(self,n,silent=False):
+    def vc(self,n,verpose=True):
         '''
         Reads on the fly analysis data from fortran.
         The data is stored in self.vc dictionary
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
         '''
 
         # read xy plane data
@@ -945,23 +950,23 @@ class Read:
             for m in range(self.p["m2d_spex"]):
                 self.vc[self.p["cl"][m+self.p["m2d_xy"]+self.p['m2d_xz']+self.p['m2d_flux']]] = vl[:,:,m]
                 
-        if not silent :
+        if verpose:
             print('### variables are stored in self.vc ###')
 
     ##############################
-    def qq_check(self,n,silent=False,end_step=False):
+    def qq_check(self,n,verpose=True,end_step=False):
         '''
         Reads 3D full data for checkpoint
         The data is stored in self.qc dictionary
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
-            end_step : bool
-                If true, checkpoint of end step is read.
+        n : int
+            A selected time step for data
+        verpose : bool
+            False suppresses a message of store
+        end_step : bool
+            If true, checkpoint of end step is read.
         '''
 
         mtype = self.p['mtype']
@@ -986,25 +991,25 @@ class Read:
 
         f.close()
         
-        if not silent :
+        if verpose:
             print('### variables are stored in self.qc ###')
 
     ##############################
-    def qq_slice(self,n_slice,direc,n,silent=False):
+    def qq_slice(self,n_slice,direc,n,verpose=True):
         '''
         Reads 2D data of slice.
         The data is stored in self.ql dictionary
 
         Parameters
         ----------
-            n_slice : int
-                index of slice
-            direc : str
-                slice direction. 'x', 'y', or 'z'
-            n : int
-                a selected time step for data
-            silent : bool
-                True suppresses a message of store
+        n_slice : int
+            index of slice
+        direc : str
+            slice direction. 'x', 'y', or 'z'
+        n : int
+            a selected time step for data
+        verpose : bool
+            False suppresses a message of store
         '''
         mtype = self.p['mtype']
 
@@ -1059,17 +1064,17 @@ class Read:
                 print('### variables are stored in self.ql ###')
         
     ##############################
-    def qq_2d(self,n,silent=False):
+    def qq_2d(self,n,verpose=True):
         '''
         Reads full data of 2D calculation
         The data is stored in self.q2 dictionary
 
         Parameters
         ----------
-            n : int
-                A selected time step for data
-            silent : bool
-                True suppresses a message of store
+        n : int
+            A selected time step for data 
+        verpose : bool
+            False suppresses a message of store
         '''
         mtype = self.p["mtype"]
         ix = self.p["ix"]
@@ -1116,7 +1121,7 @@ class Read:
         self.q2["fr"] = qqq["qq"].reshape((mtype+5,ix,jx),order="F")[12,:,:]
         f.close()
 
-        if not silent :
+        if verpose:
             print('### variables are stored in self.q2 ###')
 
     def YinYangSet(self):
@@ -1154,6 +1159,60 @@ class Read:
                 # self.p['cossg_yy'] = -np.sin(self.p['zog_yy'])*np.sin(self.p['zzg_yy'])
                 # self.p['sinsg_yy'] =  np.cos(self.p['zog_yy'])/np.sin(self.p['yyg_yy'])
     
+    def models(self,verpose=True):
+        '''
+        This method read Model S based stratification.
+        
+        Parameters
+        ----------
+        verpose : bool
+            False suppresses a message
+        '''
+
+        self.ms = {}
+        
+        f = open(self.p['datadir']+'../input_data/params.txt','r')
+        self.ms['ix'] = int(f.read())
+        f.close()
+
+        ix = self.ms['ix']
+
+        endian = '>'
+        dtype = np.dtype
+        dtyp=np.dtype([ \
+                        ("head",endian+"i"),\
+                        ("x",endian+str(ix)+"d"),\
+                        ("pr0",endian+str(ix)+"d"),\
+                        ("ro0",endian+str(ix)+"d"),\
+                        ("te0",endian+str(ix)+"d"),\
+                        ("se0",endian+str(ix)+"d"),\
+                        ("en0",endian+str(ix)+"d"),\
+                        ("op0",endian+str(ix)+"d"),\
+                        ("tu0",endian+str(ix)+"d"),\
+                        ("dsedr0",endian+str(ix)+"d"),\
+                        ("dtedr0",endian+str(ix)+"d"),\
+                        ("dprdro",endian+str(ix)+"d"),\
+                        ("dprdse",endian+str(ix)+"d"),\
+                        ("dtedro",endian+str(ix)+"d"),\
+                        ("dtedse",endian+str(ix)+"d"),\
+                        ("dendro",endian+str(ix)+"d"),\
+                        ("dendse",endian+str(ix)+"d"),\
+                        ("gx",endian+str(ix)+"d"),\
+                        ("kp",endian+str(ix)+"d"),\
+                        ("cp",endian+str(ix)+"d"),\
+                        ("tail",endian+"i")\
+        ])
+        f = open(self.p['datadir']+"../input_data/value_cart.dac",'rb')
+        back = np.fromfile(f,dtype=dtyp,count=1)
+        f.close()
+        
+        for key in back.dtype.names:
+            if back[key].size == ix:
+                self.ms[key] = back[key].reshape((ix),order='F')
+                
+        if verpose:
+            print('### Model S based stratification is stored in self.ms ###')
+    
     def summary(self):
         '''
         Show R2D2.Read summary.
@@ -1164,7 +1223,7 @@ class Read:
 
         print(RED + '### Star information ###' + END)
         if 'mstar' in self.p:
-            print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.Constant.msun)+' msun')
+            print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.constant.msun)+' msun')
         if 'astar' in self.p:
             print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
 

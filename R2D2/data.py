@@ -2,7 +2,7 @@ import R2D2
 
 class Data:
     '''
-    Cass for managing R2D2 data
+    Class for managing R2D2 data
     
     Attributes
     ----------
@@ -16,7 +16,7 @@ class Data:
         See :class:`R2D2.R2D2_read.models_init`
             
     '''
-
+    
     def __init__(self,datadir,verbose=False,self_old=None):
         '''
         Initialize R2D2.Data
@@ -37,7 +37,8 @@ class Data:
         '''
         if hasattr(self.read, name):
             attr = getattr(self.read, name)
-            return attr
+            if not callable(attr):  # 属性が関数でない場合のみ返す
+                return attr
 
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 

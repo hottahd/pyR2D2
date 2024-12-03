@@ -14,21 +14,15 @@ R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の�
 .. toctree::
    :maxdepth: 2
 
-   start.rst
-   environment.rst
-   typical_case.rst
-   equation.rst
-   code.rst
-   scheme.rst
-   parameter.rst
-   geometry.rst
-   boundary.rst
-   artdif.rst
-   io.rst
-   paraview.rst
-   api_reference.rst
-   notation.rst
+   quick_start
+   environment
+   typical_case
+   r2d2_py
+   api_reference
    sphinx.rst
+   paraview.rst
+   geometry.rst
+   notation.rst
 	     
 ライセンス
 ----------------------------------
@@ -41,8 +35,6 @@ R2D2は公開ソフトウェアではなく、再配布も禁じている。
 * R2D2で実行する計算は、堀田と議論する必要がある。パラメタ変更などの細かい変更には相談する必要はないが、新しいプロジェクトを開始するときはその都度相談すること。堀田自身のプロジェクト、堀田の指導学生のプロジェクトとの重複を避けるためである。
 * R2D2を用いた論文を出版するときは `Hotta et al., 2019 <https://ui.adsabs.harvard.edu/abs/2019SciA....5.2307H/abstract>`_, `Hotta and Iijima, 2020 <https://ui.adsabs.harvard.edu/abs/2020MNRAS.494.2523H/abstract>`_ を引用すること。  
 * R2D2を用いた研究を発表するときは、`R2D2のロゴ <https://hottahd.github.io/R2D2-manual/_images/R2D2_logo_red.png>`_ の使用が推奨される(強制ではない)。
-
-改訂履歴
 
 出版論文
 ----------------------------------
@@ -71,10 +63,5 @@ R2D2を用いた研究で出版された論文は以下です。
 
 * :ref:`genindex`
 * :ref:`search`
-
-TODOリスト
-----------------------------------
-.. todolist:: 
-
 
 最終更新日：|today|

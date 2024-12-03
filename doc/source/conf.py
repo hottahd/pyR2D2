@@ -27,7 +27,7 @@ release = '1.3'
 import sys, os
 sys.path.insert(0, os.path.abspath('../../'))
 import R2D2
-import R2D2.fortran_util
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,10 +40,13 @@ extensions = [
     'sphinx.ext.viewcode',  # ソースコードのリンク 
     'sphinx.ext.intersphinx',  # 他のドキュメントへのリンク       
     'sphinx.ext.todo',
-    'sphinx.ext.autosummary',
-    'sphinx_automodapi.automodapi',
     'sphinx.ext.imgmath',
+    'sphinx_toolbox.more_autosummary', # 他の拡張機能
+    'sphinx_automodapi.automodapi',
 ]
+
+# autodocsumm_member_order = 'bysource'
+#autodoc_member_order = 'bysource'  # or 'alphabetical', 'groupwise'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -84,23 +87,35 @@ html_theme = 'bizstyle'
 html_theme = 'sphinx_rtd_theme'
 #html_theme = "pydata_sphinx_theme"
 
-# autodoc_member_order = 'bysource'
-# autodoc_default_options = {
-#     'special-members': '__init__',
-#     'members': False,
-# }
+autodoc_member_order = 'bysource'
+autosummary_imported_members = True
+autodoc_default_options = {
+    # 'members': True,              # クラスやモジュールのメンバーを表示
+    'undoc-members': True,        # ドキュメント化されていないメンバーも表示
+    'private-members': True,      # アンダースコア(_)で始まるメンバーも表示
+    'special-members': '__init__', # 特殊メソッドも表示 (__init__, __call__ など)
+    'member-order': 'bysource',   # ソースコードの順に表示
+    'show-inheritance': True,     # クラスの継承関係を表示
+}
 
-napoleon_include_init_with_doc = True
+automodsumm_sort = False  # ソートを無効化（ファイル順序を優先）
+
+# napoleon_include_init_with_doc = True
 napoleon_use_ivar = True
 
 automodapi_inheritance_diagram = False
-autosummary_generate = False  # autosummaryでファイルを生成
+autosummary_generate = True  # autosummaryでファイルを生成
+
+automodsumm_included_members = ['__init__']
+
+graphviz_dot = 'dot'
 
 ##############################
 # Logo setting
 html_logo = '_static/figs/R2D2_logo_red.png'
 html_theme_options = {
     "logo_only": False,  # サイドバーにロゴだけ表示
+    "navigation_depth": 4,  # サイドバーの深さ
 #    "style_nav_header_background": "#2980B9",  # ナビゲーションヘッダーの色を変更（任意）
 }
 
@@ -144,3 +159,5 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
 def setup(app):
     # Connect the hook to the autodoc event in Sphinx
     app.connect("autodoc-process-docstring", autodoc_process_docstring)
+    
+    from sphinx.ext.autosummary import Autosummary

@@ -229,3 +229,44 @@ def update_results_file(file_path, total_size, unit, caseid, dir_path):
             size_timestamp_realpath = existing_dict[caseid]
             # フォーマット: ディレクトリ名、右揃えで6桁、小数点2桁、単位
             f.write(f"{caseid:<10} {size_timestamp_realpath}\n")
+            
+def eos(data,ro,se,var):
+    '''
+    Returns the Table equation of state.
+    
+    Parameters
+    ----------
+    data : R2D2.Data, or, R2D2.Read
+        Instance of R2D2.Data or R2D2.Read classes
+    ro : float
+        Density
+    se : float)
+        Entropy
+    var : str
+        Variable name, pr, te, en, op
+    
+    Returns
+    -------
+    qq : float
+        Corresponding variable
+       
+    Warning
+    -------
+    This method is very slow for large numpy array. Please consider using fortraun code.
+    '''
+    
+    import numpy as np
+    
+    iro = int((np.log(ro) - data.p['log_ro_e'][0])//data.p['dlogro_e'])
+    ise = int((       se  - data.p['se_e'][0]    )//data.p['dse_e'])
+    
+    dlogro = np.log(ro) - data.p['log_ro_e'][iro]
+    dse = se - data.p['se_e'][ise]
+    
+    qq = np.exp((\
+        + data.p['log_'+var+'_e'][iro  ,ise  ]*(data.p['dlogro_e'] - dlogro)*(data.p['dse_e'] - dse) \
+        + data.p['log_'+var+'_e'][iro+1,ise  ]*(                     dlogro)*(data.p['dse_e'] - dse) \
+        + data.p['log_'+var+'_e'][iro  ,ise+1]*(data.p['dlogro_e'] - dlogro)*(                  dse) \
+        + data.p['log_'+var+'_e'][iro+1,ise+1]*(                     dlogro)*(                  dse) \
+        )/data.p['dlogro_e']/data.p['dse_e'])    
+    return qq

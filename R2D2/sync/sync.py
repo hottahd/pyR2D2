@@ -1,16 +1,22 @@
 import os
 
 class Sync:
+    """
+    Class for downloading data from remote server
+    
+    """
+    
     def __init__(self, read):
         """
         Initialize R2D2.Sync
         
         Parameters
         ----------
-        read : R2D2.read
+        read : R2D2.Read
             Instance of R2D2.read
         """
         self.read = read
+        
         
     def __getattr__(self, name):
         if hasattr(self.read, name):
