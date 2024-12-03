@@ -1,10 +1,10 @@
-<!-- <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       Version: {{ current_version }}
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
-      {% if languages|length >= 1 %}
+      {% if languages is iterable and languages|length >= 1 %}
       <dl>
         <dt>{{ _('Languages') }}</dt>
           {% for the_language, url in languages %}
@@ -12,15 +12,19 @@
           {% endfor %}
       </dl>
       {% endif %}
-      {% if versions|length >= 1 %}
+      {% if versions is iterable %}
       <dl>
         <dt>{{ _('Versions') }}</dt>
         {% for the_version, url in versions %}
           <dd><a href="{{ url }}/index.html">{{ the_version }}</a></dd>
         {% endfor %}
       </dl>
+      {% else %}
+      <dl>
+        <dt>{{ _('Versions') }}</dt>
+        <dd><a href="{{ versions.url }}/index.html">{{ versions.name }}</a></dd>
+      </dl>
       {% endif %}
       <br>
-      </dl>
     </div>
-  </div> -->
+  </div>
