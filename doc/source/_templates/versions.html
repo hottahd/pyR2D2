@@ -15,16 +15,13 @@
       {% if versions is iterable %}
       <dl>
         <dt>{{ _('Versions') }}</dt>
-        {% for the_version, url in versions %}
-          <dd><a href="{{ url }}/index.html">{{ the_version }}</a></dd>
+        {% for version in versions %}
+          <dd><a href="{{ version.url }}/index.html">{{ version.name }}</a></dd>
         {% endfor %}
       </dl>
       {% else %}
-      <dl>
-        <dt>{{ _('Versions') }}</dt>
-        <dd><a href="{{ versions.url }}/index.html">{{ versions.name }}</a></dd>
-      </dl>
+      <p>No versions available</p>
       {% endif %}
       <br>
     </div>
-  </div>
+</div>
