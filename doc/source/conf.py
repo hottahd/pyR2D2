@@ -41,8 +41,8 @@ extensions = [
     'sphinx.ext.intersphinx',  # 他のドキュメントへのリンク       
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
-    'sphinx_toolbox.more_autosummary', # 他の拡張機能
     'sphinx_automodapi.automodapi',
+    'sphinx_multiversion',
 ]
 
 # autodocsumm_member_order = 'bysource'
@@ -98,6 +98,8 @@ autodoc_default_options = {
     'show-inheritance': True,     # クラスの継承関係を表示
 }
 
+smv_tag_whitelist = r'^v.*$'  # タグ "v1.0" などを対象
+
 automodsumm_sort = False  # ソートを無効化（ファイル順序を優先）
 
 # napoleon_include_init_with_doc = True
@@ -114,9 +116,17 @@ graphviz_dot = 'dot'
 # Logo setting
 html_logo = '_static/figs/R2D2_logo_red.png'
 html_theme_options = {
+    'version_selector': True,
     "logo_only": False,  # サイドバーにロゴだけ表示
     "navigation_depth": 4,  # サイドバーの深さ
-#    "style_nav_header_background": "#2980B9",  # ナビゲーションヘッダーの色を変更（任意）
+    "style_nav_header_background": "#30476E",  # ナビゲーションヘッダーの色を変更（任意）
+}
+
+##############################
+
+html_context = {
+  'current_version' : "v0.1",
+  'versions' : [["v0.1", "v0.1"]],
 }
 
 ##############################
