@@ -124,12 +124,9 @@ html_theme_options = {
 
 ##############################
 
-
 html_context = {
-    'versions': [
-        {'name': 'v1.0', 'url': '/v1.0'},
-        {'name': 'v2.0', 'url': '/v2.0'},
-    ]
+  'current_version' : "v0.1",
+  'versions' : [["v0.1", "v0.1"]],
 }
 
 ##############################
