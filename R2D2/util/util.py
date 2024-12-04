@@ -31,7 +31,7 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None):
         
     """
     
-    if datadir is None
+    if datadir is None:
         main_locals['caseid'] = caseid_select(main_locals)
         datadir = "../run/"+main_locals['caseid']+"/data/"
     

@@ -7,18 +7,17 @@ import R2D2
 import sys, os
 import pickle
 
-caseid = R2D2.util.caseid_select(locals()) # caseidを選択
-datadir="../run/"+caseid+"/data/"
+# R2D2.Data instanceの設定
+caseid = R2D2.util.caseid_select(locals())
+datadir = "../run/"+caseid+"/data/"
+d = R2D2.Data(datadir)
+
+R2D2.util.locals_define(d,locals())
+n0 = R2D2.util.define_n0(d,locals())
 
 # 生成された画像の出力先の設定・作成
 pngdir="../figs/"+caseid+"/est/"
 os.makedirs(pngdir,exist_ok=True)
-
-# R2D2 instanceの設定
-R2D2.util.initialize_instance(locals(),'d')
-d = R2D2.R2D2_data(datadir,self_old=d)
-R2D2.util.locals_define(d,locals())
-n0 = R2D2.util.define_n0(d,locals())
 
 print("Maximum time step= ",d.p['nd']," time ="\
       ,d.p['dtout']*float(d.p['nd'])/3600./24.," [day]")
@@ -85,18 +84,18 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
     #####################
     # drawing
     vls = ['ff','fk','fr','fm','ft']
-    colors = [R2D2.magenta,R2D2.green,R2D2.blue,R2D2.orange,R2D2.ash]
+    colors = [R2D2.color.magenta,R2D2.color.green,R2D2.color.blue,R2D2.color.orange,R2D2.color.ash]
     labels = ['$F_\mathrm{e}$',r'$F_\mathrm{k}$',r'$F_\mathrm{r}$',r'$F_\mathrm{m}$',r'$F_\mathrm{t}$']
     for vl, color, label in zip(vls, colors, labels):
         ax1.plot(xp,md[vl]/fstar,label=label,color=color)
 
-    ax1.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color=R2D2.ash)
+    ax1.hlines(y=1,xmin=xp.min(),xmax=xp.max(),linestyle='--',color=R2D2.color.ash)
 
     #####################
     md['vhrms'] = np.sqrt(md['vyrms'] + md['vzrms']**2)
     md['vvrms'] = np.sqrt(md['vxrms']**2 + md['vhrms']**2)
     vls = ['vxrms','vhrms','vvrms']
-    colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+    colors = [R2D2.color.blue,R2D2.color.magenta,R2D2.color.green]
     labels = [r'$v_{x\mathrm{(rms)}}$',r'$v_\mathrm{h(rms)}$',r'$v_\mathrm{(rms)}$']
     for vl, color, label in zip(vls, colors, labels):
         ax2.plot(xpp,md[vl]*1.e-5,label=label,color=color)
@@ -108,14 +107,14 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
     md['bhrms'] = np.sqrt(md['byrms']**2 + md['bzrms']**2)
     md['bbrms'] = np.sqrt(md['bxrms']**2 + md['bhrms']**2)
     vls = ['bxrms','bhrms','bbrms']
-    colors = [R2D2.blue,R2D2.magenta,R2D2.green]
+    colors = [R2D2.color.blue,R2D2.color.magenta,R2D2.color.green]
     labels = [r'$B_{x\mathrm{(rms)}}$',r'$B_\mathrm{h(rms)}$',r'$B_\mathrm{(rms)}$']
     for vl, color, label in zip(vls, colors, labels):
         ax3.plot(xpp,md[vl]*1.e-5,label=label,color=color)
     
     #####################
-    ax4.plot(xpp,md['sem']+d.p['se0'],color=R2D2.blue,label=r'$s$')
-    ax4.plot(xpp,d.p['se0'],color=R2D2.blue,ls='--',label=r'$s_0$')
+    ax4.plot(xpp,md['sem']+d.p['se0'],color=R2D2.color.blue,label=r'$s$')
+    ax4.plot(xpp,d.p['se0'],color=R2D2.color.blue,ls='--',label=r'$s_0$')
 
     titles = ['Energy fluxes','RMS velocity','RMS magnetic field','Entropy']
     ylabels = [r"$F/F_*$",r"velocities$\mathrm{~[km~s^{-1}]}$",r"Magnetic field [G]",r'$\mathrm{erg~g^{-1}~K^{-1}}$']
@@ -135,8 +134,8 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
 for n in tqdm(range(n0,nd+1)):
     print(f"\r n = {n} ", end='', flush=True)
     ##############################
-    t = d.read_time(n)    
-    d.read_vc(n,silent=True)
+    t = d.read.time(n)    
+    d.read.on_the_fly(n,verpose=False)
 
     ##############################    
     if d.p['geometry'] == 'Cartesian':
