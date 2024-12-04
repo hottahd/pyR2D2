@@ -1,6 +1,6 @@
 import R2D2
 
-def init(main_locals,instance_name='d'):
+def init(main_locals,instance_name='d',verpose=True,datadir=None):
     """
     Initialize R2D2.Data instance in main program.
     
@@ -10,6 +10,10 @@ def init(main_locals,instance_name='d'):
         locals() in main program, which include local variables
     instance_name : str
         name of instance of R2D2.Data object
+    verpose : bool
+        If True, print self.summar()
+    datadir : str
+        directory path to R2D2 data
 
     
     Notes
@@ -27,11 +31,16 @@ def init(main_locals,instance_name='d'):
         
     """
     
-    main_locals['caseid'] = caseid_select(main_locals)
-    datadir = "../run/"+main_locals['caseid']+"/data/"
+    if datadir is None
+        main_locals['caseid'] = caseid_select(main_locals)
+        datadir = "../run/"+main_locals['caseid']+"/data/"
     
     initialize_instance(main_locals,instance_name)
     main_locals[instance_name] = R2D2.Data(datadir)
+    locals_define(main_locals[instance_name],main_locals)
+    
+    if verpose:
+        main_locals[instance_name].summary()
     
 def initialize_instance(main_locals,instance_name):
     '''
