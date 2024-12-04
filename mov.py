@@ -9,7 +9,7 @@ caseid = R2D2.util.caseid_select(locals())
 datadir="../run/"+caseid+"/data/"
 
 R2D2.util.initialize_instance(locals(),'d')
-d = R2D2.R2D2_data(datadir,self_old=d)
+d = R2D2.Data(datadir,self_old=d)
 R2D2.util.locals_define(d,locals())
 
 pngdir="../figs/"+caseid+"/mov/"
@@ -46,12 +46,12 @@ if not d.p['geometry'] == 'Cartesian':
     SINYM = SINY.sum(axis=1)
 
 # read initial time
-t0 = d.read_time(0,silent=True)
+t0 = d.read.time(0,verpose=False)
 
 for n in tqdm(range(n0,d.p['nd']+1)):
     # read data
-    t = d.read_time(n,silent=True) 
-    d.read_vc(n,silent=True)
+    t = d.read.time(n,verpose=False)
+    d.read.on_the_fly(n,verpose=False)
     
     ##############################
     
@@ -61,7 +61,7 @@ for n in tqdm(range(n0,d.p['nd']+1)):
         tight_layout_flag = False
     
     if d.p['geometry'] == 'Cartesian':
-        d.read_qq_tau(n*int(d.p['ifac']),silent=True)
+        d.read.qq_tau(n*int(d.p['ifac']),verpose=False)
         tu_height = d.qt['he'][d.p['jc'],:]
         
         inm = d.qt['in'].mean() # mean intensity

@@ -44,7 +44,7 @@ class Read:
         time. See :class:`R2D2.Read.time`
     vc : dict
         data of on the fly analysis.
-        See :class:`R2D2.Read.vc`
+        See :class:`R2D2.Read.on_the_fly`
     
     '''
     
@@ -910,7 +910,7 @@ class Read:
 
         return self.t
     ##############################
-    def vc(self,n,verpose=True):
+    def on_the_fly(self,n,verpose=True):
         '''
         Reads on the fly analysis data from fortran.
         The data is stored in self.vc dictionary
