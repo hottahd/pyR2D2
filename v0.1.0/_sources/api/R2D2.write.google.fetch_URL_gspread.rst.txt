@@ -1,0 +1,6 @@
+fetch_URL_gspread
+=================
+
+.. currentmodule:: R2D2.write.google
+
+.. autofunction:: fetch_URL_gspread

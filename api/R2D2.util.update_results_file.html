@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>update_results_file &mdash; R2D2 Document 1.3 documentation</title>
+  <title>update_results_file &mdash; R2D2 Document 0.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -14,13 +14,13 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="../_static/documentation_options.js?v=a58bc63e"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="d_x" href="R2D2.fortran_util.d_x.html" />
+    <link rel="next" title="R2D2.write.google Package" href="../R2D2.write.html" />
     <link rel="prev" title="locals_define" href="R2D2.util.locals_define.html" /> 
 </head>
 
@@ -28,7 +28,7 @@
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #30476E" >
 
           
           
@@ -45,47 +45,34 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../equation.html">方程式</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../code.html">コード</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../scheme.html">数値スキーム</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../parameter.html">パラメータ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../boundary.html">境界条件</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../artdif.html">人工粘性</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">出力と読込</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../r2d2_py.html">R2D2_py</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2">R2D2 Package</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#module-R2D2.util">R2D2.util Package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="../api_reference.html#functions">Functions</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.caseid_select.html">caseid_select</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.define_n0.html">define_n0</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.get_best_unit.html">get_best_unit</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.get_total_file_size.html">get_total_file_size</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.init.html">init</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.initialize_instance.html">initialize_instance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="R2D2.util.locals_define.html">locals_define</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">update_results_file</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../R2D2.package.html">R2D2 Package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../R2D2.package.html#module-R2D2.util">R2D2.util Package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../R2D2.package.html#functions">Functions</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../R2D2.package.html#module-R2D2.write">R2D2.write Package</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.fortran_util">R2D2.fortran_util Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#module-R2D2.vtk">R2D2.vtk Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 </ul>
 
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">R2D2 Document</a>
       </nav>
@@ -96,6 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../api_reference.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../R2D2.package.html">R2D2 Package</a></li>
       <li class="breadcrumb-item active">update_results_file</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/R2D2.util.update_results_file.rst.txt" rel="nofollow"> View page source</a>
@@ -132,7 +120,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="R2D2.util.locals_define.html" class="btn btn-neutral float-left" title="locals_define" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="R2D2.fortran_util.d_x.html" class="btn btn-neutral float-right" title="d_x" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../R2D2.write.html" class="btn btn-neutral float-right" title="R2D2.write.google Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
@@ -151,7 +139,22 @@
       </div>
     </section>
   </div>
-  <script>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });

@@ -1,0 +1,6 @@
+init
+====
+
+.. currentmodule:: R2D2.util
+
+.. autofunction:: init

@@ -1,0 +1,6 @@
+eos
+===
+
+.. currentmodule:: R2D2.util
+
+.. autofunction:: eos

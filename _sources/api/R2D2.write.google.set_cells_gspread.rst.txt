@@ -1,0 +1,6 @@
+set_cells_gspread
+=================
+
+.. currentmodule:: R2D2.write.google
+
+.. autofunction:: set_cells_gspread

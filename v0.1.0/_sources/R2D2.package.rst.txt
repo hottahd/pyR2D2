@@ -1,0 +1,14 @@
+.. automodapi:: R2D2
+    
+.. automodapi:: R2D2.util
+
+.. automodapi:: R2D2.write
+
+
+    Sub Packages
+    ~~~~~~~~~~~~~~~
+
+    .. toctree::
+        :maxdepth: 1
+
+        R2D2.write.rst

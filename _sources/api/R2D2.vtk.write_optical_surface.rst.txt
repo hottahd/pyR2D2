@@ -1,6 +1,0 @@
-write_optical_surface
-=====================
-
-.. currentmodule:: R2D2.vtk
-
-.. autofunction:: write_optical_surface

@@ -1,6 +1,0 @@
-interp
-======
-
-.. currentmodule:: R2D2.fortran_util
-
-.. autofunction:: interp

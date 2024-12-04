@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sphinx使用の覚書 &mdash; R2D2 Document 1.3 documentation</title>
+  <title>Sphinx使用の覚書 &mdash; R2D2 Document 0.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -14,20 +14,21 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="R2D2 pythonでのキーワードの説明" href="notation.html" /> 
+    <link rel="next" title="Paraviewを用いた3Dデータ表示" href="paraview.html" />
+    <link rel="prev" title="R2D2.color.color Module" href="R2D2.module.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #30476E" >
 
           
           
@@ -44,20 +45,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="start.html">R2D2を使い始めるには</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="equation.html">方程式</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">コード</a></li>
-<li class="toctree-l1"><a class="reference internal" href="scheme.html">数値スキーム</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parameter.html">パラメータ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
-<li class="toctree-l1"><a class="reference internal" href="boundary.html">境界条件</a></li>
-<li class="toctree-l1"><a class="reference internal" href="artdif.html">人工粘性</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">出力と読込</a></li>
-<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r2d2_py.html">R2D2_py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sphinx使用の覚書</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id1">はじめに</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id3">インストール</a></li>
@@ -74,13 +66,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
 </ul>
 
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">R2D2 Document</a>
       </nav>
@@ -143,7 +138,7 @@ sphinx-quickstart
 <h2>VS codeの利用<a class="headerlink" href="#vs-code" title="Link to this heading"></a></h2>
 <p>VS codeを利用すると快適にreStructuredTextを作成することができる。
 <code class="docutils literal notranslate"><span class="pre">*.rst</span></code> ファイルをVS codeで開くと自動で確認されるが、以下のプラグインをインストールする。</p>
-<a class="reference internal image-reference" href="figs/restructuredtext_vs.png"><img alt="figs/restructuredtext_vs.png" src="figs/restructuredtext_vs.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="_images/restructuredtext_vs.png"><img alt="_images/restructuredtext_vs.png" src="_images/restructuredtext_vs.png" style="width: 500px;" />
 </a>
 <p><code class="docutils literal notranslate"><span class="pre">Cmd+k</span> <span class="pre">Cmd+r</span></code> で画面を分割してプレビューできる。正しい <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> の場所を設定する必要がある。</p>
 </section>
@@ -221,12 +216,12 @@ sphinx-quickstart
 <section id="id9">
 <h3>画像<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <p>画像の挿入には <code class="docutils literal notranslate"><span class="pre">image</span></code> ディレクティブを使う。オプションで、画像サイズなどを調整できる。堀田はだいたいwidthで調整している。</p>
-<div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">image</span><span class="p">::</span> figs/R2D2_logo.png
+<div class="highlight-restructuredtext notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">image</span><span class="p">::</span> _static/figs/R2D2_logo.png
     <span class="nc">:width:</span> 350 px
 </pre></div>
 </div>
 <p>とすると下記のように画像が挿入される。</p>
-<a class="reference internal image-reference" href="figs/R2D2_logo.png"><img alt="figs/R2D2_logo.png" src="figs/R2D2_logo.png" style="width: 350px;" />
+<a class="reference internal image-reference" href="_images/R2D2_logo.png"><img alt="_images/R2D2_logo.png" src="_images/R2D2_logo.png" style="width: 350px;" />
 </a>
 </section>
 <section id="id10">
@@ -264,7 +259,7 @@ sphinx-quickstart
 </pre></div>
 </div>
 <p>と書いてあるので、To Doのまとめが示されている。</p>
-<p>最終更新日：Dec 01, 2024</p>
+<p>最終更新日：Dec 04, 2024</p>
 </section>
 </section>
 </section>
@@ -273,7 +268,8 @@ sphinx-quickstart
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="notation.html" class="btn btn-neutral float-left" title="R2D2 pythonでのキーワードの説明" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="R2D2.module.html" class="btn btn-neutral float-left" title="R2D2.color.color Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="paraview.html" class="btn btn-neutral float-right" title="Paraviewを用いた3Dデータ表示" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
@@ -292,7 +288,22 @@ sphinx-quickstart
       </div>
     </section>
   </div>
-  <script>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });

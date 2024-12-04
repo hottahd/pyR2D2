@@ -1,208 +1,105 @@
+
+
 <!DOCTYPE html>
-
-<html lang="en" data-content_root="../../../">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="lang:clipboard.copy" content="Copy to clipboard">
-  <meta name="lang:clipboard.copied" content="Copied to clipboard">
-  <meta name="lang:search.language" content="en">
-  <meta name="lang:search.pipeline.stopwords" content="True">
-  <meta name="lang:search.pipeline.trimmer" content="True">
-  <meta name="lang:search.result.none" content="No matching documents">
-  <meta name="lang:search.result.one" content="1 matching document">
-  <meta name="lang:search.result.other" content="# matching documents">
-  <meta name="lang:search.tokenizer" content="[\s\-]+">
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R2D2.util.util &mdash; R2D2 Document 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
 
   
-    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
-
-    <style>
-      body,
-      input {
-        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
-      }
-
-      code,
-      kbd,
-      pre {
-        font-family: "Roboto Mono", "Courier New", Courier, monospace
-      }
-    </style>
-  
-
-  <link rel="stylesheet" href="../../../_static/stylesheets/application.css"/>
-  <link rel="stylesheet" href="../../../_static/stylesheets/application-palette.css"/>
-  <link rel="stylesheet" href="../../../_static/stylesheets/application-fixes.css"/>
-  
-  <link rel="stylesheet" href="../../../_static/fonts/material-icons.css"/>
-  
-  <meta name="theme-color" content="#3f51b5">
-  <script src="../../../_static/javascripts/modernizr.js"></script>
-  
-  
-  
-    <title>R2D2.util.util &#8212; R2D2 Document 1.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=83e35b93" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
-    <script src="../../../_static/documentation_options.js?v=c55cb9cb"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-  
-   
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
 
-  </head>
-  <body dir=ltr
-        data-md-color-primary=blue-grey data-md-color-accent=blue>
-  
-  <svg class="md-svg">
-    <defs data-children-count="0">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-      
-    </defs>
-  </svg>
-  
-  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
-  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
-  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-  <a href="#_modules/R2D2/util/util" tabindex="1" class="md-skip"> Skip to content </a>
-  <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex navheader">
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../../index.html" title="R2D2 Document 1.3 documentation"
-           class="md-header-nav__button md-logo">
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
           
-            &nbsp;
           
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
-          <span class="md-header-nav__topic">R2D2 Document 1.3 documentation</span>
-          <span class="md-header-nav__topic"> R2D2.util.util </span>
-        </div>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
-        
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../search.html" method="get" name="search">
-      <input type="text" class="md-search__input" name="q" placeholder=""Search""
-             autocapitalize="off" autocomplete="off" spellcheck="false"
-             data-md-component="query" data-md-state="active">
-      <label class="md-icon md-search__icon" for="__search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
-        &#xE5CD;
-      </button>
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result">
-          <div class="md-search-result__meta">
-            Type to start searching
-          </div>
-          <ol class="md-search-result__list"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+          <a href="../../../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../r2d2_py.html">R2D2_py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../notation.html">R2D2 pythonでのキーワードの説明</a></li>
+</ul>
 
+        </div>
       </div>
-      
-      
-  
-  <script src="../../../_static/javascripts/version_dropdown.js"></script>
-  <script>
-    var json_loc = "../../../"versions.json"",
-        target_loc = "../../../../",
-        text = "Versions";
-    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
-  </script>
-  
+    </nav>
 
-    </div>
-  </nav>
-</header>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">R2D2 Document</a>
+      </nav>
 
-  
-  <div class="md-container">
-    
-    
-    
-  <nav class="md-tabs" data-md-component="tabs">
-    <div class="md-tabs__inner md-grid">
-      <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../../index.html" class="md-tabs__link">R2D2 Document 1.3 documentation</a></li>
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">Module code</a></li>
-      </ul>
-    </div>
-  </nav>
-    <main class="md-main">
-      <div class="md-main__inner md-grid" data-md-component="container">
-        
-          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-            <div class="md-sidebar__scrollwrap">
-              <div class="md-sidebar__inner">
-                <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../../index.html" title="R2D2 Document 1.3 documentation" class="md-nav__button md-logo">
-      
-        <img src="../../../_static/" alt=" logo" width="48" height="48">
-      
-    </a>
-    <a href="../../../index.html"
-       title="R2D2 Document 1.3 documentation">R2D2 Document 1.3 documentation</a>
-  </label>
-  
-
-</nav>
-              </div>
-            </div>
-          </div>
-          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-            <div class="md-sidebar__scrollwrap">
-              <div class="md-sidebar__inner">
-                
-<nav class="md-nav md-nav--secondary">
-  <ul class="md-nav__list" data-md-scrollfix="">
-    
-
-<li id="searchbox" class="md-nav__item"></li>
-
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">R2D2.util.util</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
   </ul>
-</nav>
-              </div>
-            </div>
-          </div>
-        
-        <div class="md-content">
-          <article class="md-content__inner md-typeset" role="main">
-            
-  <h1 id="modules-r2d2-util-util--page-root">Source code for R2D2.util.util</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">)</span> 
-<span class="kn">from</span> <span class="nn">R2D2.r2d2_data</span> <span class="kn">import</span> <span class="n">R2D2_data</span>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for R2D2.util.util</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">R2D2</span>
 
 <div class="viewcode-block" id="init">
 <a class="viewcode-back" href="../../../api/R2D2.util.init.html#R2D2.util.init">[docs]</a>
-<span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="o">=</span><span class="s1">'d'</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    This is a pen.</span>
+<span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize R2D2.Data instance in main program.</span>
 <span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    main_locals : dict</span>
+<span class="sd">        locals() in main program, which include local variables</span>
+<span class="sd">    instance_name : str</span>
+<span class="sd">        name of instance of R2D2.Data object</span>
+
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    1. Select caseid from existing caseid in main_locals or from user input.</span>
+<span class="sd">    2. Initialize instance of R2D2.Data object in main program.</span>
+<span class="sd">    3. Assign the R2D2.Data.p dictionary keys to main_locals.</span>
+<span class="sd">        </span>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    .. code-block:: python</span>
@@ -210,28 +107,28 @@
 <span class="sd">        import R2D2</span>
 <span class="sd">        R2D2.util.init(locals())</span>
 <span class="sd">        </span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
-    <span class="n">main_locals</span><span class="p">[</span><span class="s1">'caseid'</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">)</span>
-    <span class="n">datadir</span> <span class="o">=</span> <span class="s2">"../run/"</span><span class="o">+</span><span class="n">main_locals</span><span class="p">[</span><span class="s1">'caseid'</span><span class="p">]</span><span class="o">+</span><span class="s2">"/data/"</span>
+    <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">)</span>
+    <span class="n">datadir</span> <span class="o">=</span> <span class="s2">&quot;../run/&quot;</span><span class="o">+</span><span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/data/&quot;</span>
     
     <span class="n">initialize_instance</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="p">)</span>
-    <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">R2D2_data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span></div>
+    <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">R2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="initialize_instance">
 <a class="viewcode-back" href="../../../api/R2D2.util.initialize_instance.html#R2D2.util.initialize_instance">[docs]</a>
 <span class="k">def</span> <span class="nf">initialize_instance</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Initializes arbitrary instance of R2D2_data object in main program.</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Initializes arbitrary instance of R2D2.Data object in main program.</span>
 <span class="sd">        </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    main_locals : dict</span>
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    instance_name : str</span>
-<span class="sd">        name of instance of R2D2_data object</span>
-<span class="sd">    '''</span>
+<span class="sd">        name of instance of R2D2.Data object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">instance_name</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
         <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
@@ -239,7 +136,7 @@
 <div class="viewcode-block" id="caseid_select">
 <a class="viewcode-back" href="../../../api/R2D2.util.caseid_select.html#R2D2.util.caseid_select">[docs]</a>
 <span class="k">def</span> <span class="nf">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">force_read</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Choose caseid from input or from user input.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -249,64 +146,64 @@
 <span class="sd">    force_read : bool</span>
 <span class="sd">        If True, force to read caseid from user input.</span>
 <span class="sd">        If False, read caseid from main_locals if exists</span>
-<span class="sd">    '''</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     
-    <span class="n">RED</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\033</span><span class="s1">[31m'</span>
-    <span class="n">END</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\033</span><span class="s1">[0m'</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[31m&#39;</span>
+    <span class="n">END</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
 
-    <span class="k">if</span> <span class="s1">'caseid'</span> <span class="ow">in</span> <span class="n">main_locals</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_read</span><span class="p">:</span>
-        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">'caseid'</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;caseid&#39;</span> <span class="ow">in</span> <span class="n">main_locals</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_read</span><span class="p">:</span>
+        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-       <span class="n">caseid</span> <span class="o">=</span> <span class="s1">'d'</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">"input caseid id (3 digit): "</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+       <span class="n">caseid</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;input caseid id (3 digit): &quot;</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
        
     <span class="k">return</span> <span class="n">caseid</span></div>
 
 
 <div class="viewcode-block" id="locals_define">
 <a class="viewcode-back" href="../../../api/R2D2.util.locals_define.html#R2D2.util.locals_define">[docs]</a>
-<span class="k">def</span> <span class="nf">locals_define</span><span class="p">(</span><span class="n">r2d2_data</span><span class="p">,</span><span class="n">main_locals</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
+<span class="k">def</span> <span class="nf">locals_define</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">main_locals</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Substitute selp.p to main_locals in main program.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read</span>
-<span class="sd">        Instance of R2D2_data object</span>
+<span class="sd">    data : R2D2.Data, or, R2D2.Read</span>
+<span class="sd">        Instance of R2D2.Data or R2D2.Read classes</span>
 <span class="sd">    main_locals : dict</span>
 <span class="sd">        locals() in main program, which include local variables</span>
-<span class="sd">    '''</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">r2d2_data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">main_locals</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>    
     <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="define_n0">
 <a class="viewcode-back" href="../../../api/R2D2.util.define_n0.html#R2D2.util.define_n0">[docs]</a>
-<span class="k">def</span> <span class="nf">define_n0</span><span class="p">(</span><span class="n">r2d2_data</span><span class="p">,</span><span class="n">main_locals</span><span class="p">,</span><span class="n">nd_type</span><span class="o">=</span><span class="s1">'nd'</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
+<span class="k">def</span> <span class="nf">define_n0</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">main_locals</span><span class="p">,</span><span class="n">nd_type</span><span class="o">=</span><span class="s1">&#39;nd&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Define n0 in main_locals if not exists.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    r2d2_data : R2D2.R2D2_data, or, R2D2.R2D2_read</span>
-<span class="sd">        instance of R2D2_data object</span>
+<span class="sd">    data : R2D2.Data, or, R2D2.Read</span>
+<span class="sd">        instance of R2D2.Data or R2D2.Read classes</span>
 <span class="sd">    main_locals : dict</span>
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    nd_type : str</span>
-<span class="sd">        type of nd. 'nd' for MHD output, 'nd_tau' for high cadence output.</span>
-<span class="sd">    '''</span>
-    <span class="k">if</span> <span class="s1">'n0'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
-        <span class="n">main_locals</span><span class="p">[</span><span class="s1">'n0'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">'n0'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">r2d2_data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]:</span>
-        <span class="n">main_locals</span><span class="p">[</span><span class="s1">'n0'</span><span class="p">]</span> <span class="o">=</span> <span class="n">r2d2_data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]</span>
+<span class="sd">        type of nd. &#39;nd&#39; for MHD output, &#39;nd_tau&#39; for high cadence output.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="s1">&#39;n0&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;n0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;n0&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]:</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;n0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]</span>
     
-    <span class="k">return</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">'n0'</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;n0&#39;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_best_unit">
 <a class="viewcode-back" href="../../../api/R2D2.util.get_best_unit.html#R2D2.util.get_best_unit">[docs]</a>
 <span class="k">def</span> <span class="nf">get_best_unit</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">unit_multipliers</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the best unit for displaying the size.</span>
 
 <span class="sd">    Parameters</span>
@@ -315,38 +212,38 @@
 <span class="sd">        size of the file</span>
 <span class="sd">    unit_multipliers : dict</span>
 <span class="sd">        dictionary of unit multipliers</span>
-<span class="sd">    """</span>
-    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">([</span><span class="s1">'B'</span><span class="p">,</span> <span class="s1">'kB'</span><span class="p">,</span> <span class="s1">'MB'</span><span class="p">,</span> <span class="s1">'GB'</span><span class="p">,</span> <span class="s1">'TB'</span><span class="p">,</span> <span class="s1">'PB'</span><span class="p">]):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">([</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;kB&#39;</span><span class="p">,</span> <span class="s1">&#39;MB&#39;</span><span class="p">,</span> <span class="s1">&#39;GB&#39;</span><span class="p">,</span> <span class="s1">&#39;TB&#39;</span><span class="p">,</span> <span class="s1">&#39;PB&#39;</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;=</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">unit</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">unit</span>
-    <span class="k">return</span> <span class="s1">'B'</span></div>
+    <span class="k">return</span> <span class="s1">&#39;B&#39;</span></div>
 
 
 <div class="viewcode-block" id="get_total_file_size">
 <a class="viewcode-back" href="../../../api/R2D2.util.get_total_file_size.html#R2D2.util.get_total_file_size">[docs]</a>
 <span class="k">def</span> <span class="nf">get_total_file_size</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Evaluate total size of files in directory.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters:</span>
 <span class="sd">       directory (str): directory path</span>
-<span class="sd">       unit (str): unit of file size. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'.</span>
+<span class="sd">       unit (str): unit of file size. Choose from &#39;B&#39;, &#39;kB&#39;, &#39;MB&#39;, &#39;GB&#39;, &#39;TB&#39;, &#39;PB&#39;.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">       total_size (int): total size of files in directory in bytes</span>
-<span class="sd">    '''</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="kn">import</span> <span class="nn">os</span>
     
     <span class="n">unit_multipliers</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">'B'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s1">'kB'</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="s1">'MB'</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
-        <span class="s1">'GB'</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
-        <span class="s1">'TB'</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span>
-        <span class="s1">'PB'</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">5</span>
+        <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;kB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="s1">&#39;MB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;GB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;TB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;PB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">5</span>
     <span class="p">}</span>
     
     <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unit_multipliers</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid unit: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid unit: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">. Choose from &#39;B&#39;, &#39;kB&#39;, &#39;MB&#39;, &#39;GB&#39;, &#39;TB&#39;, &#39;PB&#39;.&quot;</span><span class="p">)</span>
     
     <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">dirnames</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
@@ -360,8 +257,8 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">display_unit</span> <span class="o">=</span> <span class="n">unit</span>
                 <span class="n">converted_size</span> <span class="o">=</span> <span class="n">total_size</span> <span class="o">/</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">display_unit</span><span class="p">]</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\r</span><span class="si">{</span><span class="s1">' '</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="se">\r</span><span class="s2">Current total size: </span><span class="si">{</span><span class="n">converted_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">display_unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">''</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="c1">#print(f"\rCurrent total size: {converted_size:.2f} {display_unit} ", end='', flush=True)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="se">\r</span><span class="s2">Current total size: </span><span class="si">{</span><span class="n">converted_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">display_unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1">#print(f&quot;\rCurrent total size: {converted_size:.2f} {display_unit} &quot;, end=&#39;&#39;, flush=True)</span>
             <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
                 <span class="c1"># ファイルが見つからない場合は無視</span>
                 <span class="k">continue</span>
@@ -370,7 +267,7 @@
         <span class="n">unit</span> <span class="o">=</span> <span class="n">get_best_unit</span><span class="p">(</span><span class="n">total_size</span><span class="p">,</span> <span class="n">unit_multipliers</span><span class="p">)</span>
         
     <span class="n">final_size</span> <span class="o">=</span> <span class="n">total_size</span> <span class="o">/</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Final total size: </span><span class="si">{</span><span class="n">final_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Final total size: </span><span class="si">{</span><span class="n">final_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>    
             
     <span class="k">return</span> <span class="n">final_size</span><span class="p">,</span> <span class="n">unit</span></div>
 
@@ -379,7 +276,7 @@
 <div class="viewcode-block" id="update_results_file">
 <a class="viewcode-back" href="../../../api/R2D2.util.update_results_file.html#R2D2.util.update_results_file">[docs]</a>
 <span class="k">def</span> <span class="nf">update_results_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">total_size</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Updates the results file with the size of a directory.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -395,11 +292,11 @@
 <span class="sd">    dir_path : str</span>
 <span class="sd">        The directory path</span>
 <span class="sd">        </span>
-<span class="sd">    '''</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="kn">import</span> <span class="nn">os</span>
     <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
     <span class="c1"># 現在の日時を取得</span>
-    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S"</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
 
      <span class="c1"># シンボリックリンクの場合の実体パスを取得</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
@@ -409,7 +306,7 @@
     
     <span class="c1"># 既存のデータを読み込む</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">existing_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">existing_data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -423,52 +320,107 @@
             <span class="n">size</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-            <span class="n">existing_dict</span><span class="p">[</span><span class="n">existing_caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">existing_dict</span><span class="p">[</span><span class="n">existing_caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
     
     <span class="c1"># ディレクトリサイズの情報を更新</span>
-    <span class="n">directory_size_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">total_size</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
-    <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">directory_size_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">real_path</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">directory_size_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_size</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">directory_size_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">real_path</span><span class="si">}</span><span class="s2">&quot;</span>
     
     <span class="c1"># 更新されたデータを書き込む</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">caseid</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">existing_dict</span><span class="p">):</span>
             <span class="n">size_timestamp_realpath</span> <span class="o">=</span> <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span>
             <span class="c1"># フォーマット: ディレクトリ名、右揃えで6桁、小数点2桁、単位</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">caseid</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">size_timestamp_realpath</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caseid</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">size_timestamp_realpath</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+            
+<div class="viewcode-block" id="eos">
+<a class="viewcode-back" href="../../../api/R2D2.util.eos.html#R2D2.util.eos">[docs]</a>
+<span class="k">def</span> <span class="nf">eos</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">ro</span><span class="p">,</span><span class="n">se</span><span class="p">,</span><span class="n">var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns the Table equation of state.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : R2D2.Data, or, R2D2.Read</span>
+<span class="sd">        Instance of R2D2.Data or R2D2.Read classes</span>
+<span class="sd">    ro : float</span>
+<span class="sd">        Density</span>
+<span class="sd">    se : float)</span>
+<span class="sd">        Entropy</span>
+<span class="sd">    var : str</span>
+<span class="sd">        Variable name, pr, te, en, op</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qq : float</span>
+<span class="sd">        Corresponding variable</span>
+<span class="sd">       </span>
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    This method is very slow for large numpy array. Please consider using fortraun code.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    
+    <span class="n">iro</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ro</span><span class="p">)</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_ro_e&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dlogro_e&#39;</span><span class="p">])</span>
+    <span class="n">ise</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span>       <span class="n">se</span>  <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;se_e&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>    <span class="p">)</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dse_e&#39;</span><span class="p">])</span>
+    
+    <span class="n">dlogro</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ro</span><span class="p">)</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_ro_e&#39;</span><span class="p">][</span><span class="n">iro</span><span class="p">]</span>
+    <span class="n">dse</span> <span class="o">=</span> <span class="n">se</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;se_e&#39;</span><span class="p">][</span><span class="n">ise</span><span class="p">]</span>
+    
+    <span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span>\
+        <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_&#39;</span><span class="o">+</span><span class="n">var</span><span class="o">+</span><span class="s1">&#39;_e&#39;</span><span class="p">][</span><span class="n">iro</span>  <span class="p">,</span><span class="n">ise</span>  <span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dlogro_e&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dse_e&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_&#39;</span><span class="o">+</span><span class="n">var</span><span class="o">+</span><span class="s1">&#39;_e&#39;</span><span class="p">][</span><span class="n">iro</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">ise</span>  <span class="p">]</span><span class="o">*</span><span class="p">(</span>                     <span class="n">dlogro</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dse_e&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_&#39;</span><span class="o">+</span><span class="n">var</span><span class="o">+</span><span class="s1">&#39;_e&#39;</span><span class="p">][</span><span class="n">iro</span>  <span class="p">,</span><span class="n">ise</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dlogro_e&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span><span class="o">*</span><span class="p">(</span>                  <span class="n">dse</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;log_&#39;</span><span class="o">+</span><span class="n">var</span><span class="o">+</span><span class="s1">&#39;_e&#39;</span><span class="p">][</span><span class="n">iro</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">ise</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span>                     <span class="n">dlogro</span><span class="p">)</span><span class="o">*</span><span class="p">(</span>                  <span class="n">dse</span><span class="p">)</span> \
+        <span class="p">)</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dlogro_e&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;dse_e&#39;</span><span class="p">])</span>    
+    <span class="k">return</span> <span class="n">qq</span></div>
 
 </pre></div>
 
-          </article>
-        </div>
-      </div>
-    </main>
-  </div>
-  <footer class="md-footer">
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-          
-          
-        </a>
-        
-      </nav>
-    </div>
-    <div class="md-footer-meta md-typeset">
-      <div class="md-footer-meta__inner md-grid">
-        <div class="md-footer-copyright">
-          <div class="md-footer-copyright__highlight">
-              &#169; Copyright 2020-2024, Hideyuki Hotta.
-              
+           </div>
           </div>
-            Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-             and
-            <a href="https://github.com/bashtage/sphinx-material/">Material for
-              Sphinx</a>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          <dd><a href="v0.1">v0.1</a></dd>
+        
+      </dl>
+      
+      <br>
     </div>
-  </footer>
-  <script src="../../../_static/javascripts/application.js"></script>
-  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
-  </body>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>
