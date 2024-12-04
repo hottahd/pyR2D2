@@ -21,3 +21,7 @@ from . import write
 from . import util
 
 __all__ = ['Data','Read','Sync','color','constant','write','util']
+
+from setuptools_scm import get_version
+
+__version__ = '.'.join(get_version(root="..", relative_to=__file__).split('.')[:3])

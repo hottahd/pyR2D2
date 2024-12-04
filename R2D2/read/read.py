@@ -1,10 +1,6 @@
 import R2D2
 import numpy as np
 
-"""
-This is
-"""
-
 class Read:
     '''
     Class for reading R2D2 data
@@ -19,10 +15,31 @@ class Read:
         See :class:`R2D2.Read.qq_select`
     qq : dict
         3D full data.
-        See :class:`R2D2.Read.qq_3d`
+        See :class:`R2D2.Read.qq_3d`        
     qt : dict
         2D data at constant optical depths.
         See :class:`R2D2.Read.qq_tau`
+    qt_yin, qt_yan : dict
+        2D data at constant optical depths in Yin-Yang grid.
+        See :class:`R2D2.Read.qq_tau`        
+    qz : dict    
+        2D data at constant z.
+        See :class:`R2D2.Read.qq_select_z`
+    qr : dict
+        3D data in a restricted region.
+        See :class:`R2D2.Read.qq_3d_restricted`
+    qi : dict
+        3D data in a MPI x-region.
+        See :class:`R2D2.Read.qq_ixr`
+    ql : dict
+        2D slice data.
+        See :class:`R2D2.Read.qq_slice`
+    ql_yin, ql_yan : dict
+        2D slice data in a Yin-Yang grid.
+        See :class:`R2D2.Read.qq_slice`
+    q2 : dict
+        Full data in 2D simulation.
+        See :class:`R2D2.Read.qq_2d`
     t : float
         time. See :class:`R2D2.Read.time`
     vc : dict
@@ -48,7 +65,7 @@ class Read:
         from scipy.io import FortranFile
         import os
         
-        # check if the data is already read
+        # check if the data is already read2
         initialize_flag = True
         if self_old is not None:
             if self_old.p['datadir'] == datadir:
@@ -59,12 +76,11 @@ class Read:
             self.qs = {}
             self.qq = {}
             self.qt = {}
+            self.qt_yin = {}
+            self.qt_yan = {}            
             self.qz = {}
             self.qr = {}
-            self.qv = {}
             self.qi = {}
-            self.qt_yin = {}
-            self.qt_yan = {}
             self.ql = {}
             self.ql_yin = {}
             self.ql_yan = {}
@@ -91,16 +107,6 @@ class Read:
         ## version check
         R2D2_py_ver = 2.0
         f = open(self.p['datadir']+"param/params.dac","r")
-        line = f.readline().split()
-        # if R2D2_py_ver != float(line[2]):
-        #     print("#######################################################")
-        #     print("#######################################################")
-        #     print("### Current R2D2 Python version is ",R2D2_py_ver,".")
-        #     print("### You use the data from R2D2 version ",float(line[2]),".")
-        #     print("### Please use the same version of fortran R2D2.")
-        #     print("#######################################################")
-        #     print("#######################################################")
-        #     sys.exit()
         
         # Basic parameterの読み込み
         line = f.readline()
@@ -126,7 +132,7 @@ class Read:
         else:
             self.p["endian"] = ">"
 
-    # MPI information
+        # MPI information
         f = FortranFile(self.p['datadir']+'param/xyz.dac','r')
         shape = (self.p['ix0']*self.p['jx0']*self.p['kx0'],3)
         self.p['xyz'] = f.read_reals(dtype=np.int32).reshape(shape,order='F')
@@ -339,7 +345,7 @@ class Read:
         if verbose:
             self.summary()
             
-    ##############################
+    # -- 
     def qq_select(self,xs,n,verpose=True):
         '''
         Reads 2D slice data at a selected height.
@@ -793,13 +799,17 @@ class Read:
     ##############################
     def qq_ixr(self,ixrt,n,verpose=True):
         '''
-        Reads 3D data at a selected x-region
+        Reads 3D data at a selected a MPI process in x-direction.
         corrensponding to ixr-th region in remap coordinate
         
         Parameters
         ----------
         ixrt : int
-            Aselected x-region (0<=ixrt<=ixr)
+            Aselected x-region (0<=ixrt<=ixr-1)
+            Note
+            ----
+            ixr is the number of MPI process in x-direction
+            
         n : int
             A selected time step for data
         verpose : bool

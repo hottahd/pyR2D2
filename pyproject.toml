@@ -1,0 +1,8 @@
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "dirty-tag"
+tag_regex = r"^(?P<version>\d+\.\d+\.\d+)$"

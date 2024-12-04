@@ -14,6 +14,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+# -- import modules ----------------------------------------------------------
+
+import sys, os
+sys.path.insert(0, os.path.abspath('../../'))
+import R2D2
 
 # -- Project information -----------------------------------------------------
 
@@ -22,11 +27,8 @@ copyright = '2020-2024, Hideyuki Hotta'
 author = 'Hideyuki Hotta'
 
 # The full version, including alpha/beta/rc tags
-release = '1.3'
-
-import sys, os
-sys.path.insert(0, os.path.abspath('../../'))
-import R2D2
+version = R2D2.__version__
+release = R2D2.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -125,10 +127,7 @@ html_theme_options = {
 ##############################
 
 html_context = {
-  'current_version' : "v0.1",
-  'versions' : [
-      {'name': "v0.1", 'url': "v0.1"},
-  ],
+  'current_version' : "v"+version,
 }
 
 ##############################

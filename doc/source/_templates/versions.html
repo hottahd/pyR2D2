@@ -1,6 +1,6 @@
 <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
-      Version: {{ current_version }}
+      Version: {{ current_version.name }}
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
@@ -8,7 +8,7 @@
       <dl>
         <dt>{{ _('Languages') }}</dt>
           {% for the_language, url in languages %}
-            <dd><a href="{{ url }}/index.html">{{ the_language }}</a></dd>
+            <dd><a href="{{ url }}">{{ the_language }}</a></dd>
           {% endfor %}
       </dl>
       {% endif %}
@@ -16,7 +16,7 @@
       <dl>
         <dt>{{ _('Versions') }}</dt>
         {% for version in versions %}
-          <dd><a href="{{ version.url }}/index.html">{{ version.name }}</a></dd>
+          <dd><a href="{{ version.url }}">{{ version.name }}</a></dd>
         {% endfor %}
       </dl>
       {% else %}
