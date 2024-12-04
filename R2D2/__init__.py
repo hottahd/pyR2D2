@@ -24,4 +24,9 @@ __all__ = ['Data','Read','Sync','color','constant','write','util']
 
 from setuptools_scm import get_version
 
-__version__ = '.'.join(get_version(root="..", relative_to=__file__).split('.')[:3])
+from setuptools_scm import get_version
+
+try:
+    __version__ = '.'.join(get_version(root="..", relative_to=__file__).split('.')[:3])
+except Exception as e:
+    __version__ = "unknown"
