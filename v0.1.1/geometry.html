@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>座標生成 &mdash; R2D2 Document unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3f1b9271"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="R2D2 pythonでのキーワードの説明" href="notation.html" />
+    <link rel="prev" title="Paraviewを用いた3Dデータ表示" href="paraview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r2d2_py.html">R2D2_py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">座標生成</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">一様グリッド</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">非一様グリッド</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">座標生成</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/geometry.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>座標生成<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>R2D2では中央差分法を用いているが、そのほとんどは数値フラックスを用いて書き直すことでき、提供される <code class="docutils literal notranslate"><span class="pre">x</span></code> , <code class="docutils literal notranslate"><span class="pre">y</span></code> , <code class="docutils literal notranslate"><span class="pre">z</span></code> などは <strong>セル中心</strong> で定義される。よって計算領域内の最初のグリッドは、計算境界から半グリッド進んだところにある。</p>
+<p>また、R2D2では一様グリッドと非一様グリッドどちらでも計算できるようにしている。</p>
+<section id="id2">
+<h2>一様グリッド<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>一様グリッドを用いるときは</p>
+<ul class="simple">
+<li><p>格子間隔を計算する</p></li>
+</ul>
+<div class="math">
+<p><img src="_images/math/82e25ab141cc9c1f082aff890ef62954689dba45.svg" alt="\Delta x = \frac{x_\mathrm{max} - x_\mathrm{min}}{N_x}"/></p>
+</div><p>ここで、コードでは、配列の要素数には <code class="docutils literal notranslate"><span class="pre">margin</span></code> も含むので
+<img class="math" src="_images/math/9ab4370e5566aaad94547f4b602cd8f05769772c.svg" alt="N_x"/> を計算するには <code class="docutils literal notranslate"><span class="pre">margin</span></code> の部分を引く必要があることに注意。</p>
+<ul class="simple">
+<li><p><img class="math" src="_images/math/52b8c42c11ab904c388a12ebb54182a7e26e1467.svg" alt="x_1"/> を設定。<code class="docutils literal notranslate"><span class="pre">margin</span></code> の分も考慮して計算する。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do</span> <span class="pre">loop</span></code> で順次足していく</p></li>
+</ul>
+<p>コードは以下のようになる</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">dx_unif</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">ix00</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">marginx</span><span class="p">)</span>
+<span class="n">x00</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xmin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mf">0.5d0</span><span class="o">-</span><span class="nb">dble</span><span class="p">(</span><span class="n">marginx</span><span class="p">))</span><span class="o">*</span><span class="n">dx_unif</span>
+<span class="k">if</span><span class="p">(</span><span class="n">xdcheck</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">    do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">+</span><span class="n">i1</span><span class="p">,</span><span class="n">ix00</span>
+<span class="w">        </span><span class="n">x00</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x00</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">i1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dx_unif</span>
+<span class="w">    </span><span class="k">enddo</span>
+<span class="k">endif</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>非一様グリッド<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>非一様グリッドを用いるときは、太陽光球付近は、輻射輸送のために一様なグリッド、ある程度の深さから格子間隔が線形に増加する非一様グリッドを使うことにしている。光球近くは、光球をちゃんと解像するために一様グリッド、光球からある程度進むと、非一様グリッドを採用することにしている。
+実際の構造は以下のようになっている。非一様グリッド領域の両端２つのグリッド間隔は一様グリッドをとるようにしている。</p>
+<p>fortranのコードの中では</p>
+<ul class="simple">
+<li><p><img class="math" src="_images/math/b1539053dd987bb058f7571520d4345c582ad8d8.svg" alt="\Delta x_0"/> → <code class="docutils literal notranslate"><span class="pre">dx00</span></code> : 一様グリッドでの格子点間隔</p></li>
+<li><p><img class="math" src="_images/math/c3666440e2ccc8ad048725d2835d10e56fdeb888.svg" alt="i_\mathrm{x\left(uni\right)}"/> → <code class="docutils literal notranslate"><span class="pre">ix_ununi</span></code>: 一様グリッドの格子点数</p></li>
+<li><p><img class="math" src="_images/math/300b567dea80066c96d9971067f4d934180184ae.svg" alt="x_\mathrm{ran}"/> → <code class="docutils literal notranslate"><span class="pre">xrange</span></code>: 領域サイズ</p></li>
+<li><p><img class="math" src="_images/math/7aad8b78ffa913ae045b7d4cae6634b382aec23c.svg" alt="x_\mathrm{ran0}"/> → <code class="docutils literal notranslate"><span class="pre">xrange0</span></code>: 一様グリッドの領域サイズ</p></li>
+<li><p><img class="math" src="_images/math/5ea02ff104a2c245bef12c6e1db4769d9db47f8e.svg" alt="x_\mathrm{ran1}"/> → <code class="docutils literal notranslate"><span class="pre">xrange1</span></code>: 非一様グリッドの領域サイズ</p></li>
+<li><p><img class="math" src="_images/math/b6b690ba82956b29fb907530eaa34da2055c33a0.svg" alt="n_x"/> → <code class="docutils literal notranslate"><span class="pre">nxx</span></code> : 非一様グリッドの格子点数</p></li>
+</ul>
+<a class="reference internal image-reference" href="_images/ununiform_grid.png"><img alt="_images/ununiform_grid.png" src="_images/ununiform_grid.png" style="width: 700px;" />
+</a>
+<p>一様グリッドでのグリッド間隔は <img class="math" src="_images/math/b1539053dd987bb058f7571520d4345c582ad8d8.svg" alt="\Delta x_0"/> として、非一様グリッドでは <img class="math" src="_images/math/0a3d7987480274f492395322a7e058f06712346a.svg" alt="\delta x"/> ずつグリッド間隔が大きくなっていくとする。</p>
+<div class="math">
+<p><img src="_images/math/9a706e6bbe3e1b5f91339d1e0068af960b3f3d8a.svg" alt="x_\mathrm{tran}&amp;={\color{red} \frac{1}{2} \Delta x_0} + {\color{blue} \Delta x_0} + \Delta x_0
++ \left(\Delta x_0 + \delta x\right)
++ \left(\Delta x_0 + 2\delta x\right) + [...] \\
+&amp;+ \left[\Delta x_0 + \left(n_x - 4\right)\delta x\right]
++ {\color{blue}\left[\Delta x_0 + \left(n_x - 4\right)\delta x\right]}
++ {\color{red}\frac{1}{2}\left[\Delta x_0 + \left(n_x - 4\right)\delta x\right]} \\
+&amp;= {\color{red} \Delta x_0 + \frac{1}{2}\left(n_x-4\right)\delta x}
++{\color{blue} 2\Delta x_0 + \left(n_x - 4\right)\delta x}
++ \sum_{n=0}^{n_x - 4}\left(\Delta x_0 + n\delta x\right) \\
+&amp;= 3\Delta x_0 + \frac{3\left(n_x-4\right)\delta x}{2}
++ \frac{\left[2\Delta x_0 + \left(n_x-4\right)\delta x\right]\left(n_x - 3\right)}{2} \\
+&amp;= n_x \Delta x_0 + \frac{1}{2} n_x\left(n_x - 4\right)\delta x"/></p>
+</div><p>この関係式より、グリッド間隔の増分 <img class="math" src="_images/math/0a3d7987480274f492395322a7e058f06712346a.svg" alt="\delta x"/> を以下のように求めることができる。</p>
+<div class="math">
+<p><img src="_images/math/cef6a7b619c031c027dcfda7c4972f4c87844074.svg" alt="\delta x = \frac{2\left(x_\mathrm{tran} - n_x\Delta x_0\right)}{\left(n_x - 4\right)n_x}"/></p>
+</div><p>最終更新日：Dec 05, 2024</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="paraview.html" class="btn btn-neutral float-left" title="Paraviewを用いた3Dデータ表示" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="notation.html" class="btn btn-neutral float-right" title="R2D2 pythonでのキーワードの説明" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: v0.1.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          <dd><a href="../v0.1.0/geometry.html">v0.1.0</a></dd>
+        
+          <dd><a href="geometry.html">v0.1.1</a></dd>
+        
+          <dd><a href="../master/geometry.html">master</a></dd>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
