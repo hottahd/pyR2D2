@@ -1,6 +1,6 @@
 import R2D2
 
-def init(main_locals,instance_name='d',verpose=True,datadir=None):
+def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
     """
     Initialize R2D2.Data instance in main program.
     
@@ -30,14 +30,21 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None):
         R2D2.util.init(locals())
         
     """
+    import R2D2
     
     if datadir is None:
-        main_locals['caseid'] = caseid_select(main_locals)
+        # if google is True, force to read caseid from user input.
+        main_locals['caseid'] = caseid_select(main_locals,force_read=google)
         datadir = "../run/"+main_locals['caseid']+"/data/"
     
     initialize_instance(main_locals,instance_name)
     main_locals[instance_name] = R2D2.Data(datadir)
     locals_define(main_locals[instance_name],main_locals)
+    
+    if google:
+        import R2D2.write.google
+        R2D2.write.google.set_top_line()        
+        R2D2.write.google.set_cells_gspread(main_locals[instance_name])
     
     if verpose:
         main_locals[instance_name].summary()
@@ -67,16 +74,21 @@ def caseid_select(main_locals,force_read=False):
     force_read : bool
         If True, force to read caseid from user input.
         If False, read caseid from main_locals if exists
+        
+    Returns
+    -------
+    caseid : str
+        caseid
     '''
     
     RED = '\033[31m'
     END = '\033[0m'
 
-    if 'caseid' in main_locals and not force_read:
-        caseid = main_locals['caseid']
+    if force_read or not 'caseid' in main_locals:
+        caseid = 'd'+str(input(RED + "input caseid id (3 digit): " + END)).zfill(3)
     else:
-       caseid = 'd'+str(input(RED + "input caseid id (3 digit): " + END)).zfill(3)
-       
+        caseid = main_locals['caseid']
+        
     return caseid
 
 def locals_define(data,main_locals):

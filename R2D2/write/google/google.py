@@ -21,12 +21,12 @@ def init_gspread(json_key, project):
     '''
 
     import gspread
-    from oauth2client.service_account import ServiceAccountCredentials
+    from google.oauth2.service_account import Credentials
 
-    scope = ['https://spreadsheets.google.com/feeds',
+    scopes = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
 
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(json_key, scope)
+    credentials = Credentials.from_service_account_file(json_key, scopes=scopes)
     gc = gspread.authorize(credentials)
     
     return gc
@@ -146,7 +146,10 @@ def set_cells_gspread(data,
     cells = wks.range('A'+str_id+':'+'T'+str_id)
 
     keys = [caseid]
-    keys.append('{:.2f}'.format(data.p['mstar']/R2D2.Constant.msun))
+    if 'mstar' in data.p:
+        keys.append('{:.2f}'.format(data.p['mstar']/R2D2.constant.msun))
+    else:
+        keys.append('1.00') # solar mass
     keys.append(str(data.p['ix'])+' '+str(data.p['jx'])+' '+str(data.p['kx']))
     keys.append( '{:6.2f}'.format((data.p['xmin']-data.p['rstar'])*1.e-8))
     keys.append( '{:6.2f}'.format((data.p['xmax']-data.p['rstar'])*1.e-8))
