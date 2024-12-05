@@ -12,6 +12,7 @@ Read
 
       ~Read.YinYangSet
       ~Read.models
+      ~Read.on_the_fly
       ~Read.qq_2d
       ~Read.qq_3d
       ~Read.qq_3d_all
@@ -24,12 +25,12 @@ Read
       ~Read.qq_tau
       ~Read.summary
       ~Read.time
-      ~Read.vc
 
    .. rubric:: Methods Documentation
 
    .. automethod:: YinYangSet
    .. automethod:: models
+   .. automethod:: on_the_fly
    .. automethod:: qq_2d
    .. automethod:: qq_3d
    .. automethod:: qq_3d_all
@@ -42,4 +43,3 @@ Read
    .. automethod:: qq_tau
    .. automethod:: summary
    .. automethod:: time
-   .. automethod:: vc

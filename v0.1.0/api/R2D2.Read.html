@@ -128,7 +128,7 @@ See <a class="reference internal" href="#R2D2.Read.qq_slice" title="R2D2.Read.qq
 See <a class="reference internal" href="#R2D2.Read.qq_2d" title="R2D2.Read.qq_2d"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_2d</span></code></a></p></li>
 <li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – time. See <a class="reference internal" href="#R2D2.Read.time" title="R2D2.Read.time"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.time</span></code></a></p></li>
 <li><p><strong>vc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – data of on the fly analysis.
-See <a class="reference internal" href="#R2D2.Read.vc" title="R2D2.Read.vc"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.vc</span></code></a></p></li>
+See <a class="reference internal" href="#R2D2.Read.on_the_fly" title="R2D2.Read.on_the_fly"><code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.on_the_fly</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -141,44 +141,44 @@ See <a class="reference internal" href="#R2D2.Read.vc" title="R2D2.Read.vc"><cod
 <tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.models" title="R2D2.Read.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a>([verpose])</p></td>
 <td><p>This method read Model S based stratification.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_2d" title="R2D2.Read.qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_2d</span></code></a>(n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.on_the_fly" title="R2D2.Read.on_the_fly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_the_fly</span></code></a>(n[, verpose])</p></td>
+<td><p>Reads on the fly analysis data from fortran.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_2d" title="R2D2.Read.qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_2d</span></code></a>(n[, verpose])</p></td>
 <td><p>Reads full data of 2D calculation The data is stored in self.q2 dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d" title="R2D2.Read.qq_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d</span></code></a>(n, value[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d" title="R2D2.Read.qq_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d</span></code></a>(n, value[, verpose])</p></td>
 <td><p>Reads 3D full data The data is stored in self.qq dictionary</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d_all" title="R2D2.Read.qq_3d_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_all</span></code></a>(n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d_all" title="R2D2.Read.qq_3d_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_all</span></code></a>(n[, verpose])</p></td>
 <td><p>This method reads 3D full data all The data is stored in self.qq dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d_restricted" title="R2D2.Read.qq_3d_restricted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_restricted</span></code></a>(n, value, x0, x1, y0, y1, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_3d_restricted" title="R2D2.Read.qq_3d_restricted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_restricted</span></code></a>(n, value, x0, x1, y0, y1, ...)</p></td>
 <td><p>Reads 3D restricted-area data The data is stored in self.qr dictionary</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_check" title="R2D2.Read.qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_check</span></code></a>(n[, verpose, end_step])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_check" title="R2D2.Read.qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_check</span></code></a>(n[, verpose, end_step])</p></td>
 <td><p>Reads 3D full data for checkpoint The data is stored in self.qc dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_ixr" title="R2D2.Read.qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_ixr</span></code></a>(ixrt, n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_ixr" title="R2D2.Read.qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_ixr</span></code></a>(ixrt, n[, verpose])</p></td>
 <td><p>Reads 3D data at a selected a MPI process in x-direction.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_select" title="R2D2.Read.qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select</span></code></a>(xs, n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_select" title="R2D2.Read.qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select</span></code></a>(xs, n[, verpose])</p></td>
 <td><p>Reads 2D slice data at a selected height.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_select_z" title="R2D2.Read.qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select_z</span></code></a>(zs, n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_select_z" title="R2D2.Read.qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select_z</span></code></a>(zs, n[, verpose])</p></td>
 <td><p>Reads 2D slice data at constant z The data is stored in self.qz dictionary</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_slice" title="R2D2.Read.qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_slice</span></code></a>(n_slice, direc, n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_slice" title="R2D2.Read.qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_slice</span></code></a>(n_slice, direc, n[, verpose])</p></td>
 <td><p>Reads 2D data of slice.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.qq_tau" title="R2D2.Read.qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_tau</span></code></a>(n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.qq_tau" title="R2D2.Read.qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_tau</span></code></a>(n[, verpose])</p></td>
 <td><p>Reads 2D data at certain optical depths.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.summary" title="R2D2.Read.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.summary" title="R2D2.Read.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>()</p></td>
 <td><p>Show R2D2.Read summary.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#R2D2.Read.time" title="R2D2.Read.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>(n[, tau, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.time" title="R2D2.Read.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>(n[, tau, verpose])</p></td>
 <td><p>Reads time at a selected time step The data is stored in self.t</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#R2D2.Read.vc" title="R2D2.Read.vc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vc</span></code></a>(n[, verpose])</p></td>
-<td><p>Reads on the fly analysis data from fortran.</p></td>
 </tr>
 </tbody>
 </table>
@@ -197,6 +197,21 @@ YinYang direct plot.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="R2D2.Read.on_the_fly">
+<span class="sig-name descname"><span class="pre">on_the_fly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/read/read.html#Read.on_the_fly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.Read.on_the_fly" title="Link to this definition"></a></dt>
+<dd><p>Reads on the fly analysis data from fortran.
+The data is stored in self.vc dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -404,21 +419,6 @@ The data is stored in self.t</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="R2D2.Read.vc">
-<span class="sig-name descname"><span class="pre">vc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/R2D2/read/read.html#Read.vc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#R2D2.Read.vc" title="Link to this definition"></a></dt>
-<dd><p>Reads on the fly analysis data from fortran.
-The data is stored in self.vc dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>

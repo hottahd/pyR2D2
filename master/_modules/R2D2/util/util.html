@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>R2D2.util.util &mdash; R2D2 Document 1.3 documentation</title>
+  <title>R2D2.util.util &mdash; R2D2 Document unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=c55cb9cb"></script>
+      <script src="../../../_static/documentation_options.js?v=3f1b9271"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -82,7 +82,7 @@
 
 <div class="viewcode-block" id="init">
 <a class="viewcode-back" href="../../../api/R2D2.util.init.html#R2D2.util.init">[docs]</a>
-<span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="n">verpose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">google</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize R2D2.Data instance in main program.</span>
 <span class="sd">    </span>
@@ -92,6 +92,10 @@
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    instance_name : str</span>
 <span class="sd">        name of instance of R2D2.Data object</span>
+<span class="sd">    verpose : bool</span>
+<span class="sd">        If True, print self.summar()</span>
+<span class="sd">    datadir : str</span>
+<span class="sd">        directory path to R2D2 data</span>
 
 <span class="sd">    </span>
 <span class="sd">    Notes</span>
@@ -108,12 +112,24 @@
 <span class="sd">        R2D2.util.init(locals())</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">R2D2</span>
     
-    <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">)</span>
-    <span class="n">datadir</span> <span class="o">=</span> <span class="s2">&quot;../run/&quot;</span><span class="o">+</span><span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/data/&quot;</span>
+    <span class="k">if</span> <span class="n">datadir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># if google is True, force to read caseid from user input.</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">force_read</span><span class="o">=</span><span class="n">google</span><span class="p">)</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="s2">&quot;../run/&quot;</span><span class="o">+</span><span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;/data/&quot;</span>
     
     <span class="n">initialize_instance</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span><span class="n">instance_name</span><span class="p">)</span>
-    <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">R2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span></div>
+    <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">R2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+    <span class="n">locals_define</span><span class="p">(</span><span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">],</span><span class="n">main_locals</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">google</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">R2D2.write.google</span>
+        <span class="n">R2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">set_top_line</span><span class="p">()</span>        
+        <span class="n">R2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">set_cells_gspread</span><span class="p">(</span><span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="n">verpose</span><span class="p">:</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
 
     
 <div class="viewcode-block" id="initialize_instance">
@@ -146,16 +162,21 @@
 <span class="sd">    force_read : bool</span>
 <span class="sd">        If True, force to read caseid from user input.</span>
 <span class="sd">        If False, read caseid from main_locals if exists</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    caseid : str</span>
+<span class="sd">        caseid</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="n">RED</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[31m&#39;</span>
     <span class="n">END</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
 
-    <span class="k">if</span> <span class="s1">&#39;caseid&#39;</span> <span class="ow">in</span> <span class="n">main_locals</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_read</span><span class="p">:</span>
-        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">force_read</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s1">&#39;caseid&#39;</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
+        <span class="n">caseid</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;input caseid id (3 digit): &quot;</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-       <span class="n">caseid</span> <span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;input caseid id (3 digit): &quot;</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-       
+        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s1">&#39;caseid&#39;</span><span class="p">]</span>
+        
     <span class="k">return</span> <span class="n">caseid</span></div>
 
 
