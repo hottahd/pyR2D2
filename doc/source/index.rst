@@ -20,8 +20,8 @@ R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の�
    api_reference
    sphinx.rst
    paraview.rst
-   notation.rst
    geometry.rst
+   notation.rst
 	     
 ライセンス
 ----------------------------------
