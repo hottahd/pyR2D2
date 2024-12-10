@@ -1,4 +1,4 @@
-import R2D2
+import pyR2D2
 
 class Data:
     '''
@@ -21,8 +21,8 @@ class Data:
         '''
         Initialize R2D2.Data
         '''
-        self.read = R2D2.Read(datadir,verbose=verbose,self_old=self_old)
-        self.sync = R2D2.Sync(self.read)
+        self.read = pyR2D2.Read(datadir,verbose=verbose,self_old=self_old)
+        self.sync = pyR2D2.Sync(self.read)
         
     def summary(self):
         """

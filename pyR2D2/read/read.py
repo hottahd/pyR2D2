@@ -1,4 +1,4 @@
-import R2D2
+import pyR2D2
 import numpy as np
 
 class Read:
@@ -1233,7 +1233,7 @@ class Read:
 
         print(RED + '### Star information ###' + END)
         if 'mstar' in self.p:
-            print('mstar = ','{:.2f}'.format(self.p['mstar']/R2D2.constant.msun)+' msun')
+            print('mstar = ','{:.2f}'.format(self.p['mstar']/pyR2D2.constant.msun)+' msun')
         if 'astar' in self.p:
             print('astar = ','{:.2e}'.format(self.p['astar'])+' yr')
 

@@ -190,7 +190,7 @@ def upgrade_resolution(
     import os
     import os.path
     import numpy as np
-    import R2D2
+    import pyR2D2
     from . import common
     import sys
     from tqdm import tqdm
@@ -256,13 +256,13 @@ def upgrade_resolution(
     print('### Upgrade starts ###')
     for m in tqdm(range(0,self.p['mtype'])):
         if memory_saving:
-            self.qu = R2D2.fortran_util.interp(self.p['xg'],self.p['yg'],self.p['zg'], \
+            self.qu = pyR2D2.fortran_util.interp(self.p['xg'],self.p['yg'],self.p['zg'], \
                                                 self.up['x'],self.up['y'],self.up['z'], \
                                                 self.qc[:,:,:,m])
             self.qu.reshape([self.up['ixg']*self.up['jxg']*self.up['kxg']] \
                             ,order='F').astype(endian+'d').tofile('../run/'+caseid+'/data/qq/qq'+'{0:02d}'.format(m)+'.dac.e')            
         else:
-            self.qu[:,:,:,m] = R2D2.fortran_util.interp(self.p['xg'],self.p['yg'],self.p['zg'], \
+            self.qu[:,:,:,m] = pyR2D2.fortran_util.interp(self.p['xg'],self.p['yg'],self.p['zg'], \
                                                   self.up['x'],self.up['y'],self.up['z'], \
                                                   self.qc[:,:,:,m])
             

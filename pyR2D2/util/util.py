@@ -1,4 +1,4 @@
-import R2D2
+import pyR2D2
 
 def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
     """
@@ -30,7 +30,7 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
         R2D2.util.init(locals())
         
     """
-    import R2D2
+    import pyR2D2
     
     if datadir is None:
         # if google is True, force to read caseid from user input.
@@ -38,13 +38,13 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
         datadir = "../run/"+main_locals['caseid']+"/data/"
     
     initialize_instance(main_locals,instance_name)
-    main_locals[instance_name] = R2D2.Data(datadir)
+    main_locals[instance_name] = pyR2D2.Data(datadir)
     locals_define(main_locals[instance_name],main_locals)
     
     if google:
-        import R2D2.write.google
-        R2D2.write.google.set_top_line()        
-        R2D2.write.google.set_cells_gspread(main_locals[instance_name])
+        import pyR2D2.write.google
+        pyR2D2.write.google.set_top_line()        
+        pyR2D2.write.google.set_cells_gspread(main_locals[instance_name])
     
     if verpose:
         main_locals[instance_name].summary()
