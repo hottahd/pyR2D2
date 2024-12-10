@@ -1,0 +1,6 @@
+locals_define
+=============
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: locals_define

@@ -1,0 +1,192 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R2D2.data &mdash; R2D2 Document unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3f1b9271"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../r2d2_py.html">R2D2_py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notation.html">R2D2 pythonでのキーワードの説明</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">R2D2.data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for R2D2.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">R2D2</span>
+
+<div class="viewcode-block" id="Data">
+<a class="viewcode-back" href="../../api/R2D2.Data.html#R2D2.Data">[docs]</a>
+<span class="k">class</span> <span class="nc">Data</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Class for managing R2D2 data</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    read : R2D2.Read</span>
+<span class="sd">        Instance of R2D2.Read</span>
+<span class="sd">    sync : R2D2.Sync</span>
+<span class="sd">        Instance of R2D2.Sync</span>
+
+<span class="sd">    models : dict</span>
+<span class="sd">        Model S based stratification.</span>
+<span class="sd">        See :class:`R2D2.R2D2_read.models_init`</span>
+<span class="sd">            </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+<div class="viewcode-block" id="Data.__init__">
+<a class="viewcode-back" href="../../api/R2D2.Data.html#R2D2.Data.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">datadir</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">self_old</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize R2D2.Data</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">R2D2</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span><span class="n">self_old</span><span class="o">=</span><span class="n">self_old</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync</span> <span class="o">=</span> <span class="n">R2D2</span><span class="o">.</span><span class="n">Sync</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Data.summary">
+<a class="viewcode-back" href="../../api/R2D2.Data.html#R2D2.Data.summary">[docs]</a>
+    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rapper of :meth:`R2D2.Read.summary`</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        When an attribute is not found in R2D2.Data, it is searched in R2D2.Data.Read</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>  <span class="c1"># 属性が関数でない場合のみ返す</span>
+                <span class="k">return</span> <span class="n">attr</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># R2D2_data.read_time = read.read_time</span>
+
+<span class="c1"># R2D2_data.set_cells_gspread  = google.set_cells_gspread</span>
+<span class="c1"># R2D2_data.upgrade_resolution = resolution.upgrade_resolution</span>
+<span class="c1"># R2D2_data.models_init       = models.init</span>
+<span class="c1"># R2D2_data.eos               = models.eos</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: v0.1.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          <dd><a href="data.html">v0.1.0</a></dd>
+        
+          <dd><a href="../../../v0.1.1/index.html">v0.1.1</a></dd>
+        
+          <dd><a href="../../../v0.2.0/index.html">v0.2.0</a></dd>
+        
+          <dd><a href="../../../master/index.html">master</a></dd>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

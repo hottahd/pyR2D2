@@ -1,0 +1,6 @@
+get_best_unit
+=============
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: get_best_unit

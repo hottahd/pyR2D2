@@ -1,0 +1,6 @@
+get_total_file_size
+===================
+
+.. currentmodule:: R2D2.util
+
+.. autofunction:: get_total_file_size

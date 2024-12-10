@@ -1,0 +1,45 @@
+Read
+====
+
+.. currentmodule:: R2D2
+
+.. autoclass:: Read
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Read.YinYangSet
+      ~Read.models
+      ~Read.on_the_fly
+      ~Read.qq_2d
+      ~Read.qq_3d
+      ~Read.qq_3d_all
+      ~Read.qq_3d_restricted
+      ~Read.qq_check
+      ~Read.qq_ixr
+      ~Read.qq_select
+      ~Read.qq_select_z
+      ~Read.qq_slice
+      ~Read.qq_tau
+      ~Read.summary
+      ~Read.time
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: YinYangSet
+   .. automethod:: models
+   .. automethod:: on_the_fly
+   .. automethod:: qq_2d
+   .. automethod:: qq_3d
+   .. automethod:: qq_3d_all
+   .. automethod:: qq_3d_restricted
+   .. automethod:: qq_check
+   .. automethod:: qq_ixr
+   .. automethod:: qq_select
+   .. automethod:: qq_select_z
+   .. automethod:: qq_slice
+   .. automethod:: qq_tau
+   .. automethod:: summary
+   .. automethod:: time
