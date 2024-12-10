@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from matplotlib.patheffects import withStroke
 from tqdm import tqdm
-import R2D2
+import pyR2D2
 import sys
 import os
 
@@ -19,7 +19,7 @@ datadir="../run/"+caseid+"/data/"
 pngdir="../figs/"+caseid+"/mov_photo/"
 os.makedirs(pngdir,exist_ok=True)
 
-d = R2D2.R2D2_data(datadir)
+d = pyR2D2.R2D2_data(datadir)
 for key in d.p:
     exec('%s = %s%s%s' % (key, 'd.p["',key,'"]'))
     

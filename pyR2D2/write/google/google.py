@@ -132,7 +132,7 @@ def set_cells_gspread(data,
     '''
     import datetime
     import numpy as np
-    import R2D2
+    import pyR2D2
 
     if json_key == None:
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
@@ -147,7 +147,7 @@ def set_cells_gspread(data,
 
     keys = [caseid]
     if 'mstar' in data.p:
-        keys.append('{:.2f}'.format(data.p['mstar']/R2D2.constant.msun))
+        keys.append('{:.2f}'.format(data.p['mstar']/pyR2D2.constant.msun))
     else:
         keys.append('1.00') # solar mass
     keys.append(str(data.p['ix'])+' '+str(data.p['jx'])+' '+str(data.p['kx']))

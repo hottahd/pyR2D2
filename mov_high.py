@@ -1,22 +1,22 @@
 import numpy as np
 from tqdm import tqdm
-import R2D2
+import pyR2D2
 import sys, os
 import matplotlib.pyplot as plt
 import mov_util
 
 
-caseid = R2D2.util.caseid_select(locals())
+caseid = pyR2D2.util.caseid_select(locals())
 datadir="../run/"+caseid+"/data/"
 
-R2D2.util.initialize_instance(locals(),'d')
-d = R2D2.R2D2_data(datadir,self_old=d)
-R2D2.util.locals_define(d,locals())
+pyR2D2.util.initialize_instance(locals(),'d')
+d = pyR2D2.R2D2_data(datadir,self_old=d)
+pyR2D2.util.locals_define(d,locals())
 
 pngdir="../figs/"+caseid+"/mov_high/"
 os.makedirs(pngdir,exist_ok=True)
 
-n0 = R2D2.util.define_n0(d,locals(),nd_type='nd_tau')
+n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd_tau')
 
 print("Maximum time step= ",d.p['nd_tau']," time ="\
           ,d.p['dtout_tau']*float(d.p['nd_tau'])/3600./24.," [day]")
