@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import R2D2
+import pyR2D2
 import sys
 import os
 
@@ -17,7 +17,7 @@ dir="../run/"+caseid+"/data/"
 pngdir="../figs/"+caseid+"/photo/"
 os.makedirs(pngdir,exist_ok=True)
 
-d = R2D2.R2D2_data(dir)
+d = pyR2D2.R2D2_data(dir)
 for key in d.p:
     exec('%s = %s%s%s' % (key, 'd.p["',key,'"]'))
 

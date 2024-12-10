@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import R2D2
+import pyR2D2
 import sys
 import os
 import cartopy.crs as ccrs
@@ -21,7 +21,7 @@ os.makedirs(casedir,exist_ok=True)
 pngdir="../figs/"+caseid+"/slice/"
 os.makedirs(pngdir,exist_ok=True)
 
-d = R2D2.R2D2_data(datadir)
+d = pyR2D2.R2D2_data(datadir)
 for key in d.p:
     exec('%s = %s%s%s' % (key, 'd.p["',key,'"]'))
 

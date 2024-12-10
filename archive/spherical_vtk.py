@@ -1,4 +1,4 @@
-import R2D2
+import pyR2D2
 import os
 
 n = 60
@@ -29,8 +29,8 @@ if READ:
 
 if CONVERT:
     print('- Convert Spherical to Cartesian ###')
-    qqc,xc,yc,zc = R2D2.spherical2cartesian(x/rstar,y,z,qqs,ixc,jxc,kxc)
+    qqc,xc,yc,zc = pyR2D2.spherical2cartesian(x/rstar,y,z,qqs,ixc,jxc,kxc)
 
 if WRITE:
     print('- Write data in VTK format')
-    R2D2.write_3D(qqc,xc,yc,zc,file,var)
+    pyR2D2.write_3D(qqc,xc,yc,zc,file,var)

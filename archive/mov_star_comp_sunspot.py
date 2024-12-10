@@ -1,15 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import R2D2
+import pyR2D2
 import sys,os
     
 pngdir="../figs/comp/mov_star_comp_sunspot/"
 os.makedirs(pngdir,exist_ok=True)
 
-d02 = R2D2.R2D2_data('../run/d007/data/')
-d06 = R2D2.R2D2_data('../run/d008/data/')
-d10 = R2D2.R2D2_data('../run/d009/data/')
+d02 = pyR2D2.R2D2_data('../run/d007/data/')
+d06 = pyR2D2.R2D2_data('../run/d008/data/')
+d10 = pyR2D2.R2D2_data('../run/d009/data/')
     
 plt.close('all')
 plt.rcParams['font.size'] = 22

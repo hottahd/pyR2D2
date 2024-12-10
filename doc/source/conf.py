@@ -18,7 +18,7 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath('../../'))
-import R2D2
+import pyR2D2
 
 # -- Project information -----------------------------------------------------
 
@@ -27,8 +27,8 @@ copyright = '2020-2024, Hideyuki Hotta'
 author = 'Hideyuki Hotta'
 
 # The full version, including alpha/beta/rc tags
-version = R2D2.__version__
-release = R2D2.__version__
+version = pyR2D2.__version__
+release = pyR2D2.__version__
 
 
 # -- General configuration ---------------------------------------------------
