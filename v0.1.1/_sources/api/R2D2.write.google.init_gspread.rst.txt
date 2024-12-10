@@ -1,6 +1,0 @@
-init_gspread
-============
-
-.. currentmodule:: R2D2.write.google
-
-.. autofunction:: init_gspread

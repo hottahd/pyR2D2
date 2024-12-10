@@ -1,0 +1,6 @@
+eos
+===
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: eos

@@ -1,6 +1,0 @@
-initialize_instance
-===================
-
-.. currentmodule:: R2D2.util
-
-.. autofunction:: initialize_instance

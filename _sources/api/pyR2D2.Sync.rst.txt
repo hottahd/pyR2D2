@@ -1,0 +1,31 @@
+Sync
+====
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: Sync
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Sync.all
+      ~Sync.check
+      ~Sync.remap_qq
+      ~Sync.select
+      ~Sync.setup
+      ~Sync.slice
+      ~Sync.tau
+      ~Sync.vc
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: all
+   .. automethod:: check
+   .. automethod:: remap_qq
+   .. automethod:: select
+   .. automethod:: setup
+   .. automethod:: slice
+   .. automethod:: tau
+   .. automethod:: vc

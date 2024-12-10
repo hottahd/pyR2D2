@@ -1,6 +1,0 @@
-define_n0
-=========
-
-.. currentmodule:: R2D2.util
-
-.. autofunction:: define_n0

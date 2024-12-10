@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR2D2 Package &mdash; R2D2 Document 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=37f418d5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data" href="api/pyR2D2.Data.html" />
+    <link rel="prev" title="API Reference" href="api_reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="api_reference.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="api_reference.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyR2D2 Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pyR2D2.util">pyR2D2.util Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pyR2D2.write">pyR2D2.write Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sub-packages">Sub Packages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#modules">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api_reference.html">API Reference</a></li>
+      <li class="breadcrumb-item active">pyR2D2 Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pyR2D2.package.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyR2D2">
+<span id="pyr2d2-package"></span><h1>pyR2D2 Package<a class="headerlink" href="#module-pyR2D2" title="Link to this heading"></a></h1>
+<p>This is a package for dealing with R2D2 simulation data.</p>
+<p class="rubric">Example</p>
+<p>A <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> instance can be created as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyR2D2</span>
+<span class="n">datadir</span> <span class="o">=</span> <span class="s1">&#39;../run/d001/data/&#39;</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Data</span></code></a>(datadir[, verbose, self_old])</p></td>
+<td><p>Class for managing R2D2 data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Read.html#pyR2D2.Read" title="pyR2D2.Read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Read</span></code></a>(datadir[, verbose, self_old])</p></td>
+<td><p>Class for reading pyR2D2 data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.Sync.html#pyR2D2.Sync" title="pyR2D2.Sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sync</span></code></a>(read)</p></td>
+<td><p>Class for downloading data from remote server</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="module-pyR2D2.util">
+<span id="pyr2d2-util-package"></span><h1>pyR2D2.util Package<a class="headerlink" href="#module-pyR2D2.util" title="Link to this heading"></a></h1>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.caseid_select.html#pyR2D2.util.caseid_select" title="pyR2D2.util.caseid_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">caseid_select</span></code></a>(main_locals[, force_read])</p></td>
+<td><p>Choose caseid from input or from user input.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.define_n0.html#pyR2D2.util.define_n0" title="pyR2D2.util.define_n0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_n0</span></code></a>(data, main_locals[, nd_type])</p></td>
+<td><p>Define n0 in main_locals if not exists.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.eos.html#pyR2D2.util.eos" title="pyR2D2.util.eos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eos</span></code></a>(data, ro, se, var)</p></td>
+<td><p>Returns the Table equation of state.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.get_best_unit.html#pyR2D2.util.get_best_unit" title="pyR2D2.util.get_best_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_unit</span></code></a>(size, unit_multipliers)</p></td>
+<td><p>Get the best unit for displaying the size.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.get_total_file_size.html#pyR2D2.util.get_total_file_size" title="pyR2D2.util.get_total_file_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_total_file_size</span></code></a>(directory[, unit])</p></td>
+<td><p>Evaluate total size of files in directory.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.init.html#pyR2D2.util.init" title="pyR2D2.util.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a>(main_locals[, instance_name, verpose, ...])</p></td>
+<td><p>Initialize pyR2D2.Data instance in main program.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.initialize_instance.html#pyR2D2.util.initialize_instance" title="pyR2D2.util.initialize_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_instance</span></code></a>(main_locals, instance_name)</p></td>
+<td><p>Initializes arbitrary instance of pyR2D2.Data object in main program.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.locals_define.html#pyR2D2.util.locals_define" title="pyR2D2.util.locals_define"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locals_define</span></code></a>(data, main_locals)</p></td>
+<td><p>Substitute selp.p to main_locals in main program.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.update_results_file.html#pyR2D2.util.update_results_file" title="pyR2D2.util.update_results_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_results_file</span></code></a>(file_path, total_size, ...)</p></td>
+<td><p>Updates the results file with the size of a directory.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="module-pyR2D2.write">
+<span id="pyr2d2-write-package"></span><h1>pyR2D2.write Package<a class="headerlink" href="#module-pyR2D2.write" title="Link to this heading"></a></h1>
+<section id="sub-packages">
+<h2>Sub Packages<a class="headerlink" href="#sub-packages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.write.html">pyR2D2.write.google Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.write.html#module-pyR2D2.write.vtk">pyR2D2.write.vtk Package</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_reference.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/pyR2D2.Data.html" class="btn btn-neutral float-right" title="Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

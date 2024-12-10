@@ -1,0 +1,6 @@
+initialize_instance
+===================
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: initialize_instance

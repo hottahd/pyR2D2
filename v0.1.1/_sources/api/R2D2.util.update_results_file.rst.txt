@@ -1,6 +1,0 @@
-update_results_file
-===================
-
-.. currentmodule:: R2D2.util
-
-.. autofunction:: update_results_file

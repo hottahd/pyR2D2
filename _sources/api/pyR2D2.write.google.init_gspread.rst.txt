@@ -1,0 +1,6 @@
+init_gspread
+============
+
+.. currentmodule:: pyR2D2.write.google
+
+.. autofunction:: init_gspread
