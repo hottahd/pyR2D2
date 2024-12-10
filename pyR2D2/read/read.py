@@ -3,7 +3,7 @@ import numpy as np
 
 class Read:
     '''
-    Class for reading R2D2 data
+    Class for reading pyR2D2 data
     
     Attributes
     ----------
@@ -59,7 +59,7 @@ class Read:
             directory of data
         verbose : bool
             True shows the information of data
-        self_old : R2D2.Data
+        self_old : pyR2D2.Data
             if self_old is not None, datadir is compared with old one and if datadir is same as old one, self is updated with self_old
         '''
         from scipy.io import FortranFile
@@ -105,7 +105,6 @@ class Read:
         self.p['nd_tau'] = nd_tau
 
         ## version check
-        R2D2_py_ver = 2.0
         f = open(self.p['datadir']+"param/params.dac","r")
         
         # Basic parameterの読み込み
@@ -1225,7 +1224,7 @@ class Read:
     
     def summary(self):
         '''
-        Show R2D2.Read summary.
+        Show pyR2D2.Read summary.
         '''
             
         RED = '\033[31m'

@@ -1,5 +1,5 @@
 """
-Provides R2D2 default blind-oriented color set.
+Provides pyR2D2 default blind-oriented color set.
 Set can be use for plotting.
     
 
@@ -25,10 +25,10 @@ Example
 
 .. code-block:: python
 
-    import R2D2
+    import pyR2D2
     import matplotlib.pyplot as plt
         
-    plt.plot(x,y,color=R2D2.color.blue)
+    plt.plot(x,y,color=pyR2D2.color.blue)
         
 Notes
 -----

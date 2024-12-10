@@ -19,8 +19,8 @@ Example
 
 .. code-block:: python
 
-    import R2D2
-    print(R2D2.constant.lsun)
+    import pyR2D2
+    print(pyR2D2.constant.lsun)
 
 """
 # Solar parameters

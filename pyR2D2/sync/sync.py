@@ -1,4 +1,5 @@
 import os
+import pyR2D2
 
 class Sync:
     """
@@ -8,12 +9,12 @@ class Sync:
     
     def __init__(self, read):
         """
-        Initialize R2D2.Sync
+        Initialize pyR2D2.Sync
         
         Parameters
         ----------
-        read : R2D2.Read
-            Instance of R2D2.read
+        read : pyR2D2.Read
+            Instance of pyR2D2.read
         """
         self.read = read
         
@@ -171,7 +172,7 @@ class Sync:
         import os
         caseid = self.p['datadir'].split('/')[-3]
 
-        R2D2_sync.setup(server,caseid,project=project)
+        pyR2D2.sync.setup(server,caseid,project=project)
         os.system('rsync -avP' \
                 +' --exclude="time/mhd" ' \
                 +' -e "'+ssh+'" ' \
