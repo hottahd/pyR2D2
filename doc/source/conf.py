@@ -143,25 +143,25 @@ latex_elements = { \
 'extraclassoptions': 'report', 
 }
 
-# Sphinx autodoc hook for adding alias information to methods of R2D2_read and R2D2_sync
-# This hook modifies the docstrings of R2D2_read and R2D2_sync methods to include an alias 
+# Sphinx autodoc hook for adding alias information to methods of pyR2D2.Read and pyR2D2.Sync
+# This hook modifies the docstrings of pyR2D2.Read and pyR2D2.Sync methods to include an alias 
 # indicating how they are accessed through R2D2_data.read or R2D2_data.sync.
-# Example: R2D2_read.qq_select -> R2D2_data.read.qq_select
+# Example: pyR2D2.Read.qq_select -> pyR2D2.Data.read.qq_select
 
 import inspect
 
 def autodoc_process_docstring(app, what, name, obj, options, lines):
     # Mapping of alias names (e.g., 'read', 'sync') to their respective classes
     target_classes = {
-        "read": "R2D2.R2D2_read.",
-        "sync": "R2D2.R2D2_sync."
+        "read": "pyR2D2.Read.",
+        "sync": "pyR2D2.Sync."
     }
 
     for alias, target_class in target_classes.items():
         if name.startswith(target_class):
             # Add a note indicating how the method is accessed
             method_name = name.split(".")[-1]
-            alias_name = f"R2D2.R2D2_data.{alias}.{method_name}"
+            alias_name = f"pyR2D2.Data.{alias}.{method_name}"
             lines.append("")
             lines.append(f".. important:: This method is accessible as `{alias_name}`.")
             lines.append("")
