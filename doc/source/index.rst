@@ -16,7 +16,7 @@ R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の�
    quick_start
    environment
    typical_case
-   r2d2_py
+   pyr2d2
    api_reference
    sphinx.rst
    paraview.rst

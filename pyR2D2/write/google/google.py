@@ -120,8 +120,8 @@ def set_cells_gspread(data,
 
     Parameters
     ----------
-    data : R2D2.Data, or, R2D2.Read
-        instance of R2D2.Data or R2D2.Read classes
+    data : pyR2D2.Data, or, pyR2D2.Read
+        instance of pyR2D2.Data or pyR2D2.Read classes
     json_key : str
         File of json key to access Google API
     project : str

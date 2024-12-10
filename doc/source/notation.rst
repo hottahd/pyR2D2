@@ -14,10 +14,10 @@ self.p [dictionary]
 
 .. code::
 
-    import R2D2
-    self = R2D2.R2D2_data(datadir)
+    import pyR2D2
+    self = pyR2D2.Data(datadir)
 
-とすると、初期設定が読み込まれる。 :code:`self` は :code:`R2D2_data` のオブジェクトであり、名前は任意である。 :code:`init.py` や :code:`mov.py` では、オブジェクト名は :code:`d` としてある。
+とすると、初期設定が読み込まれる。 :code:`self` は :code:`pyR2D2.Data` のオブジェクトであり、名前は任意である。 :code:`init.py` や :code:`mov.py` では、オブジェクト名は :code:`d` としてある。
 
 出力・時間に関する量
 ::::::::::::::::::::::::::::::::

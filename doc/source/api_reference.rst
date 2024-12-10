@@ -1,5 +1,5 @@
 ==========================
-API Reference
+pyR2D2 API Reference
 ==========================
 
 --------------------------
@@ -8,7 +8,7 @@ Packages
 .. toctree::
     :maxdepth: 2
 
-    R2D2.package
+    pyR2D2.package
 
 --------------------------
 Modules
@@ -16,6 +16,6 @@ Modules
 .. toctree::
     :maxdepth: 2
 
-    R2D2.module
+    pyR2D2.module
 
 

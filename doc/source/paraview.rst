@@ -12,11 +12,11 @@ Paraviewを用いた3Dデータ表示
 - ある物理量の三次元データ
 - ある物理量の ::math:`\tau=1` でのデータ
 
-それぞれのデータのためにR2D2 Pythonでは以下の関数が用意してある。
+それぞれのデータのためにpyR2D2では以下の関数が用意してある。
 
-:meth:`R2D2.write.vtk.write_3D`
-:meth:`R2D2.write.vtk.write_3D_vector`
-:meth:`R2D2.write.vtk.write_optical_surface`
+:meth:`pyR2D2.write.vtk.write_3D`
+:meth:`pyR2D2.write.vtk.write_3D_vector`
+:meth:`pyR2D2.write.vtk.write_optical_surface`
 
 例えば、以下のようにして実行する
 
@@ -27,9 +27,9 @@ Paraviewを用いた3Dデータ表示
     bb = sqrt(d.qq['bx']**2 + d.qq['by']**2 + d.qq['bz']**2) # 磁場の強さを計算
     d.read.tau(100) # 100番目のtau=1の2次元データを読込
 
-    R2D2.write.vtk.write_3D(bb,x,y,z,'bb.vtk','bb') 
+    pyR2D2.write.vtk.write_3D(bb,x,y,z,'bb.vtk','bb') 
     # 変数名をbbとしてファイル名bb.vtkに3次元データを出力
-    R2D2.write.write_optical_surface(d.qt['in'],d.qt['he'],y,z,'in.vtk','in')
+    pyR2D2.write.write_optical_surface(d.qt['in'],d.qt['he'],y,z,'in.vtk','in')
     # 変数名をinとしてファイル名in.vtkに2次元データを出力
 
 Paraviewを用いて3次元表示

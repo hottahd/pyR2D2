@@ -1,3 +1,0 @@
-.. automodapi:: R2D2.color.color
-
-.. automodapi:: R2D2.constant.constant

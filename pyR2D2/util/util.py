@@ -2,32 +2,32 @@ import pyR2D2
 
 def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
     """
-    Initialize R2D2.Data instance in main program.
+    Initialize pyR2D2.Data instance in main program.
     
     Parameters
     ----------
     main_locals : dict
         locals() in main program, which include local variables
     instance_name : str
-        name of instance of R2D2.Data object
+        name of instance of pyR2D2.Data object
     verpose : bool
         If True, print self.summar()
     datadir : str
-        directory path to R2D2 data
+        directory path to pyR2D2 data
 
     
     Notes
     -----
     1. Select caseid from existing caseid in main_locals or from user input.
-    2. Initialize instance of R2D2.Data object in main program.
-    3. Assign the R2D2.Data.p dictionary keys to main_locals.
+    2. Initialize instance of pyR2D2.Data object in main program.
+    3. Assign the pyR2D2.Data.p dictionary keys to main_locals.
         
     Examples
     --------
     .. code-block:: python
 
-        import R2D2
-        R2D2.util.init(locals())
+        import pyR2D2
+        pyR2D2.util.init(locals())
         
     """
     import pyR2D2
@@ -51,14 +51,14 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
     
 def initialize_instance(main_locals,instance_name):
     '''
-    Initializes arbitrary instance of R2D2.Data object in main program.
+    Initializes arbitrary instance of pyR2D2.Data object in main program.
         
     Parameters
     ----------
     main_locals : dict
         locals() in main program, which include local variables
     instance_name : str
-        name of instance of R2D2.Data object
+        name of instance of pyR2D2.Data object
     '''
     if not instance_name in main_locals:
         main_locals[instance_name] = None
@@ -97,8 +97,8 @@ def locals_define(data,main_locals):
     
     Parameters
     ----------
-    data : R2D2.Data, or, R2D2.Read
-        Instance of R2D2.Data or R2D2.Read classes
+    data : pyR2D2.Data, or, pyR2D2.Read
+        Instance of pyR2D2.Data or pyR2D2.Read classes
     main_locals : dict
         locals() in main program, which include local variables
     '''
@@ -112,8 +112,8 @@ def define_n0(data,main_locals,nd_type='nd'):
     
     Parameters
     ----------
-    data : R2D2.Data, or, R2D2.Read
-        instance of R2D2.Data or R2D2.Read classes
+    data : pyR2D2.Data, or, pyR2D2.Read
+        instance of pyR2D2.Data or pyR2D2.Read classes
     main_locals : dict
         locals() in main program, which include local variables
     nd_type : str
@@ -257,8 +257,8 @@ def eos(data,ro,se,var):
     
     Parameters
     ----------
-    data : R2D2.Data, or, R2D2.Read
-        Instance of R2D2.Data or R2D2.Read classes
+    data : pyR2D2.Data, or, pyR2D2.Read
+        Instance of pyR2D2.Data or pyR2D2.Read classes
     ro : float
         Density
     se : float)
