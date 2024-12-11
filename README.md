@@ -1,6 +1,14 @@
 # pyR2D2
 Python code for analyzing results of R2D2 simulation.
 
+## Installation
+
+```bash
+git clone git@github.com:hottahd/pyR2D2.git
+cd pyR2D2
+pip install .
+```
+
 ## Quick start
 You can generate `R2D2.Data` class instance as:
 

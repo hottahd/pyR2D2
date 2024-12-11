@@ -32,7 +32,7 @@ __all__ = ['Data',
            'OpticalDepth',
            'OnTheFly',
            'Slice',
-           'ModelS'
+           'ModelS',
            'Sync',
            'sync',
            'color',
