@@ -10,3 +10,4 @@ a.out
 doc/source/api/
 *.h5
 *.ipynb
+*.egg-info
