@@ -124,6 +124,10 @@ class Read:
                     
             line = f.readline()
         f.close()
+        
+        # d.p['rstar']のない場合はrstar = rsun
+        if 'rstar' not in self.p:
+            self.p['rstar'] = self.p['rsun']
 
         # transform endiant for python
         if self.p["swap"] == 0: # little
