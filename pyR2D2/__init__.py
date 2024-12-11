@@ -13,7 +13,8 @@ A :class:`pyR2D2.Data` instance can be created as follows:
         
 """
 from .data import Data
-from .read.read import Read
+from .data_io.parameters import Parameters
+from .data_io.read import XSelect, ZSelect, MPIRegion, FullData, RestrictedData, OpticalDepth, OnTheFly, Slice, ModelS
 from .sync.sync import Sync
 from .color import color
 from .constant import constant
@@ -21,7 +22,24 @@ from . import write
 from . import util
 from . import fortran_util
 
-__all__ = ['Data','Read','Sync','sync', 'color','constant','write','util']
+__all__ = ['Data',
+           'Parameters',
+           'XSelect',
+           'ZSelect',
+           'MPIRegion',
+           'FullData',
+           'RestrictedData',
+           'OpticalDepth',
+           'OnTheFly',
+           'Slice',
+           'ModelS'
+           'Sync',
+           'sync',
+           'color',
+           'constant',
+           'write',
+           'util',
+           ]
 
 from setuptools_scm import get_version
 

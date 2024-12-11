@@ -7,7 +7,7 @@ class Sync:
     
     """
     
-    def __init__(self, read):
+    def __init__(self, data):
         """
         Initialize pyR2D2.Sync
         
@@ -16,11 +16,11 @@ class Sync:
         read : pyR2D2.Read
             Instance of pyR2D2.read
         """
-        self.read = read
+        self.data = data
                 
     def __getattr__(self, name):
-        if hasattr(self.read, name):
-            return getattr(self.read, name)
+        if hasattr(self.data, name):
+            return getattr(self.data, name)
 
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
         
