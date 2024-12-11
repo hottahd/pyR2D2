@@ -1,0 +1,6 @@
+update_results_file
+===================
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: update_results_file

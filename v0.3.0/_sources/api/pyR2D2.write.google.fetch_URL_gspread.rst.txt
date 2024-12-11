@@ -1,0 +1,6 @@
+fetch_URL_gspread
+=================
+
+.. currentmodule:: pyR2D2.write.google
+
+.. autofunction:: fetch_URL_gspread

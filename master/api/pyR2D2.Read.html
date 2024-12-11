@@ -98,37 +98,37 @@
 <h1>Read<a class="headerlink" href="#read" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyR2D2.Read">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">Read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">Read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class for reading pyR2D2 data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – basic parameters.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.__init__</span></code></p></li>
+<li><p><strong>p</strong> (<em>pyR2D2.Prameters</em>) – basic parameters.
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Parameters()</span></code></p></li>
 <li><p><strong>qs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D data at selected height.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_select</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.qq_select" title="pyR2D2.Read.qq_select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.qq_select()</span></code></a></p></li>
 <li><p><strong>qq</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 3D full data.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_3d</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.qq_3d" title="pyR2D2.Read.qq_3d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.qq_3d()</span></code></a></p></li>
 <li><p><strong>qt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D data at constant optical depths.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_tau</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.qq_tau" title="pyR2D2.Read.qq_tau"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.qq_tau()</span></code></a></p></li>
 <li><p><strong>qt_yan</strong> (<em>qt_yin</em><em>,</em>) – 2D data at constant optical depths in Yin-Yang grid.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_tau</span></code></p></li>
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_tau()</span></code></p></li>
 <li><p><strong>qz</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D data at constant z.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_select_z</span></code></p></li>
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_select_z()</span></code></p></li>
 <li><p><strong>qr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 3D data in a restricted region.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_3d_restricted</span></code></p></li>
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_3d_restricted()</span></code></p></li>
 <li><p><strong>qi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 3D data in a MPI x-region.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_ixr</span></code></p></li>
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_ixr()</span></code></p></li>
 <li><p><strong>ql</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – 2D slice data.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_slice</span></code></p></li>
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.Read.qq_slice()</span></code></p></li>
 <li><p><strong>ql_yan</strong> (<em>ql_yin</em><em>,</em>) – 2D slice data in a Yin-Yang grid.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_slice</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.qq_slice" title="pyR2D2.Read.qq_slice"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.qq_slice()</span></code></a></p></li>
 <li><p><strong>q2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – Full data in 2D simulation.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.qq_2d</span></code></p></li>
-<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – time. See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.time</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.qq_2d" title="pyR2D2.Read.qq_2d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.qq_2d()</span></code></a></p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – time. See <a class="reference internal" href="#pyR2D2.Read.time" title="pyR2D2.Read.time"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.time()</span></code></a></p></li>
 <li><p><strong>vc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – data of on the fly analysis.
-See <code class="xref py py-class docutils literal notranslate"><span class="pre">R2D2.Read.on_the_fly</span></code></p></li>
+See <a class="reference internal" href="#pyR2D2.Read.on_the_fly" title="pyR2D2.Read.on_the_fly"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Read.on_the_fly()</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -138,46 +138,46 @@ See <code class="xref py py-class docutils literal notranslate"><span class="pre
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.YinYangSet" title="pyR2D2.Read.YinYangSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">YinYangSet</span></code></a>()</p></td>
 <td><p>YinYangSet function sets up the YinYang geometry for YinYang direct plot.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.models" title="pyR2D2.Read.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a>([verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.models" title="pyR2D2.Read.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a>([verbose])</p></td>
 <td><p>This method read Model S based stratification.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.on_the_fly" title="pyR2D2.Read.on_the_fly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_the_fly</span></code></a>(n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.on_the_fly" title="pyR2D2.Read.on_the_fly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">on_the_fly</span></code></a>(n[, verbose])</p></td>
 <td><p>Reads on the fly analysis data from fortran.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_2d" title="pyR2D2.Read.qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_2d</span></code></a>(n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_2d" title="pyR2D2.Read.qq_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_2d</span></code></a>(n[, verbose])</p></td>
 <td><p>Reads full data of 2D calculation The data is stored in self.q2 dictionary</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_3d" title="pyR2D2.Read.qq_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d</span></code></a>(n, value[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_3d" title="pyR2D2.Read.qq_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d</span></code></a>(n, value[, verbose])</p></td>
 <td><p>Reads 3D full data The data is stored in self.qq dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_3d_all" title="pyR2D2.Read.qq_3d_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_all</span></code></a>(n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_3d_all" title="pyR2D2.Read.qq_3d_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_all</span></code></a>(n[, verbose])</p></td>
 <td><p>This method reads 3D full data all The data is stored in self.qq dictionary</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_3d_restricted" title="pyR2D2.Read.qq_3d_restricted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_3d_restricted</span></code></a>(n, value, x0, x1, y0, y1, ...)</p></td>
 <td><p>Reads 3D restricted-area data The data is stored in self.qr dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_check" title="pyR2D2.Read.qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_check</span></code></a>(n[, verpose, end_step])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_check" title="pyR2D2.Read.qq_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_check</span></code></a>(n[, verbose, end_step])</p></td>
 <td><p>Reads 3D full data for checkpoint The data is stored in self.qc dictionary</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_ixr" title="pyR2D2.Read.qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_ixr</span></code></a>(ixrt, n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_ixr" title="pyR2D2.Read.qq_ixr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_ixr</span></code></a>(ixrt, n[, verbose])</p></td>
 <td><p>Reads 3D data at a selected a MPI process in x-direction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_select" title="pyR2D2.Read.qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select</span></code></a>(xs, n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_select" title="pyR2D2.Read.qq_select"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select</span></code></a>(xs, n[, verbose])</p></td>
 <td><p>Reads 2D slice data at a selected height.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_select_z" title="pyR2D2.Read.qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select_z</span></code></a>(zs, n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_select_z" title="pyR2D2.Read.qq_select_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_select_z</span></code></a>(zs, n[, verbose])</p></td>
 <td><p>Reads 2D slice data at constant z The data is stored in self.qz dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_slice" title="pyR2D2.Read.qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_slice</span></code></a>(n_slice, direc, n[, verpose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_slice" title="pyR2D2.Read.qq_slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_slice</span></code></a>(n_slice, direc, n[, verbose])</p></td>
 <td><p>Reads 2D data of slice.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_tau" title="pyR2D2.Read.qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_tau</span></code></a>(n[, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.qq_tau" title="pyR2D2.Read.qq_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qq_tau</span></code></a>(n[, verbose])</p></td>
 <td><p>Reads 2D data at certain optical depths.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Read.summary" title="pyR2D2.Read.summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary</span></code></a>()</p></td>
 <td><p>Show pyR2D2.Read summary.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.time" title="pyR2D2.Read.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>(n[, tau, verpose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Read.time" title="pyR2D2.Read.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>(n[, tau, verbose])</p></td>
 <td><p>Reads time at a selected time step The data is stored in self.t</p></td>
 </tr>
 </tbody>
@@ -196,11 +196,11 @@ YinYang direct plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.models">
-<span class="sig-name descname"><span class="pre">models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.models" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.models" title="Link to this definition"></a></dt>
 <dd><p>This method read Model S based stratification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message</p>
+<dd class="field-odd"><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message</p>
 </dd>
 </dl>
 <div class="admonition important">
@@ -211,14 +211,14 @@ YinYang direct plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.on_the_fly">
-<span class="sig-name descname"><span class="pre">on_the_fly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.on_the_fly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.on_the_fly" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">on_the_fly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.on_the_fly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.on_the_fly" title="Link to this definition"></a></dt>
 <dd><p>Reads on the fly analysis data from fortran.
 The data is stored in self.vc dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -230,14 +230,14 @@ The data is stored in self.vc dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_2d">
-<span class="sig-name descname"><span class="pre">qq_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_2d" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_2d" title="Link to this definition"></a></dt>
 <dd><p>Reads full data of 2D calculation
 The data is stored in self.q2 dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -249,7 +249,7 @@ The data is stored in self.q2 dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_3d">
-<span class="sig-name descname"><span class="pre">qq_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d" title="Link to this definition"></a></dt>
 <dd><p>Reads 3D full data
 The data is stored in self.qq dictionary</p>
 <dl class="field-list simple">
@@ -269,7 +269,7 @@ The data is stored in self.qq dictionary</p>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -281,14 +281,14 @@ The data is stored in self.qq dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_3d_all">
-<span class="sig-name descname"><span class="pre">qq_3d_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d_all" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_3d_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d_all" title="Link to this definition"></a></dt>
 <dd><p>This method reads 3D full data all
 The data is stored in self.qq dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -300,7 +300,7 @@ The data is stored in self.qq dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_3d_restricted">
-<span class="sig-name descname"><span class="pre">qq_3d_restricted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d_restricted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d_restricted" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_3d_restricted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_3d_restricted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_3d_restricted" title="Link to this definition"></a></dt>
 <dd><p>Reads 3D restricted-area data
 The data is stored in self.qr dictionary</p>
 <dl class="field-list simple">
@@ -314,7 +314,7 @@ The data is stored in self.qr dictionary</p>
 <li><p><strong>x1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
 <li><p><strong>y1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
 <li><p><strong>z1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Maximum x, y, z</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -326,14 +326,14 @@ The data is stored in self.qr dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_check">
-<span class="sig-name descname"><span class="pre">qq_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_check" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_check" title="Link to this definition"></a></dt>
 <dd><p>Reads 3D full data for checkpoint
 The data is stored in self.qc dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 <li><p><strong>end_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If true, checkpoint of end step is read.</p></li>
 </ul>
 </dd>
@@ -346,16 +346,16 @@ The data is stored in self.qc dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_ixr">
-<span class="sig-name descname"><span class="pre">qq_ixr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ixrt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_ixr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_ixr" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_ixr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ixrt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_ixr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_ixr" title="Link to this definition"></a></dt>
 <dd><p>Reads 3D data at a selected a MPI process in x-direction.
 corrensponding to ixr-th region in remap coordinate</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ixrt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Aselected x-region (0&lt;=ixrt&lt;=ixr-1)
+<li><p><strong>ixrt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected x-region (0&lt;=ixrt&lt;=ixr-1)
 .. note:: ixr is the number of MPI process in x-direction</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -367,14 +367,14 @@ corrensponding to ixr-th region in remap coordinate</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_select">
-<span class="sig-name descname"><span class="pre">qq_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_select" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_select" title="Link to this definition"></a></dt>
 <dd><p>Reads 2D slice data at a selected height.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>xs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – A selected height for data</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A setected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -388,7 +388,7 @@ corrensponding to ixr-th region in remap coordinate</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_select_z">
-<span class="sig-name descname"><span class="pre">qq_select_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_select_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_select_z" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_select_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_select_z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_select_z" title="Link to this definition"></a></dt>
 <dd><p>Reads 2D slice data at constant z
 The data is stored in self.qz dictionary</p>
 <dl class="field-list simple">
@@ -396,7 +396,7 @@ The data is stored in self.qz dictionary</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>zs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – A selected z for data</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -408,7 +408,7 @@ The data is stored in self.qz dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_slice">
-<span class="sig-name descname"><span class="pre">qq_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_slice" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_slice" title="Link to this definition"></a></dt>
 <dd><p>Reads 2D data of slice.
 The data is stored in self.ql dictionary</p>
 <dl class="field-list simple">
@@ -417,7 +417,7 @@ The data is stored in self.ql dictionary</p>
 <li><p><strong>n_slice</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – index of slice</p></li>
 <li><p><strong>direc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – slice direction. ‘x’, ‘y’, or ‘z’</p></li>
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – a selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -429,7 +429,7 @@ The data is stored in self.ql dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.qq_tau">
-<span class="sig-name descname"><span class="pre">qq_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_tau" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qq_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.qq_tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.qq_tau" title="Link to this definition"></a></dt>
 <dd><p>Reads 2D data at certain optical depths.
 The data is stored in self.qt dictionary.
 In this version the selected optical depth is 1, 0.1, and 0.01</p>
@@ -437,7 +437,7 @@ In this version the selected optical depth is 1, 0.1, and 0.01</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – A selected time step for data</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 </dl>
@@ -459,7 +459,7 @@ In this version the selected optical depth is 1, 0.1, and 0.01</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.time">
-<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.time" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.time" title="Link to this definition"></a></dt>
 <dd><p>Reads time at a selected time step
 The data is stored in self.t</p>
 <dl class="field-list simple">
@@ -467,7 +467,7 @@ The data is stored in self.t</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – selected time step for data</p></li>
 <li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – if True time for optical depth (high cadence)</p></li>
-<li><p><strong>verpose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – False suppresses a message of store</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -485,7 +485,7 @@ The data is stored in self.t</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Read.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datadir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_old</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/read/read.html#Read.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Read.__init__" title="Link to this definition"></a></dt>
 <dd><p>This method reads basic data for calculation setting
 The data is stored in self.p dictionary</p>
 <dl class="field-list simple">
@@ -547,6 +547,8 @@ The data is stored in self.p dictionary</p>
           <dd><a href="../../v0.1.1/index.html">v0.1.1</a></dd>
         
           <dd><a href="../../v0.2.0/index.html">v0.2.0</a></dd>
+        
+          <dd><a href="../../v0.3.0/index.html">v0.3.0</a></dd>
         
           <dd><a href="pyR2D2.Read.html">master</a></dd>
         

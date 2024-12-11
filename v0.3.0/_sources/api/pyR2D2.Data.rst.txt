@@ -1,0 +1,17 @@
+Data
+====
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: Data
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Data.summary
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: summary

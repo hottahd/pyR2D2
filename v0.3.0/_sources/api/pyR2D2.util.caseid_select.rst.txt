@@ -1,0 +1,6 @@
+caseid_select
+=============
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: caseid_select
