@@ -1,6 +1,6 @@
 import pyR2D2
 
-def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
+def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False, copy_to_local=False):
     """
     Initialize pyR2D2.Data instance in main program.
     
@@ -11,7 +11,7 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
     instance_name : str
         name of instance of pyR2D2.Data object
     verpose : bool
-        If True, print self.summar()
+        If True, print self.summary()
     datadir : str
         directory path to pyR2D2 data
 
@@ -38,9 +38,15 @@ def init(main_locals,instance_name='d',verpose=True,datadir=None,google=False):
         datadir = "../run/"+main_locals['caseid']+"/data/"
     
     initialize_instance(main_locals,instance_name)
-    main_locals[instance_name] = pyR2D2.Data(datadir)
-    locals_define(main_locals[instance_name],main_locals)
     
+    print("### An instance of pyR2D2.Data class is initialized as "+instance_name+" ###")
+    main_locals[instance_name] = pyR2D2.Data(datadir)
+    
+    if copy_to_local:
+        print("### Copying pyR2D2.Data.p to locals() ###")
+        locals_define(main_locals[instance_name],main_locals)
+    
+    print("")
     if google:
         import pyR2D2.write.google
         pyR2D2.write.google.set_top_line()        
@@ -102,7 +108,7 @@ def locals_define(data,main_locals):
     main_locals : dict
         locals() in main program, which include local variables
     '''
-    for key, value in data.p.items():
+    for key, value in data.p.__dict__.items():
         main_locals[key] = value    
     return
 
@@ -121,8 +127,8 @@ def define_n0(data,main_locals,nd_type='nd'):
     '''
     if 'n0' not in main_locals:
         main_locals['n0'] = 0
-    if main_locals['n0'] > data.p[nd_type]:
-        main_locals['n0'] = data.p[nd_type]
+    if main_locals['n0'] > data.p.__dict__[nd_type]:
+        main_locals['n0'] = data.p.__dict__[nd_type]
     
     return main_locals['n0']
 
@@ -278,16 +284,16 @@ def eos(data,ro,se,var):
     
     import numpy as np
     
-    iro = int((np.log(ro) - data.p['log_ro_e'][0])//data.p['dlogro_e'])
-    ise = int((       se  - data.p['se_e'][0]    )//data.p['dse_e'])
+    iro = int((np.log(ro) - data.log_ro_e[0])//data.dlogro_e)
+    ise = int((       se  - data.se_e[0]    )//data.dse_e)
     
-    dlogro = np.log(ro) - data.p['log_ro_e'][iro]
-    dse = se - data.p['se_e'][ise]
+    dlogro = np.log(ro) - data.plog_ro_e[iro]
+    dse = se - data.se_e[ise]
     
     qq = np.exp((\
-        + data.p['log_'+var+'_e'][iro  ,ise  ]*(data.p['dlogro_e'] - dlogro)*(data.p['dse_e'] - dse) \
-        + data.p['log_'+var+'_e'][iro+1,ise  ]*(                     dlogro)*(data.p['dse_e'] - dse) \
-        + data.p['log_'+var+'_e'][iro  ,ise+1]*(data.p['dlogro_e'] - dlogro)*(                  dse) \
-        + data.p['log_'+var+'_e'][iro+1,ise+1]*(                     dlogro)*(                  dse) \
-        )/data.p['dlogro_e']/data.p['dse_e'])    
+        + data.p.__dict__['log_'+var+'_e'][iro  ,ise  ]*(data.dlogro_e - dlogro)*(data.dse_e - dse) \
+        + data.p.__dict__['log_'+var+'_e'][iro+1,ise  ]*(                dlogro)*(data.dse_e - dse) \
+        + data.p.__dict__['log_'+var+'_e'][iro  ,ise+1]*(data.dlogro_e - dlogro)*(             dse) \
+        + data.p.__dict__['log_'+var+'_e'][iro+1,ise+1]*(                dlogro)*(             dse) \
+        )/data.dlogro_e/data.dse_e)
     return qq

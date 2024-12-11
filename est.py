@@ -19,25 +19,21 @@ n0 = pyR2D2.util.define_n0(d,locals())
 pngdir="../figs/"+caseid+"/est/"
 os.makedirs(pngdir,exist_ok=True)
 
-print("Maximum time step= ",d.p['nd']," time ="\
-      ,d.p['dtout']*float(d.p['nd'])/3600./24.," [day]")
+print("Maximum time step= ",d.nd," time ="\
+      ,d.dtout*float(d.nd)/3600./24.," [day]")
 
 plt.close('all')
 
-# vs codeでエラーを出さないために以下は定義
-# 実際はR2D2.util.locals_defineで定義されている
-ix, jx, nd = d.p['ix'], d.p['jx'], d.p['nd']
-
 # 座標のファクターの設定
-if d.p['geometry'] == 'Cartesian':
+if d.geometry == 'Cartesian':
     sinyy = 1
     sinyym = 1.
 else: # spherical geometry
-    xx,yy = np.meshgrid(d.p['x'],d.p['y'],indexing='ij')
+    xx,yy = np.meshgrid(d.x, d.y,indexing='ij')
     sinyy = np.sin(yy)
     sinyym = np.average(sinyy,axis=1)
 
-    xx,yy_flux = np.meshgrid(d.p['x_flux'],d.p['y'],indexing='ij')
+    xx,yy_flux = np.meshgrid(d.x_flux, d.y, indexing='ij')
     sinyy_flux = np.sin(yy_flux)
     sinyym_flux = np.average(sinyy_flux,axis=1)
 
@@ -51,33 +47,33 @@ vls = ['vxrmst', 'vyrmst', 'vzrmst',
         'romt', 'semt', 'prmt', 'temt'
         ]
 for vl in vls:
-    md[vl] = np.zeros((ix, nd-n0+1))
+    md[vl] = np.zeros((d.ix, d.nd-n0+1))
 
 ## mean magnetic field (2D)
 vls = ['vxmt', 'vymt', 'vzmt', 'bxmt', 'bymt', 'bzmt']
 for vl in vls:
-    md[vl] =  np.zeros((ix,jx,nd-n0+1))
+    md[vl] =  np.zeros((d.ix, d.jx, d.nd-n0+1))
 
 ## energy fluxes (1D but ix + 1)
 vls = ['fet','fmt','fdt','fkt','frt','ftt','fft']
 for vl in vls:
-    md[vl] = np.zeros((ix+1,nd-n0+1))
+    md[vl] = np.zeros((d.ix+1, d.nd-n0+1))
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 def est_plot(d, md, fig, ax1, ax2, ax3, ax4):    
     #####################
-    if d.p['geometry'] == 'Cartesian':
-        xp = (d.p['x_flux'] - d.p['rstar'])*1.e-8
-        xpp = (d.p['x'] - d.p['rstar'])*1.e-8
+    if d.geometry == 'Cartesian':
+        xp = (d.x_flux - d.rstar )*1.e-8
+        xpp = (d.x - d.rstar )*1.e-8
         xlabel = r'$x-R_*~\mathrm{[Mm]}$'
     else:
-        xp = d.p['x_flux']/d.p['rstar']
+        xp = d.x_flux/d.rstar
         xlabel = r'$r/R_*$'
-        xpp = d.p['x']/d.p['rstar']
+        xpp = d.x/d.rstar
         
-    if d.p['deep_flag'] == 0:
+    if d.deep_flag == 0:
         text = r"$t="+"{:.2f}".format(t/60.)+"\mathrm{~[min]}$"
     else:
         text = r"$t="+"{:.2f}".format(t/3600./24.)+"\mathrm{~[day]}$"
@@ -100,7 +96,7 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
     for vl, color, label in zip(vls, colors, labels):
         ax2.plot(xpp,md[vl]*1.e-5,label=label,color=color)
 
-    if d.p['deep_flag'] == 0:
+    if d.deep_flag == 0:
         ax2.set_yscale('log')
 
     #####################
@@ -113,8 +109,8 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
         ax3.plot(xpp,md[vl]*1.e-5,label=label,color=color)
     
     #####################
-    ax4.plot(xpp,md['sem']+d.p['se0'],color=pyR2D2.color.blue,label=r'$s$')
-    ax4.plot(xpp,d.p['se0'],color=pyR2D2.color.blue,ls='--',label=r'$s_0$')
+    ax4.plot(xpp,md['sem']+d.se0,color=pyR2D2.color.blue,label=r'$s$')
+    ax4.plot(xpp,d.se0,color=pyR2D2.color.blue,ls='--',label=r'$s_0$')
 
     titles = ['Energy fluxes','RMS velocity','RMS magnetic field','Entropy']
     ylabels = [r"$F/F_*$",r"velocities$\mathrm{~[km~s^{-1}]}$",r"Magnetic field [G]",r'$\mathrm{erg~g^{-1}~K^{-1}}$']
@@ -135,23 +131,23 @@ for n in tqdm(range(n0,nd+1)):
     print(f"\r n = {n} ", end='', flush=True)
     ##############################
     t = d.read.time(n)    
-    d.read.on_the_fly(n,verpose=False)
+    d.read.on_the_fly(n,verbose=False)
 
     ##############################    
-    if d.p['geometry'] == 'Cartesian':
-        fstar = d.p['lstar']/4/np.pi/d.p['rstar']**2
+    if d.geometry == 'Cartesian':
+        fstar = d.lstar/4/np.pi/d.rstar**2
         vls = ['fe','fd','fk','fr','fm']
         for vl in vls:
             md[vl] = np.average(d.vc[vl],axis=1)
     else:
-        fstar = d.p['lstar']/4/np.pi
+        fstar = d.lstar/4/np.pi
         vls = ['fe','fd','fk','fm']
         for vl in vls:
-            md[vl] = np.average(d.vc[vl]*sinyy_flux,axis=1)/sinyym_flux*d.p['x_flux']**2
+            md[vl] = np.average(d.vc[vl]*sinyy_flux,axis=1)/sinyym_flux*d.x_flux**2
         md['fr'] = np.average(d.vc["fr"]*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
     
     # linear と full　の判別のためのRMSエントロピーの計算
-    serms = np.sqrt(np.average(d.vc['serms']**2*sinyy,axis=1)/sinyym)/d.p['se0']
+    serms = np.sqrt(np.average(d.vc['serms']**2*sinyy,axis=1)/sinyym)/d.se0
     sermsm = 0.5*(np.append(serms,serms[-1]) + np.insert(serms,0,serms[0]))
     sr = 0.5*(1 + np.sign(sermsm - 1.e-4))
     
@@ -215,8 +211,8 @@ vls = ['fe','fd','ff','fk','fr','ft']
 for vl in vls:
     md[vl] = np.average(md[vl+'t'],axis=1)
 
-with open(d.p['datadir']+'est.pkl','wb') as f:
-    pickle.dump([d.p,md], f)    
+with open(d.datadir + 'est.pkl','wb') as f:
+    pickle.dump([d.p.__dict__,md], f)    
 
 fig2, ((ax21, ax22), (ax23, ax24)) = plt.subplots(2, 2, num='est_mean', figsize=(12, 8))
 est_plot(d,md,fig2,ax21,ax22,ax23,ax24)

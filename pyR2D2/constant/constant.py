@@ -8,10 +8,10 @@ Provides Sun-related constants
     ======== ========================== =========
     Name     description                value    
     ======== ========================== =========
-    mass     Solar mass [g]             1.988e33
-    rsun     Solar radius [cm]          6.957e10
-    lsun     Solar luminosity [erg/s]   3.828e33
-    asun     Solar age [yr]             4.570e9
+    MSUN     Solar mass [g]             1.988e33
+    RSUN     Solar radius [cm]          6.957e10
+    LSUN     Solar luminosity [erg/s]   3.828e33
+    ASUN     Solar age [yr]             4.570e9
     ======== ========================== =========
 
 Example
@@ -24,7 +24,7 @@ Example
 
 """
 # Solar parameters
-msun = 1.988e33 # g
-rsun = 6.957e10 # cm
-lsun = 3.828e33 # erg/s
-asun = 4.570e9 # yr
+MSUN = 1.988e33 # g
+RSUN = 6.957e10 # cm
+LSUN = 3.828e33 # erg/s
+ASUN = 4.570e9 # yr

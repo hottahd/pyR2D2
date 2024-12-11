@@ -17,41 +17,41 @@ os.makedirs(pngdir,exist_ok=True)
 
 n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd')
 
-print("Maximum time step= ",d.p['nd']," time ="\
-          ,d.p['dtout']*float(d.p['nd'])/3600./24.," [day]")
+print("Maximum time step= ",d.nd," time ="\
+          ,d.dtout*float(d.nd)/3600./24.," [day]")
 
 plt.close('all')
 
-if not d.p['geometry'] == 'Cartesian':
-    d.p['zz'],d.p['yy'] = np.meshgrid(d.p['z'],d.p['y']-0.5*np.pi)
+if not d.geometry == 'Cartesian':
+    d.zz, d.yy = np.meshgrid(d.z, d.y - 0.5*np.pi)
     
-    xe = np.zeros(d.p['ix']+1)
-    ye = np.zeros(d.p['jx']+1)
+    xe = np.zeros(d.ix + 1)
+    ye = np.zeros(d.jx + 1)
 
-    xe[0] = d.p['xmin']
-    xe[d.p['ix']] = d.p['xmax']
+    xe[0] = d.xmin
+    xe[d.ix] = d.xmax
     ye[0] = 0.e0
-    ye[d.p['jx']] = np.pi
-    for i in range(1,d.p['ix']):
-        xe[i] = xe[i-1] + 2*(d.p['x'][i-1] - xe[i-1])
+    ye[d.jx] = np.pi
+    for i in range(1,d.ix):
+        xe[i] = xe[i-1] + 2*(d.x[i-1] - xe[i-1])
 
-    for j in range(1,d.p['jx']):
-        ye[j] = ye[j-1] + 2*(d.p['y'][j-1] - ye[j-1])
+    for j in range(1,d.jx):
+        ye[j] = ye[j-1] + 2*(d.y[j-1] - ye[j-1])
 
     RAE, THE = np.meshgrid(xe,ye,indexing='ij')
-    d.p['XX'], d.p['YY'] = RAE*np.cos(THE), RAE*np.sin(THE)
+    d.p.XX, d.p.YY = RAE*np.cos(THE), RAE*np.sin(THE)
 
-    X, Y = np.meshgrid(x,y,indexing='ij')
+    X, Y = np.meshgrid(d.x,d.y,indexing='ij')
     SINY = np.sin(Y)
     SINYM = SINY.sum(axis=1)
 
 # read initial time
-t0 = d.read.time(0,verpose=False)
+t0 = d.read.time(0,verbose=False)
 
-for n in tqdm(range(n0,d.p['nd']+1)):
+for n in tqdm(range(n0,d.nd + 1)):
     # read data
-    t = d.read.time(n,verpose=False)
-    d.read.on_the_fly(n,verpose=False)
+    t = d.read.time(n,verbose=False)
+    d.read.on_the_fly(n,verbose=False)
     
     ##############################
     
@@ -60,16 +60,16 @@ for n in tqdm(range(n0,d.p['nd']+1)):
     else:
         tight_layout_flag = False
     
-    if d.p['geometry'] == 'Cartesian':
-        d.read.qq_tau(n*int(d.p['ifac']),verpose=False)
-        tu_height = d.qt['he'][d.p['jc'],:]
+    if d.geometry == 'Cartesian':
+        d.read.qq_tau(n*int(d.ifac),verbose=False)
+        tu_height = d.qt['he'][d.jc, :]
         
         inm = d.qt['in'].mean() # mean intensity
         inrms = np.sqrt(((d.qt['in'] - inm)**2).mean()) # RMS intensity
         frms = 2.
 
         sem, tmp = np.meshgrid(d.vc['sem'].mean(axis=1),z,indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2).mean(axis=1)),z,indexing='ij')
+        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2).mean(axis=1)),d.z,indexing='ij')
         
         bb = np.sqrt(d.vc["bx_xz"]**2 + d.vc["by_xz"]**2 + d.vc["bz_xz"]**2)        
 
@@ -95,17 +95,17 @@ for n in tqdm(range(n0,d.p['nd']+1)):
                 ]
         mov_util.mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.read_qq_select(d.p['xmax'],n,silent=True)
+        d.read_qq_select(d.xmax, n, silent=True)
         vxrms = np.sqrt((d.qs['vx']**2).mean())
         bxrms = np.sqrt((d.qs['bx']**2).mean())
         
-        sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,d.p['y'],indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),d.p['y'],indexing='ij')
+        sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,d.y,indexing='ij')
+        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),d.y,indexing='ij')
         
         if serms.max() != 0:
             se_value = (d.vc['se_xy']-sem)/serms
         else:
-            se_value = np.zeros((d.p['ix'],d.p['jx']))
+            se_value = np.zeros((d.ix, d.jx))
         
         vls = [d.qs['vx']*1.e-2,
                d.qs['bx']*1.e-3,
@@ -131,7 +131,7 @@ for n in tqdm(range(n0,d.p['nd']+1)):
         mov_util.mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
-    if(n != d.p['nd']):
+    if(n != d.nd):
         plt.clf()
         
 

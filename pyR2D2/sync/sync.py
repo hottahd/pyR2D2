@@ -17,8 +17,7 @@ class Sync:
             Instance of pyR2D2.read
         """
         self.read = read
-        
-        
+                
     def __getattr__(self, name):
         if hasattr(self.read, name):
             return getattr(self.read, name)
@@ -76,7 +75,7 @@ class Sync:
 
         import os
 
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
         os.system('rsync -avP' \
                 +' --exclude="param" ' \
                 +' --exclude="qq" ' \
@@ -84,7 +83,7 @@ class Sync:
                 +' --exclude="slice" ' \
                 +' --exclude="time/mhd" ' \
                 +' -e "'+ssh+'" ' \
-                +server+':work/'+project+'/run/'+caseid+'/data/ '+self.p['datadir'] )
+                +server+':work/'+project+'/run/'+caseid+'/data/ '+self.datadir )
         
     def remap_qq(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
@@ -104,19 +103,19 @@ class Sync:
         import os
         import numpy as np
         
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
         
         # remapを行ったMPIランクの洗い出し
-        nps = np.char.zfill(self.p['np_ijr'].flatten().astype(str),8)
+        nps = np.char.zfill(self.np_ijr.flatten().astype(str),8)
         for ns in nps:
             par_dir = str(int(ns)//1000).zfill(5)+'/'
             chi_dir = str(int(ns)).zfill(8)+'/'
             
-            os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)
+            os.makedirs(self.datadir + 'remap/qq/'+par_dir+chi_dir,exist_ok=True)
             os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.'+str(n).zfill(8)+'.'+ns \
-                    +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
+                    +' '+self.datadir + 'remap/qq/'+par_dir+chi_dir)
         
     def select(self,xs,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
@@ -137,23 +136,23 @@ class Sync:
         import os
         import numpy as np
 
-        i0 = np.argmin(np.abs(self.p["x"]-xs))
-        ir0 = self.p["i2ir"][i0]
+        i0 = np.argmin(np.abs(self.x - xs))
+        ir0 = self.i2ir[i0]
         
-        nps = np.char.zfill(self.p['np_ijr'][ir0-1,:].astype(str),8)
+        nps = np.char.zfill(self.np_ijr[ir0-1,:].astype(str),8)
 
         files = ''
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
 
         for ns in nps:
             par_dir = str(int(ns)//1000).zfill(5)+'/'
             chi_dir = str(int(ns)).zfill(8)+'/'
             
-            os.makedirs(self.p['datadir']+'remap/qq/'+par_dir+chi_dir,exist_ok=True)        
+            os.makedirs(self.datadir + 'remap/qq/'+par_dir+chi_dir,exist_ok=True)
             os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.*.'+ns \
-                    +' '+self.p['datadir']+'remap/qq/'+par_dir+chi_dir)
+                    +' '+self.datadir + 'remap/qq/'+par_dir+chi_dir)
             
     def vc(self,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
@@ -170,14 +169,14 @@ class Sync:
         '''
 
         import os
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
 
         pyR2D2.sync.setup(server,caseid,project=project)
         os.system('rsync -avP' \
                 +' --exclude="time/mhd" ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/remap/vl '
-                +self.p['datadir']+'remap/' )
+                +self.datadir+'remap/' )
         
     def check(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2],end_step=False):
         '''
@@ -202,21 +201,21 @@ class Sync:
         step = str(n).zfill(8)
         
         if end_step:
-            if np.mod(self.p['nd'],2) == 0:
+            if np.mod(self.nd,2) == 0:
                 step = 'e'
-            if np.mod(self.p['nd'],2) == 1:
+            if np.mod(self.nd,2) == 1:
                 step = 'o'
         
-        caseid = self.p['datadir'].split('/')[-3]
-        for ns in range(self.p['npe']):
+        caseid = self.datadir.split('/')[-3]
+        for ns in range(self.npe):
             par_dir = str(int(ns)//1000).zfill(5)+'/'
             chi_dir = str(int(ns)).zfill(8)+'/'
 
-            os.makedirs(self.p['datadir']+'qq/'+par_dir+chi_dir,exist_ok=True)
+            os.makedirs(self.datadir + 'qq/'+par_dir+chi_dir,exist_ok=True)
             os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/qq/'+par_dir+chi_dir+'qq.dac.'+step+'.'+str(int(ns)).zfill(8)+' ' \
-                +self.p['datadir']+'qq/'+par_dir+chi_dir )
+                +self.datadir + 'qq/'+par_dir+chi_dir )
 
     def slice(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
@@ -238,15 +237,15 @@ class Sync:
 
         step = str(n).zfill(8)
         
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
         os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/slice/slice.dac ' \
-                +self.p['datadir']+'/slice' )
+                +self.datadir + '/slice' )
         os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/data/slice/qq"*".dac.'+step+'."*" ' \
-                +self.p['datadir']+'/slice' )
+                +self.datadir + '/slice' )
             
     def all(self,server,ssh='ssh',project=os.getcwd().split('/')[-2],dist='../run/'):
         '''
@@ -265,7 +264,7 @@ class Sync:
         '''
         import os
         
-        caseid = self.p['datadir'].split('/')[-3]
+        caseid = self.datadir.split('/')[-3]
         os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/ ' \

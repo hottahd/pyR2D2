@@ -138,7 +138,7 @@ def set_cells_gspread(data,
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
 
     if caseid is None:
-        caseid = data.p['datadir'].split('/')[-3]
+        caseid = data.datadir.split('/')[-3]
     
     gc = init_gspread(json_key,project)
     wks = gc.open(project).sheet1
@@ -146,60 +146,59 @@ def set_cells_gspread(data,
     cells = wks.range('A'+str_id+':'+'T'+str_id)
 
     keys = [caseid]
-    if 'mstar' in data.p:
-        keys.append('{:.2f}'.format(data.p['mstar']/pyR2D2.constant.msun))
+    if hasattr(data.p,'mstar'):
+        keys.append('{:.2f}'.format(data.mstar/pyR2D2.constant.MSUN))
     else:
         keys.append('1.00') # solar mass
-    keys.append(str(data.p['ix'])+' '+str(data.p['jx'])+' '+str(data.p['kx']))
-    keys.append( '{:6.2f}'.format((data.p['xmin']-data.p['rstar'])*1.e-8))
-    keys.append( '{:6.2f}'.format((data.p['xmax']-data.p['rstar'])*1.e-8))
+    keys.append(str(data.ix)+' '+str(data.jx)+' '+str(data.kx))
+    keys.append( '{:6.2f}'.format((data.xmin - data.rstar)*1.e-8))
+    keys.append( '{:6.2f}'.format((data.xmax - data.rstar)*1.e-8))
     
+    if data.geometry == 'Cartesian':
+        keys.append( '{:6.2f}'.format(data.ymin*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(data.ymax*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(data.zmin*1.e-8)+' [Mm]')
+        keys.append( '{:6.2f}'.format(data.zmax*1.e-8)+' [Mm]')
 
-    if data.p['geometry'] == 'Cartesian':
-        keys.append( '{:6.2f}'.format(data.p['ymin']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(data.p['ymax']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(data.p['zmin']*1.e-8)+' [Mm]')
-        keys.append( '{:6.2f}'.format(data.p['zmax']*1.e-8)+' [Mm]')
-
-    if data.p['geometry'] == 'Spherical':
+    if data.geometry == 'Spherical':
         pi2rad = 180/np.pi
-        keys.append( '{:6.2f}'.format(data.p['ymin']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(data.p['ymax']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(data.p['zmin']*pi2rad)+' [deg]')
-        keys.append( '{:6.2f}'.format(data.p['zmax']*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(data.ymin*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(data.ymax*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(data.zmin*pi2rad)+' [deg]')
+        keys.append( '{:6.2f}'.format(data.zmax*pi2rad)+' [deg]')
 
-    if data.p['geometry'] == 'YinYang':
+    if data.geometry == 'YinYang':
         pi2rad = 180/np.pi
         keys.append( '0 [deg]')
         keys.append( '180 [deg]')
         keys.append( '-180 [deg]')
         keys.append( '180 [deg]')
     
-    if data.p['ununiform_flag']:
+    if data.ununiform_flag:
         keys.append('F')
     else:
         keys.append('T')
     
-    dx0 = (data.p['x'][1] - data.p['x'][0])*1.e-5
-    dx1 = (data.p['x'][data.p['ix']-1] - data.p['x'][data.p['ix']-2])*1.e-5
+    dx0 = (data.x[1] - data.x[0])*1.e-5
+    dx1 = (data.x[data.ix - 1] - data.x[data.ix - 2])*1.e-5
     keys.append( '{:6.2f}'.format(dx0)+' '+'{:6.2f}'.format(dx1))
-    keys.append( data.p['rte'])
-    keys.append( '{:6.2f}'.format(data.p['dtout']))
-    keys.append( '{:6.2f}'.format(data.p['dtout_tau']))
-    keys.append( '{:5.2f}'.format(data.p['potential_alpha']))
-    if data.p['xi'].max() == 1.0:
+    keys.append( data.rte)
+    keys.append( '{:6.2f}'.format(data.dtout))
+    keys.append( '{:6.2f}'.format(data.dtout_tau))
+    keys.append( '{:5.2f}'.format(data.potential_alpha))
+    if data.xi.max() == 1.0:
         keys.append('F')
     else:
         keys.append('T')
 
-    keys.append( '{:5.1f}'.format(data.p['omfac']))
-    keys.append(data.p['geometry'])
-    keys.append(data.p['origin'])
+    keys.append( '{:5.1f}'.format(data.omfac))
+    keys.append(data.geometry)
+    keys.append(data.origin)
     keys.append(str(datetime.datetime.now()).split('.')[0])
-    keys.append(data.p['server'])
+    keys.append(data.server)
     
     for cell, key in zip(cells,keys):
         cell.value = key
-    
+            
     wks.update_cells(cells)
 

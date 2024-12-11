@@ -21,7 +21,7 @@ from . import write
 from . import util
 from . import fortran_util
 
-__all__ = ['Data','Read','Sync','color','constant','write','util']
+__all__ = ['Data','Read','Sync','sync', 'color','constant','write','util']
 
 from setuptools_scm import get_version
 
