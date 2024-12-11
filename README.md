@@ -18,4 +18,4 @@ You need to `make` at `pyR2D2/` directory to use these utilities.
 
 ## Documentation
 
-https://hottahd.github.io/R2D2_py/master
+https://hottahd.github.io/pyR2D2/master
