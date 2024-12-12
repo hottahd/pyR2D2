@@ -2,16 +2,22 @@ import os
 import numpy as np
 
 class _BaseReader:
+    """
+    Base class for data readers
+    """
     def __getattr__(self, name):
-        '''
+        """
         When an attribute is not found in pyR2D2._BaseReader, it is searched in pyR2D2._BaseReader.data
-        '''
+        """
         if hasattr(self.data, name):
             attr = getattr(self.data, name)
             if not callable(attr):
                 return attr
 
 class _BaseRemapReader(_BaseReader):
+    """
+    Base class for remap data readers
+    """
     def __init__(self, data):
         self.data = data
         
@@ -37,6 +43,19 @@ class _BaseRemapReader(_BaseReader):
                 
             
     def _dtype_remap_qq(self,np0):
+        """
+        returns dtype of remap/qq/
+
+        Parameters
+        ----------
+        np0 : int
+            MPI process number
+
+        Returns
+        -------
+            dtype : np.dtype
+                data type of remap/qq/
+        """
         dtype=np.dtype([ \
                 ("qq",self.endian + str(self.mtype*self.iixl[np0]*self.jjxl[np0]*self.kx)+"f"),\
                 ("pr",self.endian + str(self.iixl[np0]*self.jjxl[np0]*self.kx)+"f"),\
@@ -72,16 +91,19 @@ class _BaseRemapReader(_BaseReader):
         return filepath
     
 class XSelect(_BaseRemapReader):
+    """
+    Class for 2D selected data at a certain x
+    """
     def read(self,xs: float,n: int):
         """
-        Reads 2D slice data at a selected height.
+        Reads 2D selected data at a certain x
 
         Parameters
         ----------
         xs : float 
             A selected height for data
         n : int 
-            A setected time step for data
+            A selected time step for data
         verbose : bool
             False suppresses a message of store            
         """
@@ -112,6 +134,9 @@ class XSelect(_BaseRemapReader):
                 self.info['xs'] = self.x[i0]
 
 class ZSelect(_BaseRemapReader):
+    '''
+    Class for 2D selected data at a certain z
+    '''
     def read(self, zs: float, n: int):
         '''
         Reads 2D slice data at constant z
@@ -150,6 +175,9 @@ class ZSelect(_BaseRemapReader):
             self.info['zs'] = self.z[k0]
             
 class MPIRegion(_BaseRemapReader):
+    '''
+    Class for 3D data at a selected MPI process
+    '''
     def read(self,ixrt,n):
         '''
         Reads 3D data at a selected a MPI process in x-direction.
@@ -190,6 +218,9 @@ class MPIRegion(_BaseRemapReader):
                         self.__dict__[key][:,self.jss[np0]:self.jee[np0]+1,:] = qqq[key].reshape((self.iixl[np0],self.jjxl[np0],self.kx),order="F")[:,:,:]
             
 class FullData(_BaseRemapReader):
+    '''
+    Class for 3D full data
+    '''
     def read(self, n: int, value):
         '''
         Reads 3D full data
@@ -251,6 +282,9 @@ class FullData(_BaseRemapReader):
                                     = qqq[value].reshape((self.iixl[np0],self.jjxl[np0],self.kx),order="F")[:,:,:]
 
 class RestrictedData(_BaseRemapReader):
+    '''
+    Class for 3D restricted-volume data
+    '''
     def read(self,n: int, value, x0: float, x1: float, y0: float, y1: float, z0: float, z1: float):
         '''
         Reads 3D restricted-area data
@@ -319,6 +353,9 @@ class RestrictedData(_BaseRemapReader):
                                     qqq[value].reshape((self.iixl[np0],self.jjxl[np0],self.kx),order="F")[isrt_snd:iend_snd,jsrt_snd:jend_snd,k0:k1+1]                         
 
 class OpticalDepth(_BaseReader):
+    '''
+    Class for 2D data at certain optical depths
+    '''
     def __init__(self, data):
         self.data = data
         self.value_keys = ['in','ro','se','pr','te','vx','vy','vz','bx','by','bz','he','fr']
@@ -348,6 +385,9 @@ class OpticalDepth(_BaseReader):
 
                 
 class OnTheFly(_BaseReader):
+    '''
+    Class for on-the-fly analysis data
+    '''
     def __init__(self, data):
         self.data = data
         
@@ -400,6 +440,9 @@ class OnTheFly(_BaseReader):
 
     ##############################
 class Slice(_BaseReader):
+    '''
+    Class for 2D slice data
+    '''
     def __init__(self, data):
         self.data = data
         
@@ -452,6 +495,9 @@ class Slice(_BaseReader):
             self.info['n_slice'] = n_slice
                     
 class TwoDimension(_BaseReader):
+    '''
+    Class for 2D data
+    '''
     def __init__(self, data):
         self.data = data
         self.value_keys = ['ro','vx','vy','vz','bx','by','bz','se','pr','te','op','tu','fr']
@@ -468,8 +514,6 @@ class TwoDimension(_BaseReader):
         ----------
         n : int
             A selected time step for data 
-        verbose : bool
-            False suppresses a message of store
         '''
         
         ### Only when memory is not allocated 
@@ -490,11 +534,14 @@ class TwoDimension(_BaseReader):
             self.__dict__[key] = qq["qq"].reshape((self.mtype+5,self.ix,self.jx),order="F")[m,:,:]
 
 class ModelS(_BaseReader):
+    '''
+    Class for Model S based stratification data
+    '''
     def __init__(self, data):
         self.data = data
     def read(self):
         '''
-        This method read Model S based stratification.
+        Reads Model S based stratification data
         '''
         
         with open(self.datadir+'../input_data/params.txt','r') as f:
@@ -529,4 +576,4 @@ class ModelS(_BaseReader):
         
         for key in qq.dtype.names:
             if qq[key].size == self.ix:
-                self.__dict__[key] = qq[key].reshape((self.ix),order='F')                
+                self.__dict__[key] = qq[key].reshape((self.ix),order='F')

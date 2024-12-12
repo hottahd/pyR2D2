@@ -4,8 +4,17 @@ import pyR2D2
 
 class Parameters:
     '''
+    Class for managing R2D2 basic parameters
     '''
     def __init__(self, data):
+        """
+        Initialize pyR2D2.Parameters
+
+        Parameters
+        ----------
+            data : pyR2D2.Data
+                Instance of pyR2D2.Data
+        """
         from scipy.io import FortranFile
         self.data = data
         self.datadir = data.datadir
@@ -286,7 +295,7 @@ class Parameters:
             
     def summary(self):
         '''
-        Show pyR2D2.Read summary.
+        Show pyR2D2.Parameter summary.
         '''
             
         RED = '\033[31m'

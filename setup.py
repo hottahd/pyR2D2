@@ -17,7 +17,6 @@ class CustomBuildPy(build_py):
         # ビルドが成功したら、親クラスのrun()を呼び出す
         super().run()
 
-
 setup(
     name="pyR2D2",
     use_scm_version={

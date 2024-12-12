@@ -34,11 +34,11 @@ __all__ = ['Data',
            'Slice',
            'ModelS',
            'Sync',
-           'sync',
            'color',
            'constant',
            'write',
            'util',
+           'fortran_util',
            ]
 
 try:

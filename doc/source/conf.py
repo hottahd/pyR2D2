@@ -107,7 +107,7 @@ automodsumm_sort = False  # ソートを無効化（ファイル順序を優先�
 # napoleon_include_init_with_doc = True
 napoleon_use_ivar = True
 
-automodapi_inheritance_diagram = False
+automodapi_inheritance_diagram = True
 autosummary_generate = True  # autosummaryでファイルを生成
 
 automodsumm_included_members = ['__init__']
@@ -153,7 +153,6 @@ import inspect
 def autodoc_process_docstring(app, what, name, obj, options, lines):
     # Mapping of alias names (e.g., 'read', 'sync') to their respective classes
     target_classes = {
-        "read": "pyR2D2.Read.",
         "sync": "pyR2D2.Sync."
     }
 

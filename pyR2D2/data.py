@@ -9,8 +9,29 @@ class Data:
     ----------
     p : pyR2D2.Parameters
         Instance of pyR2D2.Parameters
-    read : pyR2D2.Read
-        Instance of pyR2D2.Read
+    qx : pyR2D2.XSelect
+        Instance of pyR2D2.XSelect
+    qz : pyR2D2.ZSelect
+        Instance of pyR2D2.ZSelect
+    qm : pyR2D2.MPIRegion
+        Instance of pyR2D2.MPIRegion
+    qf : pyR2D2.FullData
+        Instance of pyR2D2.FullData
+    qr : pyR2D2.RestrictedData
+        Instance of pyR2D2.RestrictedData
+    qt : pyR2D2.OpticalDepth
+        Instance of pyR2D2.OpticalDepth
+    vc : pyR2D2.OnTheFly
+        Instance of pyR2D2.OnTheFly
+    qs : pyR2D2.Slice
+        Instance of pyR2D2.Slice
+    ms : pyR2D2.ModelS
+        Instance of pyR2D2.ModelS
+    time : float
+        Time at a selected time step. See :meth:`pyR2D2.Data.time_read`
+    qc : numpy.ndarray, float
+        3D full data for checkpoint. See :meth:`pyR2D2.Data.qc_read`
+        
     sync : pyR2D2.Sync
         Instance of pyR2D2.Sync
             
