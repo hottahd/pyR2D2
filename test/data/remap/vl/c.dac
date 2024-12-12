@@ -1,4 +1,4 @@
-     100      13       5
+     100      13       5      14
  su        
  sd        
  rom       
@@ -117,3 +117,17 @@
  fk        
  fm        
  fr        
+ fvxl      
+ fvyl      
+ fvzl      
+ fbxl      
+ fbyl      
+ fbzl      
+ fsel      
+ fvxm      
+ fvym      
+ fvzm      
+ fbxm      
+ fbym      
+ fbzm      
+ fsem      

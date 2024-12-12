@@ -117,5 +117,19 @@
     "fd": "mean conductive flux",
     "fk": "mean kinetic flux",
     "fm": "mean Poynting flux",
-    "fr": "mean radiative flux"
+    "fr": "mean radiative flux",
+    "fvxl": "SH expansion of vx",
+    "fvyl": "SH expansion of vy",
+    "fvzl": "SH expansion of vz",
+    "fbxl": "SH expansion of bx",
+    "fbyl": "SH expansion of by",
+    "fbzl": "SH expansion of bz",
+    "fsel": "SH expansion of entropy",
+    "fvxm": "SH expansion of vx with m = 0",
+    "fvym": "SH expansion of vy with m = 0",
+    "fvzm": "SH expansion of vz with m = 0",
+    "fbxm": "SH expansion of bx with m = 0",
+    "fbym": "SH expansion of by with m = 0",
+    "fbzm": "SH expansion of bz with m = 0",
+    "fsem": "SH expansion of entropy with m = 0"
 }
