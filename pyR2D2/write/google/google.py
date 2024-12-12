@@ -1,7 +1,8 @@
 '''
     Functions for push information to Google Spreadsheet
 '''
-import glob, os
+import os
+import glob
 
 def init_gspread(json_key, project):
     '''
@@ -31,10 +32,7 @@ def init_gspread(json_key, project):
     
     return gc
 ################################################################################
-def fetch_URL_gspread(
-    json_key=None,
-    project=__file__.split('/')[-4],    
-    ):
+def fetch_URL_gspread(json_key = None, project = None):
     '''
     Fetchs corresponding URL for google spreadsheet
 
@@ -50,6 +48,8 @@ def fetch_URL_gspread(
     URL : str
         Google spreadsheet URL
     '''
+    if project == None:
+        project = os.getcwd().split('/')[-2]
     
     if json_key == None:
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]
@@ -58,10 +58,7 @@ def fetch_URL_gspread(
     return 'https://docs.google.com/spreadsheets/d/'+gid
 ################################################################################
 
-def set_top_line(
-    json_key=None,
-    project=__file__.split('/')[-4],
-    ):
+def set_top_line(json_key = None, project = None):
     '''
     This function set top line of google spreadsheet
 
@@ -76,6 +73,9 @@ def set_top_line(
     -------
         None
     '''
+    if project == None:
+        project = os.getcwd().split('/')[-2]    
+    
     if json_key == None:
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
     gc = init_gspread(json_key,project)
@@ -111,10 +111,7 @@ def set_top_line(
     wks.update_cells(cells)
         
 ################################################################################
-def set_cells_gspread(data,
-                json_key=None,
-                project=__file__.split('/')[-4],
-                caseid=None):
+def set_cells_gspread(data, json_key = None, project = None, caseid=None):
     '''
     Outputs parameters to Google spreadsheet
 
@@ -133,6 +130,9 @@ def set_cells_gspread(data,
     import datetime
     import numpy as np
     import pyR2D2
+
+    if project == None:
+        project = os.getcwd().split('/')[-2]
 
     if json_key == None:
         json_key = glob.glob(os.environ['HOME']+'/json/*')[0]  
