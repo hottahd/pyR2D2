@@ -1,8 +1,10 @@
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+
 import pyR2D2
-import sys, os
-import matplotlib.pyplot as plt
 import mov_util
 
 caseid = pyR2D2.util.caseid_select(locals())
@@ -44,11 +46,11 @@ else:
     d.p.XX, d.p.YY = RAE*np.cos(THE), RAE*np.sin(THE)
 
 # read initial time
-t0 = d.read.time(0,verbose=False)
+t0 = d.time_read(0,verbose=False)
 
 for n in tqdm(range(n0,d.nd_tau + 1)):
     # read data
-    t = d.read.time(n,verbose=False,tau=True) 
+    t = d.time_read(n,verbose=False,tau=True)
     
     ##############################
     
@@ -58,27 +60,27 @@ for n in tqdm(range(n0,d.nd_tau + 1)):
         tight_layout_flag = False
     
     if d.geometry == 'Cartesian':
-        d.read.qq_tau(n,verbose=False)
-        d.read.qq_slice(np.argmin(abs(d.y_slice - 0.5*d.ymax)),'y',n,verbose=False)
-        tu_height = d.qt['he'][np.argmax(d.y > d.y_slice[np.argmin(abs(d.y_slice - 0.5*d.ymax))]),:]
+        d.qt.read(n)
+        d.qs.read(np.argmin(abs(d.y_slice - 0.5*d.ymax)),'y',n)
+        tu_height = d.qt.he[np.argmax(d.y > d.y_slice[np.argmin(abs(d.y_slice - 0.5*d.ymax))]),:]
                 
-        inm = d.qt['in'].mean() # mean intensity
-        inrms = np.sqrt(((d.qt['in'] - inm)**2).mean()) # RMS intensity
+        rtm = d.qt.rt.mean() # mean intensity
+        rtrms = np.sqrt(((d.qt.rt - rtm)**2).mean()) # RMS intensity
         frms = 2.
         
-        bb = np.sqrt(d.ql["bx"]**2 + d.ql["by"]**2 + d.ql["bz"]**2)
+        bb = np.sqrt(d.qs.bx**2 + d.qs.by**2 + d.qs.bz**2)
 
-        vls = [d.qt['in']*1.e-10,
-               d.qt['bx'],
-               d.ql['te'] + TE0,
+        vls = [d.qt.rt*1.e-10,
+               d.qt.bx,
+               d.qs.te + TE0,
                bb
                ]
-        vmaxs = [(inm+inrms*frms)*1.e-10, # intensity
+        vmaxs = [(rtm + rtrms*frms)*1.e-10, # intensity
                  2.5e3, # LoS B
                  d.te0.max(),
                  8.e3, # magnetic field strength
                  ]
-        vmins = [(inm-inrms*frms)*1.e-10, # intensity
+        vmins = [(rtm - rtrms*frms)*1.e-10, # intensity
                  -2.5e3, # LoS B
                  d.te0.min(),
                  0 # magnetic field strength
@@ -91,16 +93,16 @@ for n in tqdm(range(n0,d.nd_tau + 1)):
 
         mov_util.mov_cartesian_photo_2x2(d,t-t0,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.read.qq_slice(np.argmin(abs(d.x_slice - d.xmax)),'x',n,silent=True) # xmaxに一番近いところ
-        vxrms = np.sqrt((d.ql_yin['vx']**2).mean())
-        bxrms = max(np.sqrt((d.ql_yin['bx']**2).mean()),1e-2)
+        d.qs.read(np.argmin(abs(d.x_slice - d.xmax)), 'x', n, silent=True) # xmaxに一番近いところ
+        vxrms = np.sqrt((d.qs.vx_yin**2).mean())
+        bxrms = max(np.sqrt((d.qs.bx_yin**2).mean()),1e-2)
     
         vfac = 1.e-2
         bfac = 1.e-3
     
         vls = [
-            {'Yin': d.ql_yin['vx']*vfac, 'Yan': d.ql_yan['vx']*vfac},
-            {'Yin': d.ql_yin['bx']*bfac, 'Yan': d.ql_yan['bx']*bfac},
+            {'Yin': d.qs.vx_yin*vfac, 'Yan': d.qs.vx_yan*vfac},
+            {'Yin': d.qs.bx_yin*bfac, 'Yan': d.qs.bx_yan*bfac},
         ]
         
         vmaxs = [

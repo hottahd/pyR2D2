@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pyR2D2
-import sys, os
+import os
 import pickle
 
 # R2D2.Data instanceの設定
@@ -130,24 +130,24 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
 for n in tqdm(range(n0,nd+1)):
     print(f"\r n = {n} ", end='', flush=True)
     ##############################
-    t = d.read.time(n)    
-    d.read.on_the_fly(n,verbose=False)
+    t = d.time_read(n)    
+    d.vc.read(n)
 
     ##############################    
     if d.geometry == 'Cartesian':
         fstar = d.lstar/4/np.pi/d.rstar**2
         vls = ['fe','fd','fk','fr','fm']
         for vl in vls:
-            md[vl] = np.average(d.vc[vl],axis=1)
+            md[vl] = np.average(d.vc.__dict__[vl],axis=1)
     else:
         fstar = d.lstar/4/np.pi
         vls = ['fe','fd','fk','fm']
         for vl in vls:
-            md[vl] = np.average(d.vc[vl]*sinyy_flux,axis=1)/sinyym_flux*d.x_flux**2
-        md['fr'] = np.average(d.vc["fr"]*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
+            md[vl] = np.average(d.vc.__dict__[vl]*sinyy_flux,axis=1)/sinyym_flux*d.x_flux**2
+        md['fr'] = np.average(d.vc.fr*sinyy_flux,axis=1)/sinyym_flux#*x_flux**2
     
     # linear と full　の判別のためのRMSエントロピーの計算
-    serms = np.sqrt(np.average(d.vc['serms']**2*sinyy,axis=1)/sinyym)/d.se0
+    serms = np.sqrt(np.average(d.vc.serms**2*sinyy,axis=1)/sinyym)/d.se0
     sermsm = 0.5*(np.append(serms,serms[-1]) + np.insert(serms,0,serms[0]))
     sr = 0.5*(1 + np.sign(sermsm - 1.e-4))
     
@@ -159,7 +159,7 @@ for n in tqdm(range(n0,nd+1)):
     # RMS values
     vls = ['vxrms','vyrms','vzrms','bxrms','byrms','bzrms','rorms','serms','prrms','terms']
     for vl in vls:
-        md[vl+'t'][:,n-n0] = np.sqrt(np.average(d.vc[vl]**2*sinyy,axis=1)/sinyym)
+        md[vl+'t'][:,n-n0] = np.sqrt(np.average(d.vc.__dict__[vl]**2*sinyy,axis=1)/sinyym)
 
     # energy flux
     vls = ['fe','fm','fd','fk','fr','ft','ff']
@@ -169,12 +169,12 @@ for n in tqdm(range(n0,nd+1)):
     # mean magnetic field
     vls = ['vxm','vym','vzm','bxm','bym','bzm']
     for vl in vls:
-        md[vl+'t'][:,:,n-n0] = d.vc[vl]
+        md[vl+'t'][:,:,n-n0] = d.vc.__dict__[vl]
 
     # 平均量の取得
     vls = ['rom','sem','prm','tem']
     for vl in vls:
-        md[vl+'t'][:,n-n0] = np.average(d.vc[vl]*sinyy,axis=1)/sinyym
+        md[vl+'t'][:,n-n0] = np.average(d.vc.__dict__[vl]*sinyy,axis=1)/sinyym
 
     vls = ['vxrms','vyrms','vzrms','bxrms','byrms','bzrms','sem']
     for vl in vls:
@@ -190,7 +190,7 @@ for n in tqdm(range(n0,nd+1)):
     plt.pause(0.1)
     fig.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
 
-    if n != nd:
+    if n != d.nd:
         plt.clf() # clear figure
     
     # loop end
@@ -211,8 +211,8 @@ vls = ['fe','fd','ff','fk','fr','ft']
 for vl in vls:
     md[vl] = np.average(md[vl+'t'],axis=1)
 
-with open(d.datadir + 'est.pkl','wb') as f:
-    pickle.dump([d.p.__dict__,md], f)    
+# with open(d.datadir + 'est.pkl','wb') as f:
+#     pickle.dump([d.p.__dict__,md], f)    
 
 fig2, ((ax21, ax22), (ax23, ax24)) = plt.subplots(2, 2, num='est_mean', figsize=(12, 8))
 est_plot(d,md,fig2,ax21,ax22,ax23,ax24)

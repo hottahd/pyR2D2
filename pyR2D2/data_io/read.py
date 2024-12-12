@@ -358,7 +358,7 @@ class OpticalDepth(_BaseReader):
     '''
     def __init__(self, data):
         self.data = data
-        self.value_keys = ['in','ro','se','pr','te','vx','vy','vz','bx','by','bz','he','fr']
+        self.value_keys = ['rt','ro','se','pr','te','vx','vy','vz','bx','by','bz','he','fr']
         
         for key in self.value_keys:
             for tau in ['','01','001']:

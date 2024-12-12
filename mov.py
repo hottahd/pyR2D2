@@ -1,9 +1,10 @@
+import os
+
 import numpy as np
-from tqdm import tqdm
-import pyR2D2
-import sys, os
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 import mov_util
+import pyR2D2
 
 caseid = pyR2D2.util.caseid_select(locals())
 datadir="../run/"+caseid+"/data/"
@@ -46,12 +47,12 @@ if not d.geometry == 'Cartesian':
     SINYM = SINY.sum(axis=1)
 
 # read initial time
-t0 = d.read.time(0,verbose=False)
+t0 = d.time_read(0,verbose=False)
 
 for n in tqdm(range(n0,d.nd + 1)):
     # read data
-    t = d.read.time(n,verbose=False)
-    d.read.on_the_fly(n,verbose=False)
+    t = d.time_read(n,verbose=False)
+    d.vc.read(n)
     
     ##############################
     
@@ -61,29 +62,29 @@ for n in tqdm(range(n0,d.nd + 1)):
         tight_layout_flag = False
     
     if d.geometry == 'Cartesian':
-        d.read.qq_tau(n*int(d.ifac),verbose=False)
-        tu_height = d.qt['he'][d.jc, :]
+        d.qt.read(n*int(d.ifac))
+        tu_height = d.qt.he[d.jc, :]
         
-        inm = d.qt['in'].mean() # mean intensity
-        inrms = np.sqrt(((d.qt['in'] - inm)**2).mean()) # RMS intensity
+        rtm = d.qt.rt.mean() # mean intensity
+        rtrms = np.sqrt(((d.qt.rt - rtm)**2).mean()) # RMS intensity
         frms = 2.
 
-        sem, tmp = np.meshgrid(d.vc['sem'].mean(axis=1),z,indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2).mean(axis=1)),d.z,indexing='ij')
+        sem, tmp = np.meshgrid(d.vc.sem.mean(axis=1),z,indexing='ij')
+        serms, tmp = np.meshgrid(np.sqrt((d.vc.serms**2).mean(axis=1)),d.z,indexing='ij')
         
-        bb = np.sqrt(d.vc["bx_xz"]**2 + d.vc["by_xz"]**2 + d.vc["bz_xz"]**2)        
+        bb = np.sqrt(d.vc.bx_xz**2 + d.vc.by_xz**2 + d.vc.bz_xz**2)
 
-        vls = [d.qt['in']*1.e-10,
-               d.qt['bx'],
-               (d.vc['se_xz'] - sem)/serms,
+        vls = [d.qt.rt*1.e-10,
+               d.qt.bx,
+               (d.vc.se_xz - sem)/serms,
                bb
                ]
-        vmaxs = [(inm+inrms*frms)*1.e-10, # intensity
+        vmaxs = [(rtm + rtrms*frms)*1.e-10, # intensity
                  2.5e3, # LoS B
                  2., # entropy
                  8.e3, # magnetic field strength
                  ]
-        vmins = [(inm-inrms*frms)*1.e-10, # intensity
+        vmins = [(rtm - rtrms*frms)*1.e-10, # intensity
                  -2.5e3, # LoS B
                  -2., # entropy
                  0 # magnetic field strength
@@ -95,22 +96,22 @@ for n in tqdm(range(n0,d.nd + 1)):
                 ]
         mov_util.mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.read_qq_select(d.xmax, n, silent=True)
-        vxrms = np.sqrt((d.qs['vx']**2).mean())
-        bxrms = np.sqrt((d.qs['bx']**2).mean())
+        d.qx.read(d.xmax, n, silent=True)
+        vxrms = np.sqrt((d.qs.vx**2).mean())
+        bxrms = np.sqrt((d.qs.bx**2).mean())
         
-        sem, tmp   = np.meshgrid((d.vc['sem']*SINY).sum(axis=1)/SINYM,d.y,indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.vc['serms']**2*SINY).sum(axis=1)/SINYM),d.y,indexing='ij')
+        sem, tmp   = np.meshgrid((d.sem*SINY).sum(axis=1)/SINYM,d.y,indexing='ij')
+        serms, tmp = np.meshgrid(np.sqrt((d.serms**2*SINY).sum(axis=1)/SINYM),d.y,indexing='ij')
         
         if serms.max() != 0:
-            se_value = (d.vc['se_xy']-sem)/serms
+            se_value = (d.vc.se_xy - sem)/serms
         else:
             se_value = np.zeros((d.ix, d.jx))
         
-        vls = [d.qs['vx']*1.e-2,
-               d.qs['bx']*1.e-3,
+        vls = [d.qs.vx*1.e-2,
+               d.qs.bx*1.e-3,
                se_value,
-               d.vc['bzm']
+               d.vc.bzm
                ]
         vmaxs = [2*vxrms*1.e-2, # radial velocity
                  2*bxrms*1.e-3, # radial magnetic field
