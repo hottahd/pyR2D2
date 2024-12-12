@@ -598,8 +598,12 @@ class OnTheFly(_BaseReader):
         for key in self.__dict__.keys():
             type_name = 'numpy.ndarray, float'
             
-            docstring += gene_space+f"{key} : {type_name}\n"       
-            docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+            docstring += gene_space+f"{key} : {type_name}\n"
+            if key in saved_attributes:                
+                docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+            else:
+                docstring += '\n'
+            
         self.__class__.__doc__ = self.__class__.__doc__ + docstring
 
     ##############################

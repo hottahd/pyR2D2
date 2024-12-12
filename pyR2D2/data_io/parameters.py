@@ -366,7 +366,7 @@ class Parameters:
             json.dump(updated_data, f, indent=4)
     
 
-    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json',update_json=True):
+    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json',update_json=False):
         '''
         Generate docstring for pyR2D2.Parameters
         '''
@@ -391,6 +391,9 @@ class Parameters:
             value_type = type(self.__dict__[key])
             type_name = value_type.__name__ if value_type.__module__ == "builtins" else f"{value_type.__module__}.{value_type.__name__}"
             
-            docstring += gene_space+f"{key} : {type_name}\n"       
-            docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+            docstring += gene_space+f"{key} : {type_name}\n"   
+            if key in saved_attributes:    
+                docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+            else:
+                docstring += '\n'
         self.__class__.__doc__ = self.__class__.__doc__ + docstring
