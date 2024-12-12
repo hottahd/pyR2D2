@@ -151,7 +151,7 @@ def mov_yinyang_2(data,t,vls,vmaxs,vmins,titles,
     import cartopy.crs as ccrs
     import numpy as np
 
-    data.YinYangSet()
+    data.p.yinyang_setup()
     
     xsize = 16
     ysize = 9

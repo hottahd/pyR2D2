@@ -272,7 +272,6 @@ class Parameters:
         '''
         if self.geometry == 'YinYang':
             if not 'Z_yy' in self.__dict__:
-                print('Yes')
                 self.Z_yy , self.Y_yy  = np.meshgrid(self.z_yy,self.y_yy)
                 self.Zg_yy, self.Yg_yy = np.meshgrid(self.zg_yy,self.yg_yy)
 

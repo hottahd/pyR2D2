@@ -39,7 +39,7 @@ else:
     for i in range(1,d.ix):
         xe[i] = xe[i-1] + 2*(d.x[i-1] - xe[i-1])
 
-    for j in range(1,d.p['jx']):
+    for j in range(1,d.jx):
         ye[j] = ye[j-1] + 2*(d.y[j-1] - ye[j-1])
 
     RAE, THE = np.meshgrid(xe,ye,indexing='ij')
@@ -93,7 +93,7 @@ for n in tqdm(range(n0,d.nd_tau + 1)):
 
         mov_util.mov_cartesian_photo_2x2(d,t-t0,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.qs.read(np.argmin(abs(d.x_slice - d.xmax)), 'x', n, silent=True) # xmaxに一番近いところ
+        d.qs.read(np.argmin(abs(d.x_slice - d.xmax)), 'x', n) # xmaxに一番近いところ
         vxrms = np.sqrt((d.qs.vx_yin**2).mean())
         bxrms = max(np.sqrt((d.qs.bx_yin**2).mean()),1e-2)
     
