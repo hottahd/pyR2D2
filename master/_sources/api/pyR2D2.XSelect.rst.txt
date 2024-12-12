@@ -1,0 +1,17 @@
+XSelect
+=======
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: XSelect
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~XSelect.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

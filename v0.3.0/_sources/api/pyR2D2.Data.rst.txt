@@ -10,8 +10,10 @@ Data
 
    .. autosummary::
 
-      ~Data.summary
+      ~Data.qc_read
+      ~Data.time_read
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: summary
+   .. automethod:: qc_read
+   .. automethod:: time_read

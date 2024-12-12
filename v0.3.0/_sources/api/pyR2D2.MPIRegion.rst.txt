@@ -1,0 +1,17 @@
+MPIRegion
+=========
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: MPIRegion
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MPIRegion.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

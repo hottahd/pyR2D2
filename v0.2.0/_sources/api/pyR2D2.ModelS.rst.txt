@@ -1,0 +1,17 @@
+ModelS
+======
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: ModelS
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ModelS.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

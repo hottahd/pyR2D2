@@ -1,0 +1,17 @@
+OnTheFly
+========
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: OnTheFly
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~OnTheFly.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

@@ -1,6 +1,0 @@
-caseid_select
-=============
-
-.. currentmodule:: R2D2.util
-
-.. autofunction:: caseid_select

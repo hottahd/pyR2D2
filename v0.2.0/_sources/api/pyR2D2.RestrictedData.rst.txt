@@ -1,0 +1,17 @@
+RestrictedData
+==============
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: RestrictedData
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~RestrictedData.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

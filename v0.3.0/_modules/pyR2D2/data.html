@@ -79,6 +79,7 @@
              
   <h1>Source code for pyR2D2.data</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pyR2D2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <div class="viewcode-block" id="Data">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data">[docs]</a>
@@ -88,8 +89,31 @@
 <span class="sd">    </span>
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    read : pyR2D2.Read</span>
-<span class="sd">        Instance of pyR2D2.Read</span>
+<span class="sd">    p : pyR2D2.Parameters</span>
+<span class="sd">        Instance of pyR2D2.Parameters</span>
+<span class="sd">    qx : pyR2D2.XSelect</span>
+<span class="sd">        Instance of pyR2D2.XSelect</span>
+<span class="sd">    qz : pyR2D2.ZSelect</span>
+<span class="sd">        Instance of pyR2D2.ZSelect</span>
+<span class="sd">    qm : pyR2D2.MPIRegion</span>
+<span class="sd">        Instance of pyR2D2.MPIRegion</span>
+<span class="sd">    qf : pyR2D2.FullData</span>
+<span class="sd">        Instance of pyR2D2.FullData</span>
+<span class="sd">    qr : pyR2D2.RestrictedData</span>
+<span class="sd">        Instance of pyR2D2.RestrictedData</span>
+<span class="sd">    qt : pyR2D2.OpticalDepth</span>
+<span class="sd">        Instance of pyR2D2.OpticalDepth</span>
+<span class="sd">    vc : pyR2D2.OnTheFly</span>
+<span class="sd">        Instance of pyR2D2.OnTheFly</span>
+<span class="sd">    qs : pyR2D2.Slice</span>
+<span class="sd">        Instance of pyR2D2.Slice</span>
+<span class="sd">    ms : pyR2D2.ModelS</span>
+<span class="sd">        Instance of pyR2D2.ModelS</span>
+<span class="sd">    time : float</span>
+<span class="sd">        Time at a selected time step. See :meth:`pyR2D2.Data.time_read`</span>
+<span class="sd">    qc : numpy.ndarray, float</span>
+<span class="sd">        3D full data for checkpoint. See :meth:`pyR2D2.Data.qc_read`</span>
+<span class="sd">        </span>
 <span class="sd">    sync : pyR2D2.Sync</span>
 <span class="sd">        Instance of pyR2D2.Sync</span>
 <span class="sd">            </span>
@@ -101,30 +125,92 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Initialize pyR2D2.Data</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">read</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span><span class="n">self_old</span><span class="o">=</span><span class="n">self_old</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sync</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Sync</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">=</span> <span class="n">datadir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span>  <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">XSelect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qz</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">ZSelect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qm</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">MPIRegion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qf</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">FullData</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qr</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">RestrictedData</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qt</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">OpticalDepth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vc</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">OnTheFly</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Slice</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ms</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">ModelS</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qc</span>   <span class="o">=</span> <span class="kc">None</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Sync</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="Data.summary">
-<a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.summary">[docs]</a>
-    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Rapper of :meth:`pyR2D2.Read.summary`</span>
-<span class="sd">        </span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
-
-
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        When an attribute is not found in pyR2D2.Data, it is searched in pyR2D2.Data.Read</span>
+<span class="sd">        When an attribute is not found in pyR2D2.Data, it is searched in pyR2D2.Data.p</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-            <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>  <span class="c1"># 属性が関数でない場合のみ返す</span>
-                <span class="k">return</span> <span class="n">attr</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">attr</span>
 
-        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="Data.time_read">
+<a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.time_read">[docs]</a>
+    <span class="k">def</span> <span class="nf">time_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads time at a selected time step</span>
+<span class="sd">        The data is stored in self.t</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            selected time step for data</span>
+<span class="sd">        tau : bool</span>
+<span class="sd">            if True time for optical depth (high cadence)</span>
+<span class="sd">                </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        time : float</span>
+<span class="sd">            time at a selected time step</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">tau</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">+</span><span class="s2">&quot;time/tau/t.dac.&quot;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:08d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">+</span><span class="s2">&quot;time/mhd/t.dac.&quot;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:08d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;### variales are stored in self.time ###&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span></div>
+
+
+<div class="viewcode-block" id="Data.qc_read">
+<a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.qc_read">[docs]</a>
+    <span class="k">def</span> <span class="nf">qc_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reads 3D full data for checkpoint</span>
+<span class="sd">        The data is stored in self.qc dictionary</span>
+<span class="sd">    </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            A selected time step for data</span>
+<span class="sd">        end_step : bool</span>
+<span class="sd">            If true, checkpoint of end step is read.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">step</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:08d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s1">&#39;e&#39;</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s1">&#39;o&#39;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">+</span><span class="s2">&quot;qq/qq.dac.&quot;</span><span class="o">+</span><span class="n">step</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qc</span> <span class="o">=</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ixg</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">jxg</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">kxg</span><span class="p">)</span> \
+                            <span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">),</span><span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 
@@ -160,8 +246,6 @@
         <dt>Versions</dt>
         
           <dd><a href="../../../v0.1.0/index.html">v0.1.0</a></dd>
-        
-          <dd><a href="../../../v0.1.1/index.html">v0.1.1</a></dd>
         
           <dd><a href="../../../v0.2.0/index.html">v0.2.0</a></dd>
         

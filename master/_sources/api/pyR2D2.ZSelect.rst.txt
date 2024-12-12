@@ -1,0 +1,17 @@
+ZSelect
+=======
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: ZSelect
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ZSelect.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

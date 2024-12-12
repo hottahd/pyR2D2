@@ -53,6 +53,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyR2D2 Package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pyR2D2.util">pyR2D2.util Package</a><ul>
@@ -116,15 +117,59 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Data</span></code></a>(datadir[, verbose, self_old])</p></td>
 <td><p>Class for managing R2D2 data</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Read.html#pyR2D2.Read" title="pyR2D2.Read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Read</span></code></a>(datadir[, verbose, self_old])</p></td>
-<td><p>Class for reading pyR2D2 data</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Parameters.html#pyR2D2.Parameters" title="pyR2D2.Parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Parameters</span></code></a>(data)</p></td>
+<td><p>Class for managing R2D2 basic parameters</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.Sync.html#pyR2D2.Sync" title="pyR2D2.Sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sync</span></code></a>(read)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.XSelect.html#pyR2D2.XSelect" title="pyR2D2.XSelect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XSelect</span></code></a>(data)</p></td>
+<td><p>Class for 2D selected data at a certain x</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.ZSelect.html#pyR2D2.ZSelect" title="pyR2D2.ZSelect"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZSelect</span></code></a>(data)</p></td>
+<td><p>Class for 2D selected data at a certain z</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.MPIRegion.html#pyR2D2.MPIRegion" title="pyR2D2.MPIRegion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MPIRegion</span></code></a>(data)</p></td>
+<td><p>Class for 3D data at a selected MPI process</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.FullData.html#pyR2D2.FullData" title="pyR2D2.FullData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FullData</span></code></a>(data)</p></td>
+<td><p>Class for 3D full data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.RestrictedData.html#pyR2D2.RestrictedData" title="pyR2D2.RestrictedData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RestrictedData</span></code></a>(data)</p></td>
+<td><p>Class for 3D restricted-volume data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth" title="pyR2D2.OpticalDepth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpticalDepth</span></code></a>(data)</p></td>
+<td><p>Class for 2D data at certain optical depths</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly" title="pyR2D2.OnTheFly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OnTheFly</span></code></a>(data)</p></td>
+<td><p>Class for on-the-fly analysis data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Slice.html#pyR2D2.Slice" title="pyR2D2.Slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Slice</span></code></a>(data)</p></td>
+<td><p>Class for 2D slice data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.ModelS.html#pyR2D2.ModelS" title="pyR2D2.ModelS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelS</span></code></a>(data)</p></td>
+<td><p>Class for Model S based stratification data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Sync.html#pyR2D2.Sync" title="pyR2D2.Sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sync</span></code></a>(data)</p></td>
 <td><p>Class for downloading data from remote server</p></td>
 </tr>
 </tbody>
 </table>
 </section>
+<section id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Link to this heading"></a></h2>
+<div class="graphviz"><img src="_images/inheritance-8f67af08312d3d3eb7e8562af9ec0685600d9bc7.png" alt="Inheritance diagram of pyR2D2.data.Data, pyR2D2.data_io.parameters.Parameters, pyR2D2.data_io.read.XSelect, pyR2D2.data_io.read.ZSelect, pyR2D2.data_io.read.MPIRegion, pyR2D2.data_io.read.FullData, pyR2D2.data_io.read.RestrictedData, pyR2D2.data_io.read.OpticalDepth, pyR2D2.data_io.read.OnTheFly, pyR2D2.data_io.read.Slice, pyR2D2.data_io.read.ModelS, pyR2D2.sync.sync.Sync" usemap="#inheritance03a3c8c650" class="inheritance graphviz" /></div>
+<map id="inheritance03a3c8c650" name="inheritance03a3c8c650">
+<area shape="rect" id="node1" href="api/pyR2D2.Data.html#pyR2D2.Data" target="_top" title="Class for managing R2D2 data" alt="" coords="23,252,95,277"/>
+<area shape="rect" id="node2" href="api/pyR2D2.FullData.html#pyR2D2.FullData" target="_top" title="Class for 3D full data" alt="" coords="383,5,459,31"/>
+<area shape="rect" id="node4" href="api/pyR2D2.MPIRegion.html#pyR2D2.MPIRegion" target="_top" title="Class for 3D data at a selected MPI process" alt="" coords="375,55,466,80"/>
+<area shape="rect" id="node10" href="api/pyR2D2.RestrictedData.html#pyR2D2.RestrictedData" target="_top" title="Class for 3D restricted&#45;volume data" alt="" coords="361,104,480,129"/>
+<area shape="rect" id="node13" href="api/pyR2D2.XSelect.html#pyR2D2.XSelect" target="_top" title="Class for 2D selected data at a certain x" alt="" coords="385,153,457,179"/>
+<area shape="rect" id="node14" href="api/pyR2D2.ZSelect.html#pyR2D2.ZSelect" target="_top" title="Class for 2D selected data at a certain z" alt="" coords="385,203,457,228"/>
+<area shape="rect" id="node5" href="api/pyR2D2.ModelS.html#pyR2D2.ModelS" target="_top" title="Class for Model S based stratification data" alt="" coords="201,153,273,179"/>
+<area shape="rect" id="node7" href="api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly" target="_top" title="Class for on&#45;the&#45;fly analysis data" alt="" coords="195,203,279,228"/>
+<area shape="rect" id="node8" href="api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth" target="_top" title="Class for 2D data at certain optical depths" alt="" coords="183,252,290,277"/>
+<area shape="rect" id="node11" href="api/pyR2D2.Slice.html#pyR2D2.Slice" target="_top" title="Class for 2D slice data" alt="" coords="201,301,273,327"/>
+<area shape="rect" id="node9" href="api/pyR2D2.Parameters.html#pyR2D2.Parameters" target="_top" title="Class for managing R2D2 basic parameters" alt="" coords="11,153,107,179"/>
+<area shape="rect" id="node12" href="api/pyR2D2.Sync.html#pyR2D2.Sync" target="_top" title="Class for downloading data from remote server" alt="" coords="23,104,95,129"/>
+</map></section>
 </section>
 <section id="module-pyR2D2.util">
 <span id="pyr2d2-util-package"></span><h1>pyR2D2.util Package<a class="headerlink" href="#module-pyR2D2.util" title="Link to this heading"></a></h1>
@@ -212,8 +257,6 @@
         <dt>Versions</dt>
         
           <dd><a href="../v0.1.0/index.html">v0.1.0</a></dd>
-        
-          <dd><a href="../v0.1.1/index.html">v0.1.1</a></dd>
         
           <dd><a href="../v0.2.0/pyR2D2.package.html">v0.2.0</a></dd>
         

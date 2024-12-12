@@ -1,0 +1,17 @@
+OpticalDepth
+============
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: OpticalDepth
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~OpticalDepth.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

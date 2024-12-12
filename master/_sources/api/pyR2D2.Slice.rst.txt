@@ -1,0 +1,17 @@
+Slice
+=====
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: Slice
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Slice.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

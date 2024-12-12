@@ -1,0 +1,17 @@
+FullData
+========
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: FullData
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~FullData.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read

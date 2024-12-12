@@ -1,0 +1,19 @@
+Parameters
+==========
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: Parameters
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Parameters.summary
+      ~Parameters.yinyang_setup
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: summary
+   .. automethod:: yinyang_setup
