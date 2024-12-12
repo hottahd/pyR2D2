@@ -22,7 +22,9 @@ class _BaseRemapReader(_BaseReader):
         self.data = data
         
         for key in self.data.remap_kind + self.data.remap_kind_add:
-            self.__dict__[key] = None    
+            self.__dict__[key] = None
+            
+        self._add_docstring()
                 
     def _allocate_remap_qq(self, ijk: tuple):
         """
@@ -90,9 +92,45 @@ class _BaseRemapReader(_BaseReader):
             filepath = self.datadir+"remap/qq/qq.dac."+'{0:08d}'.format(n)+"."+'{0:08d}'.format(np0)
         return filepath
     
+    def _add_docstring(self):
+        docstring = "\n"
+        docstring += "    Attributes\n"
+        docstring += "    ----------\n"
+        docstring += "    ro: numpy.ndarray, float\n"
+        docstring += "        density\n"
+        docstring += "    vx: numpy.ndarray, float\n"
+        docstring += "        x velocity\n"
+        docstring += "    vy: numpy.ndarray, float\n"
+        docstring += "        y velocity\n"
+        docstring += "    vz: numpy.ndarray, float\n"
+        docstring += "        z velocity\n"
+        docstring += "    bx: numpy.ndarray, float\n"
+        docstring += "        x magnetic field\n"
+        docstring += "    by: numpy.ndarray, float\n"
+        docstring += "        y magnetic field\n"
+        docstring += "    bz: numpy.ndarray, float\n"
+        docstring += "        z magnetic field\n"
+        docstring += "    se: numpy.ndarray, float\n"
+        docstring += "        specific entropy\n"
+        docstring += "    ph: numpy.ndarray, float\n"
+        docstring += "        div B cleaning variable\n"
+        docstring += "    pr: numpy.ndarray, float\n"
+        docstring += "        pressure\n"
+        docstring += "    te: numpy.ndarray, float\n"
+        docstring += "        temperature\n"
+        docstring += "    op: numpy.ndarray, float\n"
+        docstring += "        opacity\n"
+        
+        self.__class__.__doc__ = self.__class__.__doc__ + docstring
+    
 class XSelect(_BaseRemapReader):
     """
     Class for 2D selected data at a certain x
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qx`
+    
     """
     def read(self,xs: float,n: int):
         """
@@ -136,6 +174,11 @@ class XSelect(_BaseRemapReader):
 class ZSelect(_BaseRemapReader):
     '''
     Class for 2D selected data at a certain z
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qz`
+    
     '''
     def read(self, zs: float, n: int):
         '''
@@ -177,6 +220,11 @@ class ZSelect(_BaseRemapReader):
 class MPIRegion(_BaseRemapReader):
     '''
     Class for 3D data at a selected MPI process
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qm`
+    
     '''
     def read(self,ixrt,n):
         '''
@@ -220,6 +268,11 @@ class MPIRegion(_BaseRemapReader):
 class FullData(_BaseRemapReader):
     '''
     Class for 3D full data
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`
+    
     '''
     def read(self, n: int, value):
         '''
@@ -239,7 +292,9 @@ class FullData(_BaseRemapReader):
                 - "ph": div B cleaning
                 - "te": temperature
                 - "op": Opacity
-            If values == 'all', all values are read.
+        Notes
+        -----
+        If value is 'all', all values are read            
         '''
         
         if type(value) == str:
@@ -284,6 +339,11 @@ class FullData(_BaseRemapReader):
 class RestrictedData(_BaseRemapReader):
     '''
     Class for 3D restricted-volume data
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qr`
+    
     '''
     def read(self,n: int, value, x0: float, x1: float, y0: float, y1: float, z0: float, z1: float):
         '''
@@ -355,6 +415,46 @@ class RestrictedData(_BaseRemapReader):
 class OpticalDepth(_BaseReader):
     '''
     Class for 2D data at certain optical depths
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qt`
+    
+    Attributes
+    ----------
+    rt : numpy.ndarray, float
+        raditive intensity
+    ro : numpy.ndarray, float
+        density
+    se : numpy.ndarray, float
+        specific entropy
+    pr : numpy.ndarray, float
+        pressure
+    te : numpy.ndarray, float
+        temperature
+    vx : numpy.ndarray, float
+        x velocity
+    vy : numpy.ndarray, float
+        y velocity
+    vz : numpy.ndarray, float
+        z velocity
+    bx : numpy.ndarray, float
+        x magnetic field
+    by : numpy.ndarray, float
+        y magnetic field
+    bz : numpy.ndarray, float
+        z magnetic field
+    he : numpy.ndarray, float
+        height of the optical depth
+    fr : numpy.ndarray, float
+        raditveit flux at the optical depth
+        
+    Important
+    ---------
+    Each attibutes have three values at optical depths 1, 0.1, and 0.01
+    These correspond to, for example, rt, rt01, and rt001
+        
+        
     '''
     def __init__(self, data):
         self.data = data
@@ -387,9 +487,25 @@ class OpticalDepth(_BaseReader):
 class OnTheFly(_BaseReader):
     '''
     Class for on-the-fly analysis data
+    Mean, RMS, and correlation are done in longitudinal or z directions.
+
+
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.vc`
+    
     '''
     def __init__(self, data):
         self.data = data
+                
+        m_total  = self.m2d_xy + self.m2d_xz + self.m2d_flux 
+        if self.geometry == 'YinYang':
+            m_total += self.m2d_spex
+        
+        for m in range(m_total):
+            self.__dict__[self.cl[m]] = None
+            
+        self._generate_docstring()            
         
     def read(self, n):
         '''
@@ -436,12 +552,90 @@ class OnTheFly(_BaseReader):
 
             for m in range(self.m2d_spex):
                 self.__dict__[self.cl[m+self.m2d_xy + self.m2d_xz + self.m2d_flux]] = vl[:,:,m]
-                
+    
+    def _update_json_template(self, output_file=os.path.dirname(os.path.abspath(__file__))+'/'+'OnTheFly.json'):
+        '''
+        Generate JSON template for pyR2D2.Parameters
+        '''
+        import json
+        # Extract attributes from the instance
+        current_attributes = {k: "" for k in self.__dict__ if not k.startswith("_")}
+        
+        try:
+            with open(output_file, "r") as f:
+                existing_data = json.load(f)
+        except FileNotFoundError:
+            existing_data = {}
+            
+        updated_data = {**current_attributes, **existing_data}
+    
+    
+        # Save the template as a JSON file
+        with open(output_file, "w") as f:
+            json.dump(updated_data, f, indent=4)
+    
+
+    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'OnTheFly.json', update_json=False):
+        '''
+        Generate docstring for pyR2D2.Parameters
+        '''
+        import json
+
+        if update_json:
+            self._update_json_template(json_file)
+
+        gene_space = ''
+        desc_space = ' '*4
+        
+        docstring ="\n"
+        docstring += gene_space+'Attributes\n'
+        docstring += gene_space+'----------\n'
+        try:
+            with open(json_file, "r") as f:
+                saved_attributes = json.load(f)
+        except FileNotFoundError:
+            saved_attributes = {}
+        for key in self.__dict__.keys():
+            type_name = 'numpy.ndarray, float'
+            
+            docstring += gene_space+f"{key} : {type_name}\n"       
+            docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+        self.__class__.__doc__ = self.__class__.__doc__ + docstring
 
     ##############################
 class Slice(_BaseReader):
     '''
     Class for 2D slice data
+    
+    Important
+    ---------
+    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qs`
+    
+    Attributes
+    ----------
+    ro : numpy.ndarray, float
+        density
+    vx : numpy.ndarray, float
+        x velocity
+    vy : numpy.ndarray, float
+        y velocity
+    vz : numpy.ndarray, float
+        z velocity
+    bx : numpy.ndarray, float
+        x magnetic field
+    by : numpy.ndarray, float
+        y magnetic field
+    bz : numpy.ndarray, float
+        z magnetic field
+    se : numpy.ndarray, float
+        specific entropy
+    ph : numpy.ndarray, float
+        div B cleaning variable
+    pr : numpy.ndarray, float
+        pressure
+    te : numpy.ndarray, float
+        temperature
+
     '''
     def __init__(self, data):
         self.data = data

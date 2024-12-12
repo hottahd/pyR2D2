@@ -13,8 +13,8 @@ class Parameters:
 
         Parameters
         ----------
-            data : pyR2D2.Data
-                Instance of pyR2D2.Data
+        data : pyR2D2.Data
+            Instance of pyR2D2.Data
         """
         from scipy.io import FortranFile
         self.data = data
@@ -366,13 +366,14 @@ class Parameters:
             json.dump(updated_data, f, indent=4)
     
 
-    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json'):
+    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json',update_json=True):
         '''
         Generate docstring for pyR2D2.Parameters
         '''
         import json
 
-        self._update_json_template(json_file)
+        if update_json:
+            self._update_json_template(json_file)
 
         gene_space = ''
         desc_space = ' '*4
@@ -392,4 +393,4 @@ class Parameters:
             
             docstring += gene_space+f"{key} : {type_name}\n"       
             docstring += gene_space+desc_space + saved_attributes[key]+'\n'
-        self.__class__.__doc__ = docstring
+        self.__class__.__doc__ = self.__class__.__doc__ + docstring

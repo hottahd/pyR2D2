@@ -59,7 +59,7 @@ class Sync:
                 +' -e "'+ssh+'" ' \
                 +server+':work/'+project+'/run/'+caseid+'/'+' '+dist+caseid+'/')
             
-    def tau(self,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
+    def tau(self,server, n: int = None, ssh='ssh', project=os.getcwd().split('/')[-2]):
         '''
         Downloads data at constant optical depth
 
@@ -74,6 +74,12 @@ class Sync:
         '''
 
         import os
+        
+        if n is None:
+            filedir = ''
+            filename = ' '
+        else:
+            filename = 'tau/qq.dac.'+str(n).zfill(8)
 
         caseid = self.datadir.split('/')[-3]
         os.system('rsync -avP' \
@@ -83,7 +89,7 @@ class Sync:
                 +' --exclude="slice" ' \
                 +' --exclude="time/mhd" ' \
                 +' -e "'+ssh+'" ' \
-                +server+':work/'+project+'/run/'+caseid+'/data/ '+self.datadir )
+                +server+':work/'+project+'/run/'+caseid+'/data/'+filename+' '+self.datadir+filename )
         
     def remap_qq(self,n,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
@@ -117,7 +123,7 @@ class Sync:
                 +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.'+str(n).zfill(8)+'.'+ns \
                     +' '+self.datadir + 'remap/qq/'+par_dir+chi_dir)
         
-    def select(self,xs,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
+    def select(self,xs,server, n: int = None, ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
         Downloads data at certain height
 
@@ -143,6 +149,11 @@ class Sync:
 
         files = ''
         caseid = self.datadir.split('/')[-3]
+        
+        if n is None:
+            filename_part = 'qq.dac.*.'
+        else:
+            filename_part = 'qq.dac.'+str(n).zfill(8)+'.'
 
         for ns in nps:
             par_dir = str(int(ns)//1000).zfill(5)+'/'
@@ -151,7 +162,7 @@ class Sync:
             os.makedirs(self.datadir + 'remap/qq/'+par_dir+chi_dir,exist_ok=True)
             os.system('rsync -avP ' \
                 +' -e "'+ssh+'" ' \
-                +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+'qq.dac.*.'+ns \
+                +server+':work/'+project+'/run/'+caseid+'/data/remap/qq/'+par_dir+chi_dir+filename_part+ns \
                     +' '+self.datadir + 'remap/qq/'+par_dir+chi_dir)
             
     def vc(self,server,ssh='ssh',project=os.getcwd().split('/')[-2]):
