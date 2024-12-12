@@ -1,6 +1,0 @@
-write_3D
-========
-
-.. currentmodule:: R2D2.write.vtk
-
-.. autofunction:: write_3D

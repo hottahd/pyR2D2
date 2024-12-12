@@ -5,15 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.data_io.parameters &mdash; R2D2 Document unknown documentation</title>
+  <title>pyR2D2.data_io.parameters &mdash; R2D2 Document 0.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bd887c6c" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=3f1b9271"></script>
+      <script src="../../../_static/documentation_options.js?v=4621528c"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -50,7 +51,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 </ul>
 
         </div>
@@ -80,6 +80,7 @@
   <h1>Source code for pyR2D2.data_io.parameters</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pydoc</span>
 <span class="kn">import</span> <span class="nn">pyR2D2</span>
 
 <div class="viewcode-block" id="Parameters">
@@ -96,8 +97,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">            data : pyR2D2.Data</span>
-<span class="sd">                Instance of pyR2D2.Data</span>
+<span class="sd">        data : pyR2D2.Data</span>
+<span class="sd">            Instance of pyR2D2.Data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">FortranFile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
@@ -347,7 +348,10 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">+</span><span class="s1">&#39;cont_log.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="mi">6</span><span class="p">][</span><span class="o">-</span><span class="mi">11</span><span class="p">:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;N/A&#39;</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="s1">&#39;N/A&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_docstring</span><span class="p">()</span></div>
+
 
 
 <div class="viewcode-block" id="Parameters.yinyang_setup">
@@ -428,7 +432,62 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;time step (nd_tau) =&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nd_tau</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;time =&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">/</span><span class="mi">3600</span><span class="p">),</span><span class="s1">&#39; [hour]&#39;</span><span class="p">)</span></div>
-</div>
+
+        
+
+    <span class="k">def</span> <span class="nf">_update_json_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="s1">&#39;parameters.json&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generate JSON template for pyR2D2.Parameters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="c1"># Extract attributes from the instance</span>
+        <span class="n">current_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)}</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">existing_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">existing_data</span> <span class="o">=</span> <span class="p">{}</span>
+            
+        <span class="n">updated_data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">current_attributes</span><span class="p">,</span> <span class="o">**</span><span class="n">existing_data</span><span class="p">}</span>
+    
+    
+        <span class="c1"># Save the template as a JSON file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">updated_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_generate_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">json_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="s1">&#39;parameters.json&#39;</span><span class="p">,</span><span class="n">update_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generate docstring for pyR2D2.Parameters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="k">if</span> <span class="n">update_json</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_json_template</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+        <span class="n">gene_space</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">desc_space</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">4</span>
+        
+        <span class="n">docstring</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">docstring</span> <span class="o">+=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="s1">&#39;Attributes</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="s1">&#39;----------</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">saved_attributes</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">saved_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">value_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">type_name</span> <span class="o">=</span> <span class="n">value_type</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">if</span> <span class="n">value_type</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="s2">&quot;builtins&quot;</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value_type</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">value_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            
+            <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">type_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>   
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">saved_attributes</span><span class="p">:</span>    
+                <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="n">desc_space</span> <span class="o">+</span> <span class="n">saved_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">docstring</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+</span> <span class="n">docstring</span></div>
 
 </pre></div>
 
@@ -468,6 +527,8 @@
           <dd><a href="../../../../v0.2.0/index.html">v0.2.0</a></dd>
         
           <dd><a href="../../../../v0.3.0/index.html">v0.3.0</a></dd>
+        
+          <dd><a href="../../../../v0.3.1/index.html">v0.3.1</a></dd>
         
           <dd><a href="parameters.html">master</a></dd>
         

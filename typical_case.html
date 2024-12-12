@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>典型的計算例 &mdash; R2D2 Document 0.3.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=4621528c"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyR2D2" href="pyr2d2.html" />
+    <link rel="prev" title="R2D2を使うための環境設定" href="environment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">典型的計算例</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">デカルト座標</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">小規模局所光球計算</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">中規模黒点計算</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">全対流層計算</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">深い部分のみの計算</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yin-yang">球座標(Yin-Yang格子含む)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Yin-Yangで深いところのみの計算</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id9">2次元計算</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">磁束管浮上</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">典型的計算例</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/typical_case.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>典型的計算例<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>ここでは、典型的計算設定について紹介する。</p>
+<section id="id2">
+<h2>デカルト座標<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>小規模局所光球計算<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2005A%26A...429..335V/abstract">Vögler et al., 2005</a> などで行われている小規模局所光球計算の設定を説明する。</p>
+<ul>
+<li><dl class="simple">
+<dt>Makefileのオプション</dt><dd><p>指定するオプションは
+光球のみ一様グリッドで計算するので, 複数方向輻射輸送で計算する。以下が指定されていたコメントアウトする。</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC</span> <span class="pre">:=</span> <span class="pre">-Done_ray</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>計算領域・解像度</dt><dd><p>計算領域は鉛直方向(R2D2ではx方向)にrsun から700 km上から5.444 Mm下までをとる。水平方向(R2D2ではyとz方向)には、6.144 Mmずつとる。</p>
+<p>太陽光球を計算するときは、鉛直方向には少なくとも48 km, 水平方向には少なくとも192 kmの格子間隔が必要である。ここでは各方向に48 kmの格子点間隔をとることにして、各方向に128グリッドづつ格子点を用意する。ここではMPIプロセスを2×2×2プロセス使う例を示す。これらの設定は <code class="code docutils literal notranslate"><span class="pre">src/all/geometry_def.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">ny0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">nz0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ix0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">jx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">kx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="p">...</span>
+
+<span class="cp">#ifdef deep</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsun</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.7d8</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsun</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">5.444d8</span>
+<span class="cp">#endif</span>
+
+<span class="p">...</span>
+
+<span class="cp">#ifndef ideal</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.144d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.144d0</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>と設定する。念のために</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xdcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ydcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zdcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="p">...</span>
+
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">jper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">kper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>となっているかチェックする。全て <code class="code docutils literal notranslate"><span class="pre">xdcheck</span></code> などは2に設定してあると3次元計算となる。<code class="code docutils literal notranslate"><span class="pre">iper</span></code> はそれぞれの方向に周期境界条件を使うかのフラグである。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>音速抑制法</dt><dd><p>光球のみ計算の時は、音速抑制法を使う必要は無いので、音速抑制率を常に1に設定する。
+<code class="code docutils literal notranslate"><span class="pre">src/all/background_init.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef ideal</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+
+<span class="p">...</span>
+
+<span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="n">ix00</span>
+<span class="w">    </span><span class="c">!xi00(i) = max(1.d0,160.d0*(ro00(i)/rob))**(1.d0/3.d0)*sqrt(dprdro(i)/dprdrob)</span>
+<span class="w">    </span><span class="n">xi00</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d0</span>
+
+<span class="w">    </span><span class="p">...</span>
+<span class="k">end do</span>
+
+<span class="p">...</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>と設定する。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>境界条件</dt><dd><p>水平方向は周期境界を用いるので、鉛直方向の境界条件のみを設定すれば良い。
+磁場の上部境界条件はポテンシャル磁場の境界条件を用いる。他の設定はVöglerの論文を参照。
+<code class="code docutils literal notranslate"><span class="pre">src/all/bc_all.F90</span></code> で設定している。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef ideal</span>
+<span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+
+<span class="cp">#ifdef deep</span>
+<span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">call </span><span class="n">bcx</span><span class="p">(</span><span class="n">qq</span><span class="p">)</span>
+<span class="w">    </span><span class="c">!call bcx_whole(qq)</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>とする。 <code class="code docutils literal notranslate"><span class="pre">bcx(qq)</span></code> が実行されるようにする。
+また、念のため</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">call </span><span class="n">bc_potential</span><span class="p">(</span><span class="n">qq</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>がコメントアウトされていないかチェックする。</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>輻射輸送</dt><dd><p>輻射輸送は複数本の光線を解くのが良い。Makefileで <code class="code docutils literal notranslate"><span class="pre">PPC:</span> <span class="pre">=</span> <span class="pre">-Done_ray</span></code> を設定しないようにする。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>初期条件</dt><dd><p>初期条件は、鉛直方向速度(vx)にランダムな微小速度を与えている。プラージュ領域を計算したい場合は
+<code class="code docutils literal notranslate"><span class="pre">model_init.F90</span></code> で</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">bx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="mf">0.d0</span>
+</pre></div>
+</div>
+<p>とすれば良い.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>出力アウトプット</dt><dd><p>ここは本当は完全に自由だが、データの出力の設定である。粒状斑の動きを詳しく見ようと思ったら30秒ほどの時間ケーデンスで出力するのが良い。
+<code class="code docutils literal notranslate"><span class="pre">main.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">dtout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="mf">0.d0</span>
+<span class="n">ifac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>その他注意事項</dt><dd><p><code class="code docutils literal notranslate"><span class="pre">model_def.F90</span></code> で <code class="code docutils literal notranslate"><span class="pre">remap_calc.F90</span></code> で出力するスライスの位置を決定している。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">jc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ny</span><span class="o">*</span><span class="n">jx0</span><span class="o">/</span><span class="mi">2</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">kc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nz</span><span class="o">*</span><span class="n">kx0</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>と領域の真ん中を出力することにしているが、状況によって違う場所が出力されている場合がある。もし変なことが起こったらここをチェックしてみると良い。</p>
+<p>また、 <code class="code docutils literal notranslate"><span class="pre">io.F90</span></code> の中程に計算の途中に磁場などを追加する設定がある。ここに何か書いてあると初期条件に足してしまうので、add something で検索して <code class="code docutils literal notranslate"><span class="pre">call</span> <span class="pre">model_*</span></code> (*は任意)のところはコメントアウトするように。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>計算結果</dt><dd><p>以下のような計算が得られる。</p>
+<a class="reference internal image-reference" href="_images/photosphere.png"><img alt="_images/photosphere.png" src="_images/photosphere.png" style="width: 500px;" />
+</a>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h3>中規模黒点計算<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2012ApJ...750...62R/abstract">Rempel, 2012</a> で行われている中規模光球計算の設定を説明する。</p>
+<ul>
+<li><dl class="simple">
+<dt>Makefileのオプション</dt><dd><p>光球のみ一様グリッドで計算するので, <code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">-Ddeep</span></code> を設定していないかチェック。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>計算領域・解像度</dt><dd><p>計算領域は鉛直方向(R2D2ではx方向)にrsun から700 km上から5.444 Mm下までをとる。水平方向(R2D2ではyとz方向)には、49.152 Mmずつとる。</p>
+<p>太陽光球を計算するときは、鉛直方向には少なくとも48 km, 水平方向には少なくとも192 kmの格子間隔が必要である。ここでは鉛直方向に48 km、水平方向に96 kmの格子点間隔をとることにして、鉛直方向に128グリッド、水平方向に512グリッドづつ格子点を用意する。ここではMPIプロセスを2×4×4プロセス使う例を示す。これらの設定は <code class="code docutils literal notranslate"><span class="pre">src/all/geometry_def.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef deep</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#elif ideal</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsun</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.7d8</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rsun</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">5.444d8</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#ifndef ideal</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="mf">9.152d8</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="mf">9.152d8</span>
+<span class="cp">#endif</span>
+
+<span class="p">...</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">ny0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="n">nz0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">128</span>
+
+<span class="p">...</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ix0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">jx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">kx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+</pre></div>
+</div>
+<p>と設定する。念のために</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xdcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ydcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zdcheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="p">...</span>
+
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">iper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">jper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">kper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>となっているかチェックする。全て <code class="code docutils literal notranslate"><span class="pre">xdcheck</span></code> などは2に設定してあると3次元計算となる。<code class="code docutils literal notranslate"><span class="pre">iper</span></code> はそれぞれの方向に周期境界条件を使うかのフラグである。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>音速抑制法</dt><dd><p>光球のみ計算の時は、音速抑制法を使う必要は無いので、音速抑制率を常に1に設定する。
+<code class="code docutils literal notranslate"><span class="pre">src/all/background_init.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef ideal</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+
+<span class="p">...</span>
+
+<span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="n">ix00</span>
+<span class="w">    </span><span class="c">!xi00(i) = max(1.d0,160.d0*(ro00(i)/rob))**(1.d0/3.d0)*sqrt(dprdro(i)/dprdrob)</span>
+<span class="w">    </span><span class="n">xi00</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d0</span>
+
+<span class="w">    </span><span class="p">...</span>
+<span class="k">end do</span>
+
+<span class="p">...</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>と設定する。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>境界条件</dt><dd><p>水平方向は周期境界を用いるので、鉛直方向の境界条件のみを設定すれば良い。
+磁場の上部境界条件はポテンシャル磁場の境界条件を用いる。他の設定はRempelの論文を参照。
+<code class="code docutils literal notranslate"><span class="pre">src/all/bc_all.F90</span></code> で設定している。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef ideal</span>
+<span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+
+<span class="cp">#ifdef deep</span>
+<span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="k">call </span><span class="n">bcx_sunspot</span><span class="p">(</span><span class="n">qq</span><span class="p">)</span>
+<span class="w">    </span><span class="c">!call bcx(qq)</span>
+<span class="w">    </span><span class="c">!call bcx_whole(qq)</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>とする。 <code class="code docutils literal notranslate"><span class="pre">bcx_sunspot(qq)</span></code> が実行されるようにする。
+また、念のため</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">call </span><span class="n">bc_potential</span><span class="p">(</span><span class="n">qq</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>がコメントアウトされていないかチェックする。</p>
+<p>ポテンシャル磁場から少しずらしたい時は、 <code class="code docutils literal notranslate"><span class="pre">mhd_def.F90</span></code> の中でRempel, 2012で定義されている <img class="math" src="_images/math/2841b4d2731ceadeb2d0bdf7e9e4aab5d5bfebfd.svg" alt="\alpha"/> が定義されている。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">potential_alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.5d0</span>
+</pre></div>
+</div>
+<p>などとする。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>輻射輸送</dt><dd><p>輻射輸送は複数本の光線を解くのが良い。
+<code class="code docutils literal notranslate"><span class="pre">rte_def.F90</span></code> を編集する。推奨される設定は</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rte_multiray_flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">true</span><span class="p">.</span>
+<span class="kt">logical</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">rte_linear_flag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">.</span><span class="n">false</span><span class="p">.</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">mhd_rte_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>とするのが良い。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>初期条件</dt><dd><p>初期条件は、鉛直方向速度(vx)にランダムな微小速度を与えている。
+黒点以外は磁場をゼロにしておく。
+<code class="code docutils literal notranslate"><span class="pre">model_init.F90</span></code> で</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">bx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="n">bz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+</pre></div>
+</div>
+<p>とすれば良い.</p>
+<p>黒点設置のために <code class="code docutils literal notranslate"><span class="pre">model_sunspot.F90</span></code> を編集。いくつかパラメタがあるが、変えたい時はプログラムのコメントを参照すること。 <code class="code docutils literal notranslate"><span class="pre">io.F90</span></code> を編集し、</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="c">!add something</span>
+<span class="n">time00</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="k">if</span><span class="p">(</span><span class="n">ns</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="w"> </span><span class="n">nd</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<span class="k">    call </span><span class="n">model_sunspot</span>
+<span class="k">endif</span>
+</pre></div>
+</div>
+<p>とする。デフォルトでは、 <code class="code docutils literal notranslate"><span class="pre">call</span> <span class="pre">model_sunspot</span></code> がコメントアウトされていることが多いと思われる。</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>出力アウトプット</dt><dd><p>ここは本当は完全に自由だが、データの出力の設定である。粒状斑の動きを詳しく見ようと思ったら30秒ほどの時間ケーデンスで出力するのが良い。
+<code class="code docutils literal notranslate"><span class="pre">main.F90</span></code> を編集。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">dtout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="mf">0.d0</span>
+<span class="n">ifac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>その他注意事項</dt><dd><p><code class="code docutils literal notranslate"><span class="pre">model_def.F90</span></code> で <code class="code docutils literal notranslate"><span class="pre">remap_calc.F90</span></code> で出力するスライスの位置を決定している。</p>
+<p>と領域の真ん中を出力することにしているが、状況によって違う場所が出力されている場合がある。もし変なことが起こったらここをチェックしてみると良い。</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h3>全対流層計算<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<div class="admonition-todo admonition" id="id6">
+<p class="admonition-title">Todo</p>
+<p>全対流層計算の設定例</p>
+</div>
+</section>
+<section id="id7">
+<h3>深い部分のみの計算<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Makefileのオプション</p>
+<blockquote>
+<div><div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nf">PPC</span><span class="o">:</span><span class="w"> </span>= -<span class="n">Ddeep</span> <span class="c"># 深い層のみ</span>
+<span class="nf">PPC</span><span class="o">:</span><span class="w"> </span>= -<span class="n">Done_ray</span> <span class="c"># ここでは輻射輸送は解かないがone_rayとしておくことでメモリ節約</span>
+<span class="nf">PPC</span><span class="o">:</span><span class="w"> </span>= -<span class="n">Dremap_</span>2<span class="n">d_assign</span> <span class="c"># remapで2次元的に出力する</span>
+<span class="nf">PPC</span><span class="o">:</span><span class="w"> </span>= -<span class="n">Dsoundwave_suppress</span> <span class="c"># 音波が暴走するのを抑える</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>計算領域・解像度</p>
+<blockquote>
+<div><p>水平方向には太陽半径程度、鉛直方向には <img class="math" src="_images/math/97df08540cf10cf53a4376b036806abcc0bc87bf.svg" alt="0.71R_\odot"/> から <img class="math" src="_images/math/4c8bf23afd4adf2b2e4712602186976eccfbe5f7.svg" alt="0.96R_\odot"/> 程度までがおすすめ。</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="p">,</span><span class="w"> </span><span class="k">private</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">nx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">ny0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">nz0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span>
+<span class="kt">integer</span><span class="p">,</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ix0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">jx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">kx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="p">...</span>
+
+<span class="cp">#ifdef deep</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.96d0</span><span class="o">*</span><span class="n">rstar</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">xmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.71d0</span><span class="o">*</span><span class="n">rstar</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#endif</span>
+
+<span class="p">...</span>
+
+<span class="cp">#ifdef deep</span>
+<span class="w">    </span><span class="c">! for deep CZ calculation</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">ymax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rstar</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zmin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.d0</span>
+<span class="w">    </span><span class="kt">real</span><span class="p">(</span><span class="nb">KIND</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)),</span><span class="w"> </span><span class="k">parameter</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">zmax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rstar</span>
+<span class="cp">#else</span>
+<span class="w">    </span><span class="c">! for surface calculation</span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>音速抑制法</p></li>
+<li><dl class="simple">
+<dt>音速抑制法</dt><dd><p>対流層の深い部分のみを計算する場合は、音速と熱対流の比が大体同程度となるように設定する。
+<code class="code docutils literal notranslate"><span class="pre">src/all/background_init.F90</span></code> で設定しているがやや複雑なことをしているので、このままにしておくと良いであろう。</p>
+</dd>
+</dl>
+</li>
+<li><p>境界条件</p>
+<blockquote>
+<div><p><code class="code docutils literal notranslate"><span class="pre">scr/all/bc_all.F90</span></code> を見ると良い</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef spherical</span>
+<span class="w">  </span><span class="p">...</span><span class="w"> </span><span class="p">(</span><span class="n">ignore</span><span class="w"> </span><span class="n">this</span><span class="p">)</span>
+<span class="cp">#else</span>
+<span class="w">  </span><span class="k">call </span><span class="n">bcx_deep</span><span class="p">(</span><span class="n">qq</span><span class="p">)</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>となっていればオーケー</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>輻射輸送</dt><dd><p>対流層の深い部分では、輻射輸送を解く必要はない。</p>
+</dd>
+</dl>
+</li>
+<li><p>初期条件
+初期条件では、鉛直方向速度(vx)にランダムな微小速度を与えている。磁場を入れたい場合は、適当な値を <code class="code docutils literal notranslate"><span class="pre">model_init.F90</span></code> で設定すれば良い。</p></li>
+</ul>
+</section>
+</section>
+<section id="yin-yang">
+<h2>球座標(Yin-Yang格子含む)<a class="headerlink" href="#yin-yang" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>Yin-Yangで深いところのみの計算<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Makefileのオプション</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-Ddeep</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-Done_ray</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-Ddeep</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-Dspherical</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-DYinYang</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-DnoFFTW</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PPC:=</span> <span class="pre">$(PPC)</span> <span class="pre">-Dremap_2d_assign</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>格子点数</dt><dd><ul class="simple">
+<li><p>Yin-Yang gridを使うために <code class="code docutils literal notranslate"><span class="pre">ny0*jx0*3=nz0*kx0</span></code> となるようにする</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+<section id="id9">
+<h2>2次元計算<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<section id="id10">
+<h3>磁束管浮上<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>最終更新日：Dec 12, 2024</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="environment.html" class="btn btn-neutral float-left" title="R2D2を使うための環境設定" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyr2d2.html" class="btn btn-neutral float-right" title="pyR2D2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

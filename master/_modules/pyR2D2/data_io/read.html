@@ -5,15 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.data_io.read &mdash; R2D2 Document 0.3.1.dev3+dirty documentation</title>
+  <title>pyR2D2.data_io.read &mdash; R2D2 Document 0.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bd887c6c" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=ee6aceb1"></script>
+      <script src="../../../_static/documentation_options.js?v=4621528c"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -50,7 +51,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 </ul>
 
         </div>
@@ -102,7 +102,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">remap_kind</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">remap_kind_add</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>    
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_docstring</span><span class="p">()</span>
                 
     <span class="k">def</span> <span class="nf">_allocate_remap_qq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ijk</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -170,11 +172,47 @@
             <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">+</span><span class="s2">&quot;remap/qq/qq.dac.&quot;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:08d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:08d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">filepath</span>
     
+    <span class="k">def</span> <span class="nf">_add_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">docstring</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    Attributes</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    ----------</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    ro: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        density</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    vx: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        x velocity</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    vy: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        y velocity</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    vz: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        z velocity</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    bx: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        x magnetic field</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    by: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        y magnetic field</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    bz: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        z magnetic field</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    se: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        specific entropy</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    ph: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        div B cleaning variable</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    pr: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        pressure</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    te: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        temperature</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    op: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        opacity</span><span class="se">\n</span><span class="s2">&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+</span> <span class="n">docstring</span>
+    
 <div class="viewcode-block" id="XSelect">
 <a class="viewcode-back" href="../../../api/pyR2D2.XSelect.html#pyR2D2.XSelect">[docs]</a>
 <span class="k">class</span> <span class="nc">XSelect</span><span class="p">(</span><span class="n">_BaseRemapReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for 2D selected data at a certain x</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qx`</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="XSelect.read">
 <a class="viewcode-back" href="../../../api/pyR2D2.XSelect.html#pyR2D2.XSelect.read">[docs]</a>
@@ -224,6 +262,11 @@
 <span class="k">class</span> <span class="nc">ZSelect</span><span class="p">(</span><span class="n">_BaseRemapReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 2D selected data at a certain z</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qz`</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="ZSelect.read">
 <a class="viewcode-back" href="../../../api/pyR2D2.ZSelect.html#pyR2D2.ZSelect.read">[docs]</a>
@@ -271,6 +314,11 @@
 <span class="k">class</span> <span class="nc">MPIRegion</span><span class="p">(</span><span class="n">_BaseRemapReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 3D data at a selected MPI process</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qm`</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="MPIRegion.read">
 <a class="viewcode-back" href="../../../api/pyR2D2.MPIRegion.html#pyR2D2.MPIRegion.read">[docs]</a>
@@ -320,6 +368,11 @@
 <span class="k">class</span> <span class="nc">FullData</span><span class="p">(</span><span class="n">_BaseRemapReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 3D full data</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="FullData.read">
 <a class="viewcode-back" href="../../../api/pyR2D2.FullData.html#pyR2D2.FullData.read">[docs]</a>
@@ -341,7 +394,9 @@
 <span class="sd">                - &quot;ph&quot;: div B cleaning</span>
 <span class="sd">                - &quot;te&quot;: temperature</span>
 <span class="sd">                - &quot;op&quot;: Opacity</span>
-<span class="sd">            If values == &#39;all&#39;, all values are read.</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If value is &#39;all&#39;, all values are read            </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
@@ -390,6 +445,11 @@
 <span class="k">class</span> <span class="nc">RestrictedData</span><span class="p">(</span><span class="n">_BaseRemapReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 3D restricted-volume data</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qr`</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="RestrictedData.read">
 <a class="viewcode-back" href="../../../api/pyR2D2.RestrictedData.html#pyR2D2.RestrictedData.read">[docs]</a>
@@ -467,6 +527,46 @@
 <span class="k">class</span> <span class="nc">OpticalDepth</span><span class="p">(</span><span class="n">_BaseReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 2D data at certain optical depths</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qt`</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rt : numpy.ndarray, float</span>
+<span class="sd">        raditive intensity</span>
+<span class="sd">    ro : numpy.ndarray, float</span>
+<span class="sd">        density</span>
+<span class="sd">    se : numpy.ndarray, float</span>
+<span class="sd">        specific entropy</span>
+<span class="sd">    pr : numpy.ndarray, float</span>
+<span class="sd">        pressure</span>
+<span class="sd">    te : numpy.ndarray, float</span>
+<span class="sd">        temperature</span>
+<span class="sd">    vx : numpy.ndarray, float</span>
+<span class="sd">        x velocity</span>
+<span class="sd">    vy : numpy.ndarray, float</span>
+<span class="sd">        y velocity</span>
+<span class="sd">    vz : numpy.ndarray, float</span>
+<span class="sd">        z velocity</span>
+<span class="sd">    bx : numpy.ndarray, float</span>
+<span class="sd">        x magnetic field</span>
+<span class="sd">    by : numpy.ndarray, float</span>
+<span class="sd">        y magnetic field</span>
+<span class="sd">    bz : numpy.ndarray, float</span>
+<span class="sd">        z magnetic field</span>
+<span class="sd">    he : numpy.ndarray, float</span>
+<span class="sd">        height of the optical depth</span>
+<span class="sd">    fr : numpy.ndarray, float</span>
+<span class="sd">        raditveit flux at the optical depth</span>
+<span class="sd">        </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    Each attibutes have three values at optical depths 1, 0.1, and 0.01</span>
+<span class="sd">    These correspond to, for example, rt, rt01, and rt001</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="OpticalDepth.__init__">
 <a class="viewcode-back" href="../../../api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth.__init__">[docs]</a>
@@ -508,11 +608,27 @@
 <span class="k">class</span> <span class="nc">OnTheFly</span><span class="p">(</span><span class="n">_BaseReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for on-the-fly analysis data</span>
+<span class="sd">    Mean, RMS, and correlation are done in longitudinal or z directions.</span>
+
+
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.vc`</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="OnTheFly.__init__">
 <a class="viewcode-back" href="../../../api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+                
+        <span class="n">m_total</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_xy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_xz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_flux</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;YinYang&#39;</span><span class="p">:</span>
+            <span class="n">m_total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_spex</span>
+        
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_total</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cl</span><span class="p">[</span><span class="n">m</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_docstring</span><span class="p">()</span>            </div>
 
         
 <div class="viewcode-block" id="OnTheFly.read">
@@ -562,9 +678,61 @@
 
             <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">m2d_spex</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cl</span><span class="p">[</span><span class="n">m</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">m2d_xy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_xz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">m2d_flux</span><span class="p">]]</span> <span class="o">=</span> <span class="n">vl</span><span class="p">[:,:,</span><span class="n">m</span><span class="p">]</span></div>
-</div>
 
-                
+    
+    <span class="k">def</span> <span class="nf">_update_json_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="s1">&#39;OnTheFly.json&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generate JSON template for pyR2D2.Parameters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="c1"># Extract attributes from the instance</span>
+        <span class="n">current_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)}</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">existing_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">existing_data</span> <span class="o">=</span> <span class="p">{}</span>
+            
+        <span class="n">updated_data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">current_attributes</span><span class="p">,</span> <span class="o">**</span><span class="n">existing_data</span><span class="p">}</span>
+    
+    
+        <span class="c1"># Save the template as a JSON file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">updated_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_generate_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">json_file</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="s1">&#39;OnTheFly.json&#39;</span><span class="p">,</span> <span class="n">update_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Generate docstring for pyR2D2.Parameters</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="k">if</span> <span class="n">update_json</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_json_template</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+        <span class="n">gene_space</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">desc_space</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">4</span>
+        
+        <span class="n">docstring</span> <span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="s1">&#39;Attributes</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="s1">&#39;----------</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">saved_attributes</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">saved_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">type_name</span> <span class="o">=</span> <span class="s1">&#39;numpy.ndarray, float&#39;</span>
+            
+            <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">type_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">saved_attributes</span><span class="p">:</span>                
+                <span class="n">docstring</span> <span class="o">+=</span> <span class="n">gene_space</span><span class="o">+</span><span class="n">desc_space</span> <span class="o">+</span> <span class="n">saved_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">docstring</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+</span> <span class="n">docstring</span></div>
+
 
     <span class="c1">##############################</span>
 <div class="viewcode-block" id="Slice">
@@ -572,6 +740,36 @@
 <span class="k">class</span> <span class="nc">Slice</span><span class="p">(</span><span class="n">_BaseReader</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class for 2D slice data</span>
+<span class="sd">    </span>
+<span class="sd">    Important</span>
+<span class="sd">    ---------</span>
+<span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qs`</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ro : numpy.ndarray, float</span>
+<span class="sd">        density</span>
+<span class="sd">    vx : numpy.ndarray, float</span>
+<span class="sd">        x velocity</span>
+<span class="sd">    vy : numpy.ndarray, float</span>
+<span class="sd">        y velocity</span>
+<span class="sd">    vz : numpy.ndarray, float</span>
+<span class="sd">        z velocity</span>
+<span class="sd">    bx : numpy.ndarray, float</span>
+<span class="sd">        x magnetic field</span>
+<span class="sd">    by : numpy.ndarray, float</span>
+<span class="sd">        y magnetic field</span>
+<span class="sd">    bz : numpy.ndarray, float</span>
+<span class="sd">        z magnetic field</span>
+<span class="sd">    se : numpy.ndarray, float</span>
+<span class="sd">        specific entropy</span>
+<span class="sd">    ph : numpy.ndarray, float</span>
+<span class="sd">        div B cleaning variable</span>
+<span class="sd">    pr : numpy.ndarray, float</span>
+<span class="sd">        pressure</span>
+<span class="sd">    te : numpy.ndarray, float</span>
+<span class="sd">        temperature</span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
 <div class="viewcode-block" id="Slice.__init__">
 <a class="viewcode-back" href="../../../api/pyR2D2.Slice.html#pyR2D2.Slice.__init__">[docs]</a>
@@ -761,6 +959,8 @@
           <dd><a href="../../../../v0.2.0/index.html">v0.2.0</a></dd>
         
           <dd><a href="../../../../v0.3.0/index.html">v0.3.0</a></dd>
+        
+          <dd><a href="../../../../v0.3.1/index.html">v0.3.1</a></dd>
         
           <dd><a href="read.html">master</a></dd>
         

@@ -6,22 +6,23 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Reference &mdash; R2D2 Document unknown documentation</title>
+  <title>pyR2D2 API Reference &mdash; R2D2 Document 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=3f1b9271"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="R2D2 Package" href="R2D2.package.html" />
-    <link rel="prev" title="R2D2_py" href="r2d2_py.html" /> 
+    <link rel="next" title="pyR2D2 Package" href="pyR2D2.package.html" />
+    <link rel="prev" title="pyR2D2" href="pyr2d2.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,24 +49,23 @@
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="r2d2_py.html">R2D2_py</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pyR2D2 API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#packages">Packages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="R2D2.package.html">R2D2 Package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="R2D2.package.html#module-R2D2.util">R2D2.util Package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="R2D2.package.html#module-R2D2.write">R2D2.write Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyR2D2.package.html">pyR2D2 Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="R2D2.module.html">R2D2.color.color Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="R2D2.module.html#module-R2D2.constant.constant">R2D2.constant.constant Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyR2D2.module.html">pyR2D2.color.color Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyR2D2.module.html#module-pyR2D2.constant.constant">pyR2D2.constant.constant Module</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
 </ul>
 
@@ -83,7 +83,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">API Reference</li>
+      <li class="breadcrumb-item active">pyR2D2 API Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api_reference.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -93,23 +93,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="api-reference">
-<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+  <section id="pyr2d2-api-reference">
+<h1>pyR2D2 API Reference<a class="headerlink" href="#pyr2d2-api-reference" title="Link to this heading"></a></h1>
 <section id="packages">
 <h2>Packages<a class="headerlink" href="#packages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="R2D2.package.html">R2D2 Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.package.html#classes">Classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.package.html">pyR2D2 Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyR2D2.package.html#classes">Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyR2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="R2D2.package.html#module-R2D2.util">R2D2.util Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.package.html#functions">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyR2D2.package.html#functions">Functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="R2D2.package.html#module-R2D2.write">R2D2.write Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="R2D2.package.html#sub-packages">Sub Packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyR2D2.package.html#sub-packages">Sub Packages</a></li>
 </ul>
 </li>
 </ul>
@@ -119,8 +119,8 @@
 <h2>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="R2D2.module.html">R2D2.color.color Module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="R2D2.module.html#module-R2D2.constant.constant">R2D2.constant.constant Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.module.html">pyR2D2.color.color Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyR2D2.module.html#module-pyR2D2.constant.constant">pyR2D2.constant.constant Module</a></li>
 </ul>
 </div>
 </section>
@@ -130,8 +130,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="r2d2_py.html" class="btn btn-neutral float-left" title="R2D2_py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="R2D2.package.html" class="btn btn-neutral float-right" title="R2D2 Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyr2d2.html" class="btn btn-neutral float-left" title="pyR2D2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyR2D2.package.html" class="btn btn-neutral float-right" title="pyR2D2 Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
@@ -162,10 +162,6 @@
         <dt>Versions</dt>
         
           <dd><a href="api_reference.html">v0.1.0</a></dd>
-        
-          <dd><a href="../v0.2.0/api_reference.html">v0.2.0</a></dd>
-        
-          <dd><a href="../v0.3.0/api_reference.html">v0.3.0</a></dd>
         
           <dd><a href="../master/api_reference.html">master</a></dd>
         

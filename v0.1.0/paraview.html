@@ -6,21 +6,22 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Paraviewを用いた3Dデータ表示 &mdash; R2D2 Document unknown documentation</title>
+  <title>Paraviewを用いた3Dデータ表示 &mdash; R2D2 Document 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=3f1b9271"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="R2D2 pythonでのキーワードの説明" href="notation.html" />
+    <link rel="next" title="座標生成" href="geometry.html" />
     <link rel="prev" title="Sphinx使用の覚書" href="sphinx.html" /> 
 </head>
 
@@ -48,15 +49,14 @@
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="r2d2_py.html">R2D2_py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Paraviewを用いた3Dデータ表示</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id1">データ準備</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#paraview3">Paraviewを用いて3次元表示</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="notation.html">R2D2 pythonでのキーワードの説明</a></li>
 <li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
 </ul>
 
@@ -96,19 +96,19 @@
 <li><p>ある物理量の三次元データ</p></li>
 <li><p>ある物理量の :<img class="math" src="_images/math/0765a4962991d8ac1a8c00d3c3bd6cf5ee6ebdfc.svg" alt="\tau=1"/> でのデータ</p></li>
 </ul>
-<p>それぞれのデータのためにR2D2 Pythonでは以下の関数が用意してある。</p>
-<p><a class="reference internal" href="api/R2D2.write.vtk.write_3D.html#R2D2.write.vtk.write_3D" title="R2D2.write.vtk.write_3D"><code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.write.vtk.write_3D()</span></code></a>
-<a class="reference internal" href="api/R2D2.write.vtk.write_3D_vector.html#R2D2.write.vtk.write_3D_vector" title="R2D2.write.vtk.write_3D_vector"><code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.write.vtk.write_3D_vector()</span></code></a>
-<a class="reference internal" href="api/R2D2.write.vtk.write_optical_surface.html#R2D2.write.vtk.write_optical_surface" title="R2D2.write.vtk.write_optical_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">R2D2.write.vtk.write_optical_surface()</span></code></a></p>
+<p>それぞれのデータのためにpyR2D2では以下の関数が用意してある。</p>
+<p><a class="reference internal" href="api/pyR2D2.write.vtk.write_3D.html#pyR2D2.write.vtk.write_3D" title="pyR2D2.write.vtk.write_3D"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D()</span></code></a>
+<a class="reference internal" href="api/pyR2D2.write.vtk.write_3D_vector.html#pyR2D2.write.vtk.write_3D_vector" title="pyR2D2.write.vtk.write_3D_vector"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D_vector()</span></code></a>
+<a class="reference internal" href="api/pyR2D2.write.vtk.write_optical_surface.html#pyR2D2.write.vtk.write_optical_surface" title="pyR2D2.write.vtk.write_optical_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_optical_surface()</span></code></a></p>
 <p>例えば、以下のようにして実行する</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">init</span> <span class="c1">#　初期設定</span>
 <span class="n">d</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">qq_3D</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># 100番目の3次元データを読込</span>
 <span class="n">bb</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;bx&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;by&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;bz&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 磁場の強さを計算</span>
 <span class="n">d</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># 100番目のtau=1の2次元データを読込</span>
 
-<span class="n">R2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">vtk</span><span class="o">.</span><span class="n">write_3D</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;bb.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;bb&#39;</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">vtk</span><span class="o">.</span><span class="n">write_3D</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;bb.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;bb&#39;</span><span class="p">)</span>
 <span class="c1"># 変数名をbbとしてファイル名bb.vtkに3次元データを出力</span>
-<span class="n">R2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">write_optical_surface</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;in&#39;</span><span class="p">],</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;he&#39;</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;in.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">write_optical_surface</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;in&#39;</span><span class="p">],</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;he&#39;</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;in.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
 <span class="c1"># 変数名をinとしてファイル名in.vtkに2次元データを出力</span>
 </pre></div>
 </div>
@@ -154,7 +154,7 @@
 </div></blockquote>
 </li>
 </ol>
-<p>最終更新日：Dec 05, 2024</p>
+<p>最終更新日：Dec 12, 2024</p>
 </section>
 </section>
 
@@ -163,7 +163,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="sphinx.html" class="btn btn-neutral float-left" title="Sphinx使用の覚書" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="notation.html" class="btn btn-neutral float-right" title="R2D2 pythonでのキーワードの説明" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="geometry.html" class="btn btn-neutral float-right" title="座標生成" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
@@ -194,10 +194,6 @@
         <dt>Versions</dt>
         
           <dd><a href="paraview.html">v0.1.0</a></dd>
-        
-          <dd><a href="../v0.2.0/paraview.html">v0.2.0</a></dd>
-        
-          <dd><a href="../v0.3.0/paraview.html">v0.3.0</a></dd>
         
           <dd><a href="../master/paraview.html">master</a></dd>
         

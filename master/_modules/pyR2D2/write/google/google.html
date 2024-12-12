@@ -5,15 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.write.google.google &mdash; R2D2 Document 0.3.1.dev3+dirty documentation</title>
+  <title>pyR2D2.write.google.google &mdash; R2D2 Document 0.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=bd887c6c" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=ee6aceb1"></script>
+      <script src="../../../../_static/documentation_options.js?v=4621528c"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -50,7 +51,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../geometry.html">座標生成</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../notation.html">R2D2 pythonでのキーワードの説明</a></li>
 </ul>
 
         </div>
@@ -81,7 +81,8 @@
 <span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Functions for push information to Google Spreadsheet</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">import</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
 <div class="viewcode-block" id="init_gspread">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.google.init_gspread.html#pyR2D2.write.google.init_gspread">[docs]</a>
@@ -116,10 +117,7 @@
 <span class="c1">################################################################################</span>
 <div class="viewcode-block" id="fetch_URL_gspread">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.google.fetch_URL_gspread.html#pyR2D2.write.google.fetch_URL_gspread">[docs]</a>
-<span class="k">def</span> <span class="nf">fetch_URL_gspread</span><span class="p">(</span>
-    <span class="n">json_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">project</span><span class="o">=</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span>    
-    <span class="p">):</span>
+<span class="k">def</span> <span class="nf">fetch_URL_gspread</span><span class="p">(</span><span class="n">json_key</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">project</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Fetchs corresponding URL for google spreadsheet</span>
 
@@ -135,6 +133,8 @@
 <span class="sd">    URL : str</span>
 <span class="sd">        Google spreadsheet URL</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">project</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
     
     <span class="k">if</span> <span class="n">json_key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">json_key</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/json/*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -146,10 +146,7 @@
 
 <div class="viewcode-block" id="set_top_line">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.google.set_top_line.html#pyR2D2.write.google.set_top_line">[docs]</a>
-<span class="k">def</span> <span class="nf">set_top_line</span><span class="p">(</span>
-    <span class="n">json_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">project</span><span class="o">=</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span>
-    <span class="p">):</span>
+<span class="k">def</span> <span class="nf">set_top_line</span><span class="p">(</span><span class="n">json_key</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">project</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    This function set top line of google spreadsheet</span>
 
@@ -164,6 +161,9 @@
 <span class="sd">    -------</span>
 <span class="sd">        None</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">project</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>    
+    
     <span class="k">if</span> <span class="n">json_key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">json_key</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/json/*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  
     <span class="n">gc</span> <span class="o">=</span> <span class="n">init_gspread</span><span class="p">(</span><span class="n">json_key</span><span class="p">,</span><span class="n">project</span><span class="p">)</span>
@@ -202,10 +202,7 @@
 <span class="c1">################################################################################</span>
 <div class="viewcode-block" id="set_cells_gspread">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.google.set_cells_gspread.html#pyR2D2.write.google.set_cells_gspread">[docs]</a>
-<span class="k">def</span> <span class="nf">set_cells_gspread</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-                <span class="n">json_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">project</span><span class="o">=</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span>
-                <span class="n">caseid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">set_cells_gspread</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">json_key</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">project</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">caseid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Outputs parameters to Google spreadsheet</span>
 
@@ -224,6 +221,9 @@
     <span class="kn">import</span> <span class="nn">datetime</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">pyR2D2</span>
+
+    <span class="k">if</span> <span class="n">project</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">json_key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">json_key</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/json/*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  
@@ -332,6 +332,8 @@
           <dd><a href="../../../../../v0.2.0/index.html">v0.2.0</a></dd>
         
           <dd><a href="../../../../../v0.3.0/index.html">v0.3.0</a></dd>
+        
+          <dd><a href="../../../../../v0.3.1/index.html">v0.3.1</a></dd>
         
           <dd><a href="google.html">master</a></dd>
         
