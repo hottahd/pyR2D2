@@ -96,20 +96,20 @@ for n in tqdm(range(n0,d.nd + 1)):
                 ]
         mov_util.mov_cartesian_photo_2x2(d,t,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.qx.read(d.xmax, n, silent=True)
-        vxrms = np.sqrt((d.qs.vx**2).mean())
-        bxrms = np.sqrt((d.qs.bx**2).mean())
+        d.qx.read(d.xmax, n)
+        vxrms = np.sqrt((d.qx.vx**2).mean())
+        bxrms = np.sqrt((d.qx.bx**2).mean())
         
-        sem, tmp   = np.meshgrid((d.sem*SINY).sum(axis=1)/SINYM,d.y,indexing='ij')
-        serms, tmp = np.meshgrid(np.sqrt((d.serms**2*SINY).sum(axis=1)/SINYM),d.y,indexing='ij')
+        sem, tmp   = np.meshgrid((d.vc.sem*SINY).sum(axis=1)/SINYM,d.y,indexing='ij')
+        serms, tmp = np.meshgrid(np.sqrt((d.vc.serms**2*SINY).sum(axis=1)/SINYM),d.y,indexing='ij')
         
         if serms.max() != 0:
             se_value = (d.vc.se_xy - sem)/serms
         else:
             se_value = np.zeros((d.ix, d.jx))
         
-        vls = [d.qs.vx*1.e-2,
-               d.qs.bx*1.e-3,
+        vls = [d.qx.vx*1.e-2,
+               d.qx.bx*1.e-3,
                se_value,
                d.vc.bzm
                ]

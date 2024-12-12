@@ -85,7 +85,7 @@ def mov_cartesian_photo_2x2(data,t,vls,tu_height,vmaxs,vmins,titles,cmaps=['infe
     if tight_layout_flag:
         fig.tight_layout()
         
-    ax3.annotate(text="$t="+"{:.2f}".format((t)/60/60)+"~\mathrm{[hour]}$"\
+    ax3.annotate(text="$t="+"{:.2f}".format((t)/60/60)+r"~\mathrm{[hour]}$"\
                      ,xy=[0.01,0.02],xycoords="figure fraction"\
                      ,color='black',fontsize=20)
     
@@ -135,7 +135,7 @@ def mov_spherical_2x2(data,t,vls,vmaxs,vmins,titles,cmaps=['inferno','gray','inf
     if tight_layout_flag:
         fig.tight_layout()
         
-    ax3.annotate(text="$t="+"{:.2f}".format((t)/60/60/24)+"~\mathrm{[day]}$"\
+    ax3.annotate(text="$t="+"{:.2f}".format((t)/60/60/24)+r"~\mathrm{[day]}$"\
                     ,xy=[0.01,0.02],xycoords="figure fraction"\
                     ,color='black',fontsize=20)
     
@@ -193,6 +193,6 @@ def mov_yinyang_2(data,t,vls,vmaxs,vmins,titles,
         cbar = fig.colorbar(im,cax=cax,orientation='horizontal')
         cbar.ax.tick_params(labelsize=12)
         
-    ax1.annotate(text="$t="+"{:.2f}".format((t)/60/60/24)+"~\mathrm{[day]}$"\
+    ax1.annotate(text="$t="+"{:.2f}".format((t)/60/60/24)+r"~\mathrm{[day]}$"\
             ,xy=[0.01,0.02],xycoords="figure fraction"\
             ,color='black',fontsize=25)
