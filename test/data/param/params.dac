@@ -1,0 +1,55 @@
+R2D2 version 2.0
+       2 xdcheck i
+       2 ydcheck i
+       2 zdcheck i
+       2 margin i
+      32 nx i
+      96 ny i
+      96 nz i
+    2048 npe i
+       8 ix0 i
+      16 jx0 i
+      16 kx0 i
+       9 mtype i
+0.6966894528E+11 xmax d
+0.6905454528E+11 xmin d
+0.3686400000E+10 ymax d
+0.0000000000E+00 ymin d
+0.3686400000E+10 zmax d
+0.0000000000E+00 zmin d
+0.2400000000E+03 dtout d
+0.1800000000E+05 tend d
+       0 swap i
+     128 ix_e i
+     128 jx_e i
+      10 ixr i
+     204 jxr i
+      13 m_in i
+       3 m_tu i
+0.8000000000E+01 dtout_tau d
+0.3000000000E+02 ifac d
+0.0000000000E+00 omfac d
+0.0000000000E+00 om00 d
+     768 jc i
+     768 kc i
+0.6959894528E+11 rstar d
+0.3845997452E+34 lstar d
+0.4600000000E+10 astar d
+0.1988999963E+34 mstar d
+0.1000000000E+01 potential_alpha d
+0.1000000000E-11 romin d
+0.9200000000E+09 semin d
+0.2198680340E+10 semax d
+0.3179834500E+07 camax d
+0.2613627891E+07 vxmax d
+-.2613627891E+07 vxmin d
+0.2613627891E+07 vhmax d
+c01-6212c            server c
+T rte l
+F ununiform_flag l
+      96 ix_ununi i
+0.4800000000E+07 dx00 d
+Cartesian geometry c
+       0 deep_flag i
+0169a889-23c0-45f1-a782-24fcf660ca11 uuid_stratification c
+c957bff9-9346-4c88-9258-8e29cc388f62 uuid_eos c

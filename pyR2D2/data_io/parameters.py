@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pydoc
 import pyR2D2
 
 class Parameters:
@@ -265,6 +266,9 @@ class Parameters:
         else:
             self.origin = 'N/A'
 
+        self._generate_docstring()
+
+
     def yinyang_setup(self):
         '''
         YinYangSet function sets up the YinYang geometry for
@@ -338,3 +342,54 @@ class Parameters:
         print('time step (nd_tau) =',self.nd_tau)
         t = self.data.time_read(self.nd)
         print('time =','{:.2f}'.format(t/3600),' [hour]')
+        
+
+    def _update_json_template(self, output_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json'):
+        '''
+        Generate JSON template for pyR2D2.Parameters
+        '''
+        import json
+        # Extract attributes from the instance
+        current_attributes = {k: "" for k in self.__dict__ if not k.startswith("_")}
+        
+        try:
+            with open(output_file, "r") as f:
+                existing_data = json.load(f)
+        except FileNotFoundError:
+            existing_data = {}
+            
+        updated_data = {**current_attributes, **existing_data}
+    
+    
+        # Save the template as a JSON file
+        with open(output_file, "w") as f:
+            json.dump(updated_data, f, indent=4)
+    
+
+    def _generate_docstring(self,json_file=os.path.dirname(os.path.abspath(__file__))+'/'+'parameters.json'):
+        '''
+        Generate docstring for pyR2D2.Parameters
+        '''
+        import json
+
+        self._update_json_template(json_file)
+
+        gene_space = ''
+        desc_space = ' '*4
+        
+        docstring = ''
+        docstring +="\n"
+        docstring += gene_space+'Attributes\n'
+        docstring += gene_space+'----------\n'
+        try:
+            with open(json_file, "r") as f:
+                saved_attributes = json.load(f)
+        except FileNotFoundError:
+            saved_attributes = {}
+        for key in self.__dict__.keys():
+            value_type = type(self.__dict__[key])
+            type_name = value_type.__name__ if value_type.__module__ == "builtins" else f"{value_type.__module__}.{value_type.__name__}"
+            
+            docstring += gene_space+f"{key} : {type_name}\n"       
+            docstring += gene_space+desc_space + saved_attributes[key]+'\n'
+        self.__class__.__doc__ = docstring
