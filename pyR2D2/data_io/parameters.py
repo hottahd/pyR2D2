@@ -52,6 +52,8 @@ class Parameters:
         # self.rstarのない場合はself.rstar = pyR2D2.constant.RSUN
         if 'rstar' not in self.__dict__:
             self.rstar = pyR2D2.constant.RSUN
+        if 'lstar' not in self.__dict__:
+            self.lstar = pyR2D2.constant.LSUN
 
         # remapで出力している変数の種類
         self.remap_kind = ['ro','vx','vy','vz','bx','by','bz','se','ph']

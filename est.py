@@ -74,14 +74,14 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
         xpp = d.x/d.rstar
         
     if d.deep_flag == 0:
-        text = r"$t="+"{:.2f}".format(t/60.)+"\mathrm{~[min]}$"
+        text = r"$t="+"{:.2f}".format(t/60.)+r"\mathrm{~[min]}$"
     else:
-        text = r"$t="+"{:.2f}".format(t/3600./24.)+"\mathrm{~[day]}$"
+        text = r"$t="+"{:.2f}".format(t/3600./24.)+r"\mathrm{~[day]}$"
     #####################
     # drawing
     vls = ['ff','fk','fr','fm','ft']
     colors = [pyR2D2.color.magenta,pyR2D2.color.green,pyR2D2.color.blue,pyR2D2.color.orange,pyR2D2.color.ash]
-    labels = ['$F_\mathrm{e}$',r'$F_\mathrm{k}$',r'$F_\mathrm{r}$',r'$F_\mathrm{m}$',r'$F_\mathrm{t}$']
+    labels = [r'$F_\mathrm{e}$',r'$F_\mathrm{k}$',r'$F_\mathrm{r}$',r'$F_\mathrm{m}$',r'$F_\mathrm{t}$']
     for vl, color, label in zip(vls, colors, labels):
         ax1.plot(xp,md[vl]/fstar,label=label,color=color)
 
@@ -130,7 +130,7 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
 for n in tqdm(range(n0,nd+1)):
     print(f"\r n = {n} ", end='', flush=True)
     ##############################
-    t = d.time_read(n)    
+    t = d.time_read(n, verbose=False)
     d.vc.read(n)
 
     ##############################    

@@ -11,3 +11,4 @@ doc/source/api/
 *.h5
 *.ipynb
 *.egg-info
+pyR2D2/_version.py
