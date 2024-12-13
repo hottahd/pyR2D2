@@ -171,8 +171,10 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
             break  # No need to check further classes
 
 def run_pyR2D2(app):
+    import os
     import pyR2D2
-    pyR2D2.Data('../test/data/')
+    directory = os.path.dirname(__file__)
+    pyR2D2.Data(directory+'/../../test/data/')
 def setup(app):
     # Connect the hook to the autodoc event in Sphinx
     app.connect("autodoc-process-docstring", autodoc_process_docstring)

@@ -18,12 +18,6 @@ datadir = '../run/d001/'
 d = pyR2D2.Data(datadir)
 ```
 
-## Utilities by Fortran
-
-`pyR2D2` provides several utilities written in Fortran language.
-
-You need to `make` at `pyR2D2/` directory to use these utilities.
-
 ## Documentation
 
 https://hottahd.github.io/pyR2D2/master
