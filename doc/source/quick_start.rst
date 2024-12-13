@@ -19,7 +19,7 @@ R2D2は公開していないので、各自 :code:`R2D2.zip` のようなファ�
                └─ idl/
 
 
-pyには `R2D2_py <https://github.com/hottahd/R2D2_py>`_ をクローンしてきたもの、idlには `R2D2_idl <https://github.com/hottahd/R2D2_idl>`_ をクローンしてきたものを配置する。ここは名前が変わっても問題ない。python(py) とidlのどちらかを使えば解析は可能である(両方ダウンロードする必要はない)。
+pyには `pyR2D2 <https://github.com/hottahd/pyR2D2>`_ をクローンしてきたもの中の :code:`py` ディレクトリ、idlには `R2D2_idl <https://github.com/hottahd/R2D2_idl>`_ をクローンしてきたものを配置する。ここは名前が変わっても問題ない。python(py) とidlのどちらかを使えば解析は可能である(両方ダウンロードする必要はない)。
 
 堀田から受け取った :code:`R2D2.zip` ファイルをそれぞれ :code:`run/` ディレクトリの :code:`d001` と名前を変えて配置する。新しい設定で計算する際は :code:`d002`, :code:`d003` とコピーしていくのが良いであろう。
 
