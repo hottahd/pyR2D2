@@ -1,4 +1,10 @@
-def write_3D(qq,x,y,z,file,name):
+import numpy as np
+
+def write_3D(qq : np.ndarray,
+             x :  np.ndarray,
+             y :  np.ndarray, 
+             z :  np.ndarray,
+             file : str, name : str):
     '''
     Outputs the 3D scalar data in 
     VTK format especially for Paraview
@@ -18,7 +24,6 @@ def write_3D(qq,x,y,z,file,name):
     name : str
         Name of the variable
     '''
-    import os
 
     ix = qq.shape[0]
     jx = qq.shape[1]
@@ -48,7 +53,13 @@ def write_3D(qq,x,y,z,file,name):
 
 ######################################################
 ######################################################
-def write_optical_surface(qq,height,y,z,file,name):
+def write_optical_surface(qq : np.ndarray,
+                          height : np.ndarray, 
+                          y : np.ndarray, 
+                          z : np.ndarray,
+                          file : str,
+                          name : str,
+                          ):
     '''
     Outputs the 2D scalar data in 
     VTK format especially for Paraview
@@ -58,7 +69,8 @@ def write_optical_surface(qq,height,y,z,file,name):
     qq : numpy.ndarray, float 
         Output 3D array size of (jx,kx)
     height : numpy.ndarray, float
-        height of optical surface size of (jx,kx) stored in self.qt['he']
+        height of optical surface size of (jx,kx) stored in 
+        pyR2D2.Data.qt.he
     y : numpy.ndarray, float
         y coordinate size of (jx)
     z : numpy.ndarray, float
@@ -68,8 +80,6 @@ def write_optical_surface(qq,height,y,z,file,name):
     name : str
         Name of the variable    
     '''
-    import os
-    import numpy as np
 
     Y, Z = np.meshgrid(y,z,indexing='ij')
     jx = qq.shape[0]
@@ -107,7 +117,15 @@ def write_optical_surface(qq,height,y,z,file,name):
     
 ######################################################
 ######################################################
-def write_3D_vector(qx,qy,qz,x,y,z,file,name):
+def write_3D_vector(qx : np.ndarray, 
+                    qy : np.ndarray, 
+                    qz : np.ndarray, 
+                    x : np.ndarray, 
+                    y : np.ndarray, 
+                    z : np.ndarray, 
+                    file : str,
+                    name : str,
+                    ):
     '''
     Outputs the 3D vector data in 
     VTK format especially for Paraview
@@ -131,8 +149,6 @@ def write_3D_vector(qx,qy,qz,x,y,z,file,name):
     name : str
         Name of the variable    
     '''
-    import os
-    import numpy as np
 
     ix = qx.shape[0]
     jx = qx.shape[1]

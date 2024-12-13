@@ -51,15 +51,10 @@ R2D2を用いた研究で出版された論文は以下です。
 11. `Toriumi, Hotta and Kusano, 2023, Scientific Report, 13, 8994 <https://ui.adsabs.harvard.edu/abs/2023NatSR..13.8994T/abstract>`_
 12. `Masaki, Hotta, Katsukawa and Ishikawa, 2023, PASJ, <https://ui.adsabs.harvard.edu/abs/2023PASJ..tmp...76M/abstract>`_
 13. `Silva et al., 2023, ApJ, 948, L24 <https://ui.adsabs.harvard.edu/abs/2023ApJ...948L..24S/abstract>`_
+14. `Toriumi, Hotta and Kusano, 2024, ApJ, 975, 209, https://ui.adsabs.harvard.edu/abs/2024ApJ...975..209T/abstract`
 
 賞
 ----------------------------------
 * `HPCI ソフトウェア賞 <https://www.hpci-c.jp/hrdevelop/award.html>`_
-
-索引と検索ページ
-----------------------------------
-
-* :ref:`genindex`
-* :ref:`search`
 
 最終更新日：|today|

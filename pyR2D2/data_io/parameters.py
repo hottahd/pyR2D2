@@ -340,7 +340,7 @@ class Parameters:
         print(RED + '### calculation time ###' + END)
         print('time step (nd) =',self.nd)
         print('time step (nd_tau) =',self.nd_tau)
-        t = self.data.time_read(self.nd)
+        t = self.data.time_read(self.nd, verbose = False)
         print('time =','{:.2f}'.format(t/3600),' [hour]')
         
 
