@@ -24,10 +24,7 @@ setup(
         "relative_to": __file__,
     },
     setup_requires=["setuptools_scm"],
-    packages=find_packages(),
-        package_data={
-        "pyR2D2.fortran_util.fortran_src": ["*.so"],  # .soファイルを含める
-    },
+    include_package_data=True,
     cmdclass={"build_py": CustomBuildPy},  # build_pyをカスタムコマンドに置き換え
     zip_safe=False,
 )

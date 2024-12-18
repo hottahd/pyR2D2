@@ -1,0 +1,2 @@
+recursive-include pyR2D2/fortran_util/fortran_src *.so
+recursive-include pyR2D2/fortran_util/fortran_src *
