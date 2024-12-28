@@ -264,16 +264,20 @@ class Sync:
             ]
             Sync.rsync_subprocess_wrapper(args)
 
-    def slice(self, server, n = None, ssh='ssh',project=os.getcwd().split('/')[-2]):
+    def slice(self, server, n = None, direc='*', n_slice= None, ssh='ssh',project=os.getcwd().split('/')[-2]):
         '''
         Downloads slice data
 
         Parameters
         ----------
-        n : int
-            Step to be downloaded
         server : str
             Name of remote server
+        n : int
+            Step to be downloaded
+        direc : str
+            Direction of slice data, 'x', 'y', 'z' or '*'
+        n_slice : int
+            Slice number
         ssh : str
             Type of ssh command
         project : str
@@ -284,7 +288,12 @@ class Sync:
             step = '*'
         else:
             step = str(n).zfill(8)
-        
+            
+        if n_slice is None:
+            n_slice_str = '*'
+        else:
+            n_slice_str = str(n_slice).zfill(8)
+                                
         caseid = self.datadir.split('/')[-3]
         args = [
                 '-e', ssh,
@@ -294,7 +303,7 @@ class Sync:
         Sync.rsync_subprocess_wrapper(args)
         args = [
             '-e', ssh, 
-            server+':work/'+project+'/run/'+caseid+'/data/slice/qq*.dac.'+step+'.*',
+            server+':work/'+project+'/run/'+caseid+'/data/slice/qq'+direc+'.dac.'+step+'.'+n_slice_str,
             self.datadir + '/slice',            
         ]
         Sync.rsync_subprocess_wrapper(args)
