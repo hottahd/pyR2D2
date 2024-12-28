@@ -25,6 +25,7 @@ class Sync:
         
     def rsync_subprocess_wrapper(args):
         command = ['rsync', '-avP'] + args
+        print("Running command:", " ".join(command))
         result = subprocess.run(
             command,
             #stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -201,7 +202,8 @@ class Sync:
         '''
 
         caseid = self.datadir.split('/')[-3]
-        Sync.setup(server, caseid, project=project)
+        print(ssh)
+        Sync.setup(server, caseid, ssh=ssh, project=project)
         args = [
             '--exclude=time/mhd',
             '-e', ssh,
