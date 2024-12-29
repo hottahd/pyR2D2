@@ -142,8 +142,6 @@ class XSelect(_BaseRemapReader):
             A selected height for data
         n : int 
             A selected time step for data
-        verbose : bool
-            False suppresses a message of store            
         """
 
         i0 = np.argmin(np.abs(self.x - xs))
@@ -241,8 +239,6 @@ class MPIRegion(_BaseRemapReader):
             
         n : int
             A selected time step for data
-        verbose : bool
-            False suppresses a message of store
         '''
         # corresponding MPI process
         nps = np.where(self.ir - 1 == ixrt)[0]
@@ -516,8 +512,6 @@ class OnTheFly(_BaseReader):
         ----------
         n : int
             A selected time step for data
-        verbose : bool
-            False suppresses a message of store
         '''
 
         # read xy plane data
