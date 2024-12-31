@@ -166,7 +166,6 @@ class Sync:
         ir0 = self.i2ir[i0]
         
         nps = np.char.zfill(self.np_ijr[ir0-1,:].astype(str), 8)
-
         caseid = self.datadir.split('/')[-3]
         
         if n is None:
@@ -174,9 +173,22 @@ class Sync:
         else:
             filename_part = 'qq.dac.'+str(n).zfill(8)+'.'
 
+        # check if file exists
+        ssh_result = \
+                subprocess.run([ssh,
+                                server, 
+                                'ls work/'+project+'/run/'+caseid+'/data/remap/qq/00000/00000000/qq.dac.'+str(n).zfill(8)+'.00000000',],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               )
+
         for ns in nps:
-            par_dir = str(int(ns)//1000).zfill(5)+'/'
-            chi_dir = str(int(ns)).zfill(8)+'/'
+            if ssh_result.returncode == 0:
+                par_dir = str(int(ns)//1000).zfill(5)+'/'
+                chi_dir = str(int(ns)).zfill(8)+'/'
+            else:
+                par_dir = ''
+                chi_dir = ''
             
             os.makedirs(self.datadir + 'remap/qq/'+par_dir+chi_dir,exist_ok=True)
             args = [
