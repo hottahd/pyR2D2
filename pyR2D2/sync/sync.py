@@ -84,7 +84,7 @@ class Sync:
         '''
 
         if n is None:
-            filename = ' '
+            filename = '*'
         else:
             filename = 'tau/qq.dac.'+str(n).zfill(8)
 
