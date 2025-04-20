@@ -99,7 +99,7 @@ def set_top_line(json_key = None, project = None):
              ,'al' \
              ,'RSST' \
              ,'Om' \
-             ,'Gemetry' \
+             ,'Geometry' \
              ,'origin'
              ,'update time' \
              ,'Server'
