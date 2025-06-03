@@ -155,16 +155,19 @@ class XSelect(_BaseRemapReader):
             if jr0 == self.jr[np0]:
                 dtype = self._dtype_remap_qq(np0)
                 filepath = self._get_filepath_remap_qq(n,np0)
+
+                qqq_mem = np.memmap(filepath, dtype=dtype, mode='r', shape=(1,))
+                qqq = qqq_mem[0]
                 
-                with open(filepath,'rb') as f:
-                    qqq = np.fromfile(f,dtype=dtype,count=1)
-                    for key, m in zip( self.remap_kind, range(self.mtype) ):
-                        self.__dict__[key][self.jss[np0]:self.jee[np0]+1,:] = \
-                                qqq["qq"].reshape((self.iixl[np0], self.jjxl[np0], self.kx, self.mtype), order="F")[i0-self.iss[np0],:,:,m]
-        
-                    for key in self.remap_kind_add:
-                        self.__dict__[key][self.jss[np0]:self.jee[np0]+1,:] = \
-                                qqq[key].reshape((self.iixl[np0], self.jjxl[np0], self.kx),order="F")[i0-self.iss[np0],:,:]
+                # with open(filepath,'rb') as f:
+                    # qqq = np.fromfile(f,dtype=dtype,count=1)
+                for key, m in zip( self.remap_kind, range(self.mtype) ):
+                    self.__dict__[key][self.jss[np0]:self.jee[np0]+1,:] = \
+                            qqq["qq"].reshape((self.iixl[np0], self.jjxl[np0], self.kx, self.mtype), order="F")[i0-self.iss[np0],:,:,m]
+    
+                for key in self.remap_kind_add:
+                    self.__dict__[key][self.jss[np0]:self.jee[np0]+1,:] = \
+                            qqq[key].reshape((self.iixl[np0], self.jjxl[np0], self.kx),order="F")[i0-self.iss[np0],:,:]
 
                 self.info = {}
                 self.info['xs'] = self.x[i0]
