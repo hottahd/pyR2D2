@@ -287,7 +287,7 @@ def eos(data,ro,se,var):
     iro = int((np.log(ro) - data.log_ro_e[0])//data.dlogro_e)
     ise = int((       se  - data.se_e[0]    )//data.dse_e)
     
-    dlogro = np.log(ro) - data.plog_ro_e[iro]
+    dlogro = np.log(ro) - data.log_ro_e[iro]
     dse = se - data.se_e[ise]
     
     qq = np.exp((\
