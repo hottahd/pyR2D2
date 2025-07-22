@@ -18,7 +18,7 @@ Sphinxは、reStructuredTextからHTMLやLatexなどの
 
 .. sourcecode:: shell
 		
-   pip install sphinx 
+   conda install sphinx esbonio doc8 rstcheck
 
 Markdownを使いたい時は以下のようにする。
 
