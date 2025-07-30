@@ -506,8 +506,19 @@ class RestrictedData(_BaseRemapReader):
                         qqq = np.fromfile(f, dtype=dtype, count=1)
 
                         for value in values_input:
+                            isrt_rcv = max([0  ,self.iss[np0]-i0  ])
+                            iend_rcv = min([ixr,self.iee[np0]-i0+1])
+                            jsrt_rcv = max([0  ,self.jss[np0]-j0  ])
+                            jend_rcv = min([jxr,self.jee[np0]-j0+1])
+                                
+                            isrt_snd = isrt_rcv - (self.iss[np0]-i0)
+                            iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
+                            jsrt_snd = jsrt_rcv - (self.jss[np0]-j0)
+                            jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+                            
                             if value in self.p.remap_kind:
                                 m = self.p.remap_kind.index(value)
+<<<<<<< HEAD
                                 isrt_rcv = max([0, self.iss[np0] - i0])
                                 iend_rcv = min([ixr, self.iee[np0] - i0 + 1])
                                 jsrt_rcv = max([0, self.jss[np0] - j0])
@@ -517,6 +528,8 @@ class RestrictedData(_BaseRemapReader):
                                 iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
                                 jsrt_snd = jsrt_rcv - (self.jss[np0] - j0)
                                 jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+=======
+>>>>>>> f2c20fd (RestrictedDataクラスのreadメソッド内での受信および送信インデックス計算を整理)
 
                                 self.__dict__[value][
                                     isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
@@ -986,4 +999,8 @@ class ModelS(_BaseReader):
 
         for key in qq.dtype.names:
             if qq[key].size == self.ix:
+<<<<<<< HEAD
                 self.__dict__[key] = qq[key].reshape((self.ix), order="F")
+=======
+                self.__dict__[key] = qq[key].reshape((self.ix),order='F')
+>>>>>>> f2c20fd (RestrictedDataクラスのreadメソッド内での受信および送信インデックス計算を整理)
