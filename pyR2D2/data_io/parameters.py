@@ -256,9 +256,9 @@ class Parameters:
 
                 dtype = np.dtype(
                     [
-                        ("x_slice", (self.endian + "d", self.nx_slice)),
-                        ("y_slice", (self.endian + "d", self.ny_slice)),
-                        ("z_slice", (self.endian + "d", self.nz_slice)),
+                        ("x_slice", (self.endian + "d", (self.nx_slice,))),
+                        ("y_slice", (self.endian + "d", (self.ny_slice,))),
+                        ("z_slice", (self.endian + "d", (self.nz_slice,))),
                     ]
                 )
                 with open(self.datadir + "slice/slice.dac", "rb") as f:
