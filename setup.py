@@ -1,14 +1,18 @@
-from setuptools import setup, find_packages
-from setuptools.command.build_py import build_py
-from setuptools_scm import get_version
 import os
 import subprocess
+
+from pybind11.setup_helpers import Pybind11Extension
+from setuptools import find_packages, setup
+from setuptools.command.build_py import build_py
+from setuptools_scm import get_version
 
 
 class CustomBuildPy(build_py):
     def run(self):
         # Fortranコードが存在するディレクトリ
-        fortran_dir = os.path.join(os.path.dirname(__file__), "pyR2D2/fortran_util/fortran_src")
+        fortran_dir = os.path.join(
+            os.path.dirname(__file__), "pyR2D2/fortran_util/fortran_src"
+        )
 
         # makeコマンドを実行
         print("Running 'make' to build Fortran library...")
@@ -16,6 +20,15 @@ class CustomBuildPy(build_py):
 
         # ビルドが成功したら、親クラスのrun()を呼び出す
         super().run()
+
+
+ext_modules = [
+    Pybind11Extension(
+        "pyR2D2.cpp_util.eos",
+        ["pyR2D2/cpp_util/eos.cpp"],
+        cxx_std=14,
+    ),
+]
 
 setup(
     name="pyR2D2",
@@ -28,4 +41,5 @@ setup(
     include_package_data=True,
     cmdclass={"build_py": CustomBuildPy},  # build_pyをカスタムコマンドに置き換え
     zip_safe=False,
+    ext_modules=ext_modules,
 )

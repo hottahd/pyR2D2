@@ -281,6 +281,7 @@ class Parameters:
             self.log_en_e = np.log(eos_d["en"] + 1.0e-200)
             self.log_te_e = np.log(eos_d["te"] + 1.0e-200)
             self.log_op_e = np.log(eos_d["op"] + 1.0e-200)
+            self.log_dprdro_e = np.log(eos_d["dprdro"] + 1.0e-200)
 
             self.dlogro_e = self.log_ro_e[1] - self.log_ro_e[0]
             self.dse_e = self.se_e[1] - self.se_e[0]
