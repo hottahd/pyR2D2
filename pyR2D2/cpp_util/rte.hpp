@@ -7,7 +7,7 @@
 double pi = 3.14159265358979323846;
 double pii = 1.0 / pi;
 
-py::tuple vertical_upward_rte(
+py::array_t<double> vertical_upward_rte(
     const py::array_t<double, py::array::c_style | py::array::forcecast> &ro_np,
     const py::array_t<double, py::array::c_style | py::array::forcecast> &se_np,
     const py::array_t<double, py::array::c_style | py::array::forcecast> &x_np,
@@ -21,10 +21,6 @@ py::tuple vertical_upward_rte(
 
   py::array_t<double> rt_np({ro.j_size, ro.k_size});
   auto rt = view_array<double>(rt_np);
-
-  py::array_t<double> tu_np({ro.i_size, ro.j_size, ro.k_size});
-  auto tu = view_array<double>(tu_np);
-
   py::array_t<double> op_np = eos.eval(ro_np, se_np, "op");
   py::array_t<double> te_np = eos.eval(ro_np, se_np, "te");
 
@@ -77,10 +73,6 @@ py::tuple vertical_upward_rte(
         double x_stt = x_mid[i];
 
         double dtu = (al_end - al_stt) * (x_end - x_stt) / (log_al_end - log_al_stt);
-        if (std::isnan(dtu))
-        {
-          std::cout << al_end << " " << al_stt << " " << x_end << " " << x_stt << " " << log_so_end << " " << log_so_stt << std::endl;
-        }
 
         rt1d[i + 1] = rt1d[i] * std::exp(-dtu) + dtu * (so_end - so_stt * std::exp(-dtu)) / (log_so_end - log_so_stt + dtu);
       }
@@ -88,5 +80,5 @@ py::tuple vertical_upward_rte(
     }
   }
 
-  return py::make_tuple(rt_np, tu_np);
+  return rt_np;
 }
