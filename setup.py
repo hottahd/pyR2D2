@@ -24,8 +24,8 @@ class CustomBuildPy(build_py):
 
 ext_modules = [
     Pybind11Extension(
-        "pyR2D2.cpp_util.eos",
-        ["pyR2D2/cpp_util/eos.cpp"],
+        "pyR2D2.cpp_util.cpp_util",
+        ["pyR2D2/cpp_util/bindings.cpp"],
         cxx_std=14,
     ),
 ]

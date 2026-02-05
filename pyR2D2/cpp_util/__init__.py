@@ -1,3 +1,3 @@
-from .eos import EOS
+from .cpp_util import EOS, vertical_upward_rte
 
-__all__ = ["EOS"]
+__all__ = ["EOS", "vertical_upward_rte"]
