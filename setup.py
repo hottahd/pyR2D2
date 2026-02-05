@@ -27,6 +27,8 @@ ext_modules = [
         "pyR2D2.cpp_util.cpp_util",
         ["pyR2D2/cpp_util/bindings.cpp"],
         cxx_std=14,
+        extra_compile_args=["-O3", "-fopenmp"],
+        extra_link_args=["-fopenmp"],
     ),
 ]
 

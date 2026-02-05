@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <omp.h>
 #include "view_array.hpp"
 #include "eos.hpp"
 
@@ -14,6 +15,15 @@ py::array_t<double> vertical_upward_rte(
     EOS &eos)
 {
 
+  // #pragma omp parallel
+  //   {
+  // #pragma omp single
+  //     {
+  //       std::cerr << "OpenMP threads = "
+  //                 << omp_get_num_threads() << std::endl;
+  //     }
+  //   }
+
   double sb = 5.67e-5; // Stefan-Boltzmann constant in cgs units
   auto ro = view_array<double>(ro_np);
   auto se = view_array<double>(se_np);
@@ -21,6 +31,9 @@ py::array_t<double> vertical_upward_rte(
 
   py::array_t<double> rt_np({ro.j_size, ro.k_size});
   auto rt = view_array<double>(rt_np);
+
+  // py::array_t<double> tu_np({ro.i_size, ro.j_size, ro.k_size});
+  // auto tu = view_array<double>(tu_np);
   py::array_t<double> op_np = eos.eval(ro_np, se_np, "op");
   py::array_t<double> te_np = eos.eval(ro_np, se_np, "te");
 
@@ -33,50 +46,57 @@ py::array_t<double> vertical_upward_rte(
     x_mid[i] = 0.5 * (x(i - 1) + x(i));
   };
 
-  std::vector<double> log_al_ctr(ro.i_size), log_so_ctr(ro.i_size);
-  std::vector<double> log_al_mid(ro.i_size), log_so_mid(ro.i_size);
-  std::vector<double> al_mid(ro.i_size), so_mid(ro.i_size);
-  std::vector<double> rt1d(ro.i_size);
+  // py::gil_scoped_release release;
 
-  for (size_t j = 0; j < ro.j_size; j++)
+#pragma omp parallel
   {
-    for (size_t k = 0; k < ro.k_size; k++)
+    std::vector<double> log_al_ctr(ro.i_size), log_so_ctr(ro.i_size);
+    std::vector<double> log_al_mid(ro.i_size), log_so_mid(ro.i_size);
+    std::vector<double> al_mid(ro.i_size), so_mid(ro.i_size);
+    std::vector<double> rt1d(ro.i_size);
+
+#pragma omp for collapse(2) schedule(static)
+    for (size_t j = 0; j < ro.j_size; j++)
     {
-      for (size_t i = 0; i < ro.i_size; i++)
+      for (size_t k = 0; k < ro.k_size; k++)
       {
-        log_al_ctr[i] = std::log(ro(i, j, k) * op(i, j, k));
-        log_so_ctr[i] = std::log(sb * std::pow(te(i, j, k), 4) * pii);
+        for (size_t i = 0; i < ro.i_size; i++)
+        {
+          log_al_ctr[i] = std::log(ro(i, j, k) * op(i, j, k));
+          log_so_ctr[i] = std::log(sb * std::pow(te(i, j, k), 4) * pii);
+        }
+
+        // value at i - 1/2
+        for (size_t i = 1; i < ro.i_size; i++)
+        {
+          log_al_mid[i] = 0.5 * (log_al_ctr[i - 1] + log_al_ctr[i]);
+          log_so_mid[i] = 0.5 * (log_so_ctr[i - 1] + log_so_ctr[i]);
+          al_mid[i] = std::exp(log_al_mid[i]);
+          so_mid[i] = std::exp(log_so_mid[i]);
+        }
+
+        rt1d[1] = so_mid[1];
+        for (size_t i = 1; i < ro.i_size - 1; i++)
+        {
+          double log_so_end = log_so_mid[i + 1];
+          double log_al_end = log_al_mid[i + 1];
+          double so_end = so_mid[i + 1];
+          double al_end = al_mid[i + 1];
+          double x_end = x_mid[i + 1];
+
+          double log_so_stt = log_so_mid[i];
+          double log_al_stt = log_al_mid[i];
+          double so_stt = so_mid[i];
+          double al_stt = al_mid[i];
+          double x_stt = x_mid[i];
+
+          double dtu = (al_end - al_stt) * (x_end - x_stt) / (log_al_end - log_al_stt);
+          // tu(i, j, k) = dtu;
+
+          rt1d[i + 1] = rt1d[i] * std::exp(-dtu) + dtu * (so_end - so_stt * std::exp(-dtu)) / (log_so_end - log_so_stt + dtu);
+        }
+        rt(j, k) = rt1d[ro.i_size - 2];
       }
-
-      // value at i - 1/2
-      for (size_t i = 1; i < ro.i_size; i++)
-      {
-        log_al_mid[i] = 0.5 * (log_al_ctr[i - 1] + log_al_ctr[i]);
-        log_so_mid[i] = 0.5 * (log_so_ctr[i - 1] + log_so_ctr[i]);
-        al_mid[i] = std::exp(log_al_mid[i]);
-        so_mid[i] = std::exp(log_so_mid[i]);
-      }
-
-      rt1d[1] = so_mid[1];
-      for (size_t i = 1; i < ro.i_size - 1; i++)
-      {
-        double log_so_end = log_so_mid[i + 1];
-        double log_al_end = log_al_mid[i + 1];
-        double so_end = so_mid[i + 1];
-        double al_end = al_mid[i + 1];
-        double x_end = x_mid[i + 1];
-
-        double log_so_stt = log_so_mid[i];
-        double log_al_stt = log_al_mid[i];
-        double so_stt = so_mid[i];
-        double al_stt = al_mid[i];
-        double x_stt = x_mid[i];
-
-        double dtu = (al_end - al_stt) * (x_end - x_stt) / (log_al_end - log_al_stt);
-
-        rt1d[i + 1] = rt1d[i] * std::exp(-dtu) + dtu * (so_end - so_stt * std::exp(-dtu)) / (log_so_end - log_so_stt + dtu);
-      }
-      rt(j, k) = rt1d[ro.i_size - 2];
     }
   }
 

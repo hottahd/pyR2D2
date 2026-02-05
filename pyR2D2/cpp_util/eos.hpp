@@ -119,6 +119,9 @@ struct EOS
       throw std::runtime_error("only 1D, 2D, and 3D arrays are supported");
     auto qq = view_array<double>(qq_np);
 
+    // py::gil_scoped_release release;
+
+#pragma omp parallel for schedule(static)
     for (size_t idx = 0; idx < ro_val.size; idx++)
     {
       qq(idx) = _eval_core(ro_val(idx), se_val(idx), log_ro, se, log_eos);
