@@ -7,9 +7,9 @@ from setuptools import find_packages, setup
 from setuptools.command.build_py import build_py
 from setuptools_scm import get_version
 
-if sys.platform == 'linux':
+if sys.platform == "linux":
     extra_compile_args = ["-O3", "-fopenmp"]
-    extra_link_args = ['-fopenmp']
+    extra_link_args = ["-fopenmp"]
 else:
     extra_compile_args = ["-O3"]
     extra_link_args = []
@@ -52,5 +52,4 @@ setup(
     cmdclass={"build_py": CustomBuildPy},  # build_pyをカスタムコマンドに置き換え
     zip_safe=False,
     ext_modules=ext_modules,
-)
 )
