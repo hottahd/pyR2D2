@@ -18,6 +18,7 @@ from .color import color
 from .constant import constant
 from .cpp_util import EOS
 from .data import Data
+from .data_io import zarr_util
 from .data_io.parameters import Parameters
 from .data_io.read import (
     FullData,
