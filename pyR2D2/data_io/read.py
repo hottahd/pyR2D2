@@ -988,3 +988,155 @@ class ModelS(_BaseReader):
         for key in qq.dtype.names:
             if qq[key].size == self.ix:
                 self.__dict__[key] = qq[key].reshape((self.ix), order="F")
+
+
+class _BasePrevAftr(_BaseReader):
+    """
+    Base class for previous and after time step data
+    """
+
+    def __init__(self, data):
+        self.data = data
+        self.ix_prev_after = (self.ix0 - self.ib_rte_bot) * self.nx
+
+    def _allocate_prev_aftr_qq(self, dtype):
+        """
+        Allocate memory for previous and after time step data
+
+        Parameters
+        ----------
+        dtype : data type
+            Data type for allocation
+        """
+        self.prev_aftr_kind = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+        memflag = True
+        if self.ro is not None:
+            memflag = not self.ro.shape == (self.ix_prev_after, self.jx, self.kx)
+        if self.ro is None or memflag:
+            for key in self.prev_aftr_kind:
+                self.__dict__[key] = np.zeros(
+                    (self.ix_prev_after, self.jx, self.kx), dtype=dtype
+                )
+
+    def _dtype_prev_aftr_qq(self, kind):
+        """
+        Data type for previous and after time step data
+
+        Parameters
+        ----------
+        kind : str
+            Data type kind for dtype
+        """
+        return np.dtype([("qq", self.endian + str(self.nx * self.ny * self.nz) + kind)])
+
+    def _get_filepath_prev_aftr_qq(self, n, n_prev_aftr, np0, prev_aftr):
+        """
+        Filepath for previous and after time step data
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        np0 : int
+            A selected MPI process number
+        """
+        cnou = "{0:05d}".format(np0 // 1000)
+        cno = "{0:08d}".format(np0)
+
+        return (
+            self.datadir
+            + prev_aftr
+            + "/"
+            + cnou
+            + "/"
+            + cno
+            + "/qq.dac."
+            + "{0:08d}".format(n)
+            + "."
+            + "{0:08d}".format(n_prev_aftr)
+            + "."
+            + cno
+        )
+
+
+class Previous(_BasePrevAftr):
+    """
+    Class for previous and after time step data
+    """
+
+    def read(self, n: int, n_prev: int):
+        """
+        Reads previous time step data
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev : int
+            A selected previous time step for data
+        """
+        self._allocate_prev_aftr_qq(dtype=np.float64)
+        dtype = self._dtype_prev_aftr_qq(kind="d")
+
+        for np0 in range(self.npe):
+            ib, jb, kb = self.xyz[np0]
+            if ib >= self.ib_rte_bot:
+                ibt = ib - self.ib_rte_bot
+
+                filepath = self._get_filepath_prev_aftr_qq(
+                    n, n_prev, np0, prev_aftr="prev"
+                )
+                qqq_mem = np.memmap(
+                    filename=filepath,
+                    dtype=dtype,
+                    mode="r",
+                    shape=(1,),
+                )
+                qqq = qqq_mem[0]
+                for key, m in zip(self.prev_aftr_kind, range(len(self.prev_aftr_kind))):
+                    self.__dict__[key][
+                        ibt * self.nx : (ibt + 1) * self.nx,
+                        jb * self.ny : (jb + 1) * self.ny,
+                        kb * self.nz : (kb + 1) * self.nz,
+                    ] = qqq["qq"].reshape((self.nx, self.ny, self.nz), order="F")
+
+
+class After(_BasePrevAftr):
+    """
+    Reads after time step data
+
+    Parameters
+    ----------
+    n : int
+        A selected time step for data
+    n_aftr : int
+        A selected after time step for data
+    """
+
+    def read(self, n: int, n_aftr: int):
+        self._allocate_prev_aftr_qq(dtype=np.float64)
+        dtype = self._dtype_prev_aftr_qq(kind="d")
+
+        for np0 in range(self.npe):
+            ib, jb, kb = self.xyz[np0]
+            if ib >= self.ib_rte_bot:
+                ibt = ib - self.ib_rte_bot
+
+                filepath = self._get_filepath_prev_aftr_qq(
+                    n, n_aftr, np0, prev_aftr="aftr"
+                )
+                qqq_mem = np.memmap(
+                    filename=filepath,
+                    dtype=dtype,
+                    mode="r",
+                    shape=(1,),
+                )
+                qqq = qqq_mem[0]
+                for key, m in zip(self.prev_aftr_kind, range(len(self.prev_aftr_kind))):
+                    self.__dict__[key][
+                        ibt * self.nx : (ibt + 1) * self.nx,
+                        jb * self.ny : (jb + 1) * self.ny,
+                        kb * self.nz : (kb + 1) * self.nz,
+                    ] = qqq["qq"].reshape((self.nx, self.ny, self.nz), order="F")

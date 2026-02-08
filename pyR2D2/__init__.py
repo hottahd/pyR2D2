@@ -21,11 +21,13 @@ from .data import Data
 from .data_io import zarr_util
 from .data_io.parameters import Parameters
 from .data_io.read import (
+    After,
     FullData,
     ModelS,
     MPIRegion,
     OnTheFly,
     OpticalDepth,
+    Previous,
     RestrictedData,
     Slice,
     XSelect,

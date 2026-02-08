@@ -46,7 +46,7 @@ def save(
                 name,
                 data=array,
                 chunks=chunks3d,
-                compressor=codec_f32,
+                compressors=codec_f32,
                 overwrite=True,
             )
         elif array.ndim == 1:
@@ -54,7 +54,7 @@ def save(
                 name,
                 data=array,
                 chunks=chunks1d,
-                compressor=codec_f32,
+                compressors=codec_f32,
                 overwrite=True,
             )
         else:

@@ -33,6 +33,10 @@ class Data:
         Time at a selected time step. See :meth:`pyR2D2.Data.time_read`
     qc : numpy.ndarray, float
         3D full data for checkpoint. See :meth:`pyR2D2.Data.qc_read`
+    qp : pyR2D2.Previous
+        Instance of pyR2D2.Previous
+    qa : pyR2D2.After
+        Instance of pyR2D2.After
 
     sync : pyR2D2.Sync
         Instance of pyR2D2.Sync
@@ -58,6 +62,8 @@ class Data:
         self.ms = pyR2D2.ModelS(self)
         self.time = None
         self.qc = None
+        self.qp = pyR2D2.Previous(self)
+        self.qa = pyR2D2.After(self)
         self.sync = pyR2D2.Sync(self)
         self.eos = pyR2D2.cpp_util.EOS(
             self.log_ro_e,
