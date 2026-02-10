@@ -5,8 +5,8 @@ import zarr
 def save(
     path: str,
     vars_dict: dict,
-    chunks3d: tuple = (64, 64, 64),
-    chunks1d: tuple = (32,),
+    params: dict = None,
+    max_chunk_size: int = 512,
     clevel: int = 5,
 ):
     """
@@ -18,10 +18,10 @@ def save(
         path to save zarr data
     vars_dict : dict
         dictionary of variables to save
-    chunks3d : tuple
-        chunk size for 3D arrays
-    chunks1d : tuple
-        chunk size for 1D arrays
+    params : dict, optional
+        additional parameters to save, by default None
+    max_chunk_size : int, optional
+        maximum chunk size for zarr arrays, by default 512
     clevel : int, optional
         compression level for zarr, by default 5
 
@@ -39,21 +39,35 @@ def save(
         typesize=4,
     )
 
+    if params is not None:
+        root.attrs["params"] = params
+
     for name, array in vars_dict.items():
         array = np.asarray(array, dtype=np.float32, order="C")
         if array.ndim == 3:
+            chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(3))
             root.create_array(
                 name,
                 data=array,
-                chunks=chunks3d,
+                chunks=chunks,
+                compressors=codec_f32,
+                overwrite=True,
+            )
+        elif array.ndim == 2:
+            chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(2))
+            root.create_array(
+                name,
+                data=array,
+                chunks=chunks,
                 compressors=codec_f32,
                 overwrite=True,
             )
         elif array.ndim == 1:
+            chunks = (min(max_chunk_size, array.shape[0]),)
             root.create_array(
                 name,
                 data=array,
-                chunks=chunks1d,
+                chunks=chunks,
                 compressors=codec_f32,
                 overwrite=True,
             )
@@ -63,24 +77,45 @@ def save(
             )
 
 
-def load(path: str, name: str):
+def load(path: str, names="all", with_attrs: bool = False):
     """
     Load zarr data
 
     Parameters
     ----------
     path : str
-        path to zarr data
-    name : str
-        name of the variable to load
+        Path to the Zarr directory.
+    names : str or list of str
+        Variable name(s) to load.
+        If "all", all arrays in the Zarr group are loaded.
+    with_attrs : bool, optional
+        If True, also return Zarr attributes (metadata). By default, False.
 
     Returns
     -------
-    np.ndarray
+    np.ndarray or dict
         loaded array from zarr data
     """
     root = zarr.open_group(path, mode="r")
-    return root[name][...]
+
+    if isinstance(names, str):
+        if names == "all":
+            names = list(root.array_keys())
+        else:
+            names = [names]
+
+    data = {}
+    for name in names:
+        data[name] = root[name][...]
+
+    if len(data) == 1:
+        data = data[names[0]]
+
+    if with_attrs:
+        attrs = root.attrs.asdict()
+        return data, attrs["params"]
+
+    return data
 
 
 def list_vars(path: str):

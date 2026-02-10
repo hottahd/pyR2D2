@@ -2,6 +2,8 @@ import os
 
 import numpy as np
 
+import pyR2D2
+
 
 class _BaseReader:
     """
@@ -995,9 +997,11 @@ class _BasePrevAftr(_BaseReader):
     Base class for previous and after time step data
     """
 
+    prev_aftr_kind = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+
     def __init__(self, data):
         self.data = data
-        self.ix_prev_after = (self.ix0 - self.ib_rte_bot) * self.nx
+        self.ix_prev_aftr = (self.ix0 - self.ib_rte_bot) * self.nx
 
     def _allocate_prev_aftr_qq(self, dtype):
         """
@@ -1008,14 +1012,13 @@ class _BasePrevAftr(_BaseReader):
         dtype : data type
             Data type for allocation
         """
-        self.prev_aftr_kind = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
         memflag = True
         if self.ro is not None:
-            memflag = not self.ro.shape == (self.ix_prev_after, self.jx, self.kx)
+            memflag = not self.ro.shape == (self.ix_prev_aftr, self.jx, self.kx)
         if self.ro is None or memflag:
             for key in self.prev_aftr_kind:
                 self.__dict__[key] = np.zeros(
-                    (self.ix_prev_after, self.jx, self.kx), dtype=dtype
+                    (self.ix_prev_aftr, self.jx, self.kx), dtype=dtype
                 )
 
     def _dtype_prev_aftr_qq(self, kind):
@@ -1027,7 +1030,16 @@ class _BasePrevAftr(_BaseReader):
         kind : str
             Data type kind for dtype
         """
-        return np.dtype([("qq", self.endian + str(self.nx * self.ny * self.nz) + kind)])
+        return np.dtype(
+            [
+                (
+                    "qq",
+                    self.endian
+                    + str(self.nx * self.ny * self.nz * len(self.prev_aftr_kind))
+                    + kind,
+                )
+            ]
+        )
 
     def _get_filepath_prev_aftr_qq(self, n, n_prev_aftr, np0, prev_aftr):
         """
@@ -1060,13 +1072,322 @@ class _BasePrevAftr(_BaseReader):
             + cno
         )
 
+    def _get_filepath_prev_aftr_zarr(self, n, n_prev_aftr, prev_aftr):
+        """
+        Filepath for previous and after time step data in zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        """
+        return (
+            self.datadir
+            + prev_aftr
+            + "/zarr/qq."
+            + str(n).zfill(8)
+            + "."
+            + str(n_prev_aftr).zfill(8)
+            + ".zarr"
+        )
+
+    def _ijk_start_size(
+        self,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+    ):
+        """
+        Get start index and size in each direction for previous and after time step data
+
+        Parameters
+        ----------
+        i_start : int, optional
+            Starting index in x-direction
+        i_size : int, optional
+            Size in x-direction
+        j_start : int, optional
+            Starting index in y-direction
+        j_size : int, optional
+            Size in y-direction
+        k_start : int, optional
+            Starting index in z-direction
+        k_size : int, optional
+            Size in z-direction
+
+        Returns
+        -------
+        i_start, i_size, j_start, j_size, k_start, k_size : int
+            Start index and size in each direction
+        """
+
+        if i_start is None:
+            i_start = 0
+        if i_size is None:
+            i_size = self.ix_prev_aftr - i_start
+        if j_start is None:
+            j_start = 0
+        if j_size is None:
+            j_size = self.jx - j_start
+        if k_start is None:
+            k_start = 0
+        if k_size is None:
+            k_size = self.kx - k_start
+
+        return i_start, i_size, j_start, j_size, k_start, k_size
+
+    def _read(
+        self,
+        n: int,
+        n_prev_aftr: int,
+        zarr_flag: bool = False,
+    ):
+        """
+        Core function to read previous and after time step data
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        Core function to read previous and after time step data
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        """
+
+        for np0 in range(self.npe):
+            ib, jb, kb = self.xyz[np0]
+            if ib == self.ib_rte_bot:
+                filepath = self._get_filepath_prev_aftr_qq(
+                    n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                )
+
+                if not os.path.exists(filepath):
+                    zarr_flag = True
+                    break
+
+        if zarr_flag:
+            zarr_filepath = self._get_filepath_prev_aftr_zarr(
+                n, n_prev_aftr, prev_aftr=self.prev_aftr
+            )
+            (qq, params) = pyR2D2.zarr_util.load(zarr_filepath, with_attrs=True)
+
+            for key in self.prev_aftr_kind:
+                self.__dict__[key] = qq[key]
+
+            self.x_prev_aftr = qq["x"]
+            self.y_prev_aftr = qq["y"]
+            self.z_prev_aftr = qq["z"]
+
+            for key in params.keys():
+                self.__dict__[key] = params[key]
+            return
+
+        else:
+
+            self.x_prev_aftr = self.data.x[-self.ix_prev_aftr :]
+            self.y_prev_aftr = self.data.y
+            self.z_prev_aftr = self.data.z
+
+            self._allocate_prev_aftr_qq(dtype=np.float64)
+            dtype = self._dtype_prev_aftr_qq(kind="d")
+
+            for np0 in range(self.npe):
+                ib, jb, kb = self.xyz[np0]
+                if ib >= self.ib_rte_bot:
+                    ibt = ib - self.ib_rte_bot
+
+                    filepath = self._get_filepath_prev_aftr_qq(
+                        n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                    )
+                    qqq_mem = np.memmap(
+                        filename=filepath,
+                        dtype=dtype,
+                        mode="r",
+                        shape=(1,),
+                    )
+                    qqq = qqq_mem[0]
+                    for key, m in zip(
+                        self.prev_aftr_kind, range(len(self.prev_aftr_kind))
+                    ):
+                        self.__dict__[key][
+                            ibt * self.nx : (ibt + 1) * self.nx,
+                            jb * self.ny : (jb + 1) * self.ny,
+                            kb * self.nz : (kb + 1) * self.nz,
+                        ] = qqq["qq"].reshape(
+                            (self.nx, self.ny, self.nz, len(self.prev_aftr_kind)),
+                            order="F",
+                        )[
+                            :, :, :, m
+                        ]
+
+    def _compress(
+        self,
+        n: int,
+        n_prev_aftr: int,
+        zarr_filepath: str = None,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+        overwrite: bool = False,
+    ):
+        """
+        Core function to compress previous and after time step data into zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        """
+
+        if zarr_filepath is None:
+            zarr_filepath = self._get_filepath_prev_aftr_zarr(
+                n, n_prev_aftr, prev_aftr=self.prev_aftr
+            )
+
+        if not overwrite and os.path.exists(zarr_filepath):
+            print(
+                "zarr file ",
+                zarr_filepath,
+                " already exists. Set overwrite=True to overwrite it.",
+            )
+            return
+        else:
+
+            i_start, i_size, j_start, j_size, k_start, k_size = self._ijk_start_size(
+                i_start=i_start,
+                i_size=i_size,
+                j_start=j_start,
+                j_size=j_size,
+                k_start=k_start,
+                k_size=k_size,
+            )
+
+            params_dict = {
+                "i_start": i_start,
+                "i_size": i_size,
+                "j_start": j_start,
+                "j_size": j_size,
+                "k_start": k_start,
+                "k_size": k_size,
+            }
+
+            self._read(n, n_prev_aftr, zarr_flag=False)
+
+            vars_dict = {}
+            for key in self.prev_aftr_kind:
+                vars_dict[key] = self.__dict__[key][
+                    i_start : i_start + i_size,
+                    j_start : j_start + j_size,
+                    k_start : k_start + k_size,
+                ]
+
+            vars_dict["x"] = self.x_prev_aftr[i_start : i_start + i_size]
+            vars_dict["y"] = self.y_prev_aftr[j_start : j_start + j_size]
+            vars_dict["z"] = self.z_prev_aftr[k_start : k_start + k_size]
+
+            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict)
+
+    def check(self, n: int, n_prev_aftr: int):
+        """
+        Core function to check previous and after time step data files
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        """
+
+        zarr_filepath = self._get_filepath_prev_aftr_zarr(
+            n, n_prev_aftr, prev_aftr=self.prev_aftr
+        )
+        if not os.path.exists(zarr_filepath):
+            print(f"Zarr file does not exist at n={n}, {self.prev_aftr}={n_prev_aftr}")
+            return False
+
+        for np0 in range(self.npe):
+            ib, jb, kb = self.xyz[np0]
+            if ib == self.ib_rte_bot:
+                filepath = self._get_filepath_prev_aftr_qq(
+                    n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                )
+
+                if not os.path.exists(filepath):
+                    return True
+
+        self._read(n, n_prev_aftr, zarr_flag=False)
+
+        qq_copy = {}
+        for key in self.prev_aftr_kind:
+            qq_copy[key] = np.copy(self.__dict__[key])
+
+        self._read(n, n_prev_aftr, zarr_flag=True)
+        for key in self.prev_aftr_kind:
+            qq_copy[key] = qq_copy[key][
+                self.i_start : self.i_start + self.i_size,
+                self.j_start : self.j_start + self.j_size,
+                self.k_start : self.k_start + self.k_size,
+            ]
+
+        for key in self.prev_aftr_kind:
+            if (abs(qq_copy[key] - self.__dict__[key])).sum() / qq_copy[
+                key
+            ].sum() > 1.0e-6:
+                print(
+                    f"Check failed for {key} at n={n}, {self.prev_aftr}={n_prev_aftr}"
+                )
+                return False
+        print(f"Check passed at n={n}, {self.prev_aftr}={n_prev_aftr}")
+        return True
+
+    def _delete(self, n: int, n_prev_aftr: int):
+        """
+        Core function to delete previous and after time step data files
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        """
+
+        for np0 in range(self.npe):
+            ib, jb, kb = self.xyz[np0]
+            if ib >= self.ib_rte_bot:
+                filepath = self._get_filepath_prev_aftr_qq(
+                    n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                )
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+
 
 class Previous(_BasePrevAftr):
     """
     Class for previous and after time step data
     """
 
-    def read(self, n: int, n_prev: int):
+    prev_aftr = "prev"
+
+    def read(self, n: int, n_prev: int, zarr_flag: bool = False):
         """
         Reads previous time step data
 
@@ -1077,66 +1398,149 @@ class Previous(_BasePrevAftr):
         n_prev : int
             A selected previous time step for data
         """
-        self._allocate_prev_aftr_qq(dtype=np.float64)
-        dtype = self._dtype_prev_aftr_qq(kind="d")
 
-        for np0 in range(self.npe):
-            ib, jb, kb = self.xyz[np0]
-            if ib >= self.ib_rte_bot:
-                ibt = ib - self.ib_rte_bot
+        self._read(n, n_prev, zarr_flag=zarr_flag)
 
-                filepath = self._get_filepath_prev_aftr_qq(
-                    n, n_prev, np0, prev_aftr="prev"
-                )
-                qqq_mem = np.memmap(
-                    filename=filepath,
-                    dtype=dtype,
-                    mode="r",
-                    shape=(1,),
-                )
-                qqq = qqq_mem[0]
-                for key, m in zip(self.prev_aftr_kind, range(len(self.prev_aftr_kind))):
-                    self.__dict__[key][
-                        ibt * self.nx : (ibt + 1) * self.nx,
-                        jb * self.ny : (jb + 1) * self.ny,
-                        kb * self.nz : (kb + 1) * self.nz,
-                    ] = qqq["qq"].reshape((self.nx, self.ny, self.nz), order="F")
+    def compress(
+        self,
+        n: int,
+        n_prev: int,
+        zarr_filepath: str = None,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+        overwrite: bool = False,
+    ):
+        """
+        Compress previous time step data into zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev : int
+            A selected previous time step for data
+        zarr_filepath : str
+            Filepath for zarr file
+        i_start : int, optional
+            Starting index in x-direction for compression
+        i_size : int, optional
+            Size in x-direction for compression
+        j_start : int, optional
+            Starting index in y-direction for compression
+        j_size : int, optional
+            Size in y-direction for compression
+        k_start : int, optional
+            Starting index in z-direction for compression
+        """
+
+        self._compress(
+            n,
+            n_prev,
+            zarr_filepath=zarr_filepath,
+            i_start=i_start,
+            i_size=i_size,
+            j_start=j_start,
+            j_size=j_size,
+            k_start=k_start,
+            k_size=k_size,
+            overwrite=overwrite,
+        )
+
+    def delete(self, n: int, n_prev: int):
+        """
+        Delete previous time step data files
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev : int
+            A selected previous time step for data
+        """
+
+        self._delete(n, n_prev)
 
 
 class After(_BasePrevAftr):
-    """
-    Reads after time step data
+    prev_aftr = "aftr"
 
-    Parameters
-    ----------
-    n : int
-        A selected time step for data
-    n_aftr : int
-        A selected after time step for data
-    """
+    def read(self, n: int, n_aftr: int, zarr_flag: bool = False):
+        """
+        Reads after time step data
 
-    def read(self, n: int, n_aftr: int):
-        self._allocate_prev_aftr_qq(dtype=np.float64)
-        dtype = self._dtype_prev_aftr_qq(kind="d")
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_aftr : int
+            A selected after time step for data
+        """
 
-        for np0 in range(self.npe):
-            ib, jb, kb = self.xyz[np0]
-            if ib >= self.ib_rte_bot:
-                ibt = ib - self.ib_rte_bot
+        self._read(n, n_aftr, zarr_flag=zarr_flag)
 
-                filepath = self._get_filepath_prev_aftr_qq(
-                    n, n_aftr, np0, prev_aftr="aftr"
-                )
-                qqq_mem = np.memmap(
-                    filename=filepath,
-                    dtype=dtype,
-                    mode="r",
-                    shape=(1,),
-                )
-                qqq = qqq_mem[0]
-                for key, m in zip(self.prev_aftr_kind, range(len(self.prev_aftr_kind))):
-                    self.__dict__[key][
-                        ibt * self.nx : (ibt + 1) * self.nx,
-                        jb * self.ny : (jb + 1) * self.ny,
-                        kb * self.nz : (kb + 1) * self.nz,
-                    ] = qqq["qq"].reshape((self.nx, self.ny, self.nz), order="F")
+    def compress(
+        self,
+        n: int,
+        n_aftr: int,
+        zarr_filepath: str = None,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+        overwrite: bool = False,
+    ):
+        """
+        Compress after time step data into zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_aftr : int
+            A selected after time step for data
+        zarr_filepath : str
+            Filepath for zarr file
+        i_start : int, optional
+            Starting index in x-direction for compression
+        i_size : int, optional
+            Size in x-direction for compression
+        j_start : int, optional
+            Starting index in y-direction for compression
+        j_size : int, optional
+            Size in y-direction for compression
+        k_start : int, optional
+            Starting index in z-direction for compression
+        """
+
+        self._compress(
+            n,
+            n_aftr,
+            zarr_filepath=zarr_filepath,
+            i_start=i_start,
+            i_size=i_size,
+            j_start=j_start,
+            j_size=j_size,
+            k_start=k_start,
+            k_size=k_size,
+            overwrite=overwrite,
+        )
+
+    def delete(self, n: int, n_aftr: int):
+        """
+        Delete after time step data files
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_aftr : int
+            A selected after time step for data
+        """
+
+        self._delete(n, n_aftr)
