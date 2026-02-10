@@ -1288,6 +1288,24 @@ class _BasePrevAftr(_BaseReader):
                 "k_size": k_size,
             }
 
+            for np0 in range(self.npe):
+                ib, jb, kb = self.xyz[np0]
+                if ib == self.ib_rte_bot:
+                    filepath = self._get_filepath_prev_aftr_qq(
+                        n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                    )
+
+                    if not os.path.exists(filepath):
+                        print(
+                            "Original file does not exist at n=",
+                            n,
+                            ", ",
+                            self.prev_aftr,
+                            "=",
+                            n_prev_aftr,
+                            ". Compression failed.",
+                        )
+                        return
             self._read(n, n_prev_aftr, zarr_flag=False)
 
             vars_dict = {}
@@ -1348,9 +1366,9 @@ class _BasePrevAftr(_BaseReader):
             ]
 
         for key in self.prev_aftr_kind:
-            if (abs(qq_copy[key] - self.__dict__[key])).sum() / qq_copy[
-                key
-            ].sum() > 1.0e-6:
+            if (abs(qq_copy[key] - self.__dict__[key])).sum() / abs(
+                qq_copy[key]
+            ).sum() > 1.0e-6:
                 print(
                     f"Check failed for {key} at n={n}, {self.prev_aftr}={n_prev_aftr}"
                 )
