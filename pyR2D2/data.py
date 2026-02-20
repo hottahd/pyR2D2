@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 import pyR2D2
@@ -65,14 +67,17 @@ class Data:
         self.qp = pyR2D2.Previous(self)
         self.qa = pyR2D2.After(self)
         self.sync = pyR2D2.Sync(self)
-        self.eos = pyR2D2.cpp_util.EOS(
-            self.log_ro_e,
-            self.se_e,
-            self.log_pr_e,
-            self.log_en_e,
-            self.log_te_e,
-            self.log_op_e,
-        )
+
+        eosdir = self.datadir[:-5] + "input_data/"
+        if os.path.exists(eosdir + "eos_table_sero.npz"):
+            self.eos = pyR2D2.cpp_util.EOS(
+                self.log_ro_e,
+                self.se_e,
+                self.log_pr_e,
+                self.log_en_e,
+                self.log_te_e,
+                self.log_op_e,
+            )
 
     def __getattr__(self, name):
         """

@@ -1001,6 +1001,8 @@ class _BasePrevAftr(_BaseReader):
 
     def __init__(self, data):
         self.data = data
+        if self.ib_rte_bot is None:
+            self.ib_rte_bot = 0
         self.ix_prev_aftr = (self.ix0 - self.ib_rte_bot) * self.nx
 
     def _allocate_prev_aftr_qq(self, dtype):
