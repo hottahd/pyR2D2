@@ -1,4 +1,5 @@
 import os
+import glob
 
 import numpy as np
 
@@ -129,6 +130,19 @@ class _BaseRemapReader(_BaseReader):
                 + "{0:08d}".format(np0)
             )
         return filepath
+
+    def _get_filepath_remap_zarr(self, n: int):
+        """
+        Filepath for remap date in zarr format
+
+        Parameters
+        ----------
+        n : int
+            time step        
+        """
+
+        return self.datadir + "remap/qq/zarr/qq." + "{0:08d}".format(n) + ".zarr"
+
 
     def _add_docstring(self):
         docstring = "\n"
@@ -350,7 +364,7 @@ class FullData(_BaseRemapReader):
 
     """
 
-    def read(self, n: int, value):
+    def read(self, n: int, value, zarr_flag: bool = False):
         """
         Reads 3D full data
         The data is stored in self.qq dictionary
@@ -368,31 +382,17 @@ class FullData(_BaseRemapReader):
                 - "ph": div B cleaning
                 - "te": temperature
                 - "op": Opacity
+        
+        zarr_flag : bool
+            If True, read from zarr format instead of binary format
+
         Notes
         -----
         If value is 'all', all values are read
         """
 
-        if type(value) == str:
-            if value == "all":
-                values_input = self.remap_kind + self.remap_kind_add
-            else:
-                values_input = [value]
-        if type(value) == list:
-            values_input = value
-
-        for value in values_input:
-            if value not in self.p.remap_kind + self.p.remap_kind_add:
-                print("######")
-                print("value =", value)
-                print(
-                    "value should be one of ", self.p.remap_kind + self.p.remap_kind_add
-                )
-                print("return")
-                return
-
-        self._allocate_remap_qq(ijk=[self.ix, self.jx, self.kx])
-
+        # check if original binary files exists
+        missing = False
         for ir0 in range(1, self.ixr + 1):
             for jr0 in range(1, self.jxr + 1):
                 np0 = self.np_ijr[ir0 - 1, jr0 - 1]
@@ -400,39 +400,225 @@ class FullData(_BaseRemapReader):
 
                     dtype = self._dtype_remap_qq(np0)
                     filepath = self._get_filepath_remap_qq(n, np0)
+                    if not os.path.exists(filepath):
+                        missing = True
+                        break
+            if missing:
+                break
+        
+        if missing:
+            zarr_flag = True
+            
+        if zarr_flag:
+            if value == "all":
+                names = value
+            else:
+                if isinstance(value, str):
+                    names = [value, "x", "y", "z"]
+                else:
+                    names = list(value) + ["x", "y", "z"]
 
-                    with open(filepath, "rb") as f:
-                        qqq = np.fromfile(f, dtype=dtype, count=1)
+                
+            zarr_filepath = self._get_filepath_remap_zarr(n)
+            (qq, params) = pyR2D2.zarr_util.load(zarr_filepath, 
+            with_attrs=True, names=names)
 
-                        for value in values_input:
-                            if value in self.p.remap_kind:
-                                m = self.p.remap_kind.index(value)
-                                self.__dict__[value][
-                                    self.iss[np0] : self.iee[np0] + 1,
-                                    self.jss[np0] : self.jee[np0] + 1,
-                                    :,
-                                ] = qqq["qq"].reshape(
-                                    (
-                                        self.iixl[np0],
-                                        self.jjxl[np0],
-                                        self.kx,
-                                        self.mtype,
-                                    ),
-                                    order="F",
-                                )[
-                                    :, :, :, m
-                                ]
-                            else:
-                                self.__dict__[value][
-                                    self.iss[np0] : self.iee[np0] + 1,
-                                    self.jss[np0] : self.jee[np0] + 1,
-                                    :,
-                                ] = qqq[value].reshape(
-                                    (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
-                                )[
-                                    :, :, :
-                                ]
+            keys = list(self.__dict__.keys())
 
+            for key in keys:
+                if key in self.remap_kind + self.remap_kind_add:
+                    self.__dict__.pop(key, None)
+
+
+            for key in qq.keys():
+                self.params = params
+                self.__dict__[key] = qq[key]
+
+        else:
+
+            if type(value) == str:
+                if value == "all":
+                    values_input = self.remap_kind + self.remap_kind_add
+                else:
+                    values_input = [value]
+            if type(value) == list:
+                values_input = value
+
+            for value in values_input:
+                if value not in self.p.remap_kind + self.p.remap_kind_add:
+                    print("######")
+                    print("value =", value)
+                    print(
+                        "value should be one of ", self.p.remap_kind + self.p.remap_kind_add
+                    )
+                    print("return")
+                    return
+
+            self._allocate_remap_qq(ijk=[self.ix, self.jx, self.kx])
+
+            for ir0 in range(1, self.ixr + 1):
+                for jr0 in range(1, self.jxr + 1):
+                    np0 = self.np_ijr[ir0 - 1, jr0 - 1]
+                    if ir0 == self.ir[np0] and jr0 == self.jr[np0]:
+
+                        dtype = self._dtype_remap_qq(np0)
+                        filepath = self._get_filepath_remap_qq(n, np0)
+
+                        with open(filepath, "rb") as f:
+                            qqq = np.fromfile(f, dtype=dtype, count=1)
+
+                            for value in values_input:
+                                if value in self.p.remap_kind:
+                                    m = self.p.remap_kind.index(value)
+                                    self.__dict__[value][
+                                        self.iss[np0] : self.iee[np0] + 1,
+                                        self.jss[np0] : self.jee[np0] + 1,
+                                        :,
+                                    ] = qqq["qq"].reshape(
+                                        (
+                                            self.iixl[np0],
+                                            self.jjxl[np0],
+                                            self.kx,
+                                            self.mtype,
+                                        ),
+                                        order="F",
+                                    )[
+                                        :, :, :, m
+                                    ]
+                                else:
+                                    self.__dict__[value][
+                                        self.iss[np0] : self.iee[np0] + 1,
+                                        self.jss[np0] : self.jee[np0] + 1,
+                                        :,
+                                    ] = qqq[value].reshape(
+                                        (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
+                                    )[
+                                        :, :, :
+                                    ]
+
+    def compress(
+            self,
+            n: int,
+            zarr_filepath: str = None,
+            i_start: int = None,
+            i_size: int = None,
+            j_start: int = None,
+            j_size: int = None,
+            k_start: int = None,
+            k_size: int = None,
+            chunks3d: tuple = None,
+            value: list = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"],
+            overwrite: bool = True,
+    ):
+
+        if zarr_filepath is None:
+            zarr_filepath = self._get_filepath_remap_zarr(n)
+        
+        if not overwrite and os.path.exists(zarr_filepath):
+            print(f"File {zarr_filepath} already exists. Set overwrite=True to overwrite it.")
+            return
+
+        i_start = 0 if i_start is None else i_start
+        i_size = self.ix if i_size is None else i_size
+        j_start = 0 if j_start is None else j_start
+        j_size = self.jx if j_size is None else j_size
+        k_start = 0 if k_start is None else k_start
+        k_size = self.kx if k_size is None else k_size
+
+        params_dict = {
+            "i_start": i_start,
+            "i_size": i_size,
+            "j_start": j_start,
+            "j_size": j_size,
+            "k_start": k_start,
+            "k_size": k_size,
+            }
+        
+        self.read(n=n, value=value, zarr_flag=False)
+
+        vars_dict = {}
+        for key in value:
+            vars_dict[key] = self.__dict__[key][
+                i_start:i_start+i_size,
+                j_start:j_start+j_size,
+                k_start:k_start+k_size
+                ]
+
+        vars_dict["x"] = self.x[i_start : i_start + i_size]
+        vars_dict["y"] = self.y[j_start : j_start + j_size]
+        vars_dict["z"] = self.z[k_start : k_start + k_size]
+
+
+        if chunks3d is None:
+            i_size_chunk = i_size
+            j_size_chunk = j_size
+            k_size_chunk = k_size
+
+            target_size = 2**24 # 64 MB for float32
+
+            i_count = 1
+            jk_count = 1
+            jk_priority = 3 # priority for j and k to be halved compared to i
+            while i_size_chunk * j_size_chunk * k_size_chunk > target_size:
+                if i_count <= jk_count * jk_priority:
+                    i_size_chunk = max(i_size_chunk // 2, 1)
+                    i_count += 1
+                else:
+                    j_size_chunk = max(j_size_chunk // 2, 1)
+                    k_size_chunk = max(k_size_chunk // 2, 1)
+                    jk_count += 1
+            
+            chunks3d = (i_size_chunk, j_size_chunk, k_size_chunk)
+            
+        pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d)
+
+    def check(self, n: int):
+        """
+        Check if the remap/qq/ file exists for all MPI processes for a given time step n
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        """
+
+        zarr_filepath = self._get_filepath_remap_zarr(n)
+        if not os.path.exists(zarr_filepath):
+            print(f"Zarr file does not exist at n={n}. Please run FullData.compress() to create it.")
+            return False
+
+        self.read(n=n, value="all", zarr_flag=True)
+        value = []
+        qq_copy = {}
+        for key in self.__dict__.keys():
+            if key in self.remap_kind + self.remap_kind_add:
+                value.append(key)
+                qq_copy[key] = self.__dict__[key]
+
+        self.read(n=n, value=value, zarr_flag=False)
+
+        for key in value:
+            if (abs(qq_copy[key] - self.__dict__[key]).sum() / abs(qq_copy[key]).sum()) > 1e-6:
+                print(f"Data mismatch for {key} at n={n}.")
+                return False
+        
+        print(f"Check passed at n={n}")
+        return True
+
+    def delete(self, n: int):
+        """
+        Delete the remap/qq/ file for a given time step n
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        """
+
+        if self.check(n=n):
+            print("Deleting", self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*")
+            for filepath in glob.glob(self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*"):
+                os.remove(filepath)
 
 class RestrictedData(_BaseRemapReader):
     """
@@ -1290,6 +1476,7 @@ class _BasePrevAftr(_BaseReader):
                 "k_size": k_size,
             }
 
+            # check if original files exist
             for np0 in range(self.npe):
                 ib, jb, kb = self.xyz[np0]
                 if ib == self.ib_rte_bot:

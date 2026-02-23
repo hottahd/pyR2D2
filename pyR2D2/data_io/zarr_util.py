@@ -2,11 +2,33 @@ import numpy as np
 import zarr
 
 
+def _check_chunks(chunks, shape_len):
+    if chunks is None:
+        return
+
+    if not isinstance(chunks, (tuple, list)):
+        raise TypeError(f"Chunks must be a tuple or list, got {type(chunks)}")
+
+    if len(chunks) != shape_len:
+        raise ValueError(
+            f"Chunks length {len(chunks)} does not match array dimensions {shape_len}"
+        )
+    for chunk in chunks:
+        if not isinstance(chunk, int):
+            raise TypeError(f"Chunk sizes must be integers, got {type(chunk)}")
+        if chunk <= 0:
+            raise ValueError(
+                f"Invalid chunk size {chunk}"
+            )
+
 def save(
     path: str,
     vars_dict: dict,
     params: dict = None,
     max_chunk_size: int = 512,
+    chunks1d: tuple = None,
+    chunks2d: tuple = None,
+    chunks3d: tuple = None,
     clevel: int = 5,
 ):
     """
@@ -22,6 +44,12 @@ def save(
         additional parameters to save, by default None
     max_chunk_size : int, optional
         maximum chunk size for zarr arrays, by default 512
+    chunks1d : tuple, optional
+        chunk size for 1D arrays, by default None (calculated from max_chunk_size)
+    chunks2d : tuple, optional
+        chunk size for 2D arrays, by default None (calculated from max_chunk_size)
+    chunks3d : tuple, optional
+        chunk size for 3D arrays, by default None (calculated from max_chunk_size
     clevel : int, optional
         compression level for zarr, by default 5
 
@@ -45,7 +73,11 @@ def save(
     for name, array in vars_dict.items():
         array = np.asarray(array, dtype=np.float32, order="C")
         if array.ndim == 3:
-            chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(3))
+            if chunks3d is None:
+                chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(3))
+            else:
+                _check_chunks(chunks3d, 3)
+                chunks = chunks3d
             root.create_array(
                 name,
                 data=array,
@@ -54,7 +86,11 @@ def save(
                 overwrite=True,
             )
         elif array.ndim == 2:
-            chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(2))
+            if chunks2d is None:
+                chunks = tuple(min(max_chunk_size, array.shape[i]) for i in range(2))
+            else:
+                _check_chunks(chunks2d, 2)
+                chunks = chunks2d
             root.create_array(
                 name,
                 data=array,
@@ -63,7 +99,11 @@ def save(
                 overwrite=True,
             )
         elif array.ndim == 1:
-            chunks = (min(max_chunk_size, array.shape[0]),)
+            if chunks1d is None:
+                chunks = (min(max_chunk_size, array.shape[0]),)
+            else:
+                _check_chunks(chunks1d, 1)
+                chunks = chunks1d
             root.create_array(
                 name,
                 data=array,
@@ -93,7 +133,7 @@ def load(path: str, names="all", with_attrs: bool = False):
 
     Returns
     -------
-    np.ndarray or dict
+    dict
         loaded array from zarr data
     """
     root = zarr.open_group(path, mode="r")
@@ -107,9 +147,6 @@ def load(path: str, names="all", with_attrs: bool = False):
     data = {}
     for name in names:
         data[name] = root[name][...]
-
-    if len(data) == 1:
-        data = data[names[0]]
 
     if with_attrs:
         attrs = root.attrs.asdict()
