@@ -508,7 +508,7 @@ class FullData(_BaseRemapReader):
             k_size: int = None,
             chunks3d: tuple = None,
             value: list = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"],
-            overwrite: bool = True,
+            overwrite: bool = False,
     ):
 
         if zarr_filepath is None:
