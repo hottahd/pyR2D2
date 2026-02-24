@@ -564,10 +564,9 @@ class FullData(_BaseRemapReader):
         vars_dict["x"] = self.x[i_start : i_start + i_size]
         vars_dict["y"] = self.y[j_start : j_start + j_size]
         vars_dict["z"] = self.z[k_start : k_start + k_size]
+        pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w")
 
         if lightweight:
-            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w")
-            
             for value0 in value:
                 print(value0)
                 self.read(n=n, value=value0, zarr_flag=False)
@@ -591,7 +590,7 @@ class FullData(_BaseRemapReader):
                     j_start:j_start+j_size,
                     k_start:k_start+k_size
                     ]
-            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d)
+            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="a")
                 
     @staticmethod
     def _check_core(qq1, qq2, key):
@@ -628,7 +627,8 @@ class FullData(_BaseRemapReader):
                     return True
 
         if lightweight:
-            for value0 in value:        
+            for value0 in value:
+                print(value0)
                 try:
                     self.read(n=n, value=value0, zarr_flag=True)
                 except:
