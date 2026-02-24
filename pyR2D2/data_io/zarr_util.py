@@ -30,6 +30,7 @@ def save(
     chunks2d: tuple = None,
     chunks3d: tuple = None,
     clevel: int = 5,
+    mode: str = "w",
 ):
     """
 
@@ -52,13 +53,15 @@ def save(
         chunk size for 3D arrays, by default None (calculated from max_chunk_size
     clevel : int, optional
         compression level for zarr, by default 5
+    mode : str, optional
+        file mode for zarr (e.g., "w" for write, "a" for append), by default "w"
 
     Raises
     ------
     ValueError
         If an array with unsupported dimensions is encountered.
     """
-    root = zarr.open_group(path, mode="w")
+    root = zarr.open_group(path, mode=mode)
 
     codec_f32 = zarr.codecs.BloscCodec(
         cname="zstd",

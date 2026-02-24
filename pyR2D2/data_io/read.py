@@ -1,5 +1,6 @@
 import os
 import glob
+import gc
 
 import numpy as np
 
@@ -363,6 +364,7 @@ class FullData(_BaseRemapReader):
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`
 
     """
+    values_zarr = ['ro', 'vx', 'vy', 'vz', 'bx', 'by', 'bz', 'se']
 
     def read(self, n: int, value, zarr_flag: bool = False):
         """
@@ -401,6 +403,7 @@ class FullData(_BaseRemapReader):
                     dtype = self._dtype_remap_qq(np0)
                     filepath = self._get_filepath_remap_qq(n, np0)
                     if not os.path.exists(filepath):
+                        print(filepath)
                         missing = True
                         break
             if missing:
@@ -431,8 +434,8 @@ class FullData(_BaseRemapReader):
 
 
             for key in qq.keys():
-                self.params = params
                 self.__dict__[key] = qq[key]
+            self.params = params
 
         else:
 
@@ -507,8 +510,10 @@ class FullData(_BaseRemapReader):
             k_start: int = None,
             k_size: int = None,
             chunks3d: tuple = None,
-            value: list = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"],
+            value: list = values_zarr,
             overwrite: bool = False,
+            lightweight: bool = False,
+            
     ):
 
         if zarr_filepath is None:
@@ -524,30 +529,6 @@ class FullData(_BaseRemapReader):
         j_size = self.jx if j_size is None else j_size
         k_start = 0 if k_start is None else k_start
         k_size = self.kx if k_size is None else k_size
-
-        params_dict = {
-            "i_start": i_start,
-            "i_size": i_size,
-            "j_start": j_start,
-            "j_size": j_size,
-            "k_start": k_start,
-            "k_size": k_size,
-            }
-        
-        self.read(n=n, value=value, zarr_flag=False)
-
-        vars_dict = {}
-        for key in value:
-            vars_dict[key] = self.__dict__[key][
-                i_start:i_start+i_size,
-                j_start:j_start+j_size,
-                k_start:k_start+k_size
-                ]
-
-        vars_dict["x"] = self.x[i_start : i_start + i_size]
-        vars_dict["y"] = self.y[j_start : j_start + j_size]
-        vars_dict["z"] = self.z[k_start : k_start + k_size]
-
 
         if chunks3d is None:
             i_size_chunk = i_size
@@ -569,10 +550,58 @@ class FullData(_BaseRemapReader):
                     jk_count += 1
             
             chunks3d = (i_size_chunk, j_size_chunk, k_size_chunk)
-            
-        pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d)
 
-    def check(self, n: int):
+        params_dict = {
+            "i_start": i_start,
+            "i_size": i_size,
+            "j_start": j_start,
+            "j_size": j_size,
+            "k_start": k_start,
+            "k_size": k_size,
+            }
+
+        vars_dict = {}
+        vars_dict["x"] = self.x[i_start : i_start + i_size]
+        vars_dict["y"] = self.y[j_start : j_start + j_size]
+        vars_dict["z"] = self.z[k_start : k_start + k_size]
+
+        if lightweight:
+            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w")
+            
+            for value0 in value:
+                print(value0)
+                self.read(n=n, value=value0, zarr_flag=False)
+                arr = self.__dict__[value0][
+                    i_start:i_start+i_size,
+                    j_start:j_start+j_size,
+                    k_start:k_start+k_size
+                ]
+                pyR2D2.zarr_util.save(zarr_filepath, {value0: arr}, chunks3d=chunks3d, mode="a")
+                del self.__dict__[value0]
+                del arr
+                gc.collect()
+        else:
+        
+            self.read(n=n, value=value, zarr_flag=False)
+
+            vars_dict = {}
+            for key in value:
+                vars_dict[key] = self.__dict__[key][
+                    i_start:i_start+i_size,
+                    j_start:j_start+j_size,
+                    k_start:k_start+k_size
+                    ]
+            pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d)
+                
+    @staticmethod
+    def _check_core(qq1, qq2, key):
+        if (abs(qq1 - qq2).sum() / (abs(qq1).sum() + 1e-12)) > 1e-6:
+            print(f"Data mismatch for {key}.")
+            return False
+        return True
+
+
+    def check(self, n: int, value: list = values_zarr, lightweight: bool = False):
         """
         Check if the remap/qq/ file exists for all MPI processes for a given time step n
 
@@ -580,6 +609,10 @@ class FullData(_BaseRemapReader):
         ----------
         n : int
             A selected time step for data
+        value : list
+            List of values to check. If the check fails for any of the values, the function returns False. By default, all values are checked.    
+        lightweight : bool
+            If True, check is done for each value separately to save memory. This is useful when the data is too large to fit in memory. By default, False (all values are checked together).
         """
 
         zarr_filepath = self._get_filepath_remap_zarr(n)
@@ -587,25 +620,43 @@ class FullData(_BaseRemapReader):
             print(f"Zarr file does not exist at n={n}. Please run FullData.compress() to create it.")
             return False
 
-        self.read(n=n, value="all", zarr_flag=True)
-        value = []
-        qq_copy = {}
-        for key in self.__dict__.keys():
-            if key in self.remap_kind + self.remap_kind_add:
-                value.append(key)
-                qq_copy[key] = self.__dict__[key]
+        for np0 in range(self.npe):
+            filepath = self._get_filepath_remap_qq(n, np0)
+            if self.iixl[np0] !=0:
+                if not os.path.exists(filepath):
+                    print(f"File {filepath} does not exist. Anyway you can delete it.")
+                    return True
 
-        self.read(n=n, value=value, zarr_flag=False)
+        if lightweight:
+            for value0 in value:        
+                try:
+                    self.read(n=n, value=value0, zarr_flag=True)
+                except:
+                    print(f"Value {value0} does not exist in zarr file. Compression must have failed. Remove the zarr file and try again.")
+                    return False
+                qq_copy = self.__dict__[value0].copy()
+                self.read(n=n, value=value0, zarr_flag=False)
+                if not self._check_core(qq_copy, self.__dict__[value0], value0):
+                    return False
+                del qq_copy
+                del self.__dict__[value0]
+        else:         
+            self.read(n=n, value=value, zarr_flag=True)
+            qq_copy = {}
+            for key in self.__dict__.keys():
+                if key in self.remap_kind + self.remap_kind_add:
+                    qq_copy[key] = self.__dict__[key].copy()
 
-        for key in value:
-            if (abs(qq_copy[key] - self.__dict__[key]).sum() / abs(qq_copy[key]).sum()) > 1e-6:
-                print(f"Data mismatch for {key} at n={n}.")
-                return False
+            self.read(n=n, value=value, zarr_flag=False)
+
+            for key in value:
+                if not self._check_core(qq_copy[key], self.__dict__[key], key):
+                    return False
         
         print(f"Check passed at n={n}")
         return True
 
-    def delete(self, n: int):
+    def delete(self, n: int, force: bool = False, lightweight: bool = False):
         """
         Delete the remap/qq/ file for a given time step n
 
@@ -613,12 +664,31 @@ class FullData(_BaseRemapReader):
         ----------
         n : int
             A selected time step for data
+        force : bool
+            If True, delete the files even if the check fails
+        lightweight : bool
+            If True, delete the zarr file for each value separately to save memory. This is useful when the data is too large to fit in memory. By default, False (all values are deleted together).
         """
 
-        if self.check(n=n):
-            print("Deleting", self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*")
-            for filepath in glob.glob(self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*"):
-                os.remove(filepath)
+        if force:
+            check_flag = True
+        else:
+            check_flag = self.check(n=n, lightweight=lightweight)
+
+        if check_flag:
+            if os.path.isdir(self.datadir+"remap/qq/00000/"):
+                print("Deleting files in", self.datadir+"remap/qq/*/*/qq.dac."+str(n).zfill(8)+".*")
+                for np0 in range(self.npe):
+
+                    filepath = self._get_filepath_remap_qq(n, np0)
+                    # print(filepath)
+                    if os.path.exists(filepath):
+                        os.remove(filepath)                
+            else:
+                print("Deleting", self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*")
+                for filepath in glob.glob(self.datadir+"remap/qq/qq.dac."+str(n).zfill(8)+".*"):
+                    # print(filepath)
+                    os.remove(filepath)
 
 class RestrictedData(_BaseRemapReader):
     """
@@ -1555,9 +1625,9 @@ class _BasePrevAftr(_BaseReader):
             ]
 
         for key in self.prev_aftr_kind:
-            if (abs(qq_copy[key] - self.__dict__[key])).sum() / abs(
+            if (abs(qq_copy[key] - self.__dict__[key])).sum() / ( abs(
                 qq_copy[key]
-            ).sum() > 1.0e-6:
+            ).sum() + 1e-12) > 1.0e-6:
                 print(
                     f"Check failed for {key} at n={n}, {self.prev_aftr}={n_prev_aftr}"
                 )
