@@ -187,7 +187,7 @@ class XSelect(_BaseRemapReader):
 
     """
 
-    def read(self, xs: float, n: int):
+    def read(self, xs: float, n: int, zarr_flag: bool = False):
         """
         Reads 2D selected data at a certain x
 
@@ -197,38 +197,66 @@ class XSelect(_BaseRemapReader):
             A selected height for data
         n : int
             A selected time step for data
+        zarr_flag : bool
+            If True, read from zarr format instead of binary format
         """
 
         i0 = np.argmin(np.abs(self.x - xs))
         ir0 = self.i2ir[i0]
-
-        self._allocate_remap_qq(ijk=[self.jx, self.kx])
-
+        
+        missing = False
+        # check if original binary files exists
         for jr0 in range(1, self.jxr + 1):
             np0 = self.np_ijr[ir0 - 1, jr0 - 1]
-
             if jr0 == self.jr[np0]:
-                dtype = self._dtype_remap_qq(np0)
                 filepath = self._get_filepath_remap_qq(n, np0)
+                if not os.path.exists(filepath):
+                    missing = True
+                    break
+        
+        if missing and not zarr_flag:
+            print("Some original binary files are missing.")
+            print("Trying to read from zarr file.")
+            zarr_flag = True
 
-                qqq_mem = np.memmap(filepath, dtype=dtype, mode="r", shape=(1,))
-                qqq = qqq_mem[0]
+        if zarr_flag:
+            # If zarr_flag is True, try to read from zarr file
+            zarr_path = self._get_filepath_remap_zarr(n)
+            if not os.path.exists(zarr_path):
+                raise FileNotFoundError(f"Zarr file does not exist: {zarr_path}")
+            qq = pyR2D2.zarr_util.load(zarr_path, names="all", i0=i0, i1=i0+1)            
+            for key in qq.keys():
+                if key in ["x", "y", "z"]:
+                    self.__dict__[key] = qq[key]
+                else:
+                    self.__dict__[key] = qq[key][0,:,:].squeeze()
+        else:
+            self._allocate_remap_qq(ijk=[self.jx, self.kx])
+            for jr0 in range(1, self.jxr + 1):
+                np0 = self.np_ijr[ir0 - 1, jr0 - 1]
 
-                for key, m in zip(self.remap_kind, range(self.mtype)):
-                    self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
-                        "qq"
-                    ].reshape(
-                        (self.iixl[np0], self.jjxl[np0], self.kx, self.mtype), order="F"
-                    )[
-                        i0 - self.iss[np0], :, :, m
-                    ]
+                if jr0 == self.jr[np0]:
+                    dtype = self._dtype_remap_qq(np0)
+                    filepath = self._get_filepath_remap_qq(n, np0)
 
-                for key in self.remap_kind_add:
-                    self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
-                        key
-                    ].reshape((self.iixl[np0], self.jjxl[np0], self.kx), order="F")[
-                        i0 - self.iss[np0], :, :
-                    ]
+                    qqq_mem = np.memmap(filepath, dtype=dtype, mode="r", shape=(1,))
+                    qqq = qqq_mem[0]
+
+                    for key, m in zip(self.remap_kind, range(self.mtype)):
+                        self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
+                            "qq"
+                        ].reshape(
+                            (self.iixl[np0], self.jjxl[np0], self.kx, self.mtype), order="F"
+                        )[
+                            i0 - self.iss[np0], :, :, m
+                        ]
+
+                    for key in self.remap_kind_add:
+                        self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
+                            key
+                        ].reshape((self.iixl[np0], self.jjxl[np0], self.kx), order="F")[
+                            i0 - self.iss[np0], :, :
+                        ]
 
                 self.info = {}
                 self.info["xs"] = self.x[i0]
@@ -409,7 +437,9 @@ class FullData(_BaseRemapReader):
             if missing:
                 break
         
-        if missing:
+        if missing and not zarr_flag:
+            print("Some original binary files are missing.")
+            print("Trying to read from zarr file.")
             zarr_flag = True
             
         if zarr_flag:
@@ -423,6 +453,10 @@ class FullData(_BaseRemapReader):
 
                 
             zarr_filepath = self._get_filepath_remap_zarr(n)
+            if not os.path.exists(zarr_filepath):
+                print(f"Zarr file does not exist at n={n}.")
+                return
+            
             (qq, params) = pyR2D2.zarr_util.load(zarr_filepath, 
             with_attrs=True, names=names)
 
@@ -619,31 +653,34 @@ class FullData(_BaseRemapReader):
             print(f"Zarr file does not exist at n={n}. Please run FullData.compress() to create it.")
             return False
 
+        for key in value:
+            if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
+                print(f"Variable {key} does not exist in zarr file at n={n}. Please run FullData.compress() to create it.")
+                return False
+
         for np0 in range(self.npe):
             filepath = self._get_filepath_remap_qq(n, np0)
-            if self.iixl[np0] !=0:
+            if self.iixl[np0]*self.jjxl[np0] !=0:
                 if not os.path.exists(filepath):
                     print(f"File {filepath} does not exist. Anyway you can delete it.")
                     return True
 
         if lightweight:
-            for value0 in value:
-                print(value0)
-                try:
-                    self.read(n=n, value=value0, zarr_flag=True)
-                except:
-                    print(f"Value {value0} does not exist in zarr file. Compression must have failed. Remove the zarr file and try again.")
-                    return False
-                qq_copy = self.__dict__[value0].copy()
-                self.read(n=n, value=value0, zarr_flag=False)
-                if not self._check_core(qq_copy, self.__dict__[value0], value0):
-                    return False
-                del qq_copy
-                del self.__dict__[value0]
+            for i in range(0,self.ix,self.ix//3):
+                self.qx.read(self.x[i], n=n, zarr_flag=True)
+                qq_copy = {}
+                for key in value:
+                    if key in self.remap_kind + self.remap_kind_add:
+                        qq_copy[key] = self.qx.__dict__[key].copy()
+                self.qx.read(self.x[i], n=n, zarr_flag=False)
+                for key in value:
+                    if key in self.remap_kind + self.remap_kind_add:
+                        if not self._check_core(qq_copy[key], self.qx.__dict__[key], key):
+                            return False
         else:         
             self.read(n=n, value=value, zarr_flag=True)
             qq_copy = {}
-            for key in self.__dict__.keys():
+            for key in value:
                 if key in self.remap_kind + self.remap_kind_add:
                     qq_copy[key] = self.__dict__[key].copy()
 
