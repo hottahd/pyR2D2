@@ -64,8 +64,8 @@ class Parameters:
             self.lstar = pyR2D2.constant.LSUN
 
         # remapで出力している変数の種類
-        self.remap_kind = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se", "ph"]
-        self.remap_kind_add = ["pr", "te", "op"]
+        self.remap_keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se", "ph"]
+        self.remap_keys_add = ["pr", "te", "op"]
 
         # transform endiant for python
         if self.swap == 0:  # little

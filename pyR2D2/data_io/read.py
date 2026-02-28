@@ -5,6 +5,7 @@ import gc
 import numpy as np
 
 import pyR2D2
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class _BaseReader:
@@ -30,12 +31,12 @@ class _BaseRemapReader(_BaseReader):
     def __init__(self, data):
         self.data = data
 
-        for key in self.data.remap_kind + self.data.remap_kind_add:
+        for key in self.remap_keys + self.remap_keys_add:
             self.__dict__[key] = None
 
         self._add_docstring()
 
-    def _allocate_remap_qq(self, ijk: tuple):
+    def _allocate_remap_qq(self, ijk: tuple, keys: list = None):
         """
         Paramters
         ---------
@@ -45,12 +46,26 @@ class _BaseRemapReader(_BaseReader):
         ijk : tuple
             size of data
         """
-        memflag = True
-        if self.ro is not None:
-            memflag = not self.ro.shape == ijk
-        if self.ro is None or memflag:
-            for key in self.remap_kind + self.remap_kind_add:
-                self.__dict__[key] = np.zeros(ijk)
+        
+        if keys is None:
+            keys = self.remap_keys + self.remap_keys_add
+        else:
+            if isinstance(keys, str):
+                if keys == "all":
+                    keys = self.remap_keys + self.remap_keys_add
+                else:
+                    keys = [keys]
+        
+        for key in keys:
+            if key not in self.remap_keys + self.remap_keys_add:
+                raise ValueError(f"key should be one of {self.remap_keys + self.remap_keys_add}, but got {key}")
+            memflag = True
+            # check if the shape of allocated array is the same as ijk.
+            # If not, allocate a new array. This is to avoid memory error when the shape of data changes.
+            if self.__dict__.get(key, None) is not None:
+                memflag = not self.__dict__[key].shape == ijk
+            if self.__dict__.get(key, None) is None or memflag:                
+                self.__dict__[key] = np.empty(ijk, dtype=np.float32)
 
     def _dtype_remap_qq(self, np0):
         """
@@ -242,7 +257,7 @@ class XSelect(_BaseRemapReader):
                     qqq_mem = np.memmap(filepath, dtype=dtype, mode="r", shape=(1,))
                     qqq = qqq_mem[0]
 
-                    for key, m in zip(self.remap_kind, range(self.mtype)):
+                    for key, m in zip(self.remap_keys, range(self.mtype)):
                         self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
                             "qq"
                         ].reshape(
@@ -251,7 +266,7 @@ class XSelect(_BaseRemapReader):
                             i0 - self.iss[np0], :, :, m
                         ]
 
-                    for key in self.remap_kind_add:
+                    for key in self.remap_keys_add:
                         self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
                             key
                         ].reshape((self.iixl[np0], self.jjxl[np0], self.kx), order="F")[
@@ -299,7 +314,7 @@ class ZSelect(_BaseRemapReader):
                 qqq_mem = np.memmap(filepath, dtype=dtype, mode="r", shape=(1,))
                 qqq = qqq_mem[0]
 
-                for key, m in zip(self.remap_kind, range(self.mtype)):
+                for key, m in zip(self.remap_keys, range(self.mtype)):
                     self.__dict__[key][
                         self.iss[np0] : self.iee[np0] + 1,
                         self.jss[np0] : self.jee[np0] + 1,
@@ -309,7 +324,7 @@ class ZSelect(_BaseRemapReader):
                         :, :, k0, m
                     ]
 
-                for key in self.remap_kind_add:
+                for key in self.remap_keys_add:
                     self.__dict__[key][
                         self.iss[np0] : self.iee[np0] + 1,
                         self.jss[np0] : self.jee[np0] + 1,
@@ -363,7 +378,7 @@ class MPIRegion(_BaseRemapReader):
 
                 with open(filepath, "rb") as f:
                     qqq = np.fromfile(f, dtype=dtype, count=1)
-                    for key, m in zip(self.remap_kind, range(self.mtype)):
+                    for key, m in zip(self.remap_keys, range(self.mtype)):
                         self.__dict__[key][
                             :, self.jss[np0] : self.jee[np0] + 1, :
                         ] = qqq["qq"].reshape(
@@ -373,7 +388,7 @@ class MPIRegion(_BaseRemapReader):
                             :, :, :, m
                         ]
 
-                    for key in self.remap_kind_add:
+                    for key in self.remap_keys_add:
                         self.__dict__[key][
                             :, self.jss[np0] : self.jee[np0] + 1, :
                         ] = qqq[key].reshape(
@@ -392,9 +407,9 @@ class FullData(_BaseRemapReader):
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`
 
     """
-    values_zarr = ['ro', 'vx', 'vy', 'vz', 'bx', 'by', 'bz', 'se']
+    zarr_keys = ['ro', 'vx', 'vy', 'vz', 'bx', 'by', 'bz', 'se']
 
-    def read(self, n: int, value, zarr_flag: bool = False):
+    def read(self, n: int, keys="all", max_workers: int = 1, zarr_flag: bool = False):
         """
         Reads 3D full data
         The data is stored in self.qq dictionary
@@ -403,8 +418,8 @@ class FullData(_BaseRemapReader):
         ----------
         n : int
             A selected time step for data
-        value : str
-            Kind of value. Options are:
+        keys : str
+            Kind of variable. Options are:
                 - "ro" : density
                 - "vx", "vy", "vz": velocity
                 - "bx", "by", "bz": magnetic field
@@ -413,12 +428,15 @@ class FullData(_BaseRemapReader):
                 - "te": temperature
                 - "op": Opacity
         
+        max_workers : int
+            Number of workers for parallel reading of binary files
+
         zarr_flag : bool
             If True, read from zarr format instead of binary format
 
         Notes
         -----
-        If value is 'all', all values are read
+        If keys is 'all', all variables are read
         """
 
         # check if original binary files exists
@@ -443,13 +461,13 @@ class FullData(_BaseRemapReader):
             zarr_flag = True
             
         if zarr_flag:
-            if value == "all":
-                names = value
+            if keys == "all":
+                names = keys
             else:
-                if isinstance(value, str):
-                    names = [value, "x", "y", "z"]
+                if isinstance(keys, str):
+                    names = [keys, "x", "y", "z"]
                 else:
-                    names = list(value) + ["x", "y", "z"]
+                    names = list(keys) + ["x", "y", "z"]
 
                 
             zarr_filepath = self._get_filepath_remap_zarr(n)
@@ -460,78 +478,75 @@ class FullData(_BaseRemapReader):
             (qq, params) = pyR2D2.zarr_util.load(zarr_filepath, 
             with_attrs=True, names=names)
 
-            keys = list(self.__dict__.keys())
-
-            for key in keys:
-                if key in self.remap_kind + self.remap_kind_add:
-                    self.__dict__.pop(key, None)
-
-
             for key in qq.keys():
                 self.__dict__[key] = qq[key]
             self.params = params
 
         else:
 
-            if type(value) == str:
-                if value == "all":
-                    values_input = self.remap_kind + self.remap_kind_add
+            if type(keys) == str:
+                if keys == "all":
+                    keys_input = self.remap_keys + self.remap_keys_add
                 else:
-                    values_input = [value]
-            if type(value) == list:
-                values_input = value
-
-            for value in values_input:
-                if value not in self.p.remap_kind + self.p.remap_kind_add:
+                    keys_input = [keys]
+            if type(keys) == list:
+                keys_input = keys
+                
+            for key in keys_input:
+                if key not in self.remap_keys + self.remap_keys_add:
                     print("######")
-                    print("value =", value)
+                    print("key =", key)
                     print(
-                        "value should be one of ", self.p.remap_kind + self.p.remap_kind_add
+                        "key should be one of ", self.remap_keys + self.remap_keys_add
                     )
                     print("return")
                     return
 
-            self._allocate_remap_qq(ijk=[self.ix, self.jx, self.kx])
+            self._allocate_remap_qq(ijk=[self.ix, self.jx, self.kx], keys=keys_input)
+            dtype = np.dtype(self.endian + "f4")
 
+            target_nps = []
             for ir0 in range(1, self.ixr + 1):
                 for jr0 in range(1, self.jxr + 1):
                     np0 = self.np_ijr[ir0 - 1, jr0 - 1]
                     if ir0 == self.ir[np0] and jr0 == self.jr[np0]:
+                        target_nps.append(np0)
 
-                        dtype = self._dtype_remap_qq(np0)
-                        filepath = self._get_filepath_remap_qq(n, np0)
+            def _read_one(np0: int):
+                n_ijk = self.iixl[np0] * self.jjxl[np0] * self.kx
+                byte_n_ijk = n_ijk * 4 # for float32
+                byte_n_ijk_mtype = byte_n_ijk * self.mtype
 
-                        with open(filepath, "rb") as f:
-                            qqq = np.fromfile(f, dtype=dtype, count=1)
+                offset = {
+                    "pr": byte_n_ijk_mtype,
+                    "te": byte_n_ijk_mtype + byte_n_ijk,
+                    "op": byte_n_ijk_mtype + 2 * byte_n_ijk,
+                }
+                filepath = self._get_filepath_remap_qq(n, np0)
+                out = {}
+                with open(filepath, "rb") as f:
+                    for key in keys_input:
+                        if key in self.remap_keys:
+                            m_idx = self.remap_keys.index(key)
+                            f.seek(m_idx * byte_n_ijk, os.SEEK_SET)
+                            buf = np.fromfile(f, dtype=dtype, count=n_ijk)
+                            out[key] = buf.reshape(
+                                (self.iixl[np0], self.jjxl[np0], self.kx), order="F")
+                        elif key in self.remap_keys_add:
+                            f.seek(offset[key], os.SEEK_SET)
+                            buf = np.fromfile(f, dtype=dtype, count=n_ijk)
+                            out[key] = buf.reshape(
+                                (self.iixl[np0], self.jjxl[np0], self.kx), order="F")        
+                i0, i1 = self.iss[np0], self.iee[np0] + 1
+                j0, j1 = self.jss[np0], self.jee[np0] + 1
+                return (np0, i0, i1, j0, j1, out)
 
-                            for value in values_input:
-                                if value in self.p.remap_kind:
-                                    m = self.p.remap_kind.index(value)
-                                    self.__dict__[value][
-                                        self.iss[np0] : self.iee[np0] + 1,
-                                        self.jss[np0] : self.jee[np0] + 1,
-                                        :,
-                                    ] = qqq["qq"].reshape(
-                                        (
-                                            self.iixl[np0],
-                                            self.jjxl[np0],
-                                            self.kx,
-                                            self.mtype,
-                                        ),
-                                        order="F",
-                                    )[
-                                        :, :, :, m
-                                    ]
-                                else:
-                                    self.__dict__[value][
-                                        self.iss[np0] : self.iee[np0] + 1,
-                                        self.jss[np0] : self.jee[np0] + 1,
-                                        :,
-                                    ] = qqq[value].reshape(
-                                        (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
-                                    )[
-                                        :, :, :
-                                    ]
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = [executor.submit(_read_one, np0) for np0 in target_nps]
+                for future in as_completed(futures):
+                    np0, i0, i1, j0, j1, out = future.result()
+                    for key, arr in out.items():
+                        self.__dict__[key][i0:i1, j0:j1, :] = arr
 
     def compress(
             self,
@@ -544,8 +559,9 @@ class FullData(_BaseRemapReader):
             k_start: int = None,
             k_size: int = None,
             chunks3d: tuple = None,
-            value: list = values_zarr,
+            keys: list = zarr_keys,
             overwrite: bool = False,
+            max_workers: int = 1,
             lightweight: bool = False,
             
     ):
@@ -601,24 +617,24 @@ class FullData(_BaseRemapReader):
         pyR2D2.zarr_util.save(zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w")
 
         if lightweight:
-            for value0 in value:
-                print(value0)
-                self.read(n=n, value=value0, zarr_flag=False)
-                arr = self.__dict__[value0][
+            for key in keys:
+                print(key)
+                self.read(n=n, keys=key, max_workers=max_workers, zarr_flag=False)
+                arr = self.__dict__[key][
                     i_start:i_start+i_size,
                     j_start:j_start+j_size,
                     k_start:k_start+k_size
                 ]
-                pyR2D2.zarr_util.save(zarr_filepath, {value0: arr}, chunks3d=chunks3d, mode="a")
-                del self.__dict__[value0]
+                pyR2D2.zarr_util.save(zarr_filepath, {key: arr}, chunks3d=chunks3d, mode="a")
+                del self.__dict__[key]
                 del arr
                 gc.collect()
         else:
         
-            self.read(n=n, value=value, zarr_flag=False)
+            self.read(n=n, keys=keys, max_workers=max_workers, zarr_flag=False)
 
             vars_dict = {}
-            for key in value:
+            for key in keys:
                 vars_dict[key] = self.__dict__[key][
                     i_start:i_start+i_size,
                     j_start:j_start+j_size,
@@ -634,7 +650,7 @@ class FullData(_BaseRemapReader):
         return True
 
 
-    def check(self, n: int, value: list = values_zarr, lightweight: bool = False):
+    def check(self, n: int, keys: list = zarr_keys, max_workers: int = 1,   lightweight: bool = False):
         """
         Check if the remap/qq/ file exists for all MPI processes for a given time step n
 
@@ -642,7 +658,7 @@ class FullData(_BaseRemapReader):
         ----------
         n : int
             A selected time step for data
-        value : list
+        keys : list or str
             List of values to check. If the check fails for any of the values, the function returns False. By default, all values are checked.    
         lightweight : bool
             If True, check is done for each value separately to save memory. This is useful when the data is too large to fit in memory. By default, False (all values are checked together).
@@ -653,7 +669,7 @@ class FullData(_BaseRemapReader):
             print(f"Zarr file does not exist at n={n}. Please run FullData.compress() to create it.")
             return False
 
-        for key in value:
+        for key in keys:
             if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
                 print(f"Variable {key} does not exist in zarr file at n={n}. Please run FullData.compress() to create it.")
                 return False
@@ -669,24 +685,24 @@ class FullData(_BaseRemapReader):
             for i in range(0,self.ix,self.ix//3):
                 self.qx.read(self.x[i], n=n, zarr_flag=True)
                 qq_copy = {}
-                for key in value:
-                    if key in self.remap_kind + self.remap_kind_add:
+                for key in keys:
+                    if key in self.remap_keys + self.remap_keys_add:
                         qq_copy[key] = self.qx.__dict__[key].copy()
                 self.qx.read(self.x[i], n=n, zarr_flag=False)
-                for key in value:
-                    if key in self.remap_kind + self.remap_kind_add:
+                for key in keys:
+                    if key in self.remap_keys + self.remap_keys_add:
                         if not self._check_core(qq_copy[key], self.qx.__dict__[key], key):
                             return False
         else:         
-            self.read(n=n, value=value, zarr_flag=True)
+            self.read(n=n, keys=keys, zarr_flag=True, max_workers=max_workers)
             qq_copy = {}
-            for key in value:
-                if key in self.remap_kind + self.remap_kind_add:
+            for key in keys:
+                if key in self.remap_keys + self.remap_keys_add:
                     qq_copy[key] = self.__dict__[key].copy()
 
-            self.read(n=n, value=value, zarr_flag=False)
+            self.read(n=n, keys=keys, zarr_flag=False)
 
-            for key in value:
+            for key in keys:
                 if not self._check_core(qq_copy[key], self.__dict__[key], key):
                     return False
         
@@ -727,6 +743,23 @@ class FullData(_BaseRemapReader):
                     # print(filepath)
                     os.remove(filepath)
 
+    def clear(self, keys="all"):
+        """
+        Free the memory used for remap/qq/ data
+        """
+
+        if isinstance(keys, str):
+            if keys == "all":
+                keys = self.remap_keys + self.remap_keys_add
+            else:
+                keys = [keys]
+
+        for key in keys:
+            if hasattr(self, key):
+                self.__dict__[key] = None
+        
+        gc.collect()
+
 class RestrictedData(_BaseRemapReader):
     """
     Class for 3D restricted-volume data
@@ -740,7 +773,7 @@ class RestrictedData(_BaseRemapReader):
     def read(
         self,
         n: int,
-        value,
+        keys: list,
         x0: float,
         x1: float,
         y0: float,
@@ -756,7 +789,7 @@ class RestrictedData(_BaseRemapReader):
         ----------
         n : int
             A selected time step for data
-        value : str
+        keys : list of str
             See :meth:`R2D2.Read.qq_3d` for options
 
         x0, y0, z0 : float
@@ -772,16 +805,16 @@ class RestrictedData(_BaseRemapReader):
         jxr = j1 - j0 + 1
         kxr = k1 - k0 + 1
 
-        if type(value) == str:
-            if value == "all":
-                values_input = self.remap_kind + self.remap_kind_add
+        if type(keys) == str:
+            if keys == "all":
+                keys_input = self.remap_keys + self.remap_keys_add
             else:
-                values_input = [value]
-        if type(value) == list:
-            values_input = value
+                keys_input = [keys]
+        if type(keys) == list:
+            keys_input = keys
 
-        for value in values_input:
-            self.__dict__[value] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
+        for key in keys_input:
+            self.__dict__[key] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
 
         for ir0 in range(1, self.ixr + 1):
             for jr0 in range(1, self.jxr + 1):
@@ -800,7 +833,7 @@ class RestrictedData(_BaseRemapReader):
                     with open(filepath, "rb") as f:
                         qqq = np.fromfile(f, dtype=dtype, count=1)
 
-                        for value in values_input:
+                        for key in keys_input:
                             isrt_rcv = max([0, self.iss[np0] - i0])
                             iend_rcv = min([ixr, self.iee[np0] - i0 + 1])
                             jsrt_rcv = max([0, self.jss[np0] - j0])
@@ -811,10 +844,10 @@ class RestrictedData(_BaseRemapReader):
                             jsrt_snd = jsrt_rcv - (self.jss[np0] - j0)
                             jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
 
-                            if value in self.p.remap_kind:
-                                m = self.p.remap_kind.index(value)
+                            if key in self.remap_keys:
+                                m = self.remap_keys.index(key)
 
-                                self.__dict__[value][
+                                self.__dict__[key][
                                     isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
                                 ] = qqq["qq"].reshape(
                                     (
@@ -828,9 +861,9 @@ class RestrictedData(_BaseRemapReader):
                                     isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1, m
                                 ]
                             else:
-                                self.__dict__[value][
+                                self.__dict__[key][
                                     isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
-                                ] = qqq[value].reshape(
+                                ] = qqq[key].reshape(
                                     (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
                                 )[
                                     isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1
@@ -1109,7 +1142,7 @@ class Slice(_BaseReader):
     def __init__(self, data):
         self.data = data
 
-        for key in self.data.remap_kind + self.data.remap_kind_add[:-1]:
+        for key in self.data.remap_keys + self.data.remap_keys_add[:-1]:
             self.__dict__[key] = None
 
     def read(self, n_slice, direc, n):
@@ -1159,7 +1192,7 @@ class Slice(_BaseReader):
                 qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
 
             for key, m in zip(
-                self.remap_kind + self.remap_kind_add[:-1], range(self.mtype + 2)
+                self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
             ):
                 self.__dict__[key + postfix] = qq.reshape(
                     (n1, n2, self.mtype + 2), order="F"
@@ -1229,7 +1262,7 @@ class TwoDimension(_BaseReader):
         with open(self.datadir + "remap/qq/qq.dac." + "{0:08d}".format(n), "rb") as f:
             qq = np.fromfile(f, dtype=dtype, count=1)
 
-        for key, m in zip(value_keys, range(self.mtype)):
+        for key, m in zip(self.value_keys, range(self.mtype)):
             self.__dict__[key] = qq["qq"].reshape(
                 (self.mtype + 5, self.ix, self.jx), order="F"
             )[m, :, :]
