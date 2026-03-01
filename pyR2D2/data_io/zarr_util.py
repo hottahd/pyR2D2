@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 import zarr
 
@@ -18,9 +19,8 @@ def _check_chunks(chunks, shape_len):
         if not isinstance(chunk, int):
             raise TypeError(f"Chunk sizes must be integers, got {type(chunk)}")
         if chunk <= 0:
-            raise ValueError(
-                f"Invalid chunk size {chunk}"
-            )
+            raise ValueError(f"Invalid chunk size {chunk}")
+
 
 def save(
     path: str,
@@ -121,7 +121,17 @@ def save(
             )
 
 
-def load(path: str, names="all", with_attrs: bool = False, i0: int = None, i1: int = None, j0: int = None, j1: int = None, k0: int = None, k1: int = None):
+def load(
+    path: str,
+    names="all",
+    with_attrs: bool = False,
+    i0: int = None,
+    i1: int = None,
+    j0: int = None,
+    j1: int = None,
+    k0: int = None,
+    k1: int = None,
+):
     """
     Load zarr data
 
@@ -143,29 +153,33 @@ def load(path: str, names="all", with_attrs: bool = False, i0: int = None, i1: i
     """
     if not os.path.isdir(path):
         raise FileNotFoundError(f"Zarr directory not found: {path}")
-    
+
     root = zarr.open_group(path, mode="r")
 
-    if i0 is None: i0 = root.attrs["params"]["i_start"]
-    if i1 is None: i1 = max(root.attrs["params"]["i_size"] + root.attrs["params"]["i_start"], i0 + 1)
-    if j0 is None: j0 = root.attrs["params"]["j_start"]
-    if j1 is None: j1 = max(root.attrs["params"]["j_size"] + root.attrs["params"]["j_start"], j0 + 1)
-    if k0 is None: k0 = root.attrs["params"]["k_start"]
-    if k1 is None: k1 = max(root.attrs["params"]["k_size"] + root.attrs["params"]["k_start"], k0 + 1)
-    
+    if i0 is None:
+        i0 = 0
+    if j0 is None:
+        j0 = 0
+    if k0 is None:
+        k0 = 0
+
+    if isinstance(names, str):
+        if names == "all":
+            names = list(root.array_keys())
+        else:
+            names = [names]
+
+    for key in list(root.array_keys()):
+        if root[key].ndim == 3:
+            (i1, j1, k1) = root[key].shape
+            break
+
     if i0 >= i1:
         raise ValueError(f"Invalid i range: i0={i0} must be less than i1={i1}")
     if j0 >= j1:
         raise ValueError(f"Invalid j range: j0={j0} must be less than j1={j1}")
     if k0 >= k1:
         raise ValueError(f"Invalid k range: k0={k0} must be less than k1={k1}")
-    
-    
-    if isinstance(names, str):
-        if names == "all":
-            names = list(root.array_keys())
-        else:
-            names = [names]
 
     data = {}
     for name in names:
@@ -196,4 +210,5 @@ def list_vars(path: str):
         list of variable names in the zarr data
     """
     root = zarr.open_group(path, mode="r")
+    return list(root.array_keys())
     return list(root.array_keys())
