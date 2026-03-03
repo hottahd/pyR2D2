@@ -162,7 +162,7 @@ def load(
         j0 = 0
     if k0 is None:
         k0 = 0
-
+        
     if isinstance(names, str):
         if names == "all":
             names = list(root.array_keys())
@@ -171,8 +171,15 @@ def load(
 
     for key in list(root.array_keys()):
         if root[key].ndim == 3:
-            (i1, j1, k1) = root[key].shape
+            (i1_tmp, j1_tmp, k1_tmp) = root[key].shape
             break
+
+    if i1 is None:
+        i1 = i1_tmp
+    if j1 is None:
+        j1 = j1_tmp
+    if k1 is None:
+        k1 = k1_tmp
 
     if i0 >= i1:
         raise ValueError(f"Invalid i range: i0={i0} must be less than i1={i1}")
