@@ -1,6 +1,7 @@
 import gc
 import glob
 import os
+import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
@@ -452,7 +453,6 @@ class FullData(_BaseRemapReader):
                     dtype = self._dtype_remap_qq(np0)
                     filepath = self._get_filepath_remap_qq(n, np0)
                     if not os.path.exists(filepath):
-                        print(filepath)
                         missing = True
                         break
             if missing:
@@ -768,11 +768,24 @@ class FullData(_BaseRemapReader):
                     "Deleting",
                     self.datadir + "remap/qq/qq.dac." + str(n).zfill(8) + ".*",
                 )
-                for filepath in glob.glob(
-                    self.datadir + "remap/qq/qq.dac." + str(n).zfill(8) + ".*"
-                ):
-                    # print(filepath)
-                    os.remove(filepath)
+                pattern = f"qq.dac.{n:08d}.*"
+                subprocess.run(
+                    [
+                        "find",
+                        f"{self.datadir}remap/qq",
+                        "-maxdepth",
+                        "1",
+                        "-name",
+                        pattern,
+                        "-delete",
+                    ],
+                    check=True,
+                )
+                # for filepath in glob.glob(
+                #     self.datadir + "remap/qq/qq.dac." + str(n).zfill(8) + ".*"
+                # ):
+                #     # print(filepath)
+                #     os.remove(filepath)
 
     def clear(self, keys="all"):
         """
