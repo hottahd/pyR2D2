@@ -390,7 +390,6 @@ class MPIRegion(_BaseRemapReader):
                         )[
                             :, :, :, m
                         ]
-
                     for key in self.remap_keys_add:
                         self.__dict__[key][
                             :, self.jss[np0] : self.jee[np0] + 1, :
@@ -724,7 +723,6 @@ class FullData(_BaseRemapReader):
                     qq_copy[key] = self.__dict__[key].copy()
 
             self.read(n=n, keys=keys, zarr_flag=False)
-
             for key in keys:
                 if not self._check_core(qq_copy[key], self.__dict__[key], key):
                     return False
@@ -1184,13 +1182,40 @@ class Slice(_BaseReader):
 
     """
 
+    zarr_keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+
     def __init__(self, data):
         self.data = data
 
         for key in self.data.remap_keys + self.data.remap_keys_add[:-1]:
             self.__dict__[key] = None
 
-    def read(self, n_slice, direc, n):
+    def _get_filepath_slice(self, n_slice, direc, n, postfix):
+        return (
+            self.datadir
+            + "slice/qq"
+            + direc
+            + postfix
+            + ".dac."
+            + str(n).zfill(8)
+            + "."
+            + str(n_slice + 1).zfill(8)
+        )
+
+    def _get_filepath_slice_zarr(self, n, direc):
+        return self.datadir + "slice/zarr/" + direc + "/qq." + str(n).zfill(8) + ".zarr"
+
+    def xyz_slice_select(self, direc):
+        if direc == "x":
+            return self.x_slice
+        elif direc == "y":
+            return self.y_slice
+        elif direc == "z":
+            return self.z_slice
+        else:
+            raise ValueError("direc should be 'x', 'y', or 'z'")
+
+    def read(self, n_slice, direc, n, zarr_flag: bool = False):
         """
         Reads 2D data of slice.
         The data is stored in self.ql dictionary
@@ -1203,6 +1228,8 @@ class Slice(_BaseReader):
             slice direction. 'x', 'y', or 'z'
         n : int
             a selected time step for data
+        zarr_flag : bool
+            If True, read from zarr format instead of binary format. By default, False (read from binary format).
         """
 
         if self.geometry == "YinYang":
@@ -1211,47 +1238,254 @@ class Slice(_BaseReader):
             postfixes = [""]
 
         for postfix in postfixes:
-            with open(
-                self.datadir
-                + "slice/qq"
-                + direc
-                + postfix
-                + ".dac."
-                + "{0:08d}".format(n)
-                + "."
-                + "{0:08d}".format(n_slice + 1),
-                "rb",
-            ) as f:
-                if direc == "x":
-                    if self.geometry == "YinYang":
-                        n1, n2 = (
-                            self.jx_yy + 2 * self.margin,
-                            self.kx_yy + 2 * self.margin,
-                        )
-                    else:
-                        n1, n2 = self.jx, self.kx
-                if direc == "y":
-                    n1, n2 = self.ix, self.kx
-                if direc == "z":
-                    n1, n2 = self.ix, self.jx
-                qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
+            if zarr_flag:
+                zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+                if not os.path.exists(zarr_filepath):
+                    print(f"Zarr file does not exist at n={n} for slice {direc}.")
+                    return
 
-            for key, m in zip(
-                self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
-            ):
-                self.__dict__[key + postfix] = qq.reshape(
-                    (n1, n2, self.mtype + 2), order="F"
-                )[:, :, m]
-            self.info = {}
-            self.info["direc"] = direc
+                i0, j0, k0 = 0, 0, 0
+                i1, j1, k1 = self.ix, self.jx, self.kx
+                if direc == "x":
+                    i0, i1 = n_slice, n_slice + 1
+                elif direc == "y":
+                    j0, j1 = n_slice, n_slice + 1
+                elif direc == "z":
+                    k0, k1 = n_slice, n_slice + 1
+
+                qq = pyR2D2.zarr_util.load(
+                    zarr_filepath,
+                    names=self.zarr_keys,
+                    i0=i0,
+                    i1=i1,
+                    j0=j0,
+                    j1=j1,
+                    k0=k0,
+                    k1=k1,
+                )
+
+                for key, value in qq.items():
+                    self.__dict__[key] = value.squeeze()
+
+            else:
+                with open(
+                    self._get_filepath_slice(n_slice, direc, n, postfix),
+                    "rb",
+                ) as f:
+                    if direc == "x":
+                        if self.geometry == "YinYang":
+                            n1, n2 = (
+                                self.jx_yy + 2 * self.margin,
+                                self.kx_yy + 2 * self.margin,
+                            )
+                        else:
+                            n1, n2 = self.jx, self.kx
+                    if direc == "y":
+                        n1, n2 = self.ix, self.kx
+                    if direc == "z":
+                        n1, n2 = self.ix, self.jx
+                    qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
+
+                for key, m in zip(
+                    self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
+                ):
+                    self.__dict__[key + postfix] = qq.reshape(
+                        (n1, n2, self.mtype + 2), order="F"
+                    )[:, :, m]
+
+            # self.info = {}
+            # self.info["direc"] = direc
+            # if direc == "x":
+            #     slice = self.x_slice
+            # if direc == "y":
+            #     slice = self.y_slice
+            # if direc == "z":
+            #     slice = self.z_slice
+            # self.info["slice"] = slice[n_slice]
+            # self.info["n_slice"] = n_slice
+
+    def compress(
+        self,
+        n: int,
+        direc: str,
+        zarr_filepath: str = None,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+        keys: list = zarr_keys,
+        overwrite: bool = False,
+    ):
+        """
+        Compress 2D slice data into zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        zarr_filepath : str, optional
+            Filepath for the output zarr file, by default None
+        direc : str, optional
+            Slice direction. 'x', 'y', or 'z', by default "x"
+        i_start : int, optional
+            Start index for the i dimension, by default None
+        i_size : int, optional
+            Size of the i dimension, by default None
+        j_start : int, optional
+            Start index for the j dimension, by default None
+        j_size : int, optional
+            Size of the j dimension, by default None
+        k_start : int, optional
+            Start index for the k dimension, by default None
+        k_size : int, optional
+            Size of the k dimension, by default None
+        keys : list, optional
+            Keys for the variables to be compressed, by default zarr_keys
+        overwrite : bool, optional
+            Whether to overwrite the existing zarr file, by default False
+        """
+
+        if zarr_filepath is None:
+            zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+
+        if not overwrite and os.path.exists(zarr_filepath):
+            print(
+                f"File {zarr_filepath} already exists. Set overwrite=True to overwrite it."
+            )
+            return
+
+        if not direc in ["x", "y", "z"]:
+            print(f"Invalid slice direction: {direc}. Must be 'x', 'y', or 'z'.")
+            return
+
+        chunk_max = 4096
+        if direc == "x":
+            i_start, i_size = 0, 1
+            chunks3d = (1, min(self.jx, chunk_max), min(self.kx, chunk_max))
+        else:
+            i_start = 0 if i_start is None else i_start
+            i_size = self.ix if i_size is None else i_size
+
+        if direc == "y":
+            j_start, j_size = 0, 1
+            chunks3d = (min(self.ix, chunk_max), 1, min(self.kx, chunk_max))
+        else:
+            j_start = 0 if j_start is None else j_start
+            j_size = self.jx if j_size is None else j_size
+
+        if direc == "z":
+            k_start, k_size = 0, 1
+            chunks3d = (min(self.ix, chunk_max), min(self.jx, chunk_max), 1)
+        else:
+            k_start = 0 if k_start is None else k_start
+            k_size = self.kx if k_size is None else k_size
+
+        params_dict = {
+            "i_start": i_start,
+            "i_size": i_size,
+            "j_start": j_start,
+            "j_size": j_size,
+            "k_start": k_start,
+            "k_size": k_size,
+        }
+
+        vars_dict = {}
+        for key in keys:
             if direc == "x":
-                slice = self.x_slice
-            if direc == "y":
-                slice = self.y_slice
-            if direc == "z":
-                slice = self.z_slice
-            self.info["slice"] = slice[n_slice]
-            self.info["n_slice"] = n_slice
+                vars_dict[key] = np.empty(
+                    (len(self.x_slice), j_size, k_size), dtype=np.float32
+                )
+            elif direc == "y":
+                vars_dict[key] = np.empty(
+                    (i_size, len(self.y_slice), k_size), dtype=np.float32
+                )
+            elif direc == "z":
+                vars_dict[key] = np.empty(
+                    (i_size, j_size, len(self.z_slice)), dtype=np.float32
+                )
+
+        xyz_slice = self.xyz_slice_select(direc)
+        for n_slice in range(len(xyz_slice)):
+            self.read(n_slice=n_slice, direc=direc, n=n)
+            for key in keys:
+                if direc == "x":
+                    vars_dict[key][n_slice, :, :] = self.__dict__[key]
+                elif direc == "y":
+                    vars_dict[key][:, n_slice, :] = self.__dict__[key]
+                elif direc == "z":
+                    vars_dict[key][:, :, n_slice] = self.__dict__[key]
+
+        pyR2D2.zarr_util.save(
+            zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
+        )
+
+    def check(
+        self,
+        n: int,
+        direc: str,
+        keys: list = zarr_keys,
+    ):
+
+        zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+        if not os.path.exists(zarr_filepath):
+            print(
+                f"Zarr file does not exist at n={n} and direc={direc}. Please run Slice.compress() to create it."
+            )
+            return False
+
+        for key in keys:
+            if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
+                print(
+                    f"Variable {key} does not exist in zarr file at n={n} and direc={direc}. Please run Slice.compress() to create it."
+                )
+                return False
+
+        xyz_slice = self.xyz_slice_select(direc)
+        for n_slice in range(len(xyz_slice)):
+            filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
+            if not os.path.exists(filepath):
+                print(f"File {filepath} does not exist. Anyway you can delete it.")
+                return True
+
+        for n_slice in range(len(xyz_slice)):
+            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=True)
+            qq_copy = {}
+            for key in keys:
+                qq_copy[key] = self.__dict__[key].copy()
+
+            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=False)
+            for key in keys:
+                print(key)
+                if not np.allclose(
+                    qq_copy[key], self.__dict__[key], rtol=1e-6, atol=1e-12
+                ):
+                    print(
+                        f"Data mismatch for {key} at slice {n_slice} and direc {direc}."
+                    )
+                    return False
+        return True
+
+    def delete(
+        self,
+        n: int,
+        direc: str,
+        force: bool = False,
+    ):
+
+        if force:
+            check_flag = True
+        else:
+            check_flag = self.check(n=n, direc=direc)
+
+        if check_flag:
+            xyz_slice = self.xyz_slice_select(direc)
+            for n_slice in range(len(xyz_slice)):
+                filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
+                if os.path.exists(filepath):
+                    print(f"Deleting {filepath}")
+                    # os.remove(filepath)
 
 
 class TwoDimension(_BaseReader):
