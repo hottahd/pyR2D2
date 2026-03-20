@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2 &mdash; R2D2 Document 0.3.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+  <title>pyR2D2 &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=4621528c"></script>
+      <script src="_static/documentation_options.js?v=b10c3eac"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -88,35 +88,39 @@
 <h1>pyR2D2<a class="headerlink" href="#pyr2d2" title="Link to this heading"></a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>Python module for dealing with calculation results from R2D2 code is available.</p>
 <p>R2D2で実施した計算を取り扱うためのPythonモジュールを公開している。</p>
 <p><a class="reference external" href="https://github.com/hottahd/R2D2_py">https://github.com/hottahd/R2D2_py</a></p>
+<p>You can install it by cloning the repository and running pip install as</p>
+<p>以下のようにしてインストールできる。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/hottahd/pyR2D2
 <span class="nb">cd</span><span class="w"> </span>pyR2D2
 pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
-<p>としてインストールする。
-PythonでR2D2で定義された関数を使うには</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyR2D2</span>
+<p>Here is a simple example of how to use the pyR2D2 module.</p>
+<p>PythonでpyR2D2で定義された関数を使うには以下のようにする。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
 </pre></div>
 </div>
-<p>とする。すべてのAPIは <a class="reference internal" href="api_reference.html"><span class="doc">pyR2D2 API Reference</span></a> に示されている。</p>
+<p>All APIs are shown in <a class="reference internal" href="api_reference.html"><span class="doc">pyR2D2 API Reference</span></a>.</p>
+<p>すべてのAPIは <a class="reference internal" href="api_reference.html"><span class="doc">pyR2D2 API Reference</span></a> に示されている。</p>
 </section>
 <section id="pyr2d2-data">
 <h2><a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a><a class="headerlink" href="#pyr2d2-data" title="Link to this heading"></a></h2>
-<p>R2D2には <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> クラスが定義してあり、これをオブジェクト指向的に用いてデータを取り扱う。</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyR2D2</span>
+<p>pyR2D2D2 provides a class <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> to handle data in an object-oriented manner. Instance can be created as follows:</p>
+<p>pyR2D2には <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> クラスが定義してあり、これをオブジェクト指向的に用いてデータを取り扱う。以下のようにしてインスタンスを作成する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
 <span class="n">datadir</span> <span class="o">=</span> <span class="s1">&#39;../run/d002/data&#39;</span>
 <span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>などとしてインスタンスを生成する。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">pyR2D2</span><span class="p">)</span>
 <span class="n">help</span><span class="p">(</span><span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>などとすると実行環境で、モジュール全体や各関数の簡単な説明を見ることができる。</p>
-<p>最終更新日：Dec 12, 2024</p>
+<p>最終更新日：Mar 20, 2026</p>
 </section>
 </section>
 

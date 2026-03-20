@@ -1,0 +1,6 @@
+regrid_data
+===========
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: regrid_data

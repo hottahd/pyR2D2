@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Paraviewを用いた3Dデータ表示 &mdash; R2D2 Document 0.3.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+  <title>Paraviewを用いた3Dデータ表示 &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=4621528c"></script>
+      <script src="_static/documentation_options.js?v=b10c3eac"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -89,26 +89,66 @@
 <p>ここでは、Paraviewを用いてR2D2の計算結果を三次元表示する方法を説明する。</p>
 <section id="id1">
 <h2>データ準備<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
-<p>すでに計算を実行していて、何らかのデータが準備できている状況を想定する。
-データをParaviewで扱うためにVTKフォーマットに変換する。
+<p>データをParaviewで扱うためにVTKフォーマットに変換する。
 変換後に用意するべきデータは</p>
 <ul class="simple">
 <li><p>ある物理量の三次元データ</p></li>
-<li><p>ある物理量の :<img class="math" src="_images/math/0765a4962991d8ac1a8c00d3c3bd6cf5ee6ebdfc.svg" alt="\tau=1"/> でのデータ</p></li>
+<li><p>ある物理量の :<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">\tau=1</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2023-11-01&gt; patch level 1
+L3 programming layer &lt;2024-01-22&gt;
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+
+! LaTeX Error: File `anyfontsize.sty' not found.
+
+Type X to quit or &lt;RETURN&gt; to proceed,
+or enter new name. (Default extension: sty)
+
+Enter file name: 
+! Emergency stop.
+&lt;read *&gt; 
+         
+l.8 \usepackage
+               {bm}^^M
+No pages of output.
+Transcript written on math.log.
+</p>
+</aside>
+ でのデータ</p></li>
 </ul>
 <p>それぞれのデータのためにpyR2D2では以下の関数が用意してある。</p>
-<p><a class="reference internal" href="api/pyR2D2.write.vtk.write_3D.html#pyR2D2.write.vtk.write_3D" title="pyR2D2.write.vtk.write_3D"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D()</span></code></a>
-<a class="reference internal" href="api/pyR2D2.write.vtk.write_3D_vector.html#pyR2D2.write.vtk.write_3D_vector" title="pyR2D2.write.vtk.write_3D_vector"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D_vector()</span></code></a>
-<a class="reference internal" href="api/pyR2D2.write.vtk.write_optical_surface.html#pyR2D2.write.vtk.write_optical_surface" title="pyR2D2.write.vtk.write_optical_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_optical_surface()</span></code></a></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/pyR2D2.write.vtk.write_3D.html#pyR2D2.write.vtk.write_3D" title="pyR2D2.write.vtk.write_3D"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/pyR2D2.write.vtk.write_3D_vector.html#pyR2D2.write.vtk.write_3D_vector" title="pyR2D2.write.vtk.write_3D_vector"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_3D_vector()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/pyR2D2.write.vtk.write_optical_surface.html#pyR2D2.write.vtk.write_optical_surface" title="pyR2D2.write.vtk.write_optical_surface"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.write.vtk.write_optical_surface()</span></code></a></p></li>
+</ul>
 <p>例えば、以下のようにして実行する</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">init</span> <span class="c1">#　初期設定</span>
-<span class="n">d</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">qq_3D</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># 100番目の3次元データを読込</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">R2D2Data</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span><span class="p">)</span> <span class="c1"># dataディレクトリにあるデータを読込</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bx&#39;</span><span class="p">,</span> <span class="s1">&#39;by&#39;</span><span class="p">,</span> <span class="s1">&#39;bz&#39;</span><span class="p">])</span> <span class="c1"># 100番目の3次元データを読込</span>
 <span class="n">bb</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;bx&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;by&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">d</span><span class="o">.</span><span class="n">qq</span><span class="p">[</span><span class="s1">&#39;bz&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 磁場の強さを計算</span>
-<span class="n">d</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># 100番目のtau=1の2次元データを読込</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># 100番目のtau=1の2次元データを読込</span>
 
-<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">vtk</span><span class="o">.</span><span class="n">write_3D</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;bb.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;bb&#39;</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">vtk</span><span class="o">.</span><span class="n">write_3D</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;bb.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;bb&#39;</span><span class="p">)</span>
 <span class="c1"># 変数名をbbとしてファイル名bb.vtkに3次元データを出力</span>
-<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">write_optical_surface</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;in&#39;</span><span class="p">],</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="p">[</span><span class="s1">&#39;he&#39;</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="s1">&#39;in.vtk&#39;</span><span class="p">,</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">write_optical_surface</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="o">.</span><span class="n">rt</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="o">.</span><span class="n">he</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="s1">&#39;in.vtk&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">)</span>
 <span class="c1"># 変数名をinとしてファイル名in.vtkに2次元データを出力</span>
 </pre></div>
 </div>
@@ -154,7 +194,7 @@
 </div></blockquote>
 </li>
 </ol>
-<p>最終更新日：Dec 12, 2024</p>
+<p>最終更新日：Mar 20, 2026</p>
 </section>
 </section>
 

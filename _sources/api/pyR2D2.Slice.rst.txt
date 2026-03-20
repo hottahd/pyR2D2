@@ -6,12 +6,30 @@ Slice
 .. autoclass:: Slice
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Slice.zarr_keys
+
    .. rubric:: Methods Summary
 
    .. autosummary::
 
+      ~Slice.check
+      ~Slice.compress
+      ~Slice.delete
       ~Slice.read
+      ~Slice.xyz_slice_select
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: zarr_keys
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: check
+   .. automethod:: compress
+   .. automethod:: delete
    .. automethod:: read
+   .. automethod:: xyz_slice_select

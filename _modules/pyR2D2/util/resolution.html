@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR2D2.util.resolution &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=b10c3eac"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyR2D2.util.resolution</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyR2D2.util.resolution</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="updated_data">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.updated_data.html#pyR2D2.util.updated_data">[docs]</a>
+<span></span><span class="k">class</span><span class="w"> </span><span class="nc">updated_data</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temporary class for upgraded data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="updated_data.__init__">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.updated_data.html#pyR2D2.util.updated_data.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+<div class="viewcode-block" id="gen_coord">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.gen_coord.html#pyR2D2.util.gen_coord">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gen_coord</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">margin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Defines uniform geometry</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xmax : float</span>
+<span class="sd">        location of upper boundary</span>
+<span class="sd">    xmin : float</span>
+<span class="sd">        location of lower boundary</span>
+<span class="sd">    ix : int</span>
+<span class="sd">        number of grid without margin        </span>
+<span class="sd">    margin : int</span>
+<span class="sd">        number of margin</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        x : numpy.ndarray, float</span>
+<span class="sd">            generated geometry size of ix + 2*margin</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="n">ix</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ix</span><span class="o">+</span><span class="n">margin</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">-</span> <span class="p">(</span><span class="n">margin</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ix</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">margin</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<span class="c1">######################################################</span>
+<span class="c1">######################################################</span>
+<div class="viewcode-block" id="gen_coord_ununiform_top">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.gen_coord_ununiform_top.html#pyR2D2.util.gen_coord_ununiform_top">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gen_coord_ununiform_top</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">margin</span><span class="p">,</span><span class="n">dx00</span><span class="p">,</span><span class="n">ix_ununi</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function defines ununiform geometry for vertical geometry</span>
+<span class="sd">    The fine grid is concentrated around the top boundary</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xmax : float</span>
+<span class="sd">        location of upper boundary</span>
+<span class="sd">    xmin : float</span>
+<span class="sd">        location of lower boundary</span>
+<span class="sd">    ix : int</span>
+<span class="sd">        number of grid without margin</span>
+<span class="sd">    margin : int</span>
+<span class="sd">        number of margin</span>
+<span class="sd">    dx00 : float</span>
+<span class="sd">        grid spacing in uniform grid region</span>
+<span class="sd">    ix_uniuni : int</span>
+<span class="sd">        number of uniform grid</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : numpy.ndarray, float</span>
+<span class="sd">        generated geometry, ix + 2*margin</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    
+    <span class="n">xrange</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+    <span class="n">xrange0</span> <span class="o">=</span> <span class="n">dx00</span><span class="o">*</span><span class="n">ix_ununi</span>
+    <span class="n">xrange1</span> <span class="o">=</span> <span class="n">xrange</span> <span class="o">-</span> <span class="n">xrange0</span>
+    <span class="n">nxx</span> <span class="o">=</span> <span class="n">ix</span> <span class="o">-</span> <span class="n">ix_ununi</span>
+
+    <span class="n">ixg</span> <span class="o">=</span> <span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">margin</span>
+
+    <span class="n">fdx</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">xrange1</span> <span class="o">-</span> <span class="n">dx00</span><span class="o">*</span><span class="n">nxx</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">nxx</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">/</span><span class="n">nxx</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ixg</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dx00</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span><span class="p">,</span><span class="n">ixg</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx00</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="n">ix_ununi</span> <span class="o">-</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx00</span>
+
+    <span class="n">dx11</span> <span class="o">=</span> <span class="n">dx00</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">-</span> <span class="n">ix_ununi</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx11</span>
+        <span class="n">dx11</span> <span class="o">=</span> <span class="n">dx11</span> <span class="o">+</span> <span class="n">fdx</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">dx11</span>
+    
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="gen_coord_ununiform_flex">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.gen_coord_ununiform_flex.html#pyR2D2.util.gen_coord_ununiform_flex">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gen_coord_ununiform_flex</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">margin</span><span class="p">,</span><span class="n">dx_fine</span><span class="p">,</span><span class="n">ix_fine</span><span class="p">,</span><span class="n">xc_fine</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function defines un-uniform geometry</span>
+<span class="sd">    The fine grid is concentrated around x = xc</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    xmax : float</span>
+<span class="sd">        location of upper boundary</span>
+<span class="sd">    xmin : float</span>
+<span class="sd">        location of lower boundary</span>
+<span class="sd">    ix : int</span>
+<span class="sd">        number of grid without margin</span>
+<span class="sd">    margin : int</span>
+<span class="sd">        number of margin</span>
+<span class="sd">    dx_fine : float</span>
+<span class="sd">        grid spacing in fine grid</span>
+<span class="sd">    ix_fine : int</span>
+<span class="sd">        number of fine grid</span>
+<span class="sd">    xc_fine : float</span>
+<span class="sd">        center position of fine grid</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    x : numpy.ndarray, float</span>
+<span class="sd">        generated geometry size of ix + 2*margin</span>
+<span class="sd">        </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    
+    <span class="n">ixg</span> <span class="o">=</span> <span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">margin</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ixg</span><span class="p">)</span>
+
+    <span class="c1"># number of low resolution grid</span>
+    <span class="n">ix_low</span> <span class="o">=</span> <span class="n">ix</span> <span class="o">-</span> <span class="n">ix_fine</span>
+    
+    <span class="c1"># grid spacing in low resolution grid</span>
+    <span class="n">dx_low</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span> <span class="o">-</span> <span class="n">dx_fine</span><span class="o">*</span><span class="n">ix_fine</span><span class="p">)</span><span class="o">/</span><span class="n">ix_low</span>
+    
+    <span class="k">if</span> <span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span> <span class="o">&lt;=</span> <span class="n">dx_fine</span><span class="o">*</span><span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span> <span class="p">:</span> <span class="c1"># if fine grid cross the boundary</span>
+        <span class="k">if</span><span class="p">((</span><span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_fine</span><span class="o">*</span><span class="n">dx_fine</span> <span class="o">==</span> <span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">):</span>
+            <span class="n">xc_fine</span> <span class="o">=</span> <span class="p">(((</span><span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_fine</span><span class="p">)</span>  <span class="p">)</span><span class="o">*</span><span class="n">dx_fine</span> <span class="o">+</span> <span class="n">xmin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xc_fine</span> <span class="o">=</span> <span class="p">(((</span><span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_fine</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dx_fine</span> <span class="o">+</span> <span class="n">xmin</span>
+        <span class="c1"># number of shift</span>
+        <span class="n">ix_shift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">((</span><span class="n">xc_fine</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_fine</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># if coarse grid cross the boundary</span>
+        <span class="n">xct</span> <span class="o">=</span> <span class="n">xc_fine</span> <span class="o">-</span> <span class="n">dx_fine</span><span class="o">*</span><span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">xct</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_low</span><span class="o">*</span><span class="n">dx_low</span> <span class="o">==</span> <span class="n">xct</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">:</span>
+            <span class="n">xct</span> <span class="o">=</span> <span class="p">((</span><span class="n">xct</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_low</span>  <span class="p">)</span><span class="o">*</span><span class="n">dx_low</span> <span class="o">+</span> <span class="n">xmin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xct</span> <span class="o">=</span> <span class="p">((</span><span class="n">xct</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_low</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dx_low</span> <span class="o">+</span> <span class="n">xmin</span>
+        <span class="n">xc_fine</span> <span class="o">=</span> <span class="n">xct</span> <span class="o">+</span> <span class="n">dx_fine</span><span class="o">*</span><span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span>
+        <span class="c1"># number of shift</span>
+        <span class="n">ix_shift</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">((</span><span class="n">xct</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span><span class="o">//</span><span class="n">dx_low</span><span class="p">)</span> <span class="o">+</span> <span class="n">ix_fine</span><span class="o">//</span><span class="mi">2</span>
+
+    <span class="c1"># Grid construction start from center of fine grid</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ix_shift</span><span class="p">]</span> <span class="o">=</span> <span class="n">xc_fine</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dx_fine</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ix</span><span class="p">):</span>
+        <span class="n">ii</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">ix_shift</span>
+        <span class="c1"># if the grid exceeds the top boundary</span>
+        <span class="c1"># return to the bottom boundary</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="n">ix_shift</span> <span class="o">&gt;</span> <span class="n">ix</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">ix_shift</span> <span class="o">-</span> <span class="n">ix</span>
+
+        <span class="c1"># return procedure from top to bottom boundary</span>
+        <span class="k">if</span> <span class="n">ii</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ix</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ix_low</span><span class="p">:</span> <span class="c1"># for fine and coarse grid boundary</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">dx_fine</span> <span class="o">+</span> <span class="n">dx_low</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">ix_fine</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ix_low</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># for fine grid</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx_fine</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># for coarse grid</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">ii</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx_low</span>
+        
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">margin</span><span class="p">):</span> <span class="c1"># for margin </span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">ixg</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">margin</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">ixg</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">margin</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span>
+
+    
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="regrid_data">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.regrid_data.html#pyR2D2.util.regrid_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">regrid_data</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">caseid</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span> <span class="p">:</span> <span class="nb">int</span>
+        <span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span> 
+        <span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">jx</span><span class="p">,</span><span class="n">kx</span>
+        <span class="p">,</span><span class="n">endian</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="n">end_step</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">,</span><span class="n">memory_saving</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">,</span><span class="n">ix_ununi</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span><span class="n">dx00</span><span class="o">=</span><span class="mf">4.8e6</span><span class="p">,</span><span class="n">x_ununif</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function chabges the resolution and output for the next</span>
+<span class="sd">    calculation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pyR2D2.Data</span>
+<span class="sd">        instance of pyR2D2.Data</span>
+<span class="sd">    caseid : str</span>
+<span class="sd">        caseid of destination directory e.g. &#39;d002&#39;</span>
+<span class="sd">    n : int</span>
+<span class="sd">        time step of upgrade data.</span>
+<span class="sd">        If end_step=True, n is ignored.</span>
+<span class="sd">    xmax : float</span>
+<span class="sd">        max location in x direction</span>
+<span class="sd">    xmin : float</span>
+<span class="sd">        min location in x direction</span>
+<span class="sd">    ymax : float</span>
+<span class="sd">        max location in y direction</span>
+<span class="sd">    ymin : float</span>
+<span class="sd">        min location in y direction</span>
+<span class="sd">    zmax : float</span>
+<span class="sd">        max location in z direction</span>
+<span class="sd">    zmin : float</span>
+<span class="sd">        min location in z direction</span>
+<span class="sd">    ix : int</span>
+<span class="sd">        updated no. of grid point in x direction</span>
+<span class="sd">    jx : int</span>
+<span class="sd">        updated no. of grid point in y direction</span>
+<span class="sd">    kx : int</span>
+<span class="sd">        updated no. of grid point in z direction</span>
+<span class="sd">    endian : str</span>
+<span class="sd">        endian</span>
+<span class="sd">    end_step : bool</span>
+<span class="sd">        If true final time step is used for upgrade and parameter n is ignored    </span>
+<span class="sd">    memory_saving : bool</span>
+<span class="sd">        If true, upgraded variables are saved in memory separately for saving memory        </span>
+<span class="sd">    ix_ununi : int</span>
+<span class="sd">        number of grid in uniform grid region</span>
+<span class="sd">    dx00 : float</span>
+<span class="sd">        grid spacing in uniform grid region</span>
+<span class="sd">    x_ununif : bool</span>
+<span class="sd">        whethere ununiform grid is used</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    ix_ununi, dx00, and u_ununif are effective only when x_ununif=True</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+    <span class="n">up</span> <span class="o">=</span> <span class="n">updated_data</span><span class="p">()</span>
+
+    <span class="c1">## read Model S based stratification</span>
+    <span class="c1">## data is stored in data.models dictionary</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">ms</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1">## check if the origin and the destination are different</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">datadir</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The origin and the destination are the same. stop..&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+    
+    <span class="c1">## check if the destination directory</span>
+    <span class="c1">## if not this method finishes</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The destination directory &#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39; already exist. stop..&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rsync -avP --exclude=&quot;data&quot; &#39;</span><span class="o">+</span><span class="n">data</span><span class="o">.</span><span class="n">datadir</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="s1">&#39; ../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="p">)</span>
+
+    <span class="c1">## number of grid after upgrade</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">ix</span> <span class="o">=</span> <span class="n">ix</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">jx</span> <span class="o">=</span> <span class="n">jx</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">kx</span> <span class="o">=</span> <span class="n">kx</span>
+
+    <span class="c1">## number of grid with margin after upgrade</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">ixg</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">ix</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">margin</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">jxg</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">jx</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">margin</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">kxg</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">kx</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">margin</span>
+    
+    <span class="k">if</span> <span class="n">x_ununif</span><span class="p">:</span>
+        <span class="c1">## generate upgraded coordinate in ununiform geometry</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">gen_coord_ununiform_top</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="n">dx00</span><span class="p">,</span> <span class="n">ix_ununi</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">## generate upgraded coordinate in uniform geometry</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">gen_coord</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+
+    <span class="c1">## generate upgraded coordinate</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">gen_coord</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">gen_coord</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+    
+    <span class="c1">## read checkpoint data of original case</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;### read existing data ###&#39;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qc_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="n">end_step</span><span class="p">)</span>
+
+    <span class="c1">## prepare checkpoint data for upgrade data</span>
+    <span class="k">if</span> <span class="n">memory_saving</span><span class="p">:</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">up</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">kxg</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">up</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mtype</span><span class="p">))</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/param/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/qq/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/slice/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/remap/qq/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/remap/vl/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/time/mhd/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/time/tau/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/tau/&#39;</span><span class="p">,</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;### Upgrade starts ###&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">mtype</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">memory_saving</span><span class="p">:</span>
+            <span class="n">up</span><span class="o">.</span><span class="n">qq</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">fortran_util</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">xg</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">yg</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">zg</span><span class="p">,</span> \
+                    <span class="n">up</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">qc</span><span class="p">[:,:,:,</span><span class="n">m</span><span class="p">])</span>
+            <span class="n">up</span><span class="o">.</span><span class="n">qq</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">up</span><span class="o">.</span><span class="n">ixg</span><span class="o">*</span><span class="n">up</span><span class="o">.</span><span class="n">jxg</span><span class="o">*</span><span class="n">up</span><span class="o">.</span><span class="n">kxg</span><span class="p">],</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">)</span> \
+                    <span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/qq/qq&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{0:02d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.dac.e&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">up</span><span class="o">.</span><span class="n">qq</span><span class="p">[:,:,:,</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">fortran_util</span> \
+                    <span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">xg</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">yg</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">zg</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">qc</span><span class="p">[:,:,:,</span><span class="n">m</span><span class="p">])</span>
+            
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">memory_saving</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;### Save data ###&#39;</span><span class="p">)</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">qq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">mtype</span><span class="o">*</span><span class="n">up</span><span class="o">.</span><span class="n">ixg</span><span class="o">*</span><span class="n">up</span><span class="o">.</span><span class="n">jxg</span><span class="o">*</span><span class="n">up</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">)</span> \
+                <span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/qq/qq.dac.e&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+        <span class="k">return</span> <span class="n">sign</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">change_judge</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="n">change</span> <span class="o">=</span> <span class="s1">&#39; (unchange)&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">enp</span><span class="p">:</span>
+                <span class="n">change</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="se">\033</span><span class="s1">[31m(changed)</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">change</span> <span class="o">=</span> <span class="s1">&#39; (changed)&#39;</span>
+                
+        <span class="k">return</span> <span class="n">change</span>
+    
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> \
+            <span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">endian</span><span class="o">+</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/time/mhd/t.dac.e&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/param/nd.dac&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../run/&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;/data/cont_log.txt&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;The initial condition of this run is upgraded data from the other directory</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;This file describes the original and the upgraded data</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;### Original data ###</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Server: &#39;</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">server</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Datadir: &#39;</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">datadir</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
+        <span class="n">cstep</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cstep</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Output step: &#39;</span><span class="o">+</span><span class="n">cstep</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">xmin</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;xmin = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; or &#39;</span>
+            <span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">xmin</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+            <span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;xmax = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; or &#39;</span>
+            <span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">xmax</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+            <span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;Spherical&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ymin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ymin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ymin&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ymax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ymax&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">zmin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;zmin&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">zmax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;zmax&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ymin</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ymin&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ymax&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">zmin</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;zmin&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">zmax</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;zmax&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;nx0*ix0 = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ix</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;ix&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ny0*jx0 = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">jx</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;jx&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;nz0*kx0 = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">kx</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="s1">&#39;kx&#39;</span><span class="p">,</span> <span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x_ununif</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.true.&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.false.&#39;</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;uniform_flag = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ununiform_flag</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">x_ununif</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ununiform_flag&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ix_ununi = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ix_ununi</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">ix_ununi</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ix_ununi&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;dx00 = &#39;&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dx00</span><span class="p">)</span> <span class="o">+</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">dx00</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;dx00&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;###############################################&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;###############################################&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;###############################################&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;### Upgrade data ###&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;xmin = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; or &#39;</span>
+            <span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xmin</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+            <span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;xmax = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; or &#39;</span>
+            <span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xmax</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+            <span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;Spherical&#39;</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; [rad] &#39;</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymin</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymax</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmin</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmin&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmax</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmax&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;nx0*ix0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ix&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ny0*jx0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;jx&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;nz0*kx0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;kx&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x_ununif</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.true.&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.false.&#39;</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;uniform_flag = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x_ununif</span><span class="p">)</span> \
+            <span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">x_ununif</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ununiform_flag&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;ix_ununi = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ix_ununi</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ix_ununi</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ix_ununi&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;dx00 = &#39;&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dx00</span><span class="p">)</span><span class="o">+</span><span class="n">change_judge</span><span class="p">(</span><span class="n">dx00</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;dx00&#39;</span><span class="p">,</span><span class="n">enp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;### Data upgrade funished ###&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Please use following parameters&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;caseid is </span><span class="se">\033</span><span class="s1">[31m&#39;</span><span class="o">+</span><span class="n">caseid</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        
+    <span class="n">value</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;xmin = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)),</span><span class="s1">&#39; or &#39;</span>
+          <span class="p">,</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xmin</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+          <span class="p">,</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmin&#39;</span><span class="p">))</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">rstar</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;xmax = rstar &#39;</span><span class="o">+</span><span class="n">sign_judge</span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)),</span><span class="s1">&#39; or &#39;</span>
+          <span class="p">,</span><span class="s1">&#39;</span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xmax</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">rstar</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;*rstar&#39;</span>
+          <span class="p">,</span><span class="n">change_judge</span><span class="p">(</span><span class="n">xmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;xmax&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s1">&#39;Spherical&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymin&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymax&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmin</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmin&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmax</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">180</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmax&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ymin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymin&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ymax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ymax</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ymax&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zmin = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmin</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmin</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmin&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zmax = &#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zmax</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">zmax</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;zmax&#39;</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nx0*ix0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">),</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">ix</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ix&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ny0*jx0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">),</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;jx&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nz0*kx0 = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">),</span> <span class="n">change_judge</span><span class="p">(</span><span class="n">up</span><span class="o">.</span><span class="n">kx</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;kx&#39;</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x_ununif</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.true.&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">uniform_flag</span> <span class="o">=</span> <span class="s1">&#39;.false.&#39;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;uniform_flag = &#39;</span><span class="o">+</span><span class="n">uniform_flag</span> \
+          <span class="p">,</span><span class="n">change_judge</span><span class="p">(</span><span class="n">x_ununif</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ununiform_flag&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">x_ununif</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ix_ununi = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ix_ununi</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">ix_ununi</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;ix_ununi&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dx00 = &#39;&#39;</span><span class="si">{:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dx00</span><span class="p">),</span><span class="n">change_judge</span><span class="p">(</span><span class="n">dx00</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;dx00&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;You plan to use uniform grid spacing.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Do not care about ix_ununi and dx00 in geometry_def.F90&#39;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

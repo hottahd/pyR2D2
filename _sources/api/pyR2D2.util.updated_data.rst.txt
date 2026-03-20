@@ -1,0 +1,7 @@
+updated_data
+============
+
+.. currentmodule:: pyR2D2.util
+
+.. autoclass:: updated_data
+   :show-inheritance:

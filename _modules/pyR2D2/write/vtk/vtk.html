@@ -5,16 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.write.vtk.vtk &mdash; R2D2 Document 0.3.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+  <title>pyR2D2.write.vtk.vtk &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=bd887c6c" />
 
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=4621528c"></script>
+      <script src="../../../../_static/documentation_options.js?v=b10c3eac"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -78,9 +78,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyR2D2.write.vtk.vtk</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
 <div class="viewcode-block" id="write_3D">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.vtk.write_3D.html#pyR2D2.write.vtk.write_3D">[docs]</a>
-<span></span><span class="k">def</span> <span class="nf">write_3D</span><span class="p">(</span><span class="n">qq</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">file</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_3D</span><span class="p">(</span><span class="n">qq</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+             <span class="n">x</span> <span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+             <span class="n">y</span> <span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+             <span class="n">z</span> <span class="p">:</span>  <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+             <span class="n">file</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Outputs the 3D scalar data in </span>
 <span class="sd">    VTK format especially for Paraview</span>
@@ -100,7 +106,6 @@
 <span class="sd">    name : str</span>
 <span class="sd">        Name of the variable</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">import</span> <span class="nn">os</span>
 
     <span class="n">ix</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">jx</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -133,7 +138,13 @@
 <span class="c1">######################################################</span>
 <div class="viewcode-block" id="write_optical_surface">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.vtk.write_optical_surface.html#pyR2D2.write.vtk.write_optical_surface">[docs]</a>
-<span class="k">def</span> <span class="nf">write_optical_surface</span><span class="p">(</span><span class="n">qq</span><span class="p">,</span><span class="n">height</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">file</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_optical_surface</span><span class="p">(</span><span class="n">qq</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                          <span class="n">height</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                          <span class="n">y</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                          <span class="n">z</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                          <span class="n">file</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Outputs the 2D scalar data in </span>
 <span class="sd">    VTK format especially for Paraview</span>
@@ -143,7 +154,8 @@
 <span class="sd">    qq : numpy.ndarray, float </span>
 <span class="sd">        Output 3D array size of (jx,kx)</span>
 <span class="sd">    height : numpy.ndarray, float</span>
-<span class="sd">        height of optical surface size of (jx,kx) stored in self.qt[&#39;he&#39;]</span>
+<span class="sd">        height of optical surface size of (jx,kx) stored in </span>
+<span class="sd">        pyR2D2.Data.qt.he</span>
 <span class="sd">    y : numpy.ndarray, float</span>
 <span class="sd">        y coordinate size of (jx)</span>
 <span class="sd">    z : numpy.ndarray, float</span>
@@ -153,8 +165,6 @@
 <span class="sd">    name : str</span>
 <span class="sd">        Name of the variable    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
     <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">)</span>
     <span class="n">jx</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -195,7 +205,15 @@
 <span class="c1">######################################################</span>
 <div class="viewcode-block" id="write_3D_vector">
 <a class="viewcode-back" href="../../../../api/pyR2D2.write.vtk.write_3D_vector.html#pyR2D2.write.vtk.write_3D_vector">[docs]</a>
-<span class="k">def</span> <span class="nf">write_3D_vector</span><span class="p">(</span><span class="n">qx</span><span class="p">,</span><span class="n">qy</span><span class="p">,</span><span class="n">qz</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">file</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_3D_vector</span><span class="p">(</span><span class="n">qx</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">qy</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">qz</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">y</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">z</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+                    <span class="n">file</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Outputs the 3D vector data in </span>
 <span class="sd">    VTK format especially for Paraview</span>
@@ -219,8 +237,6 @@
 <span class="sd">    name : str</span>
 <span class="sd">        Name of the variable    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
     <span class="n">ix</span> <span class="o">=</span> <span class="n">qx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">jx</span> <span class="o">=</span> <span class="n">qx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

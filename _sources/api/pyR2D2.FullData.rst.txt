@@ -6,12 +6,30 @@ FullData
 .. autoclass:: FullData
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~FullData.zarr_keys
+
    .. rubric:: Methods Summary
 
    .. autosummary::
 
+      ~FullData.check
+      ~FullData.clear
+      ~FullData.compress
+      ~FullData.delete
       ~FullData.read
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: zarr_keys
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: check
+   .. automethod:: clear
+   .. automethod:: compress
+   .. automethod:: delete
    .. automethod:: read

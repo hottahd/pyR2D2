@@ -1,0 +1,6 @@
+stream_function
+===============
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: stream_function

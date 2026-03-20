@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>R2D2を使うための環境設定 &mdash; R2D2 Document 0.3.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+  <title>R2D2を使うための環境設定 &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=4621528c"></script>
+      <script src="_static/documentation_options.js?v=b10c3eac"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -173,16 +173,16 @@ MacとLinuxで共通する部分が多いのでまとめて説明を記す。</p
 <p>以下は必須ではないが、ipythonを使う時の初期設定ファイルである。
 <code class="code docutils literal notranslate"><span class="pre">~/.ipython/profile_default/startup/00_first.py</span></code>
 というファイルを作りそこに以下のように記す。</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">pcolormesh</span><span class="p">,</span><span class="n">plot</span><span class="p">,</span><span class="n">clf</span><span class="p">,</span><span class="n">close</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span><span class="n">cos</span><span class="p">,</span><span class="n">tan</span><span class="p">,</span><span class="n">arcsin</span><span class="p">,</span><span class="n">arccos</span><span class="p">,</span><span class="n">arctan</span><span class="p">,</span><span class="n">exp</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="n">log2</span><span class="p">,</span><span class="n">log10</span><span class="p">,</span><span class="n">mod</span><span class="p">,</span><span class="n">sqrt</span><span class="p">,</span><span class="n">absolute</span><span class="p">,</span><span class="n">sinh</span><span class="p">,</span><span class="n">cosh</span><span class="p">,</span><span class="n">tanh</span><span class="p">,</span><span class="n">pi</span><span class="p">,</span><span class="n">arange</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">pcolormesh</span><span class="p">,</span><span class="n">plot</span><span class="p">,</span><span class="n">clf</span><span class="p">,</span><span class="n">close</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sin</span><span class="p">,</span><span class="n">cos</span><span class="p">,</span><span class="n">tan</span><span class="p">,</span><span class="n">arcsin</span><span class="p">,</span><span class="n">arccos</span><span class="p">,</span><span class="n">arctan</span><span class="p">,</span><span class="n">exp</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="n">log2</span><span class="p">,</span><span class="n">log10</span><span class="p">,</span><span class="n">mod</span><span class="p">,</span><span class="n">sqrt</span><span class="p">,</span><span class="n">absolute</span><span class="p">,</span><span class="n">sinh</span><span class="p">,</span><span class="n">cosh</span><span class="p">,</span><span class="n">tanh</span><span class="p">,</span><span class="n">pi</span><span class="p">,</span><span class="n">arange</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
-<span class="kn">from</span> <span class="nn">IPython.core.magic</span> <span class="kn">import</span> <span class="n">register_line_magic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.core.magic</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_line_magic</span>
 <span class="nd">@register_line_magic</span>
-<span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
     <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39; -i &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">r</span>
 </pre></div>
@@ -274,7 +274,7 @@ ipython<span class="w"> </span>setup.py<span class="w"> </span>install
 <section id="idl">
 <h2>IDLコードの環境設定<a class="headerlink" href="#idl" title="Link to this heading"></a></h2>
 <p>システムにIDLをインストールすれば、それのみで使える。ここでは説明しない。</p>
-<p>最終更新日：Dec 12, 2024</p>
+<p>最終更新日：Mar 20, 2026</p>
 </section>
 </section>
 

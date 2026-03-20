@@ -1,0 +1,6 @@
+gen_coord_ununiform_flex
+========================
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: gen_coord_ununiform_flex

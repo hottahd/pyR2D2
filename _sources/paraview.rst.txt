@@ -5,7 +5,6 @@ Paraviewを用いた3Dデータ表示
 
 データ準備
 --------------------------------
-すでに計算を実行していて、何らかのデータが準備できている状況を想定する。
 データをParaviewで扱うためにVTKフォーマットに変換する。
 変換後に用意するべきデータは
 
@@ -14,22 +13,22 @@ Paraviewを用いた3Dデータ表示
 
 それぞれのデータのためにpyR2D2では以下の関数が用意してある。
 
-:meth:`pyR2D2.write.vtk.write_3D`
-:meth:`pyR2D2.write.vtk.write_3D_vector`
-:meth:`pyR2D2.write.vtk.write_optical_surface`
+- :meth:`pyR2D2.write.vtk.write_3D`
+- :meth:`pyR2D2.write.vtk.write_3D_vector`
+- :meth:`pyR2D2.write.vtk.write_optical_surface`
 
 例えば、以下のようにして実行する
 
 .. code:: python
 
-    run init #　初期設定
-    d.read.qq_3D(100) # 100番目の3次元データを読込
+    d = pyR2D2.read.R2D2Data('data/') # dataディレクトリにあるデータを読込
+    d.qf.read(100, ['bx', 'by', 'bz']) # 100番目の3次元データを読込
     bb = sqrt(d.qq['bx']**2 + d.qq['by']**2 + d.qq['bz']**2) # 磁場の強さを計算
-    d.read.tau(100) # 100番目のtau=1の2次元データを読込
+    d.qt.read(100) # 100番目のtau=1の2次元データを読込
 
-    pyR2D2.write.vtk.write_3D(bb,x,y,z,'bb.vtk','bb') 
+    pyR2D2.write.vtk.write_3D(bb, d.x, d.y, d.z,'bb.vtk','bb')
     # 変数名をbbとしてファイル名bb.vtkに3次元データを出力
-    pyR2D2.write.write_optical_surface(d.qt['in'],d.qt['he'],y,z,'in.vtk','in')
+    pyR2D2.write.write_optical_surface(d.qt.rt, d.qt.he, d.y, d.z, 'in.vtk', 'in')
     # 変数名をinとしてファイル名in.vtkに2次元データを出力
 
 Paraviewを用いて3次元表示

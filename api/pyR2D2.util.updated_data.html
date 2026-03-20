@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>caseid_select &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+  <title>updated_data &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="define_n0" href="pyR2D2.util.define_n0.html" />
-    <link rel="prev" title="Sync" href="pyR2D2.Sync.html" /> 
+    <link rel="next" title="pyR2D2.write.google Package" href="../pyR2D2.write.html" />
+    <link rel="prev" title="update_results_file" href="pyR2D2.util.update_results_file.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -54,8 +54,8 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id1">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#id1">Classes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Class Inheritance Diagram</a></li>
 </ul>
 </li>
@@ -86,9 +86,9 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
           <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
-      <li class="breadcrumb-item active">caseid_select</li>
+      <li class="breadcrumb-item active">updated_data</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/pyR2D2.util.caseid_select.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/pyR2D2.util.updated_data.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -96,27 +96,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="caseid-select">
-<h1>caseid_select<a class="headerlink" href="#caseid-select" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyR2D2.util.caseid_select">
-<span class="sig-prename descclassname"><span class="pre">pyR2D2.util.</span></span><span class="sig-name descname"><span class="pre">caseid_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_locals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_read</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/util/util.html#caseid_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.caseid_select" title="Link to this definition"></a></dt>
-<dd><p>Choose caseid from input or from user input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>main_locals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – locals() in main program, which include local variables</p></li>
-<li><p><strong>force_read</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, force to read caseid from user input.
-If False, read caseid from main_locals if exists</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>caseid</strong> – caseid</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
-</dd>
-</dl>
+  <section id="updated-data">
+<h1>updated_data<a class="headerlink" href="#updated-data" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyR2D2.util.updated_data">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR2D2.util.</span></span><span class="sig-name descname"><span class="pre">updated_data</span></span><a class="reference internal" href="../_modules/pyR2D2/util/resolution.html#updated_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.updated_data" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Temporary class for upgraded data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR2D2.util.updated_data.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/util/resolution.html#updated_data.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.updated_data.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -125,8 +116,8 @@ If False, read caseid from main_locals if exists</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyR2D2.Sync.html" class="btn btn-neutral float-left" title="Sync" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyR2D2.util.define_n0.html" class="btn btn-neutral float-right" title="define_n0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyR2D2.util.update_results_file.html" class="btn btn-neutral float-left" title="update_results_file" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../pyR2D2.write.html" class="btn btn-neutral float-right" title="pyR2D2.write.google Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

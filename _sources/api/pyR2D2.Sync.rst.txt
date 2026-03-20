@@ -13,19 +13,21 @@ Sync
       ~Sync.all
       ~Sync.check
       ~Sync.remap_qq
-      ~Sync.select
+      ~Sync.rsync_subprocess_wrapper
       ~Sync.setup
       ~Sync.slice
       ~Sync.tau
       ~Sync.vc
+      ~Sync.xselect
 
    .. rubric:: Methods Documentation
 
    .. automethod:: all
    .. automethod:: check
    .. automethod:: remap_qq
-   .. automethod:: select
+   .. automethod:: rsync_subprocess_wrapper
    .. automethod:: setup
    .. automethod:: slice
    .. automethod:: tau
    .. automethod:: vc
+   .. automethod:: xselect
