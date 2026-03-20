@@ -1236,62 +1236,70 @@ class Slice(_BaseReader):
             postfixes = ["_yin", "_yan"]
         else:
             postfixes = [""]
+        
+        # check if the files exist
+        if not zarr_flag:
+            for postfix in postfixes:
+                filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
+                if not os.path.exists(filepath):
+                    zarr_flag = True
+                    print(f"File does not exist at n={n} for slice {direc} with postfix {postfix}.")
+                    print("Trying to read from zarr file.")
+                    break
 
-        for postfix in postfixes:
-            if zarr_flag:
-                zarr_filepath = self._get_filepath_slice_zarr(n, direc)
-                if not os.path.exists(zarr_filepath):
-                    print(f"Zarr file does not exist at n={n} for slice {direc}.")
-                    return
+        if zarr_flag:
+            zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+            if not os.path.exists(zarr_filepath):
+                print(f"Zarr file does not exist at n={n} for slice {direc}.")
+                return
 
-                i0, j0, k0 = 0, 0, 0
-                i1, j1, k1 = self.ix, self.jx, self.kx
-                if direc == "x":
-                    i0, i1 = n_slice, n_slice + 1
-                elif direc == "y":
-                    j0, j1 = n_slice, n_slice + 1
-                elif direc == "z":
-                    k0, k1 = n_slice, n_slice + 1
+            i0, j0, k0 = 0, 0, 0
+            i1, j1, k1 = self.ix, self.jx, self.kx
+            if direc == "x":
+                i0, i1 = n_slice, n_slice + 1
+            elif direc == "y":
+                j0, j1 = n_slice, n_slice + 1
+            elif direc == "z":
+                k0, k1 = n_slice, n_slice + 1
 
-                qq = pyR2D2.zarr_util.load(
-                    zarr_filepath,
-                    names=self.zarr_keys,
-                    i0=i0,
-                    i1=i1,
-                    j0=j0,
-                    j1=j1,
-                    k0=k0,
-                    k1=k1,
-                )
+            qq = pyR2D2.zarr_util.load(
+                zarr_filepath,
+                names=self.zarr_keys,
+                i0=i0,
+                i1=i1,
+                j0=j0,
+                j1=j1,
+                k0=k0,
+                k1=k1,
+            )
+            for key, value in qq.items():
+                self.__dict__[key] = value.squeeze()
+        else:
+            for postfix in postfixes:
+                    with open(
+                        self._get_filepath_slice(n_slice, direc, n, postfix),
+                        "rb",
+                    ) as f:
+                        if direc == "x":
+                            if self.geometry == "YinYang":
+                                n1, n2 = (
+                                    self.jx_yy + 2 * self.margin,
+                                    self.kx_yy + 2 * self.margin,
+                                )
+                            else:
+                                n1, n2 = self.jx, self.kx
+                        if direc == "y":
+                            n1, n2 = self.ix, self.kx
+                        if direc == "z":
+                            n1, n2 = self.ix, self.jx
+                        qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
 
-                for key, value in qq.items():
-                    self.__dict__[key] = value.squeeze()
-
-            else:
-                with open(
-                    self._get_filepath_slice(n_slice, direc, n, postfix),
-                    "rb",
-                ) as f:
-                    if direc == "x":
-                        if self.geometry == "YinYang":
-                            n1, n2 = (
-                                self.jx_yy + 2 * self.margin,
-                                self.kx_yy + 2 * self.margin,
-                            )
-                        else:
-                            n1, n2 = self.jx, self.kx
-                    if direc == "y":
-                        n1, n2 = self.ix, self.kx
-                    if direc == "z":
-                        n1, n2 = self.ix, self.jx
-                    qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
-
-                for key, m in zip(
-                    self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
-                ):
-                    self.__dict__[key + postfix] = qq.reshape(
-                        (n1, n2, self.mtype + 2), order="F"
-                    )[:, :, m]
+                    for key, m in zip(
+                        self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
+                    ):
+                        self.__dict__[key + postfix] = qq.reshape(
+                            (n1, n2, self.mtype + 2), order="F"
+                        )[:, :, m]
 
             # self.info = {}
             # self.info["direc"] = direc
@@ -1409,9 +1417,26 @@ class Slice(_BaseReader):
         xyz_slice = self.xyz_slice_select(direc)
         for n_slice in range(len(xyz_slice)):
             self.read(n_slice=n_slice, direc=direc, n=n)
+            
+            if self.geometry == "YinYang":
+                qq_yin = np.empty((self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32)
+                qq_yan = np.empty((self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32)
+                qq = np.empty((self.p.jx, self.p.kx, len(keys)), dtype=np.float32)
+                
+                for key in keys:
+                    qq_yin[:, :, keys.index(key)] = self.__dict__[key + "_yin"]
+                    qq_yan[:, :, keys.index(key)] = self.__dict__[key + "_yan"]
+                    
+                pyR2D2.cpp_util.yin_yang_convert_scalar(
+                    qq_yin, qq_yan, self.p.yg_yy, self.p.zg_yy, self.p.y, self.p.z, qq
+                )
+            
             for key in keys:
                 if direc == "x":
-                    vars_dict[key][n_slice, :, :] = self.__dict__[key]
+                    if self.geometry == "YinYang":
+                        vars_dict[key][n_slice, :, :] = qq[:, :, keys.index(key)]
+                    else:
+                        vars_dict[key][n_slice, :, :] = self.__dict__[key]
                 elif direc == "y":
                     vars_dict[key][:, n_slice, :] = self.__dict__[key]
                 elif direc == "z":
@@ -1428,6 +1453,20 @@ class Slice(_BaseReader):
         keys: list = zarr_keys,
     ):
 
+        if self.geometry == "YinYang":
+            postfixes = ["_yin", "_yan"]
+        else:
+            postfixes = [""]
+
+        xyz_slice = self.xyz_slice_select(direc)
+        for postfix in postfixes:
+            for n_slice in range(len(xyz_slice)):
+                filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
+                if not os.path.exists(filepath):
+                    print(f"File {filepath} does not exist. Anyway you can delete it.")
+                    return True
+            
+
         zarr_filepath = self._get_filepath_slice_zarr(n, direc)
         if not os.path.exists(zarr_filepath):
             print(
@@ -1442,7 +1481,6 @@ class Slice(_BaseReader):
                 )
                 return False
 
-        xyz_slice = self.xyz_slice_select(direc)
         for n_slice in range(len(xyz_slice)):
             filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
             if not os.path.exists(filepath):

@@ -12,3 +12,4 @@ doc/source/api/
 *.ipynb
 *.egg-info
 pyR2D2/_version.py
+.nfs*

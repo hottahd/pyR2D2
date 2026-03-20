@@ -1,12 +1,11 @@
+#pragma once
 #include <vector>
 #include <iostream>
 #include <cmath>
 #include <omp.h>
+#include "const.hpp"
 #include "view_array.hpp"
 #include "eos.hpp"
-
-double pi = 3.14159265358979323846;
-double pii = 1.0 / pi;
 
 py::array_t<double> vertical_upward_rte(
     const py::array_t<double, py::array::c_style | py::array::forcecast> &ro_np,
@@ -15,16 +14,6 @@ py::array_t<double> vertical_upward_rte(
     EOS &eos)
 {
 
-  // #pragma omp parallel
-  //   {
-  // #pragma omp single
-  //     {
-  //       std::cerr << "OpenMP threads = "
-  //                 << omp_get_num_threads() << std::endl;
-  //     }
-  //   }
-
-  double sb = 5.67e-5; // Stefan-Boltzmann constant in cgs units
   auto ro = view_array<double>(ro_np);
   auto se = view_array<double>(se_np);
   auto x = view_array<double>(x_np);
@@ -63,7 +52,7 @@ py::array_t<double> vertical_upward_rte(
         for (size_t i = 0; i < ro.i_size; i++)
         {
           log_al_ctr[i] = std::log(ro(i, j, k) * op(i, j, k));
-          log_so_ctr[i] = std::log(sb * std::pow(te(i, j, k), 4) * pii);
+          log_so_ctr[i] = std::log(cst::sb * std::pow(te(i, j, k), 4) * cst::pii);
         }
 
         // value at i - 1/2

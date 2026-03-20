@@ -3,6 +3,7 @@
 #include <string>
 #include "eos.hpp"
 #include "rte.hpp"
+#include "yin_yang_convert.hpp"
 
 namespace py = pybind11;
 
@@ -106,4 +107,51 @@ PYBIND11_MODULE(cpp_util, m)
         py::arg("se"),
         py::arg("x"),
         py::arg("eos"));
+
+    m.def(
+        "yin_yang_convert_scalar",
+        &yin_yang_convert_scalar<float>,
+        R"doc(
+    Convert scalar values from Yin-Yang grid to regular grid.
+    Parameters
+    ----------
+    qq_yin_np : numpy.ndarray (dtype=float32)
+        3D array of Yin grid values. The last index indicate the variable index.
+    qq_yan_np : numpy.ndarray (dtype=float32)
+        3D array of Yang grid values. The last index indicate the variable index.
+    th_yy_np : numpy.ndarray (dtype=float64)
+        1D array of Yin-Yang grid theta values.
+    ph_yy_np : numpy.ndarray (dtype=float64)
+        1D array of Yin-Yang grid phi values.
+    th_np : numpy.ndarray (dtype=float64)
+        1D array of regular grid theta values.
+    ph_np : numpy.ndarray (dtype=float64)
+        1D array of regular grid phi values.
+    qq : numpy.ndarray (dtype=float32)
+        3D array to store the converted values in regular grid. The last index indicate the variable index.
+     Returns
+    
+    )doc",
+        py::arg("qq_yin"),
+        py::arg("qq_yan"),
+        py::arg("th_yy"),
+        py::arg("ph_yy"),
+        py::arg("th"),
+        py::arg("ph"),
+        py::arg("qq"));
+
+    m.def(
+        "yin_yang_convert_scalar_f64",
+        &yin_yang_convert_scalar<double>,
+        R"doc(
+        np.float64 version of yin_yang_convert_scalar.
+        See yin_yang_convert_scalar for details.
+    )doc",
+        py::arg("qq_yin"),
+        py::arg("qq_yan"),
+        py::arg("th_yy"),
+        py::arg("ph_yy"),
+        py::arg("th"),
+        py::arg("ph"),
+        py::arg("qq"));
 }

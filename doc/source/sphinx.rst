@@ -18,7 +18,7 @@ Sphinxは、reStructuredTextからHTMLやLatexなどの
 
 .. sourcecode:: shell
 		
-   conda install sphinx esbonio doc8 rstcheck
+   conda install sphinx esbonio doc8 rstcheck sphinx-automodapi sphinx-multiversion sphinx-rtd-theme
 
 Markdownを使いたい時は以下のようにする。
 
@@ -58,7 +58,7 @@ VS codeを利用すると快適にreStructuredTextを作成することができ
 環境設定
 --------------------------------
 デフォルトの設定では、数式を書く時にMathjaxを使用するようで、数式の太字が意図するように表示されなかったのでsvgで出力することにした。
-以下のように　``conf.py`` に追記する。
+以下のように ``conf.py`` に追記する。
 
 .. sourcecode:: python
 
