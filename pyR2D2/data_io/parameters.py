@@ -23,22 +23,23 @@ class Parameters:
         from scipy.io import FortranFile
 
         self.data = data
+        # datadir is Path
         self.datadir = data.datadir
 
         # Time control parameters
-        with open(self.datadir + "param/nd.dac", "r") as f:
+        with open(self.datadir / "param" / "nd.dac", "r") as f:
             nn = f.read().split()
             self.nd = int(nn[0])  # current maximum time step
             self.nd_tau = int(nn[1])  # current maximum time step for tau
 
         # data/time/tau のファイルの数を数え、nd_tauと比較して大きい方をnd_tauとする
-        if os.path.isdir(self.datadir + "time/tau"):
+        if os.path.isdir(self.datadir / "time" / "tau"):
             self.nd_tau = max(
-                len(os.listdir(self.datadir + "time/tau")) - 1, self.nd_tau
+                len(os.listdir(self.datadir / "time" / "tau")) - 1, self.nd_tau
             )
 
         # Read basic parameters
-        with open(self.datadir + "param/params.dac", "r") as f:
+        with open(self.datadir / "param" / "params.dac", "r") as f:
             for line in f:
                 parts = line.split()
                 key = parts[1]
@@ -74,7 +75,7 @@ class Parameters:
             self.endian = ">"
 
         # MPI information
-        f = FortranFile(self.datadir + "param/xyz.dac", "r")
+        f = FortranFile(self.datadir / "param" / "xyz.dac", "r")
         shape = (self.ix0 * self.jx0 * self.kx0, 3)
         self.xyz = f.read_reals(dtype=np.int32).reshape(shape, order="F")
 
@@ -120,7 +121,7 @@ class Parameters:
                 ("tail", self.endian + "i"),
             ]
         )
-        with open(self.datadir + "param/back.dac", "rb") as f:
+        with open(self.datadir / "param" / "back.dac", "rb") as f:
             back = np.fromfile(f, dtype=dtype, count=1)
 
         # marginも含んだ座標
@@ -198,7 +199,7 @@ class Parameters:
         ##############################
         # read value information
         if dimension == "3d":
-            with open(self.datadir + "remap/vl/c.dac", "r") as f:
+            with open(self.datadir / "remap" / "vl" / "c.dac", "r") as f:
                 value = f.read().split()
                 self.m2d_xy = int(value[0])
                 self.m2d_xz = int(value[1])
@@ -228,7 +229,7 @@ class Parameters:
                 ]
             )
 
-            with open(self.datadir + "remap/remap_info.dac", "rb") as f:
+            with open(self.datadir / "remap" / "remap_info.dac", "rb") as f:
                 mpi = np.fromfile(f, dtype=dtyp, count=1)
 
             for key in mpi.dtype.names:
@@ -247,8 +248,8 @@ class Parameters:
             self.jss = self.jss - 1
             self.jee = self.jee - 1
 
-            if os.path.isdir(self.datadir + "slice"):
-                with open(self.datadir + "slice/params.dac", "r") as f:
+            if os.path.isdir(self.datadir / "slice"):
+                with open(self.datadir / "slice" / "params.dac", "r") as f:
                     line = f.readline()
                     while line:
                         self.__dict__[line.split()[1]] = int(line.split()[0])
@@ -261,7 +262,7 @@ class Parameters:
                         ("z_slice", (self.endian + "d", (self.nz_slice,))),
                     ]
                 )
-                with open(self.datadir + "slice/slice.dac", "rb") as f:
+                with open(self.datadir / "slice" / "slice.dac", "rb") as f:
                     slice = np.fromfile(f, dtype=dtype)
 
                     self.x_slice = slice["x_slice"].reshape(self.nx_slice, order="F")
@@ -269,9 +270,9 @@ class Parameters:
                     self.z_slice = slice["z_slice"].reshape(self.nz_slice, order="F")
 
         # read equation of state
-        eosdir = self.datadir[:-5] + "input_data/"
-        if os.path.exists(eosdir + "eos_table_sero.npz"):
-            eos_d = np.load(eosdir + "eos_table_sero.npz")
+        eosdir = self.datadir.parent / "input_data"
+        if os.path.exists(eosdir / "eos_table_sero.npz"):
+            eos_d = np.load(eosdir / "eos_table_sero.npz")
             self.log_ro_e = eos_d["ro"]  # density is defined in logarithmic scale
             self.se_e = eos_d["se"]
             self.ix_e = len(self.log_ro_e)
@@ -287,8 +288,8 @@ class Parameters:
             self.dse_e = self.se_e[1] - self.se_e[0]
 
         # read original data
-        if os.path.exists(self.datadir + "cont_log.txt"):
-            with open(self.datadir + "cont_log.txt") as f:
+        if os.path.exists(self.datadir / "cont_log.txt"):
+            with open(self.datadir / "cont_log.txt") as f:
                 self.origin = f.readlines()[6][-11:-7]
         else:
             self.origin = "N/A"

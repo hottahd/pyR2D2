@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -51,7 +52,7 @@ class Data:
         """
         Initialize pyR2D2.Data
         """
-        self.datadir = datadir
+        self.datadir = Path(datadir)
         self.p = pyR2D2.Parameters(self)
         self.qx = pyR2D2.XSelect(self)
         self.qz = pyR2D2.ZSelect(self)
@@ -68,8 +69,8 @@ class Data:
         self.qa = pyR2D2.After(self)
         self.sync = pyR2D2.Sync(self)
 
-        eosdir = self.datadir[:-5] + "input_data/"
-        if os.path.exists(eosdir + "eos_table_sero.npz"):
+        eosdir = self.datadir.parent / "input_data"
+        if (eosdir / "eos_table_sero.npz").exists():
             self.eos = pyR2D2.cpp_util.EOS(
                 self.log_ro_e,
                 self.se_e,
@@ -110,16 +111,12 @@ class Data:
         """
 
         if tau:
-            with open(
-                self.datadir + "time/tau/t.dac." + "{0:08d}".format(n), "rb"
-            ) as f:
+            with open(self.datadir / "time" / "tau" / f"t.dac.{n:08d}", "rb") as f:
                 self.time = np.fromfile(f, self.endian + "d", 1).reshape(
                     (1), order="F"
                 )[0]
         else:
-            with open(
-                self.datadir + "time/mhd/t.dac." + "{0:08d}".format(n), "rb"
-            ) as f:
+            with open(self.datadir / "time" / "mhd" / f"t.dac.{n:08d}", "rb") as f:
                 self.time = np.fromfile(f, self.endian + "d", 1).reshape(
                     (1), order="F"
                 )[0]
@@ -142,14 +139,14 @@ class Data:
             If true, checkpoint of end step is read.
         """
 
-        step = "{0:08d}".format(n)
+        step = f"{n:08d}"
         if end_step:
             if np.mod(self.nd, 2) == 0:
                 step = "e"
             if np.mod(self.nd, 2) == 1:
                 step = "o"
 
-        with open(self.datadir + "qq/qq.dac." + step, "rb") as f:
+        with open(self.datadir / "qq" / f"qq.dac.{step}", "rb") as f:
             self.qc = np.fromfile(
                 f, self.endian + "d", self.mtype * self.ixg * self.jxg * self.kxg
             ).reshape((self.ixg, self.jxg, self.kxg, self.mtype), order="F")

@@ -1,10 +1,11 @@
 import gc
-import glob
 import os
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 import numpy as np
+import zarr
 
 import pyR2D2
 
@@ -122,32 +123,18 @@ class _BaseRemapReader(_BaseReader):
 
         Returns
         -------
-        filepath : str
+        filepath : pathlib.Path
             file path of remap/qq/
         """
-        if os.path.isdir(self.datadir + "remap/qq/00000/"):
-            cnou = "{0:05d}".format(np0 // 1000)
-            cno = "{0:08d}".format(np0)
+        if (self.datadir / "remap" / "qq" / "00000").is_dir():
+            cnou = f"{np0//1000:05d}"
+            cno = f"{np0:08d}"
             filepath = (
-                self.datadir
-                + "remap/qq/"
-                + cnou
-                + "/"
-                + cno
-                + "/qq.dac."
-                + "{0:08d}".format(n)
-                + "."
-                + "{0:08d}".format(np0)
+                self.datadir / "remap" / "qq" / cnou / cno / f"qq.dac.{n:08d}.{np0:08d}"
             )
         else:
             # directoryを分けない古いバージョン対応
-            filepath = (
-                self.datadir
-                + "remap/qq/qq.dac."
-                + "{0:08d}".format(n)
-                + "."
-                + "{0:08d}".format(np0)
-            )
+            filepath = self.datadir / "remap" / "qq" / f"qq.dac.{n:08d}.{np0:08d}"
         return filepath
 
     def _get_filepath_remap_zarr(self, n: int):
@@ -158,9 +145,14 @@ class _BaseRemapReader(_BaseReader):
         ----------
         n : int
             time step
+
+        Return
+        -------
+        filepath : pathlib.Path
+            file path of remap/qq/ in zarr format
         """
 
-        return self.datadir + "remap/qq/zarr/qq." + "{0:08d}".format(n) + ".zarr"
+        return self.datadir / "remap" / "qq" / "zarr" / f"qq.{n:08d}.zarr"
 
     def _add_docstring(self):
         docstring = "\n"
@@ -227,7 +219,7 @@ class XSelect(_BaseRemapReader):
             np0 = self.np_ijr[ir0 - 1, jr0 - 1]
             if jr0 == self.jr[np0]:
                 filepath = self._get_filepath_remap_qq(n, np0)
-                if not os.path.exists(filepath):
+                if not filepath.exists():
                     missing = True
                     break
 
@@ -239,7 +231,7 @@ class XSelect(_BaseRemapReader):
         if zarr_flag:
             # If zarr_flag is True, try to read from zarr file
             zarr_path = self._get_filepath_remap_zarr(n)
-            if not os.path.exists(zarr_path):
+            if not zarr_path.exists():
                 raise FileNotFoundError(f"Zarr file does not exist: {zarr_path}")
             qq = pyR2D2.zarr_util.load(zarr_path, names="all", i0=i0, i1=i0 + 1)
             for key in qq.keys():
@@ -276,8 +268,8 @@ class XSelect(_BaseRemapReader):
                             i0 - self.iss[np0], :, :
                         ]
 
-                self.info = {}
-                self.info["xs"] = self.x[i0]
+            self.info = {}
+            self.info["xs"] = self.x[i0]
 
 
 class ZSelect(_BaseRemapReader):
@@ -337,8 +329,8 @@ class ZSelect(_BaseRemapReader):
                         :, :, k0
                     ]
 
-            self.info = {}
-            self.info["zs"] = self.z[k0]
+        self.info = {}
+        self.info["zs"] = self.z[k0]
 
 
 class MPIRegion(_BaseRemapReader):
@@ -449,9 +441,8 @@ class FullData(_BaseRemapReader):
                 np0 = self.np_ijr[ir0 - 1, jr0 - 1]
                 if ir0 == self.ir[np0] and jr0 == self.jr[np0]:
 
-                    dtype = self._dtype_remap_qq(np0)
                     filepath = self._get_filepath_remap_qq(n, np0)
-                    if not os.path.exists(filepath):
+                    if not filepath.exists():
                         missing = True
                         break
             if missing:
@@ -472,7 +463,7 @@ class FullData(_BaseRemapReader):
                     names = list(keys) + ["x", "y", "z"]
 
             zarr_filepath = self._get_filepath_remap_zarr(n)
-            if not os.path.exists(zarr_filepath):
+            if not zarr_filepath.exists():
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
@@ -486,13 +477,15 @@ class FullData(_BaseRemapReader):
 
         else:
 
-            if type(keys) == str:
+            if isinstance(keys, str):
                 if keys == "all":
                     keys_input = self.remap_keys + self.remap_keys_add
                 else:
                     keys_input = [keys]
-            if type(keys) == list:
-                keys_input = keys
+            elif isinstance(keys, (list, tuple)):
+                keys_input = list(keys)
+            else:
+                raise TypeError("keys must be str, list, or tuple")
 
             for key in keys_input:
                 if key not in self.remap_keys + self.remap_keys_add:
@@ -571,8 +564,10 @@ class FullData(_BaseRemapReader):
 
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_remap_zarr(n)
+        else:
+            zarr_filepath = Path(zarr_filepath)
 
-        if not overwrite and os.path.exists(zarr_filepath):
+        if not overwrite and zarr_filepath.exists():
             print(
                 f"File {zarr_filepath} already exists. Set overwrite=True to overwrite it."
             )
@@ -681,7 +676,7 @@ class FullData(_BaseRemapReader):
         """
 
         zarr_filepath = self._get_filepath_remap_zarr(n)
-        if not os.path.exists(zarr_filepath):
+        if not zarr_filepath.exists():
             print(
                 f"Zarr file does not exist at n={n}. Please run FullData.compress() to create it."
             )
@@ -697,7 +692,7 @@ class FullData(_BaseRemapReader):
         for np0 in range(self.npe):
             filepath = self._get_filepath_remap_qq(n, np0)
             if self.iixl[np0] * self.jjxl[np0] != 0:
-                if not os.path.exists(filepath):
+                if not filepath.exists():
                     print(f"File {filepath} does not exist. Anyway you can delete it.")
                     return True
 
@@ -750,27 +745,27 @@ class FullData(_BaseRemapReader):
             check_flag = self.check(n=n, lightweight=lightweight)
 
         if check_flag:
-            if os.path.isdir(self.datadir + "remap/qq/00000/"):
+            if (self.datadir / "remap" / "qq" / "00000").is_dir():
+                base = self.datadir / "remap" / "qq"
                 print(
                     "Deleting files in",
-                    self.datadir + "remap/qq/*/*/qq.dac." + str(n).zfill(8) + ".*",
+                    f"{base}/*/*/qq.dac.{n:08d}.*",
                 )
                 for np0 in range(self.npe):
 
                     filepath = self._get_filepath_remap_qq(n, np0)
-                    # print(filepath)
-                    if os.path.exists(filepath):
-                        os.remove(filepath)
+                    if filepath.exists():
+                        filepath.unlink()
             else:
                 print(
                     "Deleting",
-                    self.datadir + "remap/qq/qq.dac." + str(n).zfill(8) + ".*",
+                    f"{self.datadir / 'remap' / 'qq'}/qq.dac.{n:08d}.*",
                 )
                 pattern = f"qq.dac.{n:08d}.*"
                 subprocess.run(
                     [
                         "find",
-                        f"{self.datadir}remap/qq",
+                        str(self.datadir / "remap" / "qq"),
                         "-maxdepth",
                         "1",
                         "-name",
@@ -779,11 +774,6 @@ class FullData(_BaseRemapReader):
                     ],
                     check=True,
                 )
-                # for filepath in glob.glob(
-                #     self.datadir + "remap/qq/qq.dac." + str(n).zfill(8) + ".*"
-                # ):
-                #     # print(filepath)
-                #     os.remove(filepath)
 
     def clear(self, keys="all"):
         """
@@ -848,13 +838,15 @@ class RestrictedData(_BaseRemapReader):
         jxr = j1 - j0 + 1
         kxr = k1 - k0 + 1
 
-        if type(keys) == str:
+        if isinstance(keys, str):
             if keys == "all":
                 keys_input = self.remap_keys + self.remap_keys_add
             else:
                 keys_input = [keys]
-        if type(keys) == list:
-            keys_input = keys
+        elif isinstance(keys, (list, tuple)):
+            keys_input = list(keys)
+        else:
+            raise TypeError("keys must be str, list, or tuple")
 
         for key in keys_input:
             self.__dict__[key] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
@@ -991,7 +983,7 @@ class OpticalDepth(_BaseReader):
         n : int
             A selected time step for data
         """
-        with open(self.datadir + "tau/qq.dac." + "{0:08d}".format(n), "rb") as f:
+        with open(self.datadir / "tau" / f"qq.dac.{n:08d}", "rb") as f:
             qq = np.fromfile(
                 f, self.endian + "f", self.m_tu * self.m_in * self.jx * self.kx
             )
@@ -1039,9 +1031,7 @@ class OnTheFly(_BaseReader):
         """
 
         # read xy plane data
-        with open(
-            self.datadir + "remap/vl/vl_xy.dac." + "{0:08d}".format(n), "rb"
-        ) as f:
+        with open(self.datadir / "remap" / "vl" / f"vl_xy.dac.{n:08d}", "rb") as f:
             vl = np.fromfile(
                 f, self.endian + "f", self.m2d_xy * self.ix * self.jx
             ).reshape((self.ix, self.jx, self.m2d_xy), order="F")
@@ -1050,9 +1040,7 @@ class OnTheFly(_BaseReader):
             self.__dict__[self.cl[m]] = vl[:, :, m]
 
         # read xz plane data
-        with open(
-            self.datadir + "remap/vl/vl_xz.dac." + "{0:08d}".format(n), "rb"
-        ) as f:
+        with open(self.datadir / "remap" / "vl" / f"vl_xz.dac.{n:08d}", "rb") as f:
             vl = np.fromfile(
                 f, self.endian + "f", self.m2d_xz * self.ix * self.kx
             ).reshape((self.ix, self.kx, self.m2d_xz), order="F")
@@ -1061,9 +1049,7 @@ class OnTheFly(_BaseReader):
             self.__dict__[self.cl[m + self.m2d_xy]] = vl[:, :, m]
 
         # read flux related value
-        with open(
-            self.datadir + "remap/vl/vl_flux.dac." + "{0:08d}".format(n), "rb"
-        ) as f:
+        with open(self.datadir / "remap" / "vl" / f"vl_flux.dac.{n:08d}", "rb") as f:
             vl = np.fromfile(
                 f, self.endian + "f", self.m2d_flux * (self.ix + 1) * self.jx
             ).reshape((self.ix + 1, self.jx, self.m2d_flux), order="F")
@@ -1074,7 +1060,7 @@ class OnTheFly(_BaseReader):
         # read spectra
         if self.geometry == "YinYang":
             with open(
-                self.datadir + "remap/vl/vl_spex.dac." + "{0:08d}".format(n), "rb"
+                self.datadir / "remap" / "vl" / f"vl_spex.dac.{n:08d}", "rb"
             ) as f:
                 vl = np.fromfile(
                     f, self.endian + "f", self.m2d_spex * self.ix * self.kx // 4
@@ -1087,7 +1073,7 @@ class OnTheFly(_BaseReader):
 
     def _update_json_template(
         self,
-        output_file=os.path.dirname(os.path.abspath(__file__)) + "/" + "OnTheFly.json",
+        output_file=Path(__file__).resolve().parent / "OnTheFly.json",
     ):
         """
         Generate JSON template for pyR2D2.Parameters
@@ -1111,7 +1097,7 @@ class OnTheFly(_BaseReader):
 
     def _generate_docstring(
         self,
-        json_file=os.path.dirname(os.path.abspath(__file__)) + "/" + "OnTheFly.json",
+        json_file=Path(__file__).resolve().parent / "OnTheFly.json",
         update_json=False,
     ):
         """
@@ -1192,18 +1178,11 @@ class Slice(_BaseReader):
 
     def _get_filepath_slice(self, n_slice, direc, n, postfix):
         return (
-            self.datadir
-            + "slice/qq"
-            + direc
-            + postfix
-            + ".dac."
-            + str(n).zfill(8)
-            + "."
-            + str(n_slice + 1).zfill(8)
+            self.datadir / "slice" / f"qq{direc}{postfix}.dac.{n:08d}.{n_slice+1:08d}"
         )
 
     def _get_filepath_slice_zarr(self, n, direc):
-        return self.datadir + "slice/zarr/" + direc + "/qq." + str(n).zfill(8) + ".zarr"
+        return self.datadir / "slice" / "zarr" / direc / f"qq.{n:08d}.zarr"
 
     def xyz_slice_select(self, direc):
         if direc == "x":
@@ -1236,20 +1215,22 @@ class Slice(_BaseReader):
             postfixes = ["_yin", "_yan"]
         else:
             postfixes = [""]
-        
+
         # check if the files exist
         if not zarr_flag:
             for postfix in postfixes:
                 filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
-                if not os.path.exists(filepath):
+                if not filepath.exists():
                     zarr_flag = True
-                    print(f"File does not exist at n={n} for slice {direc} with postfix {postfix}.")
+                    print(
+                        f"File does not exist at n={n} for slice {direc} with postfix {postfix}."
+                    )
                     print("Trying to read from zarr file.")
                     break
 
         if zarr_flag:
             zarr_filepath = self._get_filepath_slice_zarr(n, direc)
-            if not os.path.exists(zarr_filepath):
+            if not zarr_filepath.exists():
                 print(f"Zarr file does not exist at n={n} for slice {direc}.")
                 return
 
@@ -1276,30 +1257,30 @@ class Slice(_BaseReader):
                 self.__dict__[key] = value.squeeze()
         else:
             for postfix in postfixes:
-                    with open(
-                        self._get_filepath_slice(n_slice, direc, n, postfix),
-                        "rb",
-                    ) as f:
-                        if direc == "x":
-                            if self.geometry == "YinYang":
-                                n1, n2 = (
-                                    self.jx_yy + 2 * self.margin,
-                                    self.kx_yy + 2 * self.margin,
-                                )
-                            else:
-                                n1, n2 = self.jx, self.kx
-                        if direc == "y":
-                            n1, n2 = self.ix, self.kx
-                        if direc == "z":
-                            n1, n2 = self.ix, self.jx
-                        qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
+                with open(
+                    self._get_filepath_slice(n_slice, direc, n, postfix),
+                    "rb",
+                ) as f:
+                    if direc == "x":
+                        if self.geometry == "YinYang":
+                            n1, n2 = (
+                                self.jx_yy + 2 * self.margin,
+                                self.kx_yy + 2 * self.margin,
+                            )
+                        else:
+                            n1, n2 = self.jx, self.kx
+                    if direc == "y":
+                        n1, n2 = self.ix, self.kx
+                    if direc == "z":
+                        n1, n2 = self.ix, self.jx
+                    qq = np.fromfile(f, self.endian + "f", (self.mtype + 2) * n1 * n2)
 
-                    for key, m in zip(
-                        self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
-                    ):
-                        self.__dict__[key + postfix] = qq.reshape(
-                            (n1, n2, self.mtype + 2), order="F"
-                        )[:, :, m]
+                for key, m in zip(
+                    self.remap_keys + self.remap_keys_add[:-1], range(self.mtype + 2)
+                ):
+                    self.__dict__[key + postfix] = qq.reshape(
+                        (n1, n2, self.mtype + 2), order="F"
+                    )[:, :, m]
 
             # self.info = {}
             # self.info["direc"] = direc
@@ -1357,8 +1338,10 @@ class Slice(_BaseReader):
 
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+        else:
+            zarr_filepath = Path(zarr_filepath)
 
-        if not overwrite and os.path.exists(zarr_filepath):
+        if not overwrite and zarr_filepath.exists():
             print(
                 f"File {zarr_filepath} already exists. Set overwrite=True to overwrite it."
             )
@@ -1417,20 +1400,24 @@ class Slice(_BaseReader):
         xyz_slice = self.xyz_slice_select(direc)
         for n_slice in range(len(xyz_slice)):
             self.read(n_slice=n_slice, direc=direc, n=n)
-            
+
             if self.geometry == "YinYang":
-                qq_yin = np.empty((self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32)
-                qq_yan = np.empty((self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32)
+                qq_yin = np.empty(
+                    (self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32
+                )
+                qq_yan = np.empty(
+                    (self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32
+                )
                 qq = np.empty((self.p.jx, self.p.kx, len(keys)), dtype=np.float32)
-                
+
                 for key in keys:
                     qq_yin[:, :, keys.index(key)] = self.__dict__[key + "_yin"]
                     qq_yan[:, :, keys.index(key)] = self.__dict__[key + "_yan"]
-                    
+
                 pyR2D2.cpp_util.yin_yang_convert_scalar(
                     qq_yin, qq_yan, self.p.yg_yy, self.p.zg_yy, self.p.y, self.p.z, qq
                 )
-            
+
             for key in keys:
                 if direc == "x":
                     if self.geometry == "YinYang":
@@ -1453,22 +1440,8 @@ class Slice(_BaseReader):
         keys: list = zarr_keys,
     ):
 
-        if self.geometry == "YinYang":
-            postfixes = ["_yin", "_yan"]
-        else:
-            postfixes = [""]
-
-        xyz_slice = self.xyz_slice_select(direc)
-        for postfix in postfixes:
-            for n_slice in range(len(xyz_slice)):
-                filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
-                if not os.path.exists(filepath):
-                    print(f"File {filepath} does not exist. Anyway you can delete it.")
-                    return True
-            
-
         zarr_filepath = self._get_filepath_slice_zarr(n, direc)
-        if not os.path.exists(zarr_filepath):
+        if not zarr_filepath.exists():
             print(
                 f"Zarr file does not exist at n={n} and direc={direc}. Please run Slice.compress() to create it."
             )
@@ -1481,28 +1454,44 @@ class Slice(_BaseReader):
                 )
                 return False
 
-        for n_slice in range(len(xyz_slice)):
-            filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
-            if not os.path.exists(filepath):
-                print(f"File {filepath} does not exist. Anyway you can delete it.")
-                return True
+        if self.geometry == "YinYang":
+            postfixes = ["_yin", "_yan"]
+        else:
+            postfixes = [""]
 
-        for n_slice in range(len(xyz_slice)):
-            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=True)
-            qq_copy = {}
-            for key in keys:
-                qq_copy[key] = self.__dict__[key].copy()
+        xyz_slice = self.xyz_slice_select(direc)
+        for postfix in postfixes:
+            for n_slice in range(len(xyz_slice)):
+                filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
+                if not filepath.exists():
+                    print(f"File {filepath} does not exist. Anyway you can delete it.")
+                    return True
 
-            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=False)
+        if self.geometry == "YinYang":
+            root = zarr.open_group(zarr_filepath, mode="r")
             for key in keys:
-                print(key)
-                if not np.allclose(
-                    qq_copy[key], self.__dict__[key], rtol=1e-6, atol=1e-12
-                ):
+                if root[key].shape != (len(self.x_slice), self.jx, self.kx):
                     print(
-                        f"Data mismatch for {key} at slice {n_slice} and direc {direc}."
+                        f"Shape mismatch for {key} in zarr file at n={n} and direc={direc}. Please run Slice.compress() to create it."
                     )
                     return False
+        else:
+            for n_slice in range(len(xyz_slice)):
+                self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=True)
+                qq_copy = {}
+                for key in keys:
+                    qq_copy[key] = self.__dict__[key].copy()
+
+                self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=False)
+                for key in keys:
+                    print(key)
+                    if not np.allclose(
+                        qq_copy[key], self.__dict__[key], rtol=1e-6, atol=1e-12
+                    ):
+                        print(
+                            f"Data mismatch for {key} at slice {n_slice} and direc {direc}."
+                        )
+                        return False
         return True
 
     def delete(
@@ -1521,7 +1510,7 @@ class Slice(_BaseReader):
             xyz_slice = self.xyz_slice_select(direc)
             for n_slice in range(len(xyz_slice)):
                 filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
-                if os.path.exists(filepath):
+                if filepath.exists():
                     print(f"Deleting {filepath}")
                     # os.remove(filepath)
 
@@ -1567,16 +1556,16 @@ class TwoDimension(_BaseReader):
         ### and the size of array is different
         ### memory is allocated
         memflag = True
-        if hasattr(self, "ro"):
-            memflag = not self.ro.shape == (self.ix, self.jx)
-        if not hasattr(self, "ro") or memflag:
+        if self.ro is not None:
+            memflag = self.ro.shape != (self.ix, self.jx)
+        if self.ro is None or memflag:
             for key in self.value_keys:
                 self.__dict__[key] = np.zeros((self.ix, self.jx))
 
         dtype = np.dtype(
             [("qq", self.endian + str((self.mtype + 5) * self.ix * self.jx) + "f")]
         )
-        with open(self.datadir + "remap/qq/qq.dac." + "{0:08d}".format(n), "rb") as f:
+        with open(self.datadir / "remap" / "qq" / f"qq.dac.{n:08d}", "rb") as f:
             qq = np.fromfile(f, dtype=dtype, count=1)
 
         for key, m in zip(self.value_keys, range(self.mtype)):
@@ -1598,7 +1587,7 @@ class ModelS(_BaseReader):
         Reads Model S based stratification data
         """
 
-        with open(self.datadir + "../input_data/params.txt", "r") as f:
+        with open(self.datadir.parent / "input_data" / "params.txt", "r") as f:
             self.__dict__["ix"] = int(f.read())
 
         endian = ">"
@@ -1627,7 +1616,7 @@ class ModelS(_BaseReader):
                 ("tail", endian + "i"),
             ]
         )
-        with open(self.datadir + "../input_data/value_cart.dac", "rb") as f:
+        with open(self.datadir.parent / "input_data" / "value_cart.dac", "rb") as f:
             qq = np.fromfile(f, dtype=dtype, count=1)
 
         for key in qq.dtype.names:
@@ -1704,17 +1693,10 @@ class _BasePrevAftr(_BaseReader):
 
         return (
             self.datadir
-            + prev_aftr
-            + "/"
-            + cnou
-            + "/"
-            + cno
-            + "/qq.dac."
-            + "{0:08d}".format(n)
-            + "."
-            + "{0:08d}".format(n_prev_aftr)
-            + "."
-            + cno
+            / prev_aftr
+            / cnou
+            / cno
+            / f"qq.dac.{n:08d}.{n_prev_aftr:08d}.{cno}"
         )
 
     def _get_filepath_prev_aftr_zarr(self, n, n_prev_aftr, prev_aftr):
@@ -1728,15 +1710,7 @@ class _BasePrevAftr(_BaseReader):
         n_prev_aftr : int
             A selected previous or after time step for data
         """
-        return (
-            self.datadir
-            + prev_aftr
-            + "/zarr/qq."
-            + str(n).zfill(8)
-            + "."
-            + str(n_prev_aftr).zfill(8)
-            + ".zarr"
-        )
+        return self.datadir / prev_aftr / "zarr" / f"qq.{n:08d}.{n_prev_aftr:08d}.zarr"
 
     def _ijk_start_size(
         self,
@@ -1818,7 +1792,7 @@ class _BasePrevAftr(_BaseReader):
                     n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
                 )
 
-                if not os.path.exists(filepath):
+                if not filepath.exists():
                     zarr_flag = True
                     break
 
@@ -1905,8 +1879,10 @@ class _BasePrevAftr(_BaseReader):
             zarr_filepath = self._get_filepath_prev_aftr_zarr(
                 n, n_prev_aftr, prev_aftr=self.prev_aftr
             )
+        else:
+            zarr_filepath = Path(zarr_filepath)
 
-        if not overwrite and os.path.exists(zarr_filepath):
+        if not overwrite and zarr_filepath.exists():
             print(
                 "zarr file ",
                 zarr_filepath,
@@ -1941,7 +1917,7 @@ class _BasePrevAftr(_BaseReader):
                         n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
                     )
 
-                    if not os.path.exists(filepath):
+                    if not filepath.exists():
                         print(
                             "Original file does not exist at n=",
                             n,
@@ -1983,7 +1959,7 @@ class _BasePrevAftr(_BaseReader):
         zarr_filepath = self._get_filepath_prev_aftr_zarr(
             n, n_prev_aftr, prev_aftr=self.prev_aftr
         )
-        if not os.path.exists(zarr_filepath):
+        if not zarr_filepath.exists():
             print(f"Zarr file does not exist at n={n}, {self.prev_aftr}={n_prev_aftr}")
             return False
 
@@ -1994,7 +1970,7 @@ class _BasePrevAftr(_BaseReader):
                     n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
                 )
 
-                if not os.path.exists(filepath):
+                if not filepath.exists():
                     return True
 
         self._read(n, n_prev_aftr, zarr_flag=False)
@@ -2040,8 +2016,8 @@ class _BasePrevAftr(_BaseReader):
                 filepath = self._get_filepath_prev_aftr_qq(
                     n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
                 )
-                if os.path.exists(filepath):
-                    os.remove(filepath)
+                if filepath.exists():
+                    filepath.unlink()
 
 
 class Previous(_BasePrevAftr):

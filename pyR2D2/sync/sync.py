@@ -1,5 +1,6 @@
 import os
 import subprocess
+from pathlib import Path
 
 import numpy as np
 
@@ -20,6 +21,9 @@ class Sync:
         """
         self.data = data
 
+    def _caseid(self):
+        return self.data.datadir.parts[-2]
+
     def __getattr__(self, name):
         if hasattr(self.data, name):
             return getattr(self.data, name)
@@ -28,6 +32,7 @@ class Sync:
             f"'{type(self).__name__}' object has no attribute '{name}'"
         )
 
+    @staticmethod
     def rsync_subprocess_wrapper(args):
         command = ["rsync", "-avP"] + args
         result = subprocess.run(
@@ -99,9 +104,9 @@ class Sync:
         if n is None:
             filename = "*"
         else:
-            filename = "tau/qq.dac." + str(n).zfill(8)
+            filename = f"tau/qq.dac.{n:08d}"
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
         args = [
             "--exclude=param",
             "--exclude=qq",
@@ -110,8 +115,10 @@ class Sync:
             "--exclude=time/mhd",
             "-e",
             ssh,
-            server + ":work/" + project + "/run/" + caseid + "/data/" + filename,
-            self.datadir + filename,
+            server
+            + ":"
+            + str(Path("work") / project / "run" / caseid / "data" / filename),
+            str(self.datadir / filename),
         ]
 
         result = Sync.rsync_subprocess_wrapper(args)
@@ -132,7 +139,7 @@ class Sync:
             Type of ssh command
         """
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
 
         # check if file exists
         ssh_result = subprocess.run(
@@ -143,9 +150,7 @@ class Sync:
                 + project
                 + "/run/"
                 + caseid
-                + "/data/remap/qq/00000/00000000/qq.dac."
-                + str(n).zfill(8)
-                + ".00000000",
+                + "/data/remap/qq/00000/00000000/qq.dac.00000000.00000000",
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -155,28 +160,29 @@ class Sync:
         if ssh_result.returncode == 0:
             nps = np.char.zfill(self.np_ijr.flatten().astype(str), 8)
             for ns in nps:
-                par_dir = str(int(ns) // 1000).zfill(5) + "/"
-                chi_dir = str(int(ns)).zfill(8) + "/"
+                par_dir = f"{int(ns) // 1000:05d}"
+                chi_dir = f"{int(ns):08d}"
 
-                os.makedirs(
-                    self.datadir + "remap/qq/" + par_dir + chi_dir, exist_ok=True
+                remote_base = (
+                    Path("work")
+                    / project
+                    / "run"
+                    / caseid
+                    / "data"
+                    / "remap"
+                    / "qq"
+                    / par_dir
+                    / chi_dir
                 )
+                remote_file = remote_base / f"qq.dac.{n:08d}.{ns}"
+                local_dir = self.datadir / "remap" / "qq" / par_dir / chi_dir
+                local_dir.mkdir(parents=True, exist_ok=True)
+
                 args = [
                     "-e",
                     ssh,
-                    server
-                    + ":work/"
-                    + project
-                    + "/run/"
-                    + caseid
-                    + "/data/remap/qq/"
-                    + par_dir
-                    + chi_dir
-                    + "qq.dac."
-                    + str(n).zfill(8)
-                    + "."
-                    + ns,
-                    self.datadir + "remap/qq/" + par_dir + chi_dir,
+                    server + ":" + str(remote_file),
+                    str(local_dir),
                 ]
                 Sync.rsync_subprocess_wrapper(args)
         else:
@@ -204,12 +210,12 @@ class Sync:
         ir0 = self.i2ir[i0]
 
         nps = np.char.zfill(self.np_ijr[ir0 - 1, :].astype(str), 8)
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
 
         if n is None:
             filename_part = "qq.dac.*."
         else:
-            filename_part = "qq.dac." + str(n).zfill(8) + "."
+            filename_part = f"qq.dac.{n:08d}."
 
         # check if file exists
         ssh_result = subprocess.run(
@@ -220,9 +226,7 @@ class Sync:
                 + project
                 + "/run/"
                 + caseid
-                + "/data/remap/qq/00000/00000000/qq.dac."
-                + str(n).zfill(8)
-                + ".00000000",
+                + "/data/remap/qq/00000/00000000/qq.dac.00000000.00000000",
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -230,27 +234,33 @@ class Sync:
 
         for ns in nps:
             if ssh_result.returncode == 0:
-                par_dir = str(int(ns) // 1000).zfill(5) + "/"
-                chi_dir = str(int(ns)).zfill(8) + "/"
+                par_dir = f"{int(ns) // 1000:05d}"
+                chi_dir = f"{int(ns):08d}"
             else:
                 par_dir = ""
                 chi_dir = ""
 
-            os.makedirs(self.datadir + "remap/qq/" + par_dir + chi_dir, exist_ok=True)
+            remote_base = (
+                Path("work")
+                / project
+                / "run"
+                / caseid
+                / "data"
+                / "remap"
+                / "qq"
+                / par_dir
+                / chi_dir
+            )
+            remote_file = remote_base / (filename_part + ns)
+
+            (self.datadir / "remap" / "qq" / par_dir / chi_dir).mkdir(
+                parents=True, exist_ok=True
+            )
             args = [
                 "-e",
                 ssh,
-                server
-                + ":work/"
-                + project
-                + "/run/"
-                + caseid
-                + "/data/remap/qq/"
-                + par_dir
-                + chi_dir
-                + filename_part
-                + ns,
-                self.datadir + "remap/qq/" + par_dir + chi_dir,
+                server + ":" + str(remote_file),
+                str(self.datadir / "remap" / "qq" / par_dir / chi_dir),
             ]
             Sync.rsync_subprocess_wrapper(args)
 
@@ -268,14 +278,14 @@ class Sync:
             Name of project such as 'R2D2'
         """
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
         Sync.setup(server, caseid, ssh=ssh, project=project)
         args = [
             "--exclude=time/mhd",
             "-e",
             ssh,
             server + ":work/" + project + "/run/" + caseid + "/data/remap/vl",
-            self.datadir + "remap/",
+            str(self.datadir / "remap") + "/",
         ]
         Sync.rsync_subprocess_wrapper(args)
 
@@ -307,7 +317,7 @@ class Sync:
             if np.mod(self.nd, 2) == 1:
                 step = "o"
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
         ssh_result = subprocess.run(
             [
                 ssh,
@@ -325,26 +335,28 @@ class Sync:
 
         if io_type == "posixio":
             for ns in range(self.npe):
-                par_dir = str(int(ns) // 1000).zfill(5) + "/"
-                chi_dir = str(int(ns)).zfill(8) + "/"
+                par_dir = f"{int(ns) // 1000:05d}"
+                chi_dir = f"{int(ns):08d}"
 
-                os.makedirs(self.datadir + "qq/" + par_dir + chi_dir, exist_ok=True)
+                remote_base = (
+                    Path("work")
+                    / project
+                    / "run"
+                    / caseid
+                    / "data"
+                    / "qq"
+                    / par_dir
+                    / chi_dir
+                )
+                remote_file = remote_base / f"qq.dac.{step}.{ns:08d}"
+                local_dir = self.datadir / "qq" / par_dir / chi_dir
+
+                local_dir.mkdir(parents=True, exist_ok=True)
                 args = [
                     "-e",
                     ssh,
-                    server
-                    + ":work/"
-                    + project
-                    + "/run/"
-                    + caseid
-                    + "/data/qq/"
-                    + par_dir
-                    + chi_dir
-                    + "qq.dac."
-                    + step
-                    + "."
-                    + str(int(ns)).zfill(8),
-                    self.datadir + "qq/" + par_dir + chi_dir,
+                    server + ":" + str(remote_file),
+                    str(self.datadir / "qq" / par_dir / chi_dir),
                 ]
                 Sync.rsync_subprocess_wrapper(args)
         elif io_type == "mpiio":
@@ -358,7 +370,7 @@ class Sync:
                 + caseid
                 + "/data/qq/qq.dac."
                 + step,
-                self.datadir + "qq/",
+                str(self.datadir / "qq") + "/",
             ]
             Sync.rsync_subprocess_wrapper(args)
 
@@ -400,12 +412,12 @@ class Sync:
         else:
             n_slice_str = str(n_slice).zfill(8)
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
         args = [
             "-e",
             ssh,
             server + ":work/" + project + "/run/" + caseid + "/data/slice/slice.dac",
-            self.datadir + "/slice",
+            str(self.datadir / "slice"),
         ]
         Sync.rsync_subprocess_wrapper(args)
         args = [
@@ -422,7 +434,7 @@ class Sync:
             + step
             + "."
             + n_slice_str,
-            self.datadir + "/slice",
+            str(self.datadir / "slice") + "/",
         ]
         Sync.rsync_subprocess_wrapper(args)
 
@@ -444,7 +456,7 @@ class Sync:
             Destination of data directory
         """
 
-        caseid = self.datadir.split("/")[-3]
+        caseid = self._caseid()
         args = [
             "-e",
             ssh,
