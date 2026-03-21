@@ -162,7 +162,7 @@ def load(
         j0 = 0
     if k0 is None:
         k0 = 0
-        
+
     if isinstance(names, str):
         if names == "all":
             names = list(root.array_keys())
@@ -172,6 +172,10 @@ def load(
     for key in list(root.array_keys()):
         if root[key].ndim == 3:
             (i1_tmp, j1_tmp, k1_tmp) = root[key].shape
+            break
+        if root[key].ndim == 2:
+            (i1_tmp, j1_tmp) = root[key].shape
+            k1_tmp = 1
             break
 
     if i1 is None:
@@ -193,7 +197,10 @@ def load(
         if name in ["x", "y", "z"]:
             data[name] = root[name]
         else:
-            data[name] = root[name][i0:i1, j0:j1, k0:k1]
+            if root[name].ndim == 3:
+                data[name] = root[name][i0:i1, j0:j1, k0:k1]
+            elif root[name].ndim == 2:
+                data[name] = root[name][i0:i1, j0:j1]
 
     if with_attrs:
         attrs = root.attrs.asdict()
@@ -217,5 +224,4 @@ def list_vars(path: str):
         list of variable names in the zarr data
     """
     root = zarr.open_group(path, mode="r")
-    return list(root.array_keys())
     return list(root.array_keys())
