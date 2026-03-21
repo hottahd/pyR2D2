@@ -23,6 +23,9 @@ class _BaseReader:
             attr = getattr(self.data, name)
             if not callable(attr):
                 return attr
+        raise AttributeError(
+            f"'{self.__class__.__name__}' object has no attribute '{name}'"
+        )
 
 
 class _BaseRemapReader(_BaseReader):
@@ -31,6 +34,15 @@ class _BaseRemapReader(_BaseReader):
     """
 
     def __init__(self, data):
+        """
+        Initialize the _BaseRemapReader
+
+        Parameters
+        ----------
+        data : pyR2D2.Data
+                pyR2D2.Data instance. This is used to access the attributes of pyR2D2.Data, such as x, y, z, etc.
+        """
+
         self.data = data
 
         for key in self.remap_keys + self.remap_keys_add:
@@ -40,13 +52,15 @@ class _BaseRemapReader(_BaseReader):
 
     def _allocate_remap_qq(self, ijk: tuple, keys: list = None):
         """
+        Allocates memory for remap/qq/ data
+
         Paramters
         ---------
-        qq_type : str
-            type of data.
-
         ijk : tuple
             size of data
+
+        keys : list, optional
+            list of keys to allocate. If None, all keys are allocated. If "all", all keys are allocated. By default None.
         """
 
         if keys is None:
@@ -419,9 +433,9 @@ class FullData(_BaseRemapReader):
                 - "vx", "vy", "vz": velocity
                 - "bx", "by", "bz": magnetic field
                 - "se": entropy
-                - "ph": div B cleaning
-                - "te": temperature
-                - "op": Opacity
+                - "ph": div B cleaning (not included in zarr file)
+                - "te": temperature (not included in zarr file)
+                - "op": Opacity (not included in zarr file)
 
         max_workers : int
             Number of workers for parallel reading of binary files
@@ -561,6 +575,39 @@ class FullData(_BaseRemapReader):
         max_workers: int = 1,
         lightweight: bool = False,
     ):
+        """
+        Compresses the remap/qq/ data for a given time step n into zarr format
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        zarr_filepath : str, optional
+            File path for the output zarr file. If None, the default file path is used. By default None.
+        i_start : int, optional
+            Starting index in i direction for the data to be compressed. If None, it starts from 0. By default None.
+        i_size : int, optional
+            Size in i direction for the data to be compressed. If None, it uses the full size in i direction. By default None.
+        j_start : int, optional
+            Starting index in j direction for the data to be compressed. If None, it starts from 0. By default None.
+        j_size : int, optional
+            Size in j direction for the data to be compressed. If None, it uses the full size in j direction. By default None.
+        k_start : int, optional
+            Starting index in k direction for the data to be compressed. If None, it starts from 0. By default None.
+        k_size : int, optional
+            Size in k direction for the data to be compressed. If None, it uses the full size in k direction. By default None.
+        chunks3d : tuple, optional
+            Chunk size for the 3D data in zarr format. If None, the chunk size is automatically determined. By default None.
+        keys : list, optional
+            List of variables to be compressed. By default, it includes all variables in zarr_keys.
+        overwrite : bool, optional
+            If True, overwrite the existing zarr file. If False and the zarr file already exists, the function will print a message and return without doing anything. By default False.
+        max_workers : int, optional
+            Number of workers for parallel reading of binary files when lightweight is True. By default 1.
+        lightweight : bool, optional
+            If True, the function reads and writes each variable separately to save memory. This is useful when the data is too large to fit in memory. By default False (all variables are read and written together).
+
+        """
 
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_remap_zarr(n)
@@ -940,7 +987,7 @@ class OpticalDepth(_BaseReader):
     he : numpy.ndarray, float
         height of the optical depth
     fr : numpy.ndarray, float
-        raditveit flux at the optical depth
+        radiative flux at the optical depth
 
     Important
     ---------
@@ -949,6 +996,37 @@ class OpticalDepth(_BaseReader):
 
 
     """
+
+    zarr_keys = [
+        "rt",
+        "ro",
+        "ro01",
+        "ro001",
+        "vx",
+        "vx01",
+        "vx001",
+        "vy",
+        "vy01",
+        "vy001",
+        "vz",
+        "vz01",
+        "vz001",
+        "bx",
+        "bx01",
+        "bx001",
+        "by",
+        "by01",
+        "by001",
+        "bz",
+        "bz01",
+        "bz001",
+        "he",
+        "he01",
+        "he001",
+        "fr",
+        "fr01",
+        "fr001",
+    ]
 
     def __init__(self, data):
         self.data = data
@@ -972,7 +1050,13 @@ class OpticalDepth(_BaseReader):
             for tau in ["", "01", "001"]:
                 self.__dict__[key + tau] = None
 
-    def read(self, n: int):
+    def _get_filepath_optical_depth(self, n: int):
+        return self.datadir / "tau" / f"qq.dac.{n:08d}"
+
+    def _get_filepath_optical_depth_zarr(self, n: int):
+        return self.datadir / "tau" / "zarr" / f"qq.{n:08d}.zarr"
+
+    def read(self, n: int, zarr_flag: bool = False, verbose: bool = True):
         """
         Reads 2D data at certain optical depths.
         The data is stored in self.qt dictionary.
@@ -982,17 +1066,137 @@ class OpticalDepth(_BaseReader):
         ----------
         n : int
             A selected time step for data
+        zarr_flag : bool, optional
+            Whether to read from zarr file, by default True
+        verbose : bool, optional
+            Whether to print verbose output, by default True
         """
-        with open(self.datadir / "tau" / f"qq.dac.{n:08d}", "rb") as f:
-            qq = np.fromfile(
-                f, self.endian + "f", self.m_tu * self.m_in * self.jx * self.kx
-            )
 
-        for key, mk in zip(self.value_keys, range(len(self.value_keys))):
-            for tau, mt in zip(["", "01", "001"], range(3)):
-                self.__dict__[key + tau] = qq.reshape(
-                    (self.m_tu, self.m_in, self.jx, self.kx), order="F"
-                )[mt, mk, :, :]
+        if not zarr_flag:
+            if not self._get_filepath_optical_depth(n).exists():
+                if verbose:
+                    print(
+                        f"File {self._get_filepath_optical_depth(n)} does not exist. Trying to read from zarr file."
+                    )
+                zarr_flag = True
+
+        if zarr_flag:
+            zarr_filepath = self._get_filepath_optical_depth_zarr(n)
+            if not zarr_filepath.exists():
+                print(f"Zarr file does not exist at n={n}.")
+                return
+
+            qq = pyR2D2.zarr_util.load(zarr_filepath)
+
+            for key in self.zarr_keys:
+                self.__dict__[key] = qq[key]
+            return
+
+        else:
+            with open(self.datadir / "tau" / f"qq.dac.{n:08d}", "rb") as f:
+                qq = np.fromfile(
+                    f, self.endian + "f", self.m_tu * self.m_in * self.jx * self.kx
+                )
+
+            for key, mk in zip(self.value_keys, range(len(self.value_keys))):
+                for tau, mt in zip(["", "01", "001"], range(3)):
+                    self.__dict__[key + tau] = qq.reshape(
+                        (self.m_tu, self.m_in, self.jx, self.kx), order="F"
+                    )[mt, mk, :, :]
+
+    def compress(
+        self,
+        n: int,
+        zarr_filepath: str = None,
+        keys: list = zarr_keys,
+        overwrite: bool = False,
+    ):
+
+        if zarr_filepath is None:
+            zarr_filepath = self._get_filepath_optical_depth_zarr(n)
+        else:
+            zarr_filepath = Path(zarr_filepath)
+
+        if not overwrite and zarr_filepath.exists():
+            print(
+                f"File {zarr_filepath} already exists. Set overwrite=True to overwrite it."
+            )
+            return
+
+        self.read(n=n, zarr_flag=False)
+        chunk_max = 4096
+        chunks3d = (1, min(self.jx, chunk_max), min(self.kx, chunk_max))
+        vars_dict = {}
+        for key in keys:
+            vars_dict[key] = self.__dict__[key]
+
+        params_dict = {}
+        pyR2D2.zarr_util.save(
+            zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
+        )
+
+    def check(self, n: int, keys: list = zarr_keys):
+        """
+        Check if the tau/qq/ file exists for a given time step n
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        keys : list or str
+            List of values to check. If the check fails for any of the values, the function returns False. By default, all values are checked.
+        """
+
+        zarr_filepath = self._get_filepath_optical_depth_zarr(n)
+        if not zarr_filepath.exists():
+            print(
+                f"Zarr file does not exist at n={n}. Please run OpticalDepth.compress() to create it."
+            )
+            return False
+
+        for key in keys:
+            if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
+                print(
+                    f"Variable {key} does not exist in zarr file at n={n}. Please run OpticalDepth.compress() to create it."
+                )
+                return False
+
+        self.read(n=n, zarr_flag=True)
+        qq_copy = {}
+        for key in keys:
+            qq_copy[key] = self.__dict__[key].copy()
+
+        self.read(n=n, zarr_flag=False)
+        for key in keys:
+            if not np.allclose(qq_copy[key], self.__dict__[key], rtol=1e-6, atol=1e-12):
+                print(f"Data mismatch for {key}.")
+                return False
+
+        print(f"Check passed at n={n}")
+        return True
+
+    def delete(self, n: int, force: bool = False):
+        """
+        Delete the tau/qq/ file for a given time step n
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        force : bool
+            If True, delete the files even if the check fails
+        """
+
+        if force:
+            check_flag = True
+        else:
+            check_flag = self.check(n=n)
+
+        if check_flag:
+            filepath = self._get_filepath_optical_depth(n)
+            if filepath.exists():
+                print(f"Deleting {filepath}.")
+                filepath.unlink()
 
 
 class OnTheFly(_BaseReader):
@@ -1184,6 +1388,12 @@ class Slice(_BaseReader):
     def _get_filepath_slice_zarr(self, n, direc):
         return self.datadir / "slice" / "zarr" / direc / f"qq.{n:08d}.zarr"
 
+    def _get_postfixes(self):
+        if self.geometry == "YinYang":
+            return ["_yin", "_yan"]
+        else:
+            return [""]
+
     def xyz_slice_select(self, direc):
         if direc == "x":
             return self.x_slice
@@ -1211,10 +1421,7 @@ class Slice(_BaseReader):
             If True, read from zarr format instead of binary format. By default, False (read from binary format).
         """
 
-        if self.geometry == "YinYang":
-            postfixes = ["_yin", "_yan"]
-        else:
-            postfixes = [""]
+        postfixes = self._get_postfixes()
 
         # check if the files exist
         if not zarr_flag:
@@ -1243,9 +1450,14 @@ class Slice(_BaseReader):
             elif direc == "z":
                 k0, k1 = n_slice, n_slice + 1
 
+            names = []
+            for key in self.zarr_keys:
+                for postfix in postfixes:
+                    names.append(key + postfix)
+
             qq = pyR2D2.zarr_util.load(
                 zarr_filepath,
-                names=self.zarr_keys,
+                names=names,
                 i0=i0,
                 i1=i1,
                 j0=j0,
@@ -1336,6 +1548,8 @@ class Slice(_BaseReader):
             Whether to overwrite the existing zarr file, by default False
         """
 
+        postfixes = self._get_postfixes()
+
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_slice_zarr(n, direc)
         else:
@@ -1354,7 +1568,10 @@ class Slice(_BaseReader):
         chunk_max = 4096
         if direc == "x":
             i_start, i_size = 0, 1
-            chunks3d = (1, min(self.jx, chunk_max), min(self.kx, chunk_max))
+            if self.geometry == "YinYang":
+                chunks3d = (1, min(self.jxg_yy, chunk_max), min(self.kxg_yy, chunk_max))
+            else:
+                chunks3d = (1, min(self.jx, chunk_max), min(self.kx, chunk_max))
         else:
             i_start = 0 if i_start is None else i_start
             i_size = self.ix if i_size is None else i_size
@@ -1364,14 +1581,20 @@ class Slice(_BaseReader):
             chunks3d = (min(self.ix, chunk_max), 1, min(self.kx, chunk_max))
         else:
             j_start = 0 if j_start is None else j_start
-            j_size = self.jx if j_size is None else j_size
+            if self.geometry == "YinYang":
+                j_size = self.jxg_yy if j_size is None else j_size
+            else:
+                j_size = self.jx if j_size is None else j_size
 
         if direc == "z":
             k_start, k_size = 0, 1
             chunks3d = (min(self.ix, chunk_max), min(self.jx, chunk_max), 1)
         else:
             k_start = 0 if k_start is None else k_start
-            k_size = self.kx if k_size is None else k_size
+            if self.geometry == "YinYang":
+                k_size = self.kxg_yy if k_size is None else k_size
+            else:
+                k_size = self.kx if k_size is None else k_size
 
         params_dict = {
             "i_start": i_start,
@@ -1384,50 +1607,37 @@ class Slice(_BaseReader):
 
         vars_dict = {}
         for key in keys:
-            if direc == "x":
-                vars_dict[key] = np.empty(
-                    (len(self.x_slice), j_size, k_size), dtype=np.float32
-                )
-            elif direc == "y":
-                vars_dict[key] = np.empty(
-                    (i_size, len(self.y_slice), k_size), dtype=np.float32
-                )
-            elif direc == "z":
-                vars_dict[key] = np.empty(
-                    (i_size, j_size, len(self.z_slice)), dtype=np.float32
-                )
+            for postfix in postfixes:
+                if direc == "x":
+                    vars_dict[key + postfix] = np.empty(
+                        (len(self.x_slice), j_size, k_size), dtype=np.float32
+                    )
+                elif direc == "y":
+                    vars_dict[key + postfix] = np.empty(
+                        (i_size, len(self.y_slice), k_size), dtype=np.float32
+                    )
+                elif direc == "z":
+                    vars_dict[key + postfix] = np.empty(
+                        (i_size, j_size, len(self.z_slice)), dtype=np.float32
+                    )
 
         xyz_slice = self.xyz_slice_select(direc)
         for n_slice in range(len(xyz_slice)):
             self.read(n_slice=n_slice, direc=direc, n=n)
-
-            if self.geometry == "YinYang":
-                qq_yin = np.empty(
-                    (self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32
-                )
-                qq_yan = np.empty(
-                    (self.p.jxg_yy, self.p.kxg_yy, len(keys)), dtype=np.float32
-                )
-                qq = np.empty((self.p.jx, self.p.kx, len(keys)), dtype=np.float32)
-
-                for key in keys:
-                    qq_yin[:, :, keys.index(key)] = self.__dict__[key + "_yin"]
-                    qq_yan[:, :, keys.index(key)] = self.__dict__[key + "_yan"]
-
-                pyR2D2.cpp_util.yin_yang_convert_scalar(
-                    qq_yin, qq_yan, self.p.yg_yy, self.p.zg_yy, self.p.y, self.p.z, qq
-                )
-
             for key in keys:
-                if direc == "x":
-                    if self.geometry == "YinYang":
-                        vars_dict[key][n_slice, :, :] = qq[:, :, keys.index(key)]
-                    else:
-                        vars_dict[key][n_slice, :, :] = self.__dict__[key]
-                elif direc == "y":
-                    vars_dict[key][:, n_slice, :] = self.__dict__[key]
-                elif direc == "z":
-                    vars_dict[key][:, :, n_slice] = self.__dict__[key]
+                for postfix in postfixes:
+                    if direc == "x":
+                        vars_dict[key + postfix][n_slice, :, :] = self.__dict__[
+                            key + postfix
+                        ]
+                    elif direc == "y":
+                        vars_dict[key + postfix][:, n_slice, :] = self.__dict__[
+                            key + postfix
+                        ]
+                    elif direc == "z":
+                        vars_dict[key + postfix][:, :, n_slice] = self.__dict__[
+                            key + postfix
+                        ]
 
         pyR2D2.zarr_util.save(
             zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
@@ -1440,6 +1650,7 @@ class Slice(_BaseReader):
         keys: list = zarr_keys,
     ):
 
+        postfixes = self._get_postfixes()
         zarr_filepath = self._get_filepath_slice_zarr(n, direc)
         if not zarr_filepath.exists():
             print(
@@ -1448,16 +1659,12 @@ class Slice(_BaseReader):
             return False
 
         for key in keys:
-            if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
-                print(
-                    f"Variable {key} does not exist in zarr file at n={n} and direc={direc}. Please run Slice.compress() to create it."
-                )
-                return False
-
-        if self.geometry == "YinYang":
-            postfixes = ["_yin", "_yan"]
-        else:
-            postfixes = [""]
+            for postfix in postfixes:
+                if not key + postfix in pyR2D2.zarr_util.list_vars(zarr_filepath):
+                    print(
+                        f"Variable {key + postfix} does not exist in zarr file at n={n} and direc={direc}. Please run Slice.compress() to create it."
+                    )
+                    return False
 
         xyz_slice = self.xyz_slice_select(direc)
         for postfix in postfixes:
@@ -1467,31 +1674,27 @@ class Slice(_BaseReader):
                     print(f"File {filepath} does not exist. Anyway you can delete it.")
                     return True
 
-        if self.geometry == "YinYang":
-            root = zarr.open_group(zarr_filepath, mode="r")
+        for n_slice in range(len(xyz_slice)):
+            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=True)
+            qq_copy = {}
             for key in keys:
-                if root[key].shape != (len(self.x_slice), self.jx, self.kx):
-                    print(
-                        f"Shape mismatch for {key} in zarr file at n={n} and direc={direc}. Please run Slice.compress() to create it."
-                    )
-                    return False
-        else:
-            for n_slice in range(len(xyz_slice)):
-                self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=True)
-                qq_copy = {}
-                for key in keys:
-                    qq_copy[key] = self.__dict__[key].copy()
+                for postfix in postfixes:
+                    qq_copy[key + postfix] = self.__dict__[key + postfix].copy()
 
-                self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=False)
-                for key in keys:
-                    print(key)
+            self.read(n_slice=n_slice, direc=direc, n=n, zarr_flag=False)
+            for key in keys:
+                for postfix in postfixes:
                     if not np.allclose(
-                        qq_copy[key], self.__dict__[key], rtol=1e-6, atol=1e-12
+                        qq_copy[key + postfix],
+                        self.__dict__[key + postfix],
+                        rtol=1e-6,
+                        atol=1e-12,
                     ):
                         print(
-                            f"Data mismatch for {key} at slice {n_slice} and direc {direc}."
+                            f"Data mismatch for {key + postfix} at slice {n_slice} and direc {direc}."
                         )
                         return False
+        print(f"Check passed at n={n} and direc={direc}.")
         return True
 
     def delete(
@@ -1501,6 +1704,7 @@ class Slice(_BaseReader):
         force: bool = False,
     ):
 
+        postfixes = self._get_postfixes()
         if force:
             check_flag = True
         else:
@@ -1509,10 +1713,13 @@ class Slice(_BaseReader):
         if check_flag:
             xyz_slice = self.xyz_slice_select(direc)
             for n_slice in range(len(xyz_slice)):
-                filepath = self._get_filepath_slice(n_slice, direc, n, postfix="")
-                if filepath.exists():
-                    print(f"Deleting {filepath}")
-                    # os.remove(filepath)
+                for postfix in postfixes:
+                    filepath = self._get_filepath_slice(
+                        n_slice, direc, n, postfix=postfix
+                    )
+                    if filepath.exists():
+                        print(f"Deleting {filepath}")
+                        filepath.unlink()
 
 
 class TwoDimension(_BaseReader):
