@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpticalDepth &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+  <title>OpticalDepth &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b10c3eac"></script>
+      <script src="../_static/documentation_options.js?v=c0d794c6"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -58,6 +58,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
 </ul>
 </li>
@@ -121,7 +122,7 @@
 <li><p><strong>by</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – y magnetic field</p></li>
 <li><p><strong>bz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – z magnetic field</p></li>
 <li><p><strong>he</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – height of the optical depth</p></li>
-<li><p><strong>fr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – raditveit flux at the optical depth</p></li>
+<li><p><strong>fr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – radiative flux at the optical depth</p></li>
 </ul>
 </dd>
 </dl>
@@ -133,7 +134,7 @@ These correspond to, for example, rt, rt01, and rt001</p>
 <p class="rubric">Methods Summary</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.OpticalDepth.read" title="pyR2D2.OpticalDepth.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(n)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.OpticalDepth.read" title="pyR2D2.OpticalDepth.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(n[, zarr_flag, verbose])</p></td>
 <td><p>Reads 2D data at certain optical depths.</p></td>
 </tr>
 </tbody>
@@ -141,13 +142,17 @@ These correspond to, for example, rt, rt01, and rt001</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.OpticalDepth.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#OpticalDepth.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.OpticalDepth.read" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">zarr_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#OpticalDepth.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.OpticalDepth.read" title="Link to this definition"></a></dt>
 <dd><p>Reads 2D data at certain optical depths.
 The data is stored in self.qt dictionary.
 In this version the selected optical depth is 1, 0.1, and 0.01</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – A selected time step for data</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – A selected time step for data</p></li>
+<li><p><strong>zarr_flag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to read from zarr file, by default True</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to print verbose output, by default True</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

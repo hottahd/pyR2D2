@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.data &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+  <title>pyR2D2.data &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=b10c3eac"></script>
+      <script src="../../_static/documentation_options.js?v=c0d794c6"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -79,6 +79,7 @@
              
   <h1>Source code for pyR2D2.data</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -124,8 +125,10 @@
 
 <span class="sd">    sync : pyR2D2.Sync</span>
 <span class="sd">        Instance of pyR2D2.Sync</span>
-<span class="sd">    eos : pyR2D2.EOS</span>
-<span class="sd">        Instance of pyR2D2.EOS</span>
+<span class="sd">    eos : pyR2D2.cpp_util.EOS</span>
+<span class="sd">        Instance of pyR2D2.cpp_util.EOS</span>
+<span class="sd">    yinyang: pyR2D2.cpp_util.YinYang</span>
+<span class="sd">        Instance of pyR2D2.cpp_util.YinYang</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -135,7 +138,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize pyR2D2.Data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">=</span> <span class="n">datadir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">XSelect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qz</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">ZSelect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -152,8 +155,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">qa</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">After</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sync</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Sync</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="n">eosdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;input_data/&quot;</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">eosdir</span> <span class="o">+</span> <span class="s2">&quot;eos_table_sero.npz&quot;</span><span class="p">):</span>
+        <span class="n">eosdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;input_data&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eosdir</span> <span class="o">/</span> <span class="s2">&quot;eos_table_sero.npz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eos</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">cpp_util</span><span class="o">.</span><span class="n">EOS</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_ro_e</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">se_e</span><span class="p">,</span>
@@ -161,6 +164,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_en_e</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_te_e</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_op_e</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;YinYang&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yinyang</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">cpp_util</span><span class="o">.</span><span class="n">YinYang</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">yg_yy</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">zg_yy</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
             <span class="p">)</span></div>
 
 
@@ -197,16 +208,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">tau</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">+</span> <span class="s2">&quot;time/tau/t.dac.&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{0:08d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="s2">&quot;tau&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                     <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span>
                 <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">+</span> <span class="s2">&quot;time/mhd/t.dac.&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{0:08d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="s2">&quot;mhd&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                     <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span>
                 <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -232,14 +239,14 @@
 <span class="sd">            If true, checkpoint of end step is read.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:08d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;e&quot;</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;o&quot;</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">+</span> <span class="s2">&quot;qq/qq.dac.&quot;</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;qq.dac.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">qc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span>
                 <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ixg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span>
             <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span></div>

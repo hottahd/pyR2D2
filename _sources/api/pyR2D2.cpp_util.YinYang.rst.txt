@@ -1,0 +1,17 @@
+YinYang
+=======
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autoclass:: YinYang
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~YinYang.convert_scalar
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: convert_scalar

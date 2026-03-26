@@ -1,0 +1,6 @@
+vertical_upward_rte
+===================
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autofunction:: vertical_upward_rte

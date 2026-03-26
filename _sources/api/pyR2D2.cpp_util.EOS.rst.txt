@@ -1,0 +1,17 @@
+EOS
+===
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autoclass:: EOS
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~EOS.eval
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: eval

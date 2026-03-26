@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sync &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+  <title>Sync &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b10c3eac"></script>
+      <script src="../_static/documentation_options.js?v=c0d794c6"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -58,6 +58,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
 </ul>
 </li>
@@ -114,7 +115,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Sync.remap_qq" title="pyR2D2.Sync.remap_qq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remap_qq</span></code></a>(server, n[, ssh, project])</p></td>
 <td><p>Downloads full 3D remap data</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Sync.rsync_subprocess_wrapper" title="pyR2D2.Sync.rsync_subprocess_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsync_subprocess_wrapper</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Sync.rsync_subprocess_wrapper" title="pyR2D2.Sync.rsync_subprocess_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rsync_subprocess_wrapper</span></code></a>(args)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Sync.setup" title="pyR2D2.Sync.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(server, caseid[, ssh, project, dist])</p></td>
@@ -198,7 +199,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Sync.rsync_subprocess_wrapper">
-<span class="sig-name descname"><span class="pre">rsync_subprocess_wrapper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/sync/sync.html#Sync.rsync_subprocess_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Sync.rsync_subprocess_wrapper" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rsync_subprocess_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/sync/sync.html#Sync.rsync_subprocess_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Sync.rsync_subprocess_wrapper" title="Link to this definition"></a></dt>
 <dd><div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>This method is accessible as <cite>pyR2D2.Data.sync.rsync_subprocess_wrapper</cite>.</p>

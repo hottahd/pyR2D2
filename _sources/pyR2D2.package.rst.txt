@@ -1,6 +1,7 @@
 .. automodapi:: pyR2D2
     
 .. automodapi:: pyR2D2.util
+.. automodapi:: pyR2D2.cpp_util
 
 .. automodapi:: pyR2D2.write
 

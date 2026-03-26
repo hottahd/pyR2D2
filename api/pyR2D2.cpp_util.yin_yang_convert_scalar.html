@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>initialize_instance &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
+  <title>yin_yang_convert_scalar &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -20,9 +20,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="locals_define" href="pyR2D2.util.locals_define.html" />
-    <link rel="prev" title="init" href="pyR2D2.util.init.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,27 +43,12 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id1">Classes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
@@ -85,11 +68,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
-          <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
-      <li class="breadcrumb-item active">initialize_instance</li>
+      <li class="breadcrumb-item active">yin_yang_convert_scalar</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/pyR2D2.util.initialize_instance.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/pyR2D2.cpp_util.yin_yang_convert_scalar.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -97,31 +78,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="initialize-instance">
-<h1>initialize_instance<a class="headerlink" href="#initialize-instance" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyR2D2.util.initialize_instance">
-<span class="sig-prename descclassname"><span class="pre">pyR2D2.util.</span></span><span class="sig-name descname"><span class="pre">initialize_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_locals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/util/util.html#initialize_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.initialize_instance" title="Link to this definition"></a></dt>
-<dd><p>Initializes arbitrary instance of pyR2D2.Data object in main program.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>main_locals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – locals() in main program, which include local variables</p></li>
-<li><p><strong>instance_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – name of instance of pyR2D2.Data object</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
+  <section id="yin-yang-convert-scalar">
+<h1>yin_yang_convert_scalar<a class="headerlink" href="#yin-yang-convert-scalar" title="Link to this heading"></a></h1>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyR2D2.util.init.html" class="btn btn-neutral float-left" title="init" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyR2D2.util.locals_define.html" class="btn btn-neutral float-right" title="locals_define" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>get_total_file_size &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
+  <title>vertical_upward_rte &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="init" href="pyR2D2.util.init.html" />
-    <link rel="prev" title="get_best_unit" href="pyR2D2.util.get_best_unit.html" /> 
+    <link rel="next" title="EOS" href="pyR2D2.cpp_util.EOS.html" />
+    <link rel="prev" title="updated_data" href="pyR2D2.util.updated_data.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,13 +53,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id1">Classes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Class Inheritance Diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#id3">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id4">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id5">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
 </ul>
 </li>
@@ -87,9 +87,9 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
           <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
-      <li class="breadcrumb-item active">get_total_file_size</li>
+      <li class="breadcrumb-item active">vertical_upward_rte</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/pyR2D2.util.get_total_file_size.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/pyR2D2.cpp_util.vertical_upward_rte.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -97,24 +97,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="get-total-file-size">
-<h1>get_total_file_size<a class="headerlink" href="#get-total-file-size" title="Link to this heading"></a></h1>
+  <section id="vertical-upward-rte">
+<h1>vertical_upward_rte<a class="headerlink" href="#vertical-upward-rte" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="pyR2D2.util.get_total_file_size">
-<span class="sig-prename descclassname"><span class="pre">pyR2D2.util.</span></span><span class="sig-name descname"><span class="pre">get_total_file_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/util/util.html#get_total_file_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.get_total_file_size" title="Link to this definition"></a></dt>
-<dd><p>Evaluate total size of files in directory.</p>
+<dt class="sig sig-object py" id="pyR2D2.cpp_util.vertical_upward_rte">
+<span class="sig-prename descclassname"><span class="pre">pyR2D2.cpp_util.</span></span><span class="sig-name descname"><span class="pre">vertical_upward_rte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ro</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.14)"><span class="pre">Annotated</span></a><span class="p"><span class="pre">[</span></span><span class="pre">numpy.typing.ArrayLike</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS" title="pyR2D2.cpp_util.cpp_util.EOS"><span class="pre">pyR2D2.cpp_util.cpp_util.EOS</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.typing.NDArray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyR2D2.cpp_util.vertical_upward_rte" title="Link to this definition"></a></dt>
+<dd><p>Solve the vertical upward Radiative Transfer Equation (RTE) using the Feautrier method
+for given density, specific entropy, and spatial grids.
+:param ro_np: 3D array of density values.
+:type ro_np: numpy.ndarray
+:param se_np: 3D array of specific entropy values.
+:type se_np: numpy.ndarray
+:param x_np: 1D array of spatial grid points.
+:type x_np: numpy.ndarray
+:param eos: An instance of the EOS class for thermodynamic evaluations.
+:type eos: EOS</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – directory path</p></li>
-<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – unit of file size. Choose from ‘B’, ‘kB’, ‘MB’, ‘GB’, ‘TB’, ‘PB’.</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2D array of radiative transfer results at the top boundary.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>total size of files in directory in bytes</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>total_size (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>)</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -125,8 +128,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyR2D2.util.get_best_unit.html" class="btn btn-neutral float-left" title="get_best_unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyR2D2.util.init.html" class="btn btn-neutral float-right" title="init" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyR2D2.util.updated_data.html" class="btn btn-neutral float-left" title="updated_data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyR2D2.cpp_util.EOS.html" class="btn btn-neutral float-right" title="EOS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
