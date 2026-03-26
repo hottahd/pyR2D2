@@ -43,8 +43,10 @@ class Data:
 
     sync : pyR2D2.Sync
         Instance of pyR2D2.Sync
-    eos : pyR2D2.EOS
-        Instance of pyR2D2.EOS
+    eos : pyR2D2.cpp_util.EOS
+        Instance of pyR2D2.cpp_util.EOS
+    yinyang: pyR2D2.cpp_util.YinYang
+        Instance of pyR2D2.cpp_util.YinYang
 
     """
 
@@ -78,6 +80,14 @@ class Data:
                 self.log_en_e,
                 self.log_te_e,
                 self.log_op_e,
+            )
+
+        if self.p.geometry == "YinYang":
+            self.yinyang = pyR2D2.cpp_util.YinYang(
+                self.p.yg_yy,
+                self.p.zg_yy,
+                self.p.y,
+                self.p.z,
             )
 
     def __getattr__(self, name):

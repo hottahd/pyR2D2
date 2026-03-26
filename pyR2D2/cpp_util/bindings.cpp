@@ -108,50 +108,41 @@ PYBIND11_MODULE(cpp_util, m)
         py::arg("x"),
         py::arg("eos"));
 
-    m.def(
-        "yin_yang_convert_scalar",
-        &yin_yang_convert_scalar<float>,
-        R"doc(
-    Convert scalar values from Yin-Yang grid to regular grid.
+    py::class_<YinYang>(m, "YinYang", R"doc(
+    Class for converting data between Yin-Yang grid and regular spherical grid.
     Parameters
     ----------
-    qq_yin_np : numpy.ndarray (dtype=float32)
-        3D array of Yin grid values. The last index indicate the variable index.
-    qq_yan_np : numpy.ndarray (dtype=float32)
-        3D array of Yang grid values. The last index indicate the variable index.
-    th_yy_np : numpy.ndarray (dtype=float64)
+    th_yy_np : numpy.ndarray
         1D array of Yin-Yang grid theta values.
-    ph_yy_np : numpy.ndarray (dtype=float64)
+    ph_yy_np : numpy.ndarray
         1D array of Yin-Yang grid phi values.
-    th_np : numpy.ndarray (dtype=float64)
+    th_np : numpy.ndarray
         1D array of regular grid theta values.
-    ph_np : numpy.ndarray (dtype=float64)
+    ph_np : numpy.ndarray
         1D array of regular grid phi values.
-    qq : numpy.ndarray (dtype=float32)
-        3D array to store the converted values in regular grid. The last index indicate the variable index.
-     Returns
+     )doc")
+        .def(py::init<
+             py::array_t<double, py::array::c_style | py::array::forcecast>,
+             py::array_t<double, py::array::c_style | py::array::forcecast>,
+             py::array_t<double, py::array::c_style | py::array::forcecast>,
+             py::array_t<double, py::array::c_style | py::array::forcecast>>())
+        .def(
+            "convert_scalar",
+            &YinYang::convert_scalar<float>,
+            R"doc(
+    Convert scalar values from Yin-Yang grid to regular grid.
     
-    )doc",
-        py::arg("qq_yin"),
-        py::arg("qq_yan"),
-        py::arg("th_yy"),
-        py::arg("ph_yy"),
-        py::arg("th"),
-        py::arg("ph"),
-        py::arg("qq"));
+    Parameters
+    ----------
+    qq_yin : numpy.ndarray (dtype=float32)
+        2D or 3D array of Yin grid values. If 3D, the last index indicates the variable index.
+    qq_yan : numpy.ndarray (dtype=float32)
+        2D or 3D array of Yang grid values. If 3D, the last index indicates the variable index.
 
-    m.def(
-        "yin_yang_convert_scalar_f64",
-        &yin_yang_convert_scalar<double>,
-        R"doc(
-        np.float64 version of yin_yang_convert_scalar.
-        See yin_yang_convert_scalar for details.
+    Returns
+    -------
+    None
     )doc",
-        py::arg("qq_yin"),
-        py::arg("qq_yan"),
-        py::arg("th_yy"),
-        py::arg("ph_yy"),
-        py::arg("th"),
-        py::arg("ph"),
-        py::arg("qq"));
+            py::arg("qq_yin"),
+            py::arg("qq_yan"));
 }

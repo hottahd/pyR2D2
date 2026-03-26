@@ -60,70 +60,89 @@ inline std::vector<T> lagrange_interpolation_3rd(double tht, double dth_yy_o, do
     return qq_output_core;
 }
 
-template <typename T>
-void yin_yang_convert_scalar(
-    const py::array_t<T, py::array::c_style | py::array::forcecast> &qq_yin_np,
-    const py::array_t<T, py::array::c_style | py::array::forcecast> &qq_yan_np,
-    const py::array_t<double, py::array::c_style | py::array::forcecast> &th_yy_np,
-    const py::array_t<double, py::array::c_style | py::array::forcecast> &ph_yy_np,
-    const py::array_t<double, py::array::c_style | py::array::forcecast> &th_np,
-    const py::array_t<double, py::array::c_style | py::array::forcecast> &ph_np,
-    py::array_t<T, py::array::c_style> &qq_output_np)
+struct YinYang
 {
+    py::array_t<double, py::array::c_style | py::array::forcecast> th_yy_np;
+    py::array_t<double, py::array::c_style | py::array::forcecast> ph_yy_np;
+    py::array_t<double, py::array::c_style | py::array::forcecast> th_np;
+    py::array_t<double, py::array::c_style | py::array::forcecast> ph_np;
 
-    auto qq_yin = view_array<T>(qq_yin_np);
-    auto qq_yan = view_array<T>(qq_yan_np);
-    auto th_yy = view_array<double>(th_yy_np);
-    auto ph_yy = view_array<double>(ph_yy_np);
+    YinYang(
+        py::array_t<double, py::array::c_style | py::array::forcecast> th_yy_np_,
+        py::array_t<double, py::array::c_style | py::array::forcecast> ph_yy_np_,
+        py::array_t<double, py::array::c_style | py::array::forcecast> th_np_,
+        py::array_t<double, py::array::c_style | py::array::forcecast> ph_np_)
+        : th_yy_np(th_yy_np_), ph_yy_np(ph_yy_np_), th_np(th_np_), ph_np(ph_np_) {
+          };
 
-    auto th = view_array<double>(th_np);
-    auto ph = view_array<double>(ph_np);
-
-    size_t margin = 2;
-    size_t i_size = (qq_yin.i_size - 2 * margin) * 2;
-    size_t j_size = (qq_yin.i_size - 2 * margin) * 4;
-    size_t k_size = qq_yin.k_size;
-
-    double th_min = th_yy(1);
-    double th_max = th_yy(th_yy.size - 3);
-
-    double ph_min = ph_yy(1);
-    double ph_max = ph_yy(ph_yy.size - 3);
-
-    double dth_yy_o = 1.0 / (th_yy(1) - th_yy(0));
-    double dph_yy_o = 1.0 / (ph_yy(1) - ph_yy(0));
-
-    size_t ic, jc;
-
-    // Output array in regular spherical geometry
-    auto qq_output = view_array<T>(qq_output_np);
-
-    std::vector<T> qq_output_core(k_size);
-    // for Yang grid interpolation
-    for (size_t i = 0; i < qq_output.i_size; ++i)
+    template <typename T>
+    py::object convert_scalar(
+        const py::array_t<T, py::array::c_style | py::array::forcecast> &qq_yin_np,
+        const py::array_t<T, py::array::c_style | py::array::forcecast> &qq_yan_np)
     {
-        for (size_t j = 0; j < qq_output.j_size; ++j)
-        {
-            // for Yin grid
-            if (th_min <= th(i) && th(i) <= th_max && ph_min <= ph(j) && ph(j) <= ph_max)
-            {
-                qq_output_core = lagrange_interpolation_3rd<T>(th(i), dth_yy_o, ph(j), dph_yy_o, th_yy, ph_yy, qq_yin, k_size);
-                for (size_t k = 0; k < k_size; ++k)
-                {
-                    qq_output(i, j, k) = qq_output_core[k];
-                }
-            }
-            else
-            {
-                double tht = std::acos(std::sin(th(i)) * std::sin(ph(j)));
-                double pht = std::atan2(std::cos(th(i)), -std::sin(th(i)) * std::cos(ph(j)));
 
-                qq_output_core = lagrange_interpolation_3rd<T>(tht, dth_yy_o, pht, dph_yy_o, th_yy, ph_yy, qq_yan, k_size);
-                for (size_t k = 0; k < k_size; ++k)
+        auto qq_yin = view_array<T>(qq_yin_np);
+        auto qq_yan = view_array<T>(qq_yan_np);
+        auto th_yy = view_array<double>(th_yy_np);
+        auto ph_yy = view_array<double>(ph_yy_np);
+
+        auto th = view_array<double>(th_np);
+        auto ph = view_array<double>(ph_np);
+
+        size_t margin = 2;
+        size_t i_size = (qq_yin.i_size - 2 * margin) * 2;
+        size_t j_size = (qq_yin.i_size - 2 * margin) * 4;
+        size_t k_size = qq_yin.k_size;
+
+        double th_min = th_yy(1);
+        double th_max = th_yy(th_yy.size - 3);
+
+        double ph_min = ph_yy(1);
+        double ph_max = ph_yy(ph_yy.size - 3);
+
+        double dth_yy_o = 1.0 / (th_yy(1) - th_yy(0));
+        double dph_yy_o = 1.0 / (ph_yy(1) - ph_yy(0));
+
+        // Output array in regular spherical geometry
+        py::array_t<T, py::array::c_style> qq_output_np({i_size, j_size, k_size});
+        auto qq_output = view_array<T>(qq_output_np);
+
+        std::vector<T> qq_output_core(k_size);
+        // for Yang grid interpolation
+        for (size_t i = 0; i < qq_output.i_size; ++i)
+        {
+            for (size_t j = 0; j < qq_output.j_size; ++j)
+            {
+                // for Yin grid
+                if (th_min <= th(i) && th(i) <= th_max && ph_min <= ph(j) && ph(j) <= ph_max)
                 {
-                    qq_output(i, j, k) = qq_output_core[k];
+                    qq_output_core = lagrange_interpolation_3rd<T>(th(i), dth_yy_o, ph(j), dph_yy_o, th_yy, ph_yy, qq_yin, k_size);
+                    for (size_t k = 0; k < k_size; ++k)
+                    {
+                        qq_output(i, j, k) = qq_output_core[k];
+                    }
+                }
+                else
+                {
+                    double tht = std::acos(std::sin(th(i)) * std::sin(ph(j)));
+                    double pht = std::atan2(std::cos(th(i)), -std::sin(th(i)) * std::cos(ph(j)));
+
+                    qq_output_core = lagrange_interpolation_3rd<T>(tht, dth_yy_o, pht, dph_yy_o, th_yy, ph_yy, qq_yan, k_size);
+                    for (size_t k = 0; k < k_size; ++k)
+                    {
+                        qq_output(i, j, k) = qq_output_core[k];
+                    }
                 }
             }
         }
+
+        if (qq_yin.ndim == 2)
+        {
+            return qq_output_np.attr("reshape")(py::make_tuple(i_size, j_size));
+        }
+        else if (qq_yin.ndim == 3)
+        {
+            return qq_output_np;
+        }
     }
-}
+};

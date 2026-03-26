@@ -8,6 +8,11 @@
 
 namespace py = pybind11;
 
+// Lower-dimensional arrays can be accessed with higher-dimensional operators
+// if extra indices are zero:
+// 1D: a(i), a(i,0), a(i,0,0)
+// 2D: a(i,j), a(i,j,0)
+// 3D: a(i,j,k)
 template <typename T>
 struct ViewArray
 {
@@ -25,14 +30,16 @@ struct ViewArray
   inline T &operator()(size_t i, size_t j)
   {
 #ifndef NDEBUG
-    assert((ndim >= 2) && "Invalid number of dimensions for 2D access");
+    if (ndim == 1)
+      assert(j == 0 && "For 1D access with (i,j), j must be 0");
 #endif
     return data[i * j_size + j];
   }
   inline const T &operator()(size_t i, size_t j) const
   {
 #ifndef NDEBUG
-    assert((ndim >= 2) && "Invalid number of dimensions for 2D access");
+    if (ndim == 1)
+      assert(j == 0 && "For 1D access with (i,j), j must be 0");
 #endif
     return data[i * j_size + j];
   }
@@ -40,14 +47,26 @@ struct ViewArray
   inline T &operator()(size_t i, size_t j, size_t k)
   {
 #ifndef NDEBUG
-    assert((ndim >= 3) && "Invalid number of dimensions for 3D access");
+    if (ndim == 1)
+    {
+      assert(j == 0 && "For 1D access with (i,j,k), j must be 0");
+      assert(k == 0 && "For 1D access with (i,j,k), k must be 0");
+    }
+    if (ndim == 2)
+      assert(k == 0 && "For 2D access with (i,j,k), k must be 0");
 #endif
     return data[(i * j_size + j) * k_size + k];
   }
   inline const T &operator()(size_t i, size_t j, size_t k) const
   {
 #ifndef NDEBUG
-    assert((ndim >= 3) && "Invalid number of dimensions for 3D access");
+    if (ndim == 1)
+    {
+      assert(j == 0 && "For 1D access with (i,j,k), j must be 0");
+      assert(k == 0 && "For 1D access with (i,j,k), k must be 0");
+    }
+    if (ndim == 2)
+      assert(k == 0 && "For 2D access with (i,j,k), k must be 0");
 #endif
     return data[(i * j_size + j) * k_size + k];
   }

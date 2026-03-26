@@ -1840,7 +1840,7 @@ class _BasePrevAftr(_BaseReader):
 
     def __init__(self, data):
         self.data = data
-        if self.ib_rte_bot is None:
+        if not hasattr(self.data, "ib_rte_bot"):
             self.ib_rte_bot = 0
         self.ix_prev_aftr = (self.ix0 - self.ib_rte_bot) * self.nx
 
