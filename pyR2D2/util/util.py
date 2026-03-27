@@ -4,7 +4,7 @@ import pyR2D2
 def init(
     main_locals,
     instance_name="d",
-    verpose=True,
+    verbose=True,
     datadir=None,
     google=False,
     copy_to_local=False,
@@ -18,7 +18,7 @@ def init(
         locals() in main program, which include local variables
     instance_name : str
         name of instance of pyR2D2.Data object
-    verpose : bool
+    verbose : bool
         If True, print self.summary()
     datadir : str
         directory path to pyR2D2 data
@@ -65,7 +65,7 @@ def init(
         pyR2D2.write.google.set_top_line()
         pyR2D2.write.google.set_cells_gspread(main_locals[instance_name])
 
-    if verpose:
+    if verbose:
         main_locals[instance_name].summary()
 
 
