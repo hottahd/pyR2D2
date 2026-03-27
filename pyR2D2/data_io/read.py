@@ -210,7 +210,14 @@ class XSelect(_BaseRemapReader):
 
     """
 
-    def read(self, xs: float, n: int, zarr_flag: bool = False):
+    def read(
+        self,
+        xs: float,
+        n: int,
+        keys="all",
+        zarr_flag: bool = False,
+        max_workers: int = 1,
+    ):
         """
         Reads 2D selected data at a certain x
 
@@ -220,8 +227,12 @@ class XSelect(_BaseRemapReader):
             A selected height for data
         n : int
             A selected time step for data
+        keys : str, list, or tuple
+            Kind of variable.
         zarr_flag : bool
             If True, read from zarr format instead of binary format
+        max_workers : int
+            The number of worker threads to use for reading files
         """
 
         i0 = np.argmin(np.abs(self.x - xs))
@@ -243,44 +254,91 @@ class XSelect(_BaseRemapReader):
             zarr_flag = True
 
         if zarr_flag:
+            if keys == "all":
+                names = keys
+            else:
+                if isinstance(keys, str):
+                    names = [keys, "x", "y", "z"]
+                else:
+                    names = list(keys) + ["x", "y", "z"]
+
             # If zarr_flag is True, try to read from zarr file
             zarr_path = self._get_filepath_remap_zarr(n)
             if not zarr_path.exists():
                 raise FileNotFoundError(f"Zarr file does not exist: {zarr_path}")
-            qq = pyR2D2.zarr_util.load(zarr_path, names="all", i0=i0, i1=i0 + 1)
+            qq = pyR2D2.zarr_util.load(zarr_path, names=names, i0=i0, i1=i0 + 1)
             for key in qq.keys():
                 if key in ["x", "y", "z"]:
                     self.__dict__[key] = qq[key]
                 else:
                     self.__dict__[key] = qq[key][0, :, :].squeeze()
         else:
-            self._allocate_remap_qq(ijk=[self.jx, self.kx])
+            if isinstance(keys, str):
+                if keys == "all":
+                    keys_input = self.remap_keys + self.remap_keys_add
+                else:
+                    keys_input = [keys]
+            elif isinstance(keys, (list, tuple)):
+                keys_input = list(keys)
+            else:
+                raise TypeError("keys must be str, list, or tuple")
+
+            for key in keys_input:
+                if key not in self.remap_keys + self.remap_keys_add:
+                    print("######")
+                    print("key =", key)
+                    print(
+                        "key should be one of ", self.remap_keys + self.remap_keys_add
+                    )
+                    print("return")
+                    return
+
+            self._allocate_remap_qq(ijk=[self.jx, self.kx], keys=keys_input)
+            dtype = np.dtype(self.endian + "f4")
+
+            target_nps = []
             for jr0 in range(1, self.jxr + 1):
                 np0 = self.np_ijr[ir0 - 1, jr0 - 1]
 
                 if jr0 == self.jr[np0]:
-                    dtype = self._dtype_remap_qq(np0)
-                    filepath = self._get_filepath_remap_qq(n, np0)
+                    target_nps.append(np0)
 
-                    qqq_mem = np.memmap(filepath, dtype=dtype, mode="r", shape=(1,))
-                    qqq = qqq_mem[0]
+            def _read_one(np0: int):
+                n_ijk = self.iixl[np0] * self.jjxl[np0] * self.kx
+                byte_n_ijk = n_ijk * 4  # for float32
+                byte_n_ijk_mtype = byte_n_ijk * self.mtype
 
-                    for key, m in zip(self.remap_keys, range(self.mtype)):
-                        self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
-                            "qq"
-                        ].reshape(
-                            (self.iixl[np0], self.jjxl[np0], self.kx, self.mtype),
-                            order="F",
-                        )[
-                            i0 - self.iss[np0], :, :, m
-                        ]
+                offset = {
+                    "pr": byte_n_ijk_mtype,
+                    "te": byte_n_ijk_mtype + byte_n_ijk,
+                    "op": byte_n_ijk_mtype + 2 * byte_n_ijk,
+                }
+                filepath = self._get_filepath_remap_qq(n, np0)
+                out = {}
+                with open(filepath, "rb") as f:
+                    for key in keys_input:
+                        if key in self.remap_keys:
+                            m_idx = self.remap_keys.index(key)
+                            f.seek(m_idx * byte_n_ijk, os.SEEK_SET)
+                            buf = np.fromfile(f, dtype=dtype, count=n_ijk)
+                            out[key] = buf.reshape(
+                                (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
+                            )[i0 - self.iss[np0], :, :]
+                        elif key in self.remap_keys_add:
+                            f.seek(offset[key], os.SEEK_SET)
+                            buf = np.fromfile(f, dtype=dtype, count=n_ijk)
+                            out[key] = buf.reshape(
+                                (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
+                            )[i0 - self.iss[np0], :, :]
+                    j0, j1 = self.jss[np0], self.jee[np0] + 1
+                    return (np0, j0, j1, out)
 
-                    for key in self.remap_keys_add:
-                        self.__dict__[key][self.jss[np0] : self.jee[np0] + 1, :] = qqq[
-                            key
-                        ].reshape((self.iixl[np0], self.jjxl[np0], self.kx), order="F")[
-                            i0 - self.iss[np0], :, :
-                        ]
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = [executor.submit(_read_one, np0) for np0 in target_nps]
+                for future in as_completed(futures):
+                    np0, j0, j1, out = future.result()
+                    for key, arr in out.items():
+                        self.__dict__[key][j0:j1, :] = arr
 
             self.info = {}
             self.info["xs"] = self.x[i0]
