@@ -71,6 +71,9 @@ class Data:
         self.qa = pyR2D2.After(self)
         self.sync = pyR2D2.Sync(self)
 
+        if verbose:
+            self.summary()
+
         eosdir = self.datadir.parent / "input_data"
         if (eosdir / "eos_table_sero.npz").exists():
             self.eos = pyR2D2.cpp_util.EOS(
