@@ -969,9 +969,9 @@ class OpticalDepth(_BaseReader):
     se : numpy.ndarray, float
         specific entropy
     pr : numpy.ndarray, float
-        pressure
+        pressure (not included in zarr file)
     te : numpy.ndarray, float
-        temperature
+        temperature (not included in zarr file)
     vx : numpy.ndarray, float
         x velocity
     vy : numpy.ndarray, float
@@ -1002,6 +1002,9 @@ class OpticalDepth(_BaseReader):
         "ro",
         "ro01",
         "ro001",
+        "se",
+        "se01",
+        "se001",
         "vx",
         "vx01",
         "vx001",
@@ -1056,7 +1059,13 @@ class OpticalDepth(_BaseReader):
     def _get_filepath_optical_depth_zarr(self, n: int):
         return self.datadir / "tau" / "zarr" / f"qq.{n:08d}.zarr"
 
-    def read(self, n: int, zarr_flag: bool = False, verbose: bool = True):
+    def read(
+        self,
+        n: int,
+        zarr_flag: bool = False,
+        verbose: bool = True,
+        keys: str | list | tuple = "all",
+    ):
         """
         Reads 2D data at certain optical depths.
         The data is stored in self.qt dictionary.
@@ -1070,6 +1079,9 @@ class OpticalDepth(_BaseReader):
             Whether to read from zarr file, by default True
         verbose : bool, optional
             Whether to print verbose output, by default True
+        keys : str or list or tuple, optional
+            List of values to read. If 'all', all values are read. By default 'all'.
+            It works only when zarr_flag is True. If zarr_flag is False, all values are read regardless of keys.
         """
 
         if not zarr_flag:
@@ -1081,18 +1093,29 @@ class OpticalDepth(_BaseReader):
                 zarr_flag = True
 
         if zarr_flag:
+            if isinstance(keys, str):
+                if keys == "all":
+                    names = "all"
+                else:
+                    names = [keys]
+            elif isinstance(keys, (list, tuple)):
+                names = list(keys)
+            else:
+                raise TypeError("keys must be str, list, or tuple")
+
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
             if not zarr_filepath.exists():
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
-            qq = pyR2D2.zarr_util.load(zarr_filepath)
+            qq = pyR2D2.zarr_util.load(zarr_filepath, names=names)
 
-            for key in self.zarr_keys:
+            for key in qq.keys():
                 self.__dict__[key] = qq[key]
             return
 
         else:
+
             with open(self.datadir / "tau" / f"qq.dac.{n:08d}", "rb") as f:
                 qq = np.fromfile(
                     f, self.endian + "f", self.m_tu * self.m_in * self.jx * self.kx
