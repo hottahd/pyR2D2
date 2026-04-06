@@ -217,6 +217,7 @@ class XSelect(_BaseRemapReader):
         keys="all",
         zarr_flag: bool = False,
         max_workers: int = 1,
+        verbose: bool = True,
     ):
         """
         Reads 2D selected data at a certain x
@@ -233,9 +234,11 @@ class XSelect(_BaseRemapReader):
             If True, read from zarr format instead of binary format
         max_workers : int
             The number of worker threads to use for reading files
+        verbose : bool
+            If True, print verbose output
         """
 
-        i0 = np.argmin(np.abs(self.x - xs))
+        i0 = np.argmin(np.abs(self.p.x - xs))
         ir0 = self.i2ir[i0]
 
         missing = False
@@ -249,8 +252,9 @@ class XSelect(_BaseRemapReader):
                     break
 
         if missing and not zarr_flag:
-            print("Some original binary files are missing.")
-            print("Trying to read from zarr file.")
+            if verbose:
+                print("Some original binary files are missing.")
+                print("Trying to read from zarr file.")
             zarr_flag = True
 
         if zarr_flag:
@@ -1236,7 +1240,7 @@ class OpticalDepth(_BaseReader):
             return False
 
         for key in keys:
-            if not key in pyR2D2.zarr_util.list_vars(zarr_filepath):
+            if key not in pyR2D2.zarr_util.list_vars(zarr_filepath):
                 print(
                     f"Variable {key} does not exist in zarr file at n={n}. Please run OpticalDepth.compress() to create it."
                 )

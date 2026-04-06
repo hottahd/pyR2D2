@@ -52,6 +52,10 @@ R2D2を用いた研究で出版された論文は以下です。
 12. `Masaki, Hotta, Katsukawa and Ishikawa, 2023, PASJ, <https://ui.adsabs.harvard.edu/abs/2023PASJ..tmp...76M/abstract>`_
 13. `Silva et al., 2023, ApJ, 948, L24 <https://ui.adsabs.harvard.edu/abs/2023ApJ...948L..24S/abstract>`_
 14. `Toriumi, Hotta and Kusano, 2024, ApJ, 975, 209, <https://ui.adsabs.harvard.edu/abs/2024ApJ...975..209T/abstract>`_
+15. `Masaki and Hotta, 2024, PASJ, 76, L33, <https://ui.adsabs.harvard.edu/abs/2024PASJ...76L..33M/abstract>`_
+16. `Lennard et al., MNRAS, 2025, 539, 2498 <https://ui.adsabs.harvard.edu/abs/2025MNRAS.539.2498L/abstract>`_
+17. `Hotta, 2025, ApJ, 985, 163, <https://ui.adsabs.harvard.edu/abs/2025ApJ...985..163H/abstract>`_
+18. `Hotta and Hatta, 2025, Nature Astronomy <https://www.nature.com/articles/s41550-026-02793-x>`_
 
 賞
 ----------------------------------
