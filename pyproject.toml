@@ -2,9 +2,8 @@
 requires = [
     "setuptools>=42",
     "setuptools_scm[toml]>=6.0",
-    "pybind11",
-    "cmake",
-    "numpy>2.3.4"
+    "pybind11>=2.10.0",
+    "cmake>=3.22.0",
     ]
 build-backend = "setuptools.build_meta"
 
@@ -12,3 +11,14 @@ build-backend = "setuptools.build_meta"
 version_scheme = "guess-next-dev"
 local_scheme = "dirty-tag"
 write_to = 'pyR2D2/_version.py'
+
+[project]
+name = "pyR2D2"
+dynamic = ["version"]
+dependencies = [
+    "numpy>=2.1.0",
+    "scipy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "zarr>=3.0.0",
+    "pybind11>=2.10.0",
+    ]
