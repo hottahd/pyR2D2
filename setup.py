@@ -34,7 +34,7 @@ ext_modules = [
     Pybind11Extension(
         "pyR2D2.cpp_util.cpp_util",
         ["pyR2D2/cpp_util/bindings.cpp"],
-        cxx_std=14,
+        cxx_std=20,
         extra_compile_args=extra_compile_args,
         extra_link_args=extra_link_args,
     ),
