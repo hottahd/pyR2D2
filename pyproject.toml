@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=61",
     "setuptools_scm[toml]>=6.0",
     "pybind11>=2.10.0",
     "cmake>=3.22.0",
@@ -15,10 +15,10 @@ write_to = 'pyR2D2/_version.py'
 [project]
 name = "pyR2D2"
 dynamic = ["version"]
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=2.1.0",
     "scipy>=1.10.0",
     "matplotlib>=3.7.0",
     "zarr>=3.0.0",
-    "pybind11>=2.10.0",
     ]
