@@ -1004,15 +1004,13 @@ class RestrictedData(_BaseRemapReader):
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
+
             (qq, params) = pyR2D2.zarr_util.load(
                 zarr_filepath, with_attrs=True, names=names, i0=i0, i1=i1 + 1, j0=j0, j1=j1 + 1, k0=k0, k1=k1 + 1
             )
 
             for key in qq.keys():
-                if key in ["x", "y", "z"]:
-                    self.__dict__[key] = qq[key]
-                else:
-                    self.__dict__[key] = qq[key][:, j0 : j1 + 1, :].squeeze()
+                self.__dict__[key] = qq[key]
 
         else:            
             if isinstance(keys, str):
@@ -1081,7 +1079,7 @@ class RestrictedData(_BaseRemapReader):
                                         isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1
                                     ]
 
-        self.info = {"x0": self.x[i0], "x1": self.x[i1], "y0": self.y[j0], "y1": self.y[j1], "z0": self.z[k0], "z1": self.z[k1]}
+        self.info = {"x": self.x[i0:i1+1], "y": self.y[j0:j1+1], "z": self.z[k0:k1+1]}
 
 class OpticalDepth(_BaseReader):
     """
