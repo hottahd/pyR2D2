@@ -268,13 +268,13 @@
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    se: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        specific entropy</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    ph: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        div B cleaning variable</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        div B cleaning variable (not included in zarr file)</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    pr: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        pressure</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        pressure (not included in zarr file)</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    te: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        temperature</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        temperature (not included in zarr file)</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;    op: numpy.ndarray, float</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        opacity</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">docstring</span> <span class="o">+=</span> <span class="s2">&quot;        opacity (not included in zarr file)</span><span class="se">\n</span><span class="s2">&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+</span> <span class="n">docstring</span>
 
@@ -1056,7 +1056,7 @@
 <span class="sd">        n : int</span>
 <span class="sd">            A selected time step for data</span>
 <span class="sd">        keys : list of str</span>
-<span class="sd">            See :meth:`R2D2.Read.qq_3d` for options</span>
+<span class="sd">            See :meth:`R2D2.FullData` for options</span>
 
 <span class="sd">        x0, y0, z0 : float</span>
 <span class="sd">            Minimum x, y, z by default, the minimum of the domain</span>
