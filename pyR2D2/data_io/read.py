@@ -188,13 +188,13 @@ class _BaseRemapReader(_BaseReader):
         docstring += "    se: numpy.ndarray, float\n"
         docstring += "        specific entropy\n"
         docstring += "    ph: numpy.ndarray, float\n"
-        docstring += "        div B cleaning variable\n"
+        docstring += "        div B cleaning variable (not included in zarr file)\n"
         docstring += "    pr: numpy.ndarray, float\n"
-        docstring += "        pressure\n"
+        docstring += "        pressure (not included in zarr file)\n"
         docstring += "    te: numpy.ndarray, float\n"
-        docstring += "        temperature\n"
+        docstring += "        temperature (not included in zarr file)\n"
         docstring += "    op: numpy.ndarray, float\n"
-        docstring += "        opacity\n"
+        docstring += "        opacity (not included in zarr file)\n"
 
         self.__class__.__doc__ = self.__class__.__doc__ + docstring
 
@@ -936,7 +936,7 @@ class RestrictedData(_BaseRemapReader):
         n : int
             A selected time step for data
         keys : list of str
-            See :meth:`R2D2.Read.qq_3d` for options
+            See :meth:`R2D2.FullData` for options
 
         x0, y0, z0 : float
             Minimum x, y, z by default, the minimum of the domain
