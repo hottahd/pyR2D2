@@ -5,7 +5,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
-import zarr
 
 import pyR2D2
 
@@ -217,7 +216,7 @@ class XSelect(_BaseRemapReader):
         keys="all",
         zarr_flag: bool = False,
         max_workers: int = 1,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Reads 2D selected data at a certain x
@@ -480,7 +479,7 @@ class FullData(_BaseRemapReader):
 
     zarr_keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
 
-    def read(self, n: int, keys="all", max_workers: int = 1, zarr_flag: bool = False):
+    def read(self, n: int, keys="all", max_workers: int = 1, zarr_flag: bool = False, verbose: bool = False):
         """
         Reads 3D full data
         The data is stored in self.qq dictionary
@@ -505,6 +504,9 @@ class FullData(_BaseRemapReader):
         zarr_flag : bool
             If True, read from zarr format instead of binary format
 
+        verbose : bool
+            If True, print verbose output
+
         Notes
         -----
         If keys is 'all', all variables are read
@@ -525,8 +527,9 @@ class FullData(_BaseRemapReader):
                 break
 
         if missing and not zarr_flag:
-            print("Some original binary files are missing.")
-            print("Trying to read from zarr file.")
+            if verbose:
+                print("Some original binary files are missing.")
+                print("Trying to read from zarr file.")
             zarr_flag = True
 
         if zarr_flag:
@@ -911,17 +914,18 @@ class RestrictedData(_BaseRemapReader):
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qr`
 
     """
-
     def read(
         self,
         n: int,
         keys: list,
-        x0: float,
-        x1: float,
-        y0: float,
-        y1: float,
-        z0: float,
-        z1: float,
+        x0: float = None,
+        x1: float = None,
+        y0: float = None,
+        y1: float = None,
+        z0: float = None,
+        z1: float = None,
+        zarr_flag: bool = False,
+        verbose: bool = False,
     ):
         """
         Reads 3D restricted-area data
@@ -935,10 +939,27 @@ class RestrictedData(_BaseRemapReader):
             See :meth:`R2D2.Read.qq_3d` for options
 
         x0, y0, z0 : float
-            Minimum x, y, z
+            Minimum x, y, z by default, the minimum of the domain
         x1, y1, z1 : float
-            Maximum x, y, z
+            Maximum x, y, z by default, the maximum of the domain
+        zarr_flag : bool
+            If True, read from zarr format instead of binary format
+        verbose : bool
+            If True, print verbose output
         """
+
+        if x0 is None:
+            x0 = self.x[0]
+        if x1 is None:
+            x1 = self.x[-1]
+        if y0 is None:
+            y0 = self.y[0]
+        if y1 is None:
+            y1 = self.y[-1]
+        if z0 is None:
+            z0 = self.z[0]
+        if z1 is None:
+            z1 = self.z[-1]
 
         i0, i1 = np.argmin(abs(self.x - x0)), np.argmin(abs(self.x - x1))
         j0, j1 = np.argmin(abs(self.y - y0)), np.argmin(abs(self.y - y1))
@@ -947,72 +968,118 @@ class RestrictedData(_BaseRemapReader):
         jxr = j1 - j0 + 1
         kxr = k1 - k0 + 1
 
-        if isinstance(keys, str):
-            if keys == "all":
-                keys_input = self.remap_keys + self.remap_keys_add
-            else:
-                keys_input = [keys]
-        elif isinstance(keys, (list, tuple)):
-            keys_input = list(keys)
-        else:
-            raise TypeError("keys must be str, list, or tuple")
-
-        for key in keys_input:
-            self.__dict__[key] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
-
+        # check if original binary files exists
+        missing = False
         for ir0 in range(1, self.ixr + 1):
             for jr0 in range(1, self.jxr + 1):
                 np0 = self.np_ijr[ir0 - 1, jr0 - 1]
+                if ir0 == self.ir[np0] and jr0 == self.jr[np0]:
 
-                if not (
-                    self.iss[np0] > i1
-                    or self.iee[np0] < i0
-                    or self.jss[np0] > j1
-                    or self.jee[np0] < j0
-                ):
-
-                    dtype = self._dtype_remap_qq(np0)
                     filepath = self._get_filepath_remap_qq(n, np0)
+                    if not filepath.exists():
+                        missing = True
+                        break
+            if missing:
+                break
 
-                    with open(filepath, "rb") as f:
-                        qqq = np.fromfile(f, dtype=dtype, count=1)
+        if missing and not zarr_flag:
+            if verbose:
+                print("Some original binary files are missing.")
+                print("Trying to read from zarr file.")
+            zarr_flag = True
 
-                        for key in keys_input:
-                            isrt_rcv = max([0, self.iss[np0] - i0])
-                            iend_rcv = min([ixr, self.iee[np0] - i0 + 1])
-                            jsrt_rcv = max([0, self.jss[np0] - j0])
-                            jend_rcv = min([jxr, self.jee[np0] - j0 + 1])
+        if zarr_flag:
+            if keys == "all":
+                names = keys
+            else:
+                if isinstance(keys, str):
+                    names = [keys, "x", "y", "z"]
+                else:
+                    names = list(keys) + ["x", "y", "z"]
 
-                            isrt_snd = isrt_rcv - (self.iss[np0] - i0)
-                            iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
-                            jsrt_snd = jsrt_rcv - (self.jss[np0] - j0)
-                            jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+            zarr_filepath = self._get_filepath_remap_zarr(n)
+            if not zarr_filepath.exists():
+                print(f"Zarr file does not exist at n={n}.")
+                return
 
-                            if key in self.remap_keys:
-                                m = self.remap_keys.index(key)
+            (qq, params) = pyR2D2.zarr_util.load(
+                zarr_filepath, with_attrs=True, names=names, i0=i0, i1=i1 + 1, j0=j0, j1=j1 + 1, k0=k0, k1=k1 + 1
+            )
 
-                                self.__dict__[key][
-                                    isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
-                                ] = qqq["qq"].reshape(
-                                    (
-                                        self.iixl[np0],
-                                        self.jjxl[np0],
-                                        self.kx,
-                                        self.mtype,
-                                    ),
-                                    order="F",
-                                )[
-                                    isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1, m
-                                ]
-                            else:
-                                self.__dict__[key][
-                                    isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
-                                ] = qqq[key].reshape(
-                                    (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
-                                )[
-                                    isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1
-                                ]
+            for key in qq.keys():
+                if key in ["x", "y", "z"]:
+                    self.__dict__[key] = qq[key]
+                else:
+                    self.__dict__[key] = qq[key][:, j0 : j1 + 1, :].squeeze()
 
+        else:            
+            if isinstance(keys, str):
+                if keys == "all":
+                    keys_input = self.remap_keys + self.remap_keys_add
+                else:
+                    keys_input = [keys]
+            elif isinstance(keys, (list, tuple)):
+                keys_input = list(keys)
+            else:
+                raise TypeError("keys must be str, list, or tuple")
+
+            for key in keys_input:
+                self.__dict__[key] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
+
+            for ir0 in range(1, self.ixr + 1):
+                for jr0 in range(1, self.jxr + 1):
+                    np0 = self.np_ijr[ir0 - 1, jr0 - 1]
+
+                    if not (
+                        self.iss[np0] > i1
+                        or self.iee[np0] < i0
+                        or self.jss[np0] > j1
+                        or self.jee[np0] < j0
+                    ):
+
+                        dtype = self._dtype_remap_qq(np0)
+                        filepath = self._get_filepath_remap_qq(n, np0)
+
+                        with open(filepath, "rb") as f:
+                            qqq = np.fromfile(f, dtype=dtype, count=1)
+
+                            for key in keys_input:
+                                isrt_rcv = max([0, self.iss[np0] - i0])
+                                iend_rcv = min([ixr, self.iee[np0] - i0 + 1])
+                                jsrt_rcv = max([0, self.jss[np0] - j0])
+                                jend_rcv = min([jxr, self.jee[np0] - j0 + 1])
+
+                                isrt_snd = isrt_rcv - (self.iss[np0] - i0)
+                                iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
+                                jsrt_snd = jsrt_rcv - (self.jss[np0] - j0)
+                                jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+
+                                if key in self.remap_keys:
+                                    m = self.remap_keys.index(key)
+
+                                    self.__dict__[key][
+                                        isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
+                                    ] = qqq["qq"].reshape(
+                                        (
+                                            self.iixl[np0],
+                                            self.jjxl[np0],
+                                            self.kx,
+                                            self.mtype,
+                                        ),
+                                        order="F",
+                                    )[
+                                        isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1, m
+                                    ]
+                                else:
+                                    self.__dict__[key][
+                                        isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
+                                    ] = qqq[key].reshape(
+                                        (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
+                                    )[
+                                        isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1
+                                    ]
+
+        self.info = {"x0": self.x[i0], "x1": self.x[i1], "y0": self.y[j0], "y1": self.y[j1], "z0": self.z[k0], "z1": self.z[k1]}
 
 class OpticalDepth(_BaseReader):
     """
@@ -1299,12 +1366,14 @@ class OnTheFly(_BaseReader):
     def __init__(self, data):
         self.data = data
 
-        m_total = self.m2d_xy + self.m2d_xz + self.m2d_flux
-        if self.geometry == "YinYang":
-            m_total += self.m2d_spex
+        if self.nx*self.ny*self.nz == 8:
 
-        for m in range(m_total):
-            self.__dict__[self.cl[m]] = None
+            m_total = self.m2d_xy + self.m2d_xz + self.m2d_flux
+            if self.geometry == "YinYang":
+                m_total += self.m2d_spex
+
+            for m in range(m_total):
+                self.__dict__[self.cl[m]] = None
 
         self._generate_docstring()
 
@@ -1805,6 +1874,64 @@ class Slice(_BaseReader):
                     if filepath.exists():
                         print(f"Deleting {filepath}")
                         filepath.unlink()
+
+class TwoDimension(_BaseReader):
+    """
+    Class for 2D data
+    """
+
+    def __init__(self, data):
+        self.data = data
+        self.value_keys = [
+            "ro",
+            "vx",
+            "vy",
+            "vz",
+            "bx",
+            "by",
+            "bz",
+            "se",
+            "pr",
+            "te",
+            "op",
+            "tu",
+            "fr",
+        ]
+
+        for key in self.value_keys:
+            self.__dict__[key] = None
+
+    def read(self, n):
+        """
+        Reads full data of 2D calculation
+        The data is stored in self.q2 dictionary
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        """
+
+        ### Only when memory is not allocated
+        ### and the size of array is different
+        ### memory is allocated
+        memflag = True
+        if self.ro is not None:
+            memflag = self.ro.shape != (self.ix, self.jx)
+        if self.ro is None or memflag:
+            for key in self.value_keys:
+                self.__dict__[key] = np.zeros((self.ix, self.jx))
+
+        dtype = np.dtype(
+            [("qq", self.endian + str((self.mtype + 5) * self.ix * self.jx) + "f")]
+        )
+        with open(self.datadir / "remap" / "qq" / f"qq.dac.{n:08d}", "rb") as f:
+            qq = np.fromfile(f, dtype=dtype, count=1)
+
+        for key, m in zip(self.value_keys, range(self.mtype)):
+            self.__dict__[key] = qq["qq"].reshape(
+                (self.mtype + 5, self.ix, self.jx), order="F"
+            )[m, :, :]
 
 class ModelS(_BaseReader):
     """

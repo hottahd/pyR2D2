@@ -64,6 +64,7 @@ class Data:
         self.qt = pyR2D2.OpticalDepth(self)
         self.vc = pyR2D2.OnTheFly(self)
         self.qs = pyR2D2.Slice(self)
+        self.q2 = pyR2D2.TwoDimension(self)
         self.ms = pyR2D2.ModelS(self)
         self.time = None
         self.qc = None

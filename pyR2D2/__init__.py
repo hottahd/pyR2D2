@@ -32,6 +32,7 @@ from .data_io.read import (
     Slice,
     XSelect,
     ZSelect,
+    TwoDimension,
 )
 from .sync.sync import Sync
 
@@ -46,6 +47,7 @@ __all__ = [
     "OpticalDepth",
     "OnTheFly",
     "Slice",
+    "TwoDimension",
     "ModelS",
     "Sync",
     "color",
