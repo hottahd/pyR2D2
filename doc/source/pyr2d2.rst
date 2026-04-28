@@ -9,7 +9,7 @@ Python module for dealing with calculation results from R2D2 code is available.
 
 R2D2で実施した計算を取り扱うためのPythonモジュールを公開している。
 
-https://github.com/hottahd/R2D2_py
+https://github.com/hottahd/pyR2D2
 
 You can install it by cloning the repository and running pip install as
 

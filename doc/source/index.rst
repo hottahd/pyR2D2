@@ -10,6 +10,7 @@ R2D2 Document
 
 R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の人工粘性を用いて高精度かつ安定に解く。R2D2では、太陽表面付近では現実的に輻射輸送を解き、太陽深部では微小擾乱を正確に解く手法を取ることで、太陽内部から表面までを一貫して解くことができる。
 
+
 .. toctree::
    :maxdepth: 2
 
@@ -55,7 +56,7 @@ R2D2を用いた研究で出版された論文は以下です。
 15. `Masaki and Hotta, 2024, PASJ, 76, L33, <https://ui.adsabs.harvard.edu/abs/2024PASJ...76L..33M/abstract>`_
 16. `Lennard et al., MNRAS, 2025, 539, 2498 <https://ui.adsabs.harvard.edu/abs/2025MNRAS.539.2498L/abstract>`_
 17. `Hotta, 2025, ApJ, 985, 163, <https://ui.adsabs.harvard.edu/abs/2025ApJ...985..163H/abstract>`_
-18. `Hotta and Hatta, 2025, Nature Astronomy <https://www.nature.com/articles/s41550-026-02793-x>`_
+18. `Hotta and Hatta, 2026, Nature Astronomy <https://www.nature.com/articles/s41550-026-02793-x>`_
 
 賞
 ----------------------------------

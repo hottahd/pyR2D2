@@ -62,22 +62,24 @@ FFTWのインストール
 
 Pythonコードの環境設定
 ----------------------------------------
-Anacondaをインストールし、以下に示すモジュール群をインストールする。
+各自の方法でpythonをインストールすれば良いが、ここではminiforgeを用いる方法を説明する。
+miniforgeをインストールし、以下に示すモジュール群をインストールする。
 MacとLinuxで共通する部分が多いのでまとめて説明を記す。
 
-`Anacondaのウェブサイト <https://www.anaconda.com/>`_ から対応するインストーラーをダウンロードする。
+詳しくは
+`miniforgeのGitHubレポジトリ <https://github.com/conda-forge/miniforge>`_ を参照する。以下のコマンドでインストーラーをダウンロードする。
 
 - Mac
-    dmgファイルをダウンロードして、インストール。インストールされるPATHが変わることが多いが、探してPATHを通す。 :code:`/anaconda/bin` や :code:`~/opt/anaconda/bin` など
+    .. code:: shell
+
+        curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
 - Linux
-    ダウンロードしてきたシェルスクリプトファイルのあるディレクトリで
     .. code::
 
-        bash ~/Anaconda***.sh
+        wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
-    インストールするディレクトリは :code:`/ホームディレクトリ/anaconda3` とする。
-    :code:`/ホームディレクトリ/anaconda3` にPATHを通す。
+    インストールするディレクトリは :code:`/home_directory/miniforge3` とする(デフォルト)。  インストール後、シェルの初期化ファイルに以下の行を追加して、miniforgeのbinディレクトリにPATHを通す。 :code:`/ホームディレクトリ/anaconda3` にPATHを通す。conda環境は重いので、必要なときにのみPATHを通すことを推奨する。
     スパコンのログインノードなどでもインストール方法は共通である。
 
 ipythonの初期設定
@@ -86,20 +88,19 @@ ipythonの初期設定
 :code:`~/.ipython/profile_default/startup/00_first.py`
 というファイルを作りそこに以下のように記す。
 
-.. code::
+.. code:: python
 
     import sys, os
     import matplotlib.pyplot as plt
-    import scipy as sp
-    import numpy as np                                                                                                                                                            
+    import numpy as np
     from matplotlib.pyplot import pcolormesh,plot,clf,close
     from numpy import sin,cos,tan,arcsin,arccos,arctan,exp,log,log2,log10,mod,sqrt,absolute,sinh,cosh,tanh,pi,arange
     plt.ion()
     from IPython.core.magic import register_line_magic
     @register_line_magic
     def r(line):
-        get_ipython().run_line_magic('run', ' -i ' + line)
-    del r                                                                                  
+    get_ipython().run_line_magic('run', ' -i ' + line)
+    del r                                                                              
                                       
                                   
 最後に記した設定によって、
