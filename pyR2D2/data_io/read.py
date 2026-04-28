@@ -474,6 +474,7 @@ class FullData(_BaseRemapReader):
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`
+    
 
     """
 
@@ -490,9 +491,10 @@ class FullData(_BaseRemapReader):
             A selected time step for data
         keys : str
             Kind of variable. Options are:
+                - "all": all variables shown below are read
                 - "ro" : density
-                - "vx", "vy", "vz": velocity
-                - "bx", "by", "bz": magnetic field
+                - "vx", "vy", "vz": velocities
+                - "bx", "by", "bz": magnetic fields
                 - "se": entropy
                 - "ph": div B cleaning (not included in zarr file)
                 - "te": temperature (not included in zarr file)
@@ -936,7 +938,7 @@ class RestrictedData(_BaseRemapReader):
         n : int
             A selected time step for data
         keys : list of str
-            See :meth:`R2D2.FullData` for options
+            See :meth:`pyR2D2.FullData.read` for options
 
         x0, y0, z0 : float
             Minimum x, y, z by default, the minimum of the domain
