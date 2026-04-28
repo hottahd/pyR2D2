@@ -574,6 +574,7 @@
 <span class="sd">    Important</span>
 <span class="sd">    ---------</span>
 <span class="sd">    pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`</span>
+<span class="sd">    </span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -592,9 +593,10 @@
 <span class="sd">            A selected time step for data</span>
 <span class="sd">        keys : str</span>
 <span class="sd">            Kind of variable. Options are:</span>
+<span class="sd">                - &quot;all&quot;: all variables shown below are read</span>
 <span class="sd">                - &quot;ro&quot; : density</span>
-<span class="sd">                - &quot;vx&quot;, &quot;vy&quot;, &quot;vz&quot;: velocity</span>
-<span class="sd">                - &quot;bx&quot;, &quot;by&quot;, &quot;bz&quot;: magnetic field</span>
+<span class="sd">                - &quot;vx&quot;, &quot;vy&quot;, &quot;vz&quot;: velocities</span>
+<span class="sd">                - &quot;bx&quot;, &quot;by&quot;, &quot;bz&quot;: magnetic fields</span>
 <span class="sd">                - &quot;se&quot;: entropy</span>
 <span class="sd">                - &quot;ph&quot;: div B cleaning (not included in zarr file)</span>
 <span class="sd">                - &quot;te&quot;: temperature (not included in zarr file)</span>
@@ -1056,7 +1058,7 @@
 <span class="sd">        n : int</span>
 <span class="sd">            A selected time step for data</span>
 <span class="sd">        keys : list of str</span>
-<span class="sd">            See :meth:`R2D2.FullData` for options</span>
+<span class="sd">            See :meth:`pyR2D2.FullData.read` for options</span>
 
 <span class="sd">        x0, y0, z0 : float</span>
 <span class="sd">            Minimum x, y, z by default, the minimum of the domain</span>
