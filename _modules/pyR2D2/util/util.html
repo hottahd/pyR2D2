@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.util.util &mdash; R2D2 Document 0.1.2.dev41+dirty documentation</title>
+  <title>pyR2D2.util.util &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=b10c3eac"></script>
+      <script src="../../../_static/documentation_options.js?v=ac5e0687"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -86,7 +86,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
     <span class="n">main_locals</span><span class="p">,</span>
     <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span>
-    <span class="n">verpose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">google</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">copy_to_local</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -100,7 +100,7 @@
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    instance_name : str</span>
 <span class="sd">        name of instance of pyR2D2.Data object</span>
-<span class="sd">    verpose : bool</span>
+<span class="sd">    verbose : bool</span>
 <span class="sd">        If True, print self.summary()</span>
 <span class="sd">    datadir : str</span>
 <span class="sd">        directory path to pyR2D2 data</span>
@@ -147,7 +147,7 @@
         <span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">set_top_line</span><span class="p">()</span>
         <span class="n">pyR2D2</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">set_cells_gspread</span><span class="p">(</span><span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">verpose</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
 
 

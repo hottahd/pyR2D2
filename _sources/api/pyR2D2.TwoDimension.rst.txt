@@ -1,0 +1,17 @@
+TwoDimension
+============
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: TwoDimension
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~TwoDimension.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read
