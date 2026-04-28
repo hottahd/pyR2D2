@@ -1806,66 +1806,6 @@ class Slice(_BaseReader):
                         print(f"Deleting {filepath}")
                         filepath.unlink()
 
-
-class TwoDimension(_BaseReader):
-    """
-    Class for 2D data
-    """
-
-    def __init__(self, data):
-        self.data = data
-        self.value_keys = [
-            "ro",
-            "vx",
-            "vy",
-            "vz",
-            "bx",
-            "by",
-            "bz",
-            "se",
-            "pr",
-            "te",
-            "op",
-            "tu",
-            "fr",
-        ]
-
-        for key in self.value_keys:
-            self.__dict__[key] = None
-
-    def read(self, n):
-        """
-        Reads full data of 2D calculation
-        The data is stored in self.q2 dictionary
-
-        Parameters
-        ----------
-        n : int
-            A selected time step for data
-        """
-
-        ### Only when memory is not allocated
-        ### and the size of array is different
-        ### memory is allocated
-        memflag = True
-        if self.ro is not None:
-            memflag = self.ro.shape != (self.ix, self.jx)
-        if self.ro is None or memflag:
-            for key in self.value_keys:
-                self.__dict__[key] = np.zeros((self.ix, self.jx))
-
-        dtype = np.dtype(
-            [("qq", self.endian + str((self.mtype + 5) * self.ix * self.jx) + "f")]
-        )
-        with open(self.datadir / "remap" / "qq" / f"qq.dac.{n:08d}", "rb") as f:
-            qq = np.fromfile(f, dtype=dtype, count=1)
-
-        for key, m in zip(self.value_keys, range(self.mtype)):
-            self.__dict__[key] = qq["qq"].reshape(
-                (self.mtype + 5, self.ix, self.jx), order="F"
-            )[m, :, :]
-
-
 class ModelS(_BaseReader):
     """
     Class for Model S based stratification data

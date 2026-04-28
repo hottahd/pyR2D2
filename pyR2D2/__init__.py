@@ -60,10 +60,3 @@ try:
     from ._version import version as __version__
 except ImportError:
     __version__ = "unknown"
-
-# from setuptools_scm import get_version
-
-# try:
-#     __version__ = '.'.join(get_version(root="..", relative_to=__file__).split('.')[:3])
-# except Exception as e:
-#     __version__ = "unknown"
