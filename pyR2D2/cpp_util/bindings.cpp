@@ -83,6 +83,31 @@ PYBIND11_MODULE(cpp_util, m)
     // clang-format on
 
     m.def(
+        "eval_tau",
+        &eval_tau,
+        R"doc(
+    Evaluate the optical depth for given density, specific entropy, and spatial grids.
+    Parameters
+    ----------
+    ro_np : numpy.ndarray
+        3D array of density values.
+    se_np : numpy.ndarray
+        3D array of specific entropy values.
+    x_np : numpy.ndarray
+        1D array of spatial grid points.
+    eos : EOS
+        An instance of the EOS class for thermodynamic evaluations.
+    Returns
+    -------
+    numpy.ndarray
+        2D array of radiative transfer results at the top boundary.
+    )doc",
+        py::arg("ro"),
+        py::arg("se"),
+        py::arg("x"),
+        py::arg("eos"));
+
+    m.def(
         "vertical_upward_rte",
         &vertical_upward_rte,
         R"doc(
