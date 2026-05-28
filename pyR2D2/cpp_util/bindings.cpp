@@ -4,11 +4,16 @@
 #include "eos.hpp"
 #include "rte.hpp"
 #include "yin_yang_convert.hpp"
+#include "field_line.hpp"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(cpp_util, m)
 {
+
+    //
+    // EOS
+    //
     // clang-format off
   py::class_<EOS>(m, "EOS", R"doc(
   Equation of State (EOS) class for evaluating thermodynamic quantities.
@@ -29,13 +34,13 @@ PYBIND11_MODULE(cpp_util, m)
       2D array of logarithmic opacity values.      
     )doc")
       .def(py::init<
-           py::array_t<double>,
-           py::array_t<double>,
-           py::array_t<double>,
-           py::array_t<double>,
-           py::array_t<double>,
-           py::array_t<double>>())
-      .def("eval", py::overload_cast<double, double, const std::string &>(&EOS::eval, py::const_), R"doc(
+           py::array_t<float>,
+           py::array_t<float>,
+           py::array_t<float>,
+           py::array_t<float>,
+           py::array_t<float>,
+           py::array_t<float>>())
+      .def("eval", py::overload_cast<float, float, const std::string &>(&EOS::eval, py::const_), R"doc(
       Evaluate the EOS for given density and specific entropy scalar values.
 
       Parameters
@@ -57,8 +62,8 @@ PYBIND11_MODULE(cpp_util, m)
           Evaluated EOS variable.
       )doc")
       .def("eval", py::overload_cast<
-        const py::array_t<double, py::array::c_style | py::array::forcecast>&, 
-        const py::array_t<double, py::array::c_style | py::array::forcecast>&, 
+        const py::array_t<float, py::array::c_style | py::array::forcecast>&, 
+        const py::array_t<float, py::array::c_style | py::array::forcecast>&, 
         const std::string &
         >(&EOS::eval, py::const_), R"doc(
       Evaluate the EOS for given density and specific entropy array values.
@@ -82,6 +87,10 @@ PYBIND11_MODULE(cpp_util, m)
       )doc");
     // clang-format on
 
+    //
+    // Radiative transfer
+    //
+
     m.def(
         "eval_tau",
         &eval_tau,
@@ -97,6 +106,8 @@ PYBIND11_MODULE(cpp_util, m)
         1D array of spatial grid points.
     eos : EOS
         An instance of the EOS class for thermodynamic evaluations.
+    i_bot : int, optional
+        The bottom index for the evaluation range (default is 0).
     Returns
     -------
     numpy.ndarray
@@ -105,7 +116,8 @@ PYBIND11_MODULE(cpp_util, m)
         py::arg("ro"),
         py::arg("se"),
         py::arg("x"),
-        py::arg("eos"));
+        py::arg("eos"),
+        py::arg("i_bot") = 0);
 
     m.def(
         "vertical_upward_rte",
@@ -132,6 +144,10 @@ PYBIND11_MODULE(cpp_util, m)
         py::arg("se"),
         py::arg("x"),
         py::arg("eos"));
+
+    //
+    // Yin-Yang grid conversion
+    //
 
     py::class_<YinYang>(m, "YinYang", R"doc(
     Class for converting data between Yin-Yang grid and regular spherical grid.
@@ -170,4 +186,58 @@ PYBIND11_MODULE(cpp_util, m)
     )doc",
             py::arg("qq_yin"),
             py::arg("qq_yan"));
+
+    //
+    // Field line tracing
+    //
+
+    m.def(
+        "trace_field_line",
+        &trace_field_line,
+        R"doc(
+    Trace a field line through a 3D magnetic field.
+    Parameters
+    ----------
+    x_np : numpy.ndarray
+        1D array of x-coordinates.
+    y_np : numpy.ndarray
+        1D array of y-coordinates.
+    z_np : numpy.ndarray
+        1D array of z-coordinates.
+    bx_np : numpy.ndarray
+        3D array of x-components of the magnetic field.
+    by_np : numpy.ndarray
+        3D array of y-components of the magnetic field.
+    bz_np : numpy.ndarray
+        3D array of z-components of the magnetic field.
+    x0 : double
+        Initial x-coordinate.
+    y0 : double
+        Initial y-coordinate.
+    z0 : double
+        Initial z-coordinate.
+    ds : double
+        Step size for tracing.
+    n_steps : size_t
+        Number of steps for tracing.
+    sign : double, optional
+        Sign for the tracing direction (default is 1.0).
+    Returns
+    -------
+    FieldLine
+        The traced field line.
+    )doc",
+        py::arg("x"),
+        py::arg("y"),
+        py::arg("z"),
+        py::arg("bx"),
+        py::arg("by"),
+        py::arg("bz"),
+        py::arg("fields"),
+        py::arg("x0"),
+        py::arg("y0"),
+        py::arg("z0"),
+        py::arg("ds"),
+        py::arg("n_steps"),
+        py::arg("sign") = 1.0);
 }

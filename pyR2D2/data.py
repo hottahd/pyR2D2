@@ -78,12 +78,12 @@ class Data:
         eosdir = self.datadir.parent / "input_data"
         if (eosdir / "eos_table_sero.npz").exists():
             self.eos = pyR2D2.cpp_util.EOS(
-                self.log_ro_e,
-                self.se_e,
-                self.log_pr_e,
-                self.log_en_e,
-                self.log_te_e,
-                self.log_op_e,
+                self.log_ro_e.astype(np.float32),
+                self.se_e.astype(np.float32),
+                self.log_pr_e.astype(np.float32),
+                self.log_en_e.astype(np.float32),
+                self.log_te_e.astype(np.float32),
+                self.log_op_e.astype(np.float32),
             )
 
         if self.p.geometry == "YinYang":

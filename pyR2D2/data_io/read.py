@@ -474,13 +474,20 @@ class FullData(_BaseRemapReader):
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qf`
-    
+
 
     """
 
     zarr_keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
 
-    def read(self, n: int, keys="all", max_workers: int = 1, zarr_flag: bool = False, verbose: bool = False):
+    def read(
+        self,
+        n: int,
+        keys="all",
+        max_workers: int = 1,
+        zarr_flag: bool = False,
+        verbose: bool = False,
+    ):
         """
         Reads 3D full data
         The data is stored in self.qq dictionary
@@ -548,7 +555,7 @@ class FullData(_BaseRemapReader):
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
-            (qq, params) = pyR2D2.zarr_util.load(
+            qq, params = pyR2D2.zarr_util.load(
                 zarr_filepath, with_attrs=True, names=names
             )
 
@@ -916,6 +923,7 @@ class RestrictedData(_BaseRemapReader):
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qr`
 
     """
+
     def read(
         self,
         n: int,
@@ -1004,15 +1012,22 @@ class RestrictedData(_BaseRemapReader):
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
-
-            (qq, params) = pyR2D2.zarr_util.load(
-                zarr_filepath, with_attrs=True, names=names, i0=i0, i1=i1 + 1, j0=j0, j1=j1 + 1, k0=k0, k1=k1 + 1
+            qq, params = pyR2D2.zarr_util.load(
+                zarr_filepath,
+                with_attrs=True,
+                names=names,
+                i0=i0,
+                i1=i1 + 1,
+                j0=j0,
+                j1=j1 + 1,
+                k0=k0,
+                k1=k1 + 1,
             )
 
             for key in qq.keys():
                 self.__dict__[key] = qq[key]
 
-        else:            
+        else:
             if isinstance(keys, str):
                 if keys == "all":
                     keys_input = self.remap_keys + self.remap_keys_add
@@ -1068,18 +1083,29 @@ class RestrictedData(_BaseRemapReader):
                                         ),
                                         order="F",
                                     )[
-                                        isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1, m
+                                        isrt_snd:iend_snd,
+                                        jsrt_snd:jend_snd,
+                                        k0 : k1 + 1,
+                                        m,
                                     ]
                                 else:
                                     self.__dict__[key][
                                         isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
                                     ] = qqq[key].reshape(
-                                        (self.iixl[np0], self.jjxl[np0], self.kx), order="F"
+                                        (self.iixl[np0], self.jjxl[np0], self.kx),
+                                        order="F",
                                     )[
-                                        isrt_snd:iend_snd, jsrt_snd:jend_snd, k0 : k1 + 1
+                                        isrt_snd:iend_snd,
+                                        jsrt_snd:jend_snd,
+                                        k0 : k1 + 1,
                                     ]
 
-        self.info = {"x": self.x[i0:i1+1], "y": self.y[j0:j1+1], "z": self.z[k0:k1+1]}
+        self.info = {
+            "x": self.x[i0 : i1 + 1],
+            "y": self.y[j0 : j1 + 1],
+            "z": self.z[k0 : k1 + 1],
+        }
+
 
 class OpticalDepth(_BaseReader):
     """
@@ -1194,6 +1220,10 @@ class OpticalDepth(_BaseReader):
         zarr_flag: bool = False,
         verbose: bool = True,
         keys: str | list | tuple = "all",
+        j0: int = None,
+        j1: int = None,
+        k0: int = None,
+        k1: int = None,
     ):
         """
         Reads 2D data at certain optical depths.
@@ -1211,7 +1241,24 @@ class OpticalDepth(_BaseReader):
         keys : str or list or tuple, optional
             List of values to read. If 'all', all values are read. By default 'all'.
             It works only when zarr_flag is True. If zarr_flag is False, all values are read regardless of keys.
+        j0 : int, optional
+            Starting index for the j dimension, by default None
+        j1 : int, optional
+            Ending index + 1 for the j dimension, by default None
+        k0 : int, optional
+            Starting index for the k dimension, by default None
+        k1 : int, optional
+            Ending index + 1 for the k dimension, by default None
         """
+
+        if j0 is None:
+            j0 = 0
+        if j1 is None:
+            j1 = self.jx
+        if k0 is None:
+            k0 = 0
+        if k1 is None:
+            k1 = self.kx
 
         if not zarr_flag:
             if not self._get_filepath_optical_depth(n).exists():
@@ -1233,14 +1280,22 @@ class OpticalDepth(_BaseReader):
                 raise TypeError("keys must be str, list, or tuple")
 
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
-            if not zarr_filepath.exists():
+            if (not zarr_filepath.exists()) and verbose:
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
-            qq = pyR2D2.zarr_util.load(zarr_filepath, names=names)
+            qq = pyR2D2.zarr_util.load(
+                zarr_filepath, names=names, i0=j0, i1=j1, j0=k0, j1=k1
+            )
 
             for key in qq.keys():
                 self.__dict__[key] = qq[key]
+
+            self.info = {
+                "y": self.y[j0:j1],
+                "z": self.z[k0:k1],
+            }
+
             return
 
         else:
@@ -1366,7 +1421,7 @@ class OnTheFly(_BaseReader):
     def __init__(self, data):
         self.data = data
 
-        if self.nx*self.ny*self.nz == 8:
+        if self.nx * self.ny * self.nz == 8:
 
             m_total = self.m2d_xy + self.m2d_xz + self.m2d_flux
             if self.geometry == "YinYang":
@@ -1875,6 +1930,7 @@ class Slice(_BaseReader):
                         print(f"Deleting {filepath}")
                         filepath.unlink()
 
+
 class TwoDimension(_BaseReader):
     """
     Class for 2D data
@@ -1932,6 +1988,7 @@ class TwoDimension(_BaseReader):
             self.__dict__[key] = qq["qq"].reshape(
                 (self.mtype + 5, self.ix, self.jx), order="F"
             )[m, :, :]
+
 
 class ModelS(_BaseReader):
     """
@@ -2159,7 +2216,7 @@ class _BasePrevAftr(_BaseReader):
             zarr_filepath = self._get_filepath_prev_aftr_zarr(
                 n, n_prev_aftr, prev_aftr=self.prev_aftr
             )
-            (qq, params) = pyR2D2.zarr_util.load(zarr_filepath, with_attrs=True)
+            qq, params = pyR2D2.zarr_util.load(zarr_filepath, with_attrs=True)
 
             for key in self.prev_aftr_kind:
                 self.__dict__[key] = qq[key]

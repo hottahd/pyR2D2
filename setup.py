@@ -8,10 +8,10 @@ from setuptools.command.build_py import build_py
 from setuptools_scm import get_version
 
 if sys.platform == "linux":
-    extra_compile_args = ["-O3", "-fopenmp"]
+    extra_compile_args = ["-O3", "-DNDEBUG", "-march=native", "-fopenmp"]
     extra_link_args = ["-fopenmp"]
 else:
-    extra_compile_args = ["-O3"]
+    extra_compile_args = ["-O3", "-DNDEBUG"]
     extra_link_args = []
 
 
