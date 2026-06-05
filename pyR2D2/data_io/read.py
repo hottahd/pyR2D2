@@ -1218,7 +1218,7 @@ class OpticalDepth(_BaseReader):
         self,
         n: int,
         zarr_flag: bool = False,
-        verbose: bool = True,
+        verbose: bool = False,
         keys: str | list | tuple = "all",
         j0: int = None,
         j1: int = None,
@@ -1235,9 +1235,9 @@ class OpticalDepth(_BaseReader):
         n : int
             A selected time step for data
         zarr_flag : bool, optional
-            Whether to read from zarr file, by default True
+            Whether to read from zarr file, by default False
         verbose : bool, optional
-            Whether to print verbose output, by default True
+            Whether to print verbose output, by default False
         keys : str or list or tuple, optional
             List of values to read. If 'all', all values are read. By default 'all'.
             It works only when zarr_flag is True. If zarr_flag is False, all values are read regardless of keys.
@@ -1613,7 +1613,20 @@ class Slice(_BaseReader):
         else:
             raise ValueError("direc should be 'x', 'y', or 'z'")
 
-    def read(self, n_slice, direc, n, zarr_flag: bool = False):
+    def read(
+        self,
+        n_slice,
+        direc,
+        n,
+        i0: int = None,
+        i1: int = None,
+        j0: int = None,
+        j1: int = None,
+        k0: int = None,
+        k1: int = None,
+        zarr_flag: bool = False,
+        verbose: bool = False,
+    ):
         """
         Reads 2D data of slice.
         The data is stored in self.ql dictionary
@@ -1626,9 +1639,30 @@ class Slice(_BaseReader):
             slice direction. 'x', 'y', or 'z'
         n : int
             a selected time step for data
+        i0, i1 : int, optional
+            Starting and ending index for the i dimension, by default None (the whole range)
+        j0, j1 : int, optional
+            Starting and ending index for the j dimension, by default None (the whole range)
+        k0, k1 : int, optional
+            Starting and ending index for the k dimension, by default None (the whole range)
         zarr_flag : bool
             If True, read from zarr format instead of binary format. By default, False (read from binary format).
+        verbose : bool
+            If True, print verbose output. By default, False (no verbose output).
         """
+
+        if i0 is None:
+            i0 = 0
+        if i1 is None:
+            i1 = self.ix
+        if j0 is None:
+            j0 = 0
+        if j1 is None:
+            j1 = self.jx
+        if k0 is None:
+            k0 = 0
+        if k1 is None:
+            k1 = self.kx
 
         postfixes = self._get_postfixes()
 
@@ -1638,10 +1672,11 @@ class Slice(_BaseReader):
                 filepath = self._get_filepath_slice(n_slice, direc, n, postfix)
                 if not filepath.exists():
                     zarr_flag = True
-                    print(
-                        f"File does not exist at n={n} for slice {direc} with postfix {postfix}."
-                    )
-                    print("Trying to read from zarr file.")
+                    if verbose:
+                        print(
+                            f"File does not exist at n={n} for slice {direc} with postfix {postfix}."
+                        )
+                        print("Trying to read from zarr file.")
                     break
 
         if zarr_flag:
@@ -1650,14 +1685,19 @@ class Slice(_BaseReader):
                 print(f"Zarr file does not exist at n={n} for slice {direc}.")
                 return
 
-            i0, j0, k0 = 0, 0, 0
-            i1, j1, k1 = self.ix, self.jx, self.kx
+            self.info = {}
+            self.info["x"] = self.x[i0:i1]
+            self.info["y"] = self.y[j0:j1]
+            self.info["z"] = self.z[k0:k1]
             if direc == "x":
                 i0, i1 = n_slice, n_slice + 1
+                self.info["x"] = self.x_slice[n_slice]
             elif direc == "y":
                 j0, j1 = n_slice, n_slice + 1
+                self.info["y"] = self.y_slice[n_slice]
             elif direc == "z":
                 k0, k1 = n_slice, n_slice + 1
+                self.info["z"] = self.z_slice[n_slice]
 
             names = []
             for key in self.zarr_keys:
