@@ -1,4 +1,5 @@
 import os
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -106,7 +107,51 @@ class Data:
             f"'{type(self).__name__}' object has no attribute '{name}'"
         )
 
-    def time_read(self, n, tau=False, verbose=True):
+    def zip_time(self, remove_original=False):
+        """
+        Archive datadir/time into datadir/time.zip.
+
+        Existing entries in time.zip are skipped.
+        Newly added files under time/ are appended.
+
+        Parameters
+        ----------
+        remove_original : bool, optional
+            If True, remove the original files after archiving. Default is False.
+        """
+        src = self.datadir / "time"
+        dst = self.datadir / "time.zip"
+
+        if not src.exists():
+            raise FileNotFoundError(f"{src} does not exist")
+
+        # zipfile.ZIP_STORED is used to avoid compression, which can be slow for many small files.
+        # allowZip64=True is used to support large zip files.
+        with zipfile.ZipFile(
+            dst, "a", compression=zipfile.ZIP_STORED, allowZip64=True
+        ) as zf:
+            # set is used to avoid duplicate entries in the zip file
+            existing = set(zf.namelist())
+
+            for p in src.rglob("*"):
+                # Skip directories and non-files
+                if not p.is_file():
+                    continue
+
+                # Create a relative path for the archive name
+                arcname = str(p.relative_to(self.datadir))
+
+                # Skip if the file already exists in the zip archive
+                if arcname in existing:
+                    continue
+
+                zf.write(p, arcname)
+                existing.add(arcname)
+
+                if remove_original:
+                    os.remove(p)
+
+    def time_read(self, n, tau=False, verbose=True, use_zip=False):
         """
         Reads time at a selected time step
         The data is stored in self.t
@@ -117,6 +162,11 @@ class Data:
             selected time step for data
         tau : bool
             if True time for optical depth (high cadence)
+        verbose: bool
+            if True, print a message indicating that the time variable has been stored in self.time
+        use_zip: bool
+            if True, read time from time.zip instead of the original files
+            if False, read from the original file if it exists; otherwise, fall back to time.zip.
 
         Returns
         -------
@@ -124,19 +174,28 @@ class Data:
             time at a selected time step
         """
 
-        if tau:
-            with open(self.datadir / "time" / "tau" / f"t.dac.{n:08d}", "rb") as f:
-                self.time = np.fromfile(f, self.endian + "d", 1).reshape(
-                    (1), order="F"
+        subdir = "tau" if tau else "mhd"
+        filename = f"t.dac.{n:08d}"
+
+        filepath = self.datadir / "time" / subdir / filename
+
+        if not filepath.exists() or use_zip:
+            zippath = self.datadir / "time.zip"
+            arcname = f"time/{subdir}/{filename}"
+
+            with zipfile.ZipFile(zippath, "r") as zf:
+                data = zf.read(arcname)
+                self.time = np.frombuffer(
+                    data,
+                    dtype=self.endian + "d",
+                    count=1,
                 )[0]
         else:
-            with open(self.datadir / "time" / "mhd" / f"t.dac.{n:08d}", "rb") as f:
-                self.time = np.fromfile(f, self.endian + "d", 1).reshape(
-                    (1), order="F"
-                )[0]
+            with open(filepath, "rb") as f:
+                self.time = np.fromfile(f, self.endian + "d", 1)[0]
 
         if verbose:
-            print("### variales are stored in self.time ###")
+            print("### time is stored in self.time ###")
 
         return self.time
 
