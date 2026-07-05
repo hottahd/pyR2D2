@@ -81,7 +81,8 @@ def zip_zarr(
     path = Path(path)
 
     if not path.is_dir():
-        raise FileNotFoundError(f"Zarr directory not found: {path}")
+        print(f"Warning: Zarr directory not found: {path}")
+        return None
 
     if zip_path is None:
         zip_path = Path(str(path) + ".zip")
@@ -97,7 +98,8 @@ def zip_zarr(
                 shutil.rmtree(path)
                 return zip_path
 
-            raise FileExistsError(f"Zip file already exists: {zip_path}")
+            print(f"Warning: Zip file already exists: {zip_path}")
+            return None
 
     zip_path.parent.mkdir(parents=True, exist_ok=True)
 
