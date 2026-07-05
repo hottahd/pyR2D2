@@ -142,11 +142,9 @@ class Data:
                 arcname = str(p.relative_to(self.datadir))
 
                 # Skip if the file already exists in the zip archive
-                if arcname in existing:
-                    continue
-
-                zf.write(p, arcname)
-                existing.add(arcname)
+                if arcname not in existing:
+                    zf.write(p, arcname)
+                    existing.add(arcname)
 
                 if remove_original:
                     os.remove(p)

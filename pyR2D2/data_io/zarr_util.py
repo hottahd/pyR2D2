@@ -1,7 +1,120 @@
-import os
+import shutil
+import zipfile
+from pathlib import Path
 
 import numpy as np
 import zarr
+
+
+def open_zarr_group(path: str, use_zip: bool = False):
+    path = Path(path)
+
+    # normal .zarr directory
+    if path.is_dir() and not use_zip:
+        return zarr.open_group(path, mode="r")
+
+    # explicit .zarr.zip file
+    if path.is_file() and path.suffix == ".zip":
+        store = zarr.storage.ZipStore(path, mode="r")
+        return zarr.open_group(store=store, mode="r")
+
+    zip_path = Path(str(path) + ".zip")
+    if zip_path.is_file():
+        store = zarr.storage.ZipStore(zip_path, mode="r")
+        return zarr.open_group(store=store, mode="r")
+
+    raise FileNotFoundError(f"Zarr directory or zip file not found: {path}")
+
+
+def _check_zarr_zip_equivalent(path, zip_path):
+    root_org = open_zarr_group(path)
+    root_zip = open_zarr_group(zip_path)
+
+    if root_org.attrs.asdict() != root_zip.attrs.asdict():
+        raise RuntimeError(
+            "Attributes in the original and zipped zarr do not match. "
+            "Aborting removal of original directory."
+        )
+
+    if set(root_org.array_keys()) != set(root_zip.array_keys()):
+        raise RuntimeError(
+            "Array names in the original and zipped zarr do not match. "
+            "Aborting removal of original directory."
+        )
+
+    for name in root_org.array_keys():
+        if root_org[name].shape != root_zip[name].shape:
+            raise RuntimeError(
+                f"Array shapes for '{name}' do not match. "
+                "Aborting removal of original directory."
+            )
+        if root_org[name].dtype != root_zip[name].dtype:
+            raise RuntimeError(
+                f"Array dtypes for '{name}' do not match. "
+                "Aborting removal of original directory."
+            )
+
+
+def zip_zarr(
+    path: str,
+    zip_path: str = None,
+    overwrite: bool = False,
+    remove_original: bool = False,
+):
+    """
+    Convert a .zarr directory to a .zarr.zip file without compression.
+
+    The zip file can be opened by zarr.storage.ZipStore.
+
+    Parameters
+    ----------
+    path : str
+        Path to the .zarr directory.
+    zip_path : str, optional
+        Path to the output .zarr.zip file. If None, defaults to path + ".zip".
+    overwrite : bool, optional
+        If True, overwrite the existing zip file. Default is False.
+    remove_original : bool, optional
+        If True, remove the original .zarr directory after zipping. Default is False.
+    """
+
+    path = Path(path)
+
+    if not path.is_dir():
+        raise FileNotFoundError(f"Zarr directory not found: {path}")
+
+    if zip_path is None:
+        zip_path = Path(str(path) + ".zip")
+    else:
+        zip_path = Path(zip_path)
+
+    if zip_path.exists():
+        if overwrite:
+            zip_path.unlink()
+        else:
+            if remove_original:
+                _check_zarr_zip_equivalent(path, zip_path)
+                shutil.rmtree(path)
+                return zip_path
+
+            raise FileExistsError(f"Zip file already exists: {zip_path}")
+
+    zip_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with zipfile.ZipFile(
+        zip_path,
+        mode="w",
+        compression=zipfile.ZIP_STORED,
+        allowZip64=True,
+    ) as zf:
+        for f in path.rglob("*"):
+            if f.is_file():
+                zf.write(f, arcname=f.relative_to(path))
+
+    if remove_original:
+        _check_zarr_zip_equivalent(path, zip_path)
+        shutil.rmtree(path)
+    return zip_path
 
 
 def _check_chunks(chunks, shape_len):
@@ -131,6 +244,7 @@ def load(
     j1: int = None,
     k0: int = None,
     k1: int = None,
+    use_zip: bool = False,
 ):
     """
     Load zarr data
@@ -146,15 +260,15 @@ def load(
         If True, also return Zarr attributes (metadata). By default, False.
     i0, i1, j0, j1, k0, k1 : int, optional
         Index ranges for slicing the arrays. If None, the full range is used.
+    use_zip : bool, optional
+        If True, load from a .zarr.zip file instead of a directory. By default, False.
     Returns
     -------
     dict
         loaded array from zarr data
     """
-    if not os.path.isdir(path):
-        raise FileNotFoundError(f"Zarr directory not found: {path}")
 
-    root = zarr.open_group(path, mode="r")
+    root = open_zarr_group(path, use_zip=use_zip)
 
     if i0 is None:
         i0 = 0
@@ -171,10 +285,10 @@ def load(
 
     for key in list(root.array_keys()):
         if root[key].ndim == 3:
-            (i1_tmp, j1_tmp, k1_tmp) = root[key].shape
+            i1_tmp, j1_tmp, k1_tmp = root[key].shape
             break
         if root[key].ndim == 2:
-            (i1_tmp, j1_tmp) = root[key].shape
+            i1_tmp, j1_tmp = root[key].shape
             k1_tmp = 1
             break
 
@@ -209,7 +323,7 @@ def load(
     return data
 
 
-def list_vars(path: str):
+def list_vars(path: str, use_zip: bool = False):
     """
     List variables in zarr data
 
@@ -217,11 +331,13 @@ def list_vars(path: str):
     ----------
     path : str
         path to zarr data
+    use_zip : bool, optional
+        if True, read from a .zarr.zip file instead of a directory. By default, False.
 
     Returns
     -------
     list
         list of variable names in the zarr data
     """
-    root = zarr.open_group(path, mode="r")
+    root = open_zarr_group(path, use_zip=use_zip)
     return list(root.array_keys())

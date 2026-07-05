@@ -9,6 +9,11 @@ import numpy as np
 import pyR2D2
 
 
+def _zarr_zarrzip_exists(path):
+    path = Path(path)
+    return path.exists() or Path(str(path) + ".zip").exists()
+
+
 class _BaseReader:
     """
     Base class for data readers
@@ -267,7 +272,7 @@ class XSelect(_BaseRemapReader):
 
             # If zarr_flag is True, try to read from zarr file
             zarr_path = self._get_filepath_remap_zarr(n)
-            if not zarr_path.exists():
+            if not _zarr_zarrzip_exists(zarr_path):
                 raise FileNotFoundError(f"Zarr file does not exist: {zarr_path}")
             qq = pyR2D2.zarr_util.load(zarr_path, names=names, i0=i0, i1=i0 + 1)
             for key in qq.keys():
@@ -551,8 +556,8 @@ class FullData(_BaseRemapReader):
                     names = list(keys) + ["x", "y", "z"]
 
             zarr_filepath = self._get_filepath_remap_zarr(n)
-            if not zarr_filepath.exists():
-                print(f"Zarr file does not exist at n={n}.")
+            if not _zarr_zarrzip_exists(zarr_filepath):
+                print(f"zarr or zarr.zip file does not exist at n={n}.")
                 return
 
             qq, params = pyR2D2.zarr_util.load(
@@ -913,6 +918,25 @@ class FullData(_BaseRemapReader):
 
         gc.collect()
 
+    def zip(self, n: int, overwrite: bool = False, remove_original: bool = False):
+        """
+        Compress the remap/qq/ data for a given time step n into a zip file
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data.
+        overwrite : bool
+            If True, overwrite an existing zip file.
+        remove_original : bool
+            If True, remove the original .zarr directory after verifying that the zip file is equivalent.
+        """
+
+        zarr_filepath = self._get_filepath_remap_zarr(n)
+        return pyR2D2.zarr_util.zip_zarr(
+            zarr_filepath, overwrite=overwrite, remove_original=remove_original
+        )
+
 
 class RestrictedData(_BaseRemapReader):
     """
@@ -1008,7 +1032,7 @@ class RestrictedData(_BaseRemapReader):
                     names = list(keys) + ["x", "y", "z"]
 
             zarr_filepath = self._get_filepath_remap_zarr(n)
-            if not zarr_filepath.exists():
+            if not _zarr_zarrzip_exists(zarr_filepath):
                 print(f"Zarr file does not exist at n={n}.")
                 return
 
@@ -1280,8 +1304,9 @@ class OpticalDepth(_BaseReader):
                 raise TypeError("keys must be str, list, or tuple")
 
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
-            if (not zarr_filepath.exists()) and verbose:
-                print(f"Zarr file does not exist at n={n}.")
+            if not _zarr_zarrzip_exists(zarr_filepath):
+                if verbose:
+                    print(f"zarr or zarr.zip file does not exist at n={n}.")
                 return
 
             qq = pyR2D2.zarr_util.load(
@@ -1404,6 +1429,25 @@ class OpticalDepth(_BaseReader):
             if filepath.exists():
                 print(f"Deleting {filepath}.")
                 filepath.unlink()
+
+    def zip(self, n: int, overwrite: bool = False, remove_original: bool = False):
+        """
+        Compress the tau data for a given time step n into a zip file
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data.
+        overwrite : bool
+            If True, overwrite an existing zip file.
+        remove_original : bool
+            If True, remove the original .zarr directory after verifying that the zip file is equivalent.
+        """
+
+        zarr_filepath = self._get_filepath_optical_depth_zarr(n)
+        return pyR2D2.zarr_util.zip_zarr(
+            zarr_filepath, overwrite=overwrite, remove_original=remove_original
+        )
 
 
 class OnTheFly(_BaseReader):
@@ -1681,8 +1725,10 @@ class Slice(_BaseReader):
 
         if zarr_flag:
             zarr_filepath = self._get_filepath_slice_zarr(n, direc)
-            if not zarr_filepath.exists():
-                print(f"Zarr file does not exist at n={n} for slice {direc}.")
+            if not _zarr_zarrzip_exists(zarr_filepath):
+                print(
+                    f"zarr or zarr.zip file does not exist at n={n} for slice {direc}."
+                )
                 return
 
             self.info = {}
@@ -1970,6 +2016,29 @@ class Slice(_BaseReader):
                         print(f"Deleting {filepath}")
                         filepath.unlink()
 
+    def zip(
+        self, n: int, direc: str, overwrite: bool = False, remove_original: bool = False
+    ):
+        """
+        Compress the slice data for a given time step n into a zip file
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data.
+        direc : str
+            Slice direction. 'x', 'y', or 'z'.
+        overwrite : bool
+            If True, overwrite an existing zip file.
+        remove_original : bool
+            If True, remove the original .zarr directory after verifying that the zip file is equivalent.
+        """
+
+        zarr_filepath = self._get_filepath_slice_zarr(n, direc)
+        return pyR2D2.zarr_util.zip_zarr(
+            zarr_filepath, overwrite=overwrite, remove_original=remove_original
+        )
+
 
 class TwoDimension(_BaseReader):
     """
@@ -2256,6 +2325,11 @@ class _BasePrevAftr(_BaseReader):
             zarr_filepath = self._get_filepath_prev_aftr_zarr(
                 n, n_prev_aftr, prev_aftr=self.prev_aftr
             )
+
+            if not _zarr_zarrzip_exists(zarr_filepath):
+                raise FileNotFoundError(
+                    f"zarr or zarr.zip file does not exist: {zarr_filepath}"
+                )
             qq, params = pyR2D2.zarr_util.load(zarr_filepath, with_attrs=True)
 
             for key in self.prev_aftr_kind:
@@ -2474,6 +2548,37 @@ class _BasePrevAftr(_BaseReader):
                 )
                 if filepath.exists():
                     filepath.unlink()
+
+    def zip(
+        self,
+        n: int,
+        n_prev_aftr: int,
+        overwrite: bool = False,
+        remove_original: bool = False,
+    ):
+        """
+        Compress previous/after time-step zarr data into a zip file.
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        n_prev_aftr : int
+            A selected previous or after time step for data
+        overwrite : bool
+            If True, overwrite an existing zip file.
+        remove_original : bool
+            If True, remove the original .zarr directory after verifying that the zip file is equivalent
+        """
+
+        zarr_filepath = self._get_filepath_prev_aftr_zarr(
+            n, n_prev_aftr, prev_aftr=self.prev_aftr
+        )
+        return pyR2D2.zarr_util.zip_zarr(
+            zarr_filepath,
+            overwrite=overwrite,
+            remove_original=remove_original,
+        )
 
 
 class Previous(_BasePrevAftr):
