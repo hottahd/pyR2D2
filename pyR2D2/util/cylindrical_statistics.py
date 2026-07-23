@@ -20,7 +20,7 @@ class CylindricalStatistics:
         *,
         yc: float = 0.0,
         zc: float = 0.0,
-        dr: float = 1.0,
+        dr: float | None = None,
         rmax: float | None = None,
     ) -> None:
         """
@@ -34,10 +34,11 @@ class CylindricalStatistics:
             Center of the polar coordinate system along y.
         zc : float, optional
             Center of the polar coordinate system along z.
-        dr : float, optional
+        dr : float or None, optional
             Width of each radial bin, in the same units as y/z.
             Determines the resolution of the r-axis in compute()'s
-            output (see `bin_radius`).
+            output (see `bin_radius`). Defaults to the mean grid
+            spacing of `y`, matching the resolution of the source grid.
         rmax : float or None, optional
             Maximum radius r to include; grid points farther than this are
             dropped, and it sets the outer edge of the last radial
@@ -46,6 +47,9 @@ class CylindricalStatistics:
         """
         if y.ndim != 1 or z.ndim != 1:
             raise ValueError("y and z must be 1D coordinate arrays")
+
+        if dr is None:
+            dr = np.mean(np.abs(np.diff(y)))
 
         self.jx = y.size
         self.kx = z.size

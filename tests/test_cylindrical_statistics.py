@@ -369,6 +369,17 @@ def test_non_positive_dr_raises_value_error(grid):
         CylindricalStatistics(y, z, dr=-1.0)
 
 
+def test_dr_defaults_to_y_grid_spacing(grid):
+    """dr, when omitted, must default to the mean spacing of `y` rather
+    than an arbitrary fixed value.
+    """
+    y, z = grid
+
+    cyl_stats = CylindricalStatistics(y, z)
+
+    assert cyl_stats.dr == pytest.approx(np.mean(np.abs(np.diff(y))))
+
+
 def test_non_positive_rmax_raises_value_error(grid):
     """An explicit rmax must be strictly positive."""
     y, z = grid
