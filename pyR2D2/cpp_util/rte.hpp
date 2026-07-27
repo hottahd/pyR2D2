@@ -24,6 +24,11 @@ py::array_t<float> eval_tau(
 
   auto x = view_array<float>(x_np);
 
+  if (x.i_size != ro.i_size)
+  {
+    throw std::runtime_error("x_np length must match ro_np's first axis");
+  }
+
   py::array_t<float> tu_np({ro.i_size, ro.j_size, ro.k_size});
   auto tu = view_array<float>(tu_np);
 
@@ -84,6 +89,11 @@ py::array_t<float> vertical_upward_rte(
   auto ro = view_array<float>(ro_np);
   auto se = view_array<float>(se_np);
   auto x = view_array<float>(x_np);
+
+  if (x.i_size != ro.i_size)
+  {
+    throw std::runtime_error("x_np length must match ro_np's first axis");
+  }
 
   py::array_t<float> rt_np({ro.j_size, ro.k_size});
   auto rt = view_array<float>(rt_np);

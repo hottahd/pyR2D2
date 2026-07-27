@@ -29,8 +29,22 @@ inline std::array<T, 4> lagrange_interpolation_weight_3rd(const std::array<T, 4>
 template <typename T>
 inline std::vector<T> lagrange_interpolation_3rd(double tht, double dth_yy_o, double pht, double dph_yy_o, auto const &th_yy, auto const &ph_yy, auto const &qq_yy, const size_t k_size)
 {
-    size_t ic = (tht - th_yy(0)) * dth_yy_o;
-    size_t jc = (pht - ph_yy(0)) * dph_yy_o;
+    // i_s below reads th_yy(ic-1 .. ic+2), so ic must stay within
+    // [1, th_yy.size - 3]. Clamp in double precision, before ever casting
+    // to size_t, so an out-of-range tht/pht (e.g. numerical noise at a
+    // Yin/Yang boundary) cannot underflow into a huge unsigned index.
+    double ic_d = (tht - th_yy(0)) * dth_yy_o;
+    double jc_d = (pht - ph_yy(0)) * dph_yy_o;
+
+    double ic_min = 1.0, ic_max = static_cast<double>(th_yy.size) - 3.0;
+    double jc_min = 1.0, jc_max = static_cast<double>(ph_yy.size) - 3.0;
+    if (ic_d < ic_min) ic_d = ic_min;
+    if (ic_d > ic_max) ic_d = ic_max;
+    if (jc_d < jc_min) jc_d = jc_min;
+    if (jc_d > jc_max) jc_d = jc_max;
+
+    size_t ic = static_cast<size_t>(ic_d);
+    size_t jc = static_cast<size_t>(jc_d);
 
     std::array<size_t, 4> i_s = {static_cast<size_t>(ic - 1), static_cast<size_t>(ic), static_cast<size_t>(ic + 1), static_cast<size_t>(ic + 2)};
     std::array<double, 4> th_vec = {th_yy(i_s[0]), th_yy(i_s[1]), th_yy(i_s[2]), th_yy(i_s[3])};
@@ -90,6 +104,8 @@ struct YinYang
         auto ph = view_array<double>(ph_np);
 
         size_t margin = 2;
+        if (qq_yin.i_size <= 2 * margin)
+            throw std::runtime_error("qq_yin array is too small for the configured margin");
         size_t i_size = (qq_yin.i_size - 2 * margin) * 2;
         size_t j_size = (qq_yin.i_size - 2 * margin) * 4;
         size_t k_size = qq_yin.k_size;

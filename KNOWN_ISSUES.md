@@ -68,28 +68,25 @@ rt(j, k) = rt1d[ro.i_size - 2];
 - ループは`i`が`ro.i_size - 2`まで進み、最後に書き込まれるのは`rt1d[ro.i_size - 1]`のはず。しかし取り出しているのは`rt1d[ro.i_size - 2]`で、最後の1つ手前の値になっている。
 - 意図通り(最上層を境界条件として別扱いにしたいなど)なのか、単なるオフバイワンのミスなのか、物理的な意味が分からないと判断できないため保留。Hottaさんの判断待ち。
 
-## 未検証(エージェント報告のみ、要確認)
+## 解決済み(続き2) — 2026-07-28、未検証項目をすべて検証・修正
+
+エージェント報告のみだった6件を実際にコードを読んで確認したところ、すべて実在するバグだった(`sync.py`は報告では6メソッドとされていたが、実際には8メソッド該当)。防御的なチェック・クランプ・打ち切りロジックを追加し、`python setup.py clean --all` → `build_ext --inplace`でのリビルド成功、既存pytest 114件全パス、さらに各修正について個別の手動スモークテスト(正常系・異常系とも)で動作を確認済み。
 
 ### C++側
 
-- `pyR2D2/cpp_util/field_line.hpp:24` (`interpolate3d`): 磁力線追跡でグリッド外に出た座標を範囲チェックなしにインデックスとして使っている疑い。磁力線がグリッド外に出るのは通常の終了条件のため、通常の呼び出しで発生し得るとの報告。
-- `pyR2D2/cpp_util/eos.hpp:48`: EOSテーブルの要素数が2未満の場合に境界外読み取りが起きる疑い。テーブル間のサイズ不一致も未チェック。
-- `pyR2D2/cpp_util/eos.hpp:124`: `eval`の配列版で`ro_val_np`/`se_val_np`のサイズ一致を未チェック。
-- `pyR2D2/cpp_util/yin_yang_convert.hpp:130`: Yang格子側の変換で座標の範囲チェックがYin側と非対称(Yin側はチェックあり、Yang側はなし)。負値からの`size_t`アンダーフローの疑いも。
-- `pyR2D2/cpp_util/rte.hpp:56`: `eval_tau`で`x_np`の長さと`ro`の第1軸サイズの一致を未チェック。
+- **`pyR2D2/cpp_util/field_line.hpp` (`interpolate3d` / `trace_field_line`)**: 磁力線がグリッド外に出ても`n_steps`まで追跡を続け、範囲外インデックスで読み取っていた。`trace_field_line`にグリッド範囲判定(`in_domain`)を追加し、磁力線が領域を出た時点でトレースを打ち切るように変更。開始点が最初から範囲外なら`RuntimeError`。戻り値の配列は実際に有効な長さに切り詰められる(＝`n_steps`より短くなり得る、という戻り値の仕様変更を伴う)。手動テストで「領域内に留まる短いトレースは指定`n_steps`分そのまま返る」「境界に到達すると打ち切られる」「開始点が範囲外だとエラーになる」の3パターンを確認。
+- **`pyR2D2/cpp_util/eos.hpp` (`EOS`コンストラクタ / `eval`配列版)**: テーブル要素数が2未満、テーブル間の形状不一致、`ro_val_np`/`se_val_np`のサイズ不一致、をそれぞれ`RuntimeError`で検出するように変更。正常系(2次元テーブルでの構築・評価)は従来通り動作することを確認。
+- **`pyR2D2/cpp_util/yin_yang_convert.hpp`**: `lagrange_interpolation_3rd`内のインデックス計算(`ic`, `jc`)を、`double`のままクランプしてから`size_t`にキャストするよう変更(Yin側・Yang側どちらの呼び出しも保護)。`convert_scalar`の`i_size`/`j_size`計算でも、`qq_yin.i_size`がmargin(既定2)の2倍以下だと符号なし整数演算でアンダーフローするため、事前に`RuntimeError`を投げるチェックを追加。
+- **`pyR2D2/cpp_util/rte.hpp` (`eval_tau` / `vertical_upward_rte`)**: `x_np`の長さが`ro_np`の第1軸サイズと一致しない場合に`RuntimeError`を投げるチェックを両関数に追加。
 
 ### Python側
 
-- `pyR2D2/sync/sync.py:49`ほか計6メソッド:
-  ```python
-  def some_method(self, ..., project=os.getcwd().split("/")[-2]):
-  ```
-  デフォルト引数が**import時に1回だけ**評価される。別ディレクトリから`project=`を省略して呼ぶと、古いプロジェクト名のまま同期されてしまう。
+- **`pyR2D2/sync/sync.py`**: `project=os.getcwd().split("/")[-2]`という、import時に1回だけ評価されるデフォルト引数が8メソッド(`setup`, `tau`, `remap_qq`, `xselect`, `vc`, `check`, `slice`, `all`)にあった。全て`project=None`に変更し、関数本体の先頭で`if project is None: project = os.getcwd().split("/")[-2]`と解決するように修正。呼び出し時点のカレントディレクトリが反映されることを確認。
 
 ## 優先度メモ
 
 1. ~~`rte.hpp:152` (メモリ破壊)~~ — 2026-07-27 修正済み
 2. ~~`data.py`の`zip_time` (データ消失)~~ — 2026-07-27 修正済み
 3. ~~`read.py`の`check()`~~ — 2026-07-27 レビューの結果、意図通りの挙動と判明。対応不要
-4. `rte.hpp`のオフバイワン疑い — 判断待ち
-5. その他の未検証項目 — 時間があれば個別に確認・修正
+4. `rte.hpp`のオフバイワン疑い — 判断待ち(唯一の残項目)
+5. ~~未検証項目6件~~ — 2026-07-28 すべて検証・修正済み

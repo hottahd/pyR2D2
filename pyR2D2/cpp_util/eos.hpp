@@ -42,8 +42,21 @@ struct EOS
     auto log_ro = view_array<float>(log_ro_np);
     auto se = view_array<float>(se_np);
 
+    if (log_ro.i_size < 2)
+      throw std::runtime_error("log_ro_np must have at least 2 elements");
+    if (se.i_size < 2)
+      throw std::runtime_error("se_np must have at least 2 elements");
+
     i_size = log_ro.i_size;
     j_size = se.i_size;
+
+    for (const auto &table_np : log_eos_np)
+    {
+      auto table = view_array<float>(table_np);
+      if (table.i_size != i_size || table.j_size != j_size)
+        throw std::runtime_error(
+            "EOS table shape must match (log_ro_np.size, se_np.size)");
+    }
 
     this->dlog_ro = log_ro(1) - log_ro(0);
     this->dse = se(1) - se(0);
@@ -107,6 +120,9 @@ struct EOS
 
     auto ro_val = view_array<float>(ro_val_np);
     auto se_val = view_array<float>(se_val_np);
+
+    if (ro_val.size != se_val.size)
+      throw std::runtime_error("ro_val_np and se_val_np must have the same size");
 
     py::array_t<float> qq_np;
     if (ro_val.ndim == 1)

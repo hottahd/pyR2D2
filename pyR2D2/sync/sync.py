@@ -46,7 +46,7 @@ class Sync:
 
     @staticmethod
     def setup(
-        server, caseid, ssh="ssh", project=os.getcwd().split("/")[-2], dist="../run/"
+        server, caseid, ssh="ssh", project=None, dist="../run/"
     ):
         """
         Downloads setting data from remote server
@@ -64,6 +64,9 @@ class Sync:
         dist :str
             Destination of data directory
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         args = [
             "--exclude=a.out",
@@ -87,7 +90,7 @@ class Sync:
 
         result = Sync.rsync_subprocess_wrapper(args)
 
-    def tau(self, server, n: int = None, ssh="ssh", project=os.getcwd().split("/")[-2]):
+    def tau(self, server, n: int = None, ssh="ssh", project=None):
         """
         Downloads data at constant optical depth
 
@@ -100,6 +103,9 @@ class Sync:
         project : str
             Name of project such as 'R2D2'
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         if n is None:
             filename = "*"
@@ -123,7 +129,7 @@ class Sync:
 
         result = Sync.rsync_subprocess_wrapper(args)
 
-    def remap_qq(self, server, n, ssh="ssh", project=os.getcwd().split("/")[-2]):
+    def remap_qq(self, server, n, ssh="ssh", project=None):
         """
         Downloads full 3D remap data
 
@@ -138,6 +144,9 @@ class Sync:
         ssh : str
             Type of ssh command
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
 
@@ -189,7 +198,7 @@ class Sync:
             print("File does not exist in " + server)
 
     def xselect(
-        self, xs, server, n: int = None, ssh="ssh", project=os.getcwd().split("/")[-2]
+        self, xs, server, n: int = None, ssh="ssh", project=None
     ):
         """
         Downloads data at certain height
@@ -205,6 +214,9 @@ class Sync:
             project : str
                 Name of project such as 'R2D2'
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         i0 = np.argmin(np.abs(self.x - xs))
         ir0 = self.i2ir[i0]
@@ -264,7 +276,7 @@ class Sync:
             ]
             Sync.rsync_subprocess_wrapper(args)
 
-    def vc(self, server, ssh="ssh", project=os.getcwd().split("/")[-2]):
+    def vc(self, server, ssh="ssh", project=None):
         """
         Downloads pre analyzed data
 
@@ -278,6 +290,9 @@ class Sync:
             Name of project such as 'R2D2'
         """
 
+        if project is None:
+            project = os.getcwd().split("/")[-2]
+
         caseid = self._caseid()
         Sync.setup(server, caseid, ssh=ssh, project=project)
         args = [
@@ -290,7 +305,7 @@ class Sync:
         Sync.rsync_subprocess_wrapper(args)
 
     def check(
-        self, server, n, ssh="ssh", project=os.getcwd().split("/")[-2], end_step=False
+        self, server, n, ssh="ssh", project=None, end_step=False
     ):
         """
         Downloads checkpoint data
@@ -308,6 +323,9 @@ class Sync:
         end_step : bool
             If true, checkpoint of end step is read
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         step = str(n).zfill(8)
 
@@ -381,7 +399,7 @@ class Sync:
         direc="*",
         n_slice=None,
         ssh="ssh",
-        project=os.getcwd().split("/")[-2],
+        project=None,
     ):
         """
         Downloads slice data
@@ -401,6 +419,9 @@ class Sync:
         project : str
             Name of project such as 'R2D2'
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         if n is None:
             step = "*"
@@ -439,7 +460,7 @@ class Sync:
         Sync.rsync_subprocess_wrapper(args)
 
     def all(
-        self, server, ssh="ssh", project=os.getcwd().split("/")[-2], dist="../run/"
+        self, server, ssh="ssh", project=None, dist="../run/"
     ):
         """
         This method downloads all the data
@@ -455,6 +476,9 @@ class Sync:
         dist :str
             Destination of data directory
         """
+
+        if project is None:
+            project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
         args = [
