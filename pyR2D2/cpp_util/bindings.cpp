@@ -6,6 +6,8 @@
 #include "yin_yang_convert.hpp"
 #include "field_line.hpp"
 #include "derivative.hpp"
+#include "geometry_convert.hpp"
+#include "interpolation.hpp"
 
 namespace py = pybind11;
 
@@ -33,7 +35,7 @@ PYBIND11_MODULE(cpp_util, m)
             ``qq.shape[0]``. It is converted to C-contiguous float64 when
             necessary.
         qq : numpy.ndarray
-            Three-dimensional, C-contiguous, native-endian array with dtype
+            Three-dimensional, C- or F-contiguous, native-endian array with dtype
             float32 or float64 and shape ``(nx, ny, nz)``.
 
         Returns
@@ -74,7 +76,7 @@ PYBIND11_MODULE(cpp_util, m)
             ``qq.shape[1]``. It is converted to C-contiguous float64 when
             necessary.
         qq : numpy.ndarray
-            Three-dimensional, C-contiguous, native-endian array with dtype
+            Three-dimensional, C- or F-contiguous, native-endian array with dtype
             float32 or float64 and shape ``(nx, ny, nz)``.
 
         Returns
@@ -115,7 +117,7 @@ PYBIND11_MODULE(cpp_util, m)
             ``qq.shape[2]``. It is converted to C-contiguous float64 when
             necessary.
         qq : numpy.ndarray
-            Three-dimensional, C-contiguous, native-endian array with dtype
+            Three-dimensional, C- or F-contiguous, native-endian array with dtype
             float32 or float64 and shape ``(nx, ny, nz)``.
 
         Returns
@@ -137,6 +139,95 @@ PYBIND11_MODULE(cpp_util, m)
         The first and last two z planes are set to zero. Coefficients and
         intermediate sums are evaluated in float64. The main loop releases
         the Python GIL and is parallelized with OpenMP.
+        )doc");
+    m.def(
+        "interp",
+        &interpolation_detail::interpolation_dispatch,
+        py::arg("x"),
+        py::arg("y"),
+        py::arg("z"),
+        py::arg("xu"),
+        py::arg("yu"),
+        py::arg("zu"),
+        py::arg("qq"),
+        R"doc(
+        Trilinearly interpolate a three-dimensional array.
+
+        The source grid may be nonuniform but each source coordinate must be
+        finite and strictly increasing. The input array is not copied.
+
+        Parameters
+        ----------
+        x, y, z : numpy.ndarray
+            One-dimensional source coordinates. Their lengths must match the
+            corresponding axes of ``qq``.
+        xu, yu, zu : numpy.ndarray
+            One-dimensional target coordinates.
+        qq : numpy.ndarray
+            Three-dimensional, C- or F-contiguous, native-endian array with dtype
+            float32 or float64 and shape ``(len(x), len(y), len(z))``.
+
+        Returns
+        -------
+        numpy.ndarray
+            C-contiguous array with shape ``(len(xu), len(yu), len(zu))`` and
+            the same dtype as ``qq``.
+
+        Raises
+        ------
+        TypeError
+            If ``qq`` is not native-endian float32 or float64.
+        ValueError
+            If an input shape, memory layout, or coordinate is invalid.
+
+        Notes
+        -----
+        Target points on the source-domain boundary or outside the source
+        domain are set to zero, matching the existing Fortran implementation.
+        Weights and intermediate sums are evaluated in float64. The main loop
+        releases the Python GIL and is parallelized with OpenMP.
+        )doc");
+    m.def(
+        "spherical2cartesian",
+        &geometry_convert_detail::spherical_to_cartesian_dispatch,
+        py::arg("rr"),
+        py::arg("th"),
+        py::arg("ph"),
+        py::arg("qqs"),
+        py::arg("ixc"),
+        py::arg("jxc"),
+        py::arg("kxc"),
+        R"doc(
+        Interpolate a scalar field from a spherical grid to a Cartesian grid.
+
+        Parameters
+        ----------
+        rr, th, ph : numpy.ndarray
+            One-dimensional, uniformly spaced spherical coordinates. ``ph``
+            must span one complete 2*pi period.
+        qqs : numpy.ndarray
+            Three-dimensional, C- or F-contiguous, native-endian float32 or float64
+            array with shape ``(len(rr), len(th), len(ph))``.
+        ixc, jxc, kxc : int
+            Numbers of points in the Cartesian x, y, and z coordinates. Each
+            must be at least two.
+
+        Returns
+        -------
+        qqc : numpy.ndarray
+            C-contiguous Cartesian scalar field with the same dtype as
+            ``qqs`` and shape ``(ixc, jxc, kxc)``.
+        xc, yc, zc : numpy.ndarray
+            Float64 Cartesian coordinates spanning ``[-max(rr), max(rr)]``.
+
+        Notes
+        -----
+        The radial and colatitude interpolation domain matches the existing
+        Fortran implementation: values must lie strictly between the first
+        and second-to-last source coordinates. Other output points are zero.
+        Longitude is treated as periodic. The input field is not copied,
+        calculations release the Python GIL, and the output loop is
+        parallelized with OpenMP.
         )doc");
     // clang-format on
 

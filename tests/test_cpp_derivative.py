@@ -93,12 +93,38 @@ def test_rejects_unsupported_input_dtype(nonuniform_grid, invalid_dtype):
         d_x(x, q)
 
 
-def test_rejects_non_c_contiguous_input(nonuniform_grid):
-    """暗黙コピーを避けるため、C連続でない入力を拒否する。"""
+@pytest.mark.parametrize(
+    ("derivative", "axis"),
+    [(d_x, 0), (d_y, 1), (d_z, 2)],
+)
+def test_accepts_f_contiguous_input(nonuniform_grid, derivative, axis):
+    """F連続入力をコピーせず読み、C連続入力と同じ結果を返す。"""
     x, y, z = nonuniform_grid
-    q = np.ones((x.size, y.size, z.size), dtype=np.float32, order="F")
+    coordinates = (x, y, z)
+    q_c = np.ascontiguousarray(
+        x[:, None, None] ** 3
+        + 2.0 * y[None, :, None] ** 3
+        - 0.5 * z[None, None, :] ** 3,
+        dtype=np.float32,
+    )
+    q_f = np.asfortranarray(q_c)
 
-    with pytest.raises(ValueError, match="C-contiguous"):
+    expected = derivative(coordinates[axis], q_c)
+    result = derivative(coordinates[axis], q_f)
+
+    assert q_f.flags.f_contiguous
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_rejects_noncontiguous_input(nonuniform_grid):
+    """C連続でもF連続でもない飛び飛びviewを拒否する。"""
+    x, y, z = nonuniform_grid
+    storage = np.ones((x.size, y.size, 2 * z.size), dtype=np.float32)
+    q = storage[:, :, ::2]
+
+    assert not q.flags.c_contiguous
+    assert not q.flags.f_contiguous
+    with pytest.raises(ValueError, match="C- or F-contiguous"):
         d_x(x, q)
 
 
@@ -113,13 +139,69 @@ def test_accepts_native_float_dtype_with_metadata(nonuniform_grid):
     assert result.dtype == np.float32
 
 
-def test_rejects_non_3d_input(nonuniform_grid):
-    """今回の初期実装は3次元配列だけを対象とする。"""
-    x, _, _ = nonuniform_grid
-    q = np.ones((x.size, 3), dtype=np.float32)
+@pytest.mark.parametrize(
+    ("derivative", "coordinate_index"),
+    [(d_x, 0), (d_y, 1), (d_z, 2)],
+)
+def test_1d_input_returns_1d(nonuniform_grid, derivative, coordinate_index):
+    """1D入力を同じshape・dtypeの1D配列として返す。"""
+    coordinate = nonuniform_grid[coordinate_index]
+    q = np.asarray(coordinate**3, dtype=np.float32)
 
-    with pytest.raises(ValueError, match="3D"):
-        d_x(x, q)
+    result = derivative(coordinate, q)
+
+    expected = np.zeros_like(q)
+    expected[2:-2] = 3.0 * coordinate[2:-2] ** 2
+    assert result.shape == q.shape
+    assert result.ndim == 1
+    assert result.dtype == q.dtype
+    np.testing.assert_allclose(result, expected, rtol=0.0, atol=3.0e-5)
+
+
+@pytest.mark.parametrize(
+    ("derivative", "coordinate_index", "input_shape"),
+    [
+        (d_x, 0, (7, 5)),
+        (d_y, 1, (8, 5)),  # (y, z)
+        (d_y, 1, (6, 8)),  # (x, y)
+        (d_z, 2, (5, 9)),
+    ],
+)
+def test_2d_input_returns_2d(
+    nonuniform_grid, derivative, coordinate_index, input_shape
+):
+    """対応する微分軸を判定し、2D入力と同じshapeで返す。"""
+    coordinate = nonuniform_grid[coordinate_index]
+    q = np.asfortranarray(
+        np.arange(np.prod(input_shape), dtype=np.float64).reshape(input_shape)
+    )
+
+    result = derivative(coordinate, q)
+
+    assert result.shape == q.shape
+    assert result.ndim == 2
+    assert result.dtype == q.dtype
+    assert result.flags.c_contiguous
+
+
+def test_d_y_square_2d_input_prefers_first_axis():
+    """両軸長がyと一致する場合は第0軸をyとして微分する。"""
+    y = np.linspace(-1.0, 1.0, 6)
+    q = np.broadcast_to(y[:, None] ** 3, (6, 6)).copy()
+
+    result = d_y(y, q)
+
+    expected = np.zeros_like(q)
+    expected[2:-2, :] = 3.0 * y[2:-2, None] ** 2
+    np.testing.assert_allclose(result, expected, rtol=0.0, atol=1.0e-12)
+
+
+def test_rejects_dimensions_outside_supported_range(nonuniform_grid):
+    """0Dおよび4D配列を明示的に拒否する。"""
+    x, _, _ = nonuniform_grid
+    for q in (np.array(1.0), np.ones((x.size, 1, 1, 1))):
+        with pytest.raises(ValueError, match="1D, 2D, or 3D"):
+            d_x(x, q)
 
 
 def test_rejects_coordinate_length_mismatch(nonuniform_grid):

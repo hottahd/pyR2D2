@@ -13,7 +13,7 @@ A :class:`pyR2D2.Data` instance can be created as follows:
 
 """
 
-from . import cpp_util, fortran_util, util, write
+from . import cpp_util, util, write
 from .color import color
 from .constant import constant
 from .cpp_util import EOS
@@ -54,7 +54,6 @@ __all__ = [
     "constant",
     "write",
     "util",
-    "fortran_util",
     "cpp_util",
 ]
 
