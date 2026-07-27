@@ -197,7 +197,7 @@ def run_pyR2D2(app):
     import os
     import pyR2D2
     directory = os.path.dirname(__file__)
-    pyR2D2.Data(directory+'/../../test/data/')
+    pyR2D2.Data(directory+'/../../tests/data/')
 def setup(app):
     # Connect the hook to the autodoc event in Sphinx
     app.connect("autodoc-process-docstring", autodoc_process_docstring)

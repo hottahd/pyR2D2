@@ -45,4 +45,4 @@ d = pyR2D2.Data(datadir)
 
 ## Documentation
 
-https://hottahd.github.io/pyR2D2/master
+https://hottahd.github.io/pyR2D2/
