@@ -5,11 +5,141 @@
 #include "rte.hpp"
 #include "yin_yang_convert.hpp"
 #include "field_line.hpp"
+#include "derivative.hpp"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(cpp_util, m)
 {
+    //
+    // Fourth-order derivatives on nonuniform grids
+    //
+    // clang-format off
+    m.def(
+        "d_x",
+        &derivative_detail::derivative_dispatch<0>,
+        py::arg("x"),
+        py::arg("qq"),
+        R"doc(
+        Differentiate a three-dimensional array along the x axis.
+
+        A four-point centered formula is evaluated on a possibly nonuniform
+        coordinate grid. The input array is not copied.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            One-dimensional x-coordinate array. Its length must equal
+            ``qq.shape[0]``. It is converted to C-contiguous float64 when
+            necessary.
+        qq : numpy.ndarray
+            Three-dimensional, C-contiguous, native-endian array with dtype
+            float32 or float64 and shape ``(nx, ny, nz)``.
+
+        Returns
+        -------
+        numpy.ndarray
+            C-contiguous derivative array with the same shape and dtype as
+            ``qq``.
+
+        Raises
+        ------
+        TypeError
+            If ``qq`` is not native-endian float32 or float64.
+        ValueError
+            If the array shape, memory layout, coordinate length, or
+            coordinate values are invalid.
+
+        Notes
+        -----
+        The first and last two x planes are set to zero. Coefficients and
+        intermediate sums are evaluated in float64. The main loop releases
+        the Python GIL and is parallelized with OpenMP.
+        )doc");
+    m.def(
+        "d_y",
+        &derivative_detail::derivative_dispatch<1>,
+        py::arg("y"),
+        py::arg("qq"),
+        R"doc(
+        Differentiate a three-dimensional array along the y axis.
+
+        A four-point centered formula is evaluated on a possibly nonuniform
+        coordinate grid. The input array is not copied.
+
+        Parameters
+        ----------
+        y : numpy.ndarray
+            One-dimensional y-coordinate array. Its length must equal
+            ``qq.shape[1]``. It is converted to C-contiguous float64 when
+            necessary.
+        qq : numpy.ndarray
+            Three-dimensional, C-contiguous, native-endian array with dtype
+            float32 or float64 and shape ``(nx, ny, nz)``.
+
+        Returns
+        -------
+        numpy.ndarray
+            C-contiguous derivative array with the same shape and dtype as
+            ``qq``.
+
+        Raises
+        ------
+        TypeError
+            If ``qq`` is not native-endian float32 or float64.
+        ValueError
+            If the array shape, memory layout, coordinate length, or
+            coordinate values are invalid.
+
+        Notes
+        -----
+        The first and last two y planes are set to zero. Coefficients and
+        intermediate sums are evaluated in float64. The main loop releases
+        the Python GIL and is parallelized with OpenMP.
+        )doc");
+    m.def(
+        "d_z",
+        &derivative_detail::derivative_dispatch<2>,
+        py::arg("z"),
+        py::arg("qq"),
+        R"doc(
+        Differentiate a three-dimensional array along the z axis.
+
+        A four-point centered formula is evaluated on a possibly nonuniform
+        coordinate grid. The input array is not copied.
+
+        Parameters
+        ----------
+        z : numpy.ndarray
+            One-dimensional z-coordinate array. Its length must equal
+            ``qq.shape[2]``. It is converted to C-contiguous float64 when
+            necessary.
+        qq : numpy.ndarray
+            Three-dimensional, C-contiguous, native-endian array with dtype
+            float32 or float64 and shape ``(nx, ny, nz)``.
+
+        Returns
+        -------
+        numpy.ndarray
+            C-contiguous derivative array with the same shape and dtype as
+            ``qq``.
+
+        Raises
+        ------
+        TypeError
+            If ``qq`` is not native-endian float32 or float64.
+        ValueError
+            If the array shape, memory layout, coordinate length, or
+            coordinate values are invalid.
+
+        Notes
+        -----
+        The first and last two z planes are set to zero. Coefficients and
+        intermediate sums are evaluated in float64. The main loop releases
+        the Python GIL and is parallelized with OpenMP.
+        )doc");
+    // clang-format on
+
 
     //
     // EOS
