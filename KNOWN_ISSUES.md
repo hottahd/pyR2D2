@@ -17,9 +17,9 @@ rt(j, k) = rt1d[ro.i_size - 2];
 - **症状**: クラッシュせずに他の変数の値が壊れる、サイレントな計算結果の破損。
 - **対応内容**: `rt_np`の宣言を`{ro.i_size, ro.j_size, ro.k_size}`から`{ro.j_size, ro.k_size}`(2次元)に変更。`vertical_upward_rte`のdocstringも「2D array」と明記されており、`view_array`は次元数を可変に扱える設計のため、この修正で意図通りの2次元配置になった。`python setup.py clean --all` → `python setup.py build_ext --inplace`でリビルドし、コンパイル成功・importも正常に確認済み。
 
-## 検証済み・未修正
+## 解決済み(続き)
 
-### 2. データ消失リスク: `Data.zip_time` (`pyR2D2/data.py:130-150`)
+### 2. データ消失リスク: `Data.zip_time` (`pyR2D2/data.py:130-150`) — 2026-07-27 修正済み
 
 ```python
 with zipfile.ZipFile(dst, "a", ...) as zf:
@@ -33,7 +33,9 @@ with zipfile.ZipFile(dst, "a", ...) as zf:
 - zipファイルの目次(central directory)は`with`ブロックを抜けて`close()`されるまで確定しない。
 - **発生条件**: 大量ファイルをアーカイブ中に、HPCジョブのタイムアウトやOOM Killなどでプロセスが強制終了。
 - **症状**: zipが壊れて読めない状態のまま、元ファイルはすでに削除済み。再生成不可能なシミュレーションデータの消失。
-- **直し方の方向性**: 全ファイルの`zf.write()`が終わって`with`ブロックを抜けた後にまとめて`os.remove()`する(書き込みと削除のループを分離する)。
+- **対応内容**: 削除対象を`pending_removal`リストに集約し、`os.remove()`は`with`ブロックを抜けて(zipの目次が確定して)から実行するように変更。書き込みと削除のタイミングを分離した。一時ディレクトリを使った手動テスト(新規書き込み+削除、既存エントリのスキップ、2回目呼び出しでの追記)で動作確認済み。既存のpytestスイート(114件)も全てパス。
+
+## 検証済み・未修正
 
 ### 3. データ消失リスク: `check()`が「未確認」を「安全」と誤判定 (`pyR2D2/data_io/read.py:818-823`, 同様のパターンが`Slice.check`約1969行目, `_BasePrevAftr.check`約2503行目にもあり)
 
@@ -88,7 +90,7 @@ rt(j, k) = rt1d[ro.i_size - 2];
 ## 優先度メモ
 
 1. ~~`rte.hpp:152` (メモリ破壊)~~ — 2026-07-27 修正済み
-2. `data.py`の`zip_time` (データ消失) — 優先
+2. ~~`data.py`の`zip_time` (データ消失)~~ — 2026-07-27 修正済み
 3. `read.py`の`check()` (データ消失) — 優先
 4. `rte.hpp`のオフバイワン疑い — 判断待ち
 5. その他の未検証項目 — 時間があれば個別に確認・修正

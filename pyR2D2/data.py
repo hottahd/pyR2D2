@@ -125,6 +125,12 @@ class Data:
         if not src.exists():
             raise FileNotFoundError(f"{src} does not exist")
 
+        # Files are only deleted after the zip archive below is fully closed
+        # (its central directory flushed to disk), so a crash or kill
+        # partway through archiving cannot delete originals that were never
+        # actually persisted in a readable zip.
+        pending_removal = []
+
         # zipfile.ZIP_STORED is used to avoid compression, which can be slow for many small files.
         # allowZip64=True is used to support large zip files.
         with zipfile.ZipFile(
@@ -147,7 +153,10 @@ class Data:
                     existing.add(arcname)
 
                 if remove_original:
-                    os.remove(p)
+                    pending_removal.append(p)
+
+        for p in pending_removal:
+            os.remove(p)
 
     def time_read(self, n, tau=False, verbose=True, use_zip=False):
         """
