@@ -18,6 +18,7 @@ R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の�
    environment
    typical_case
    pyr2d2
+   data_compression
    api_reference
    sphinx.rst
    paraview.rst
