@@ -85,7 +85,7 @@ py::array_t<float> vertical_upward_rte(
   auto se = view_array<float>(se_np);
   auto x = view_array<float>(x_np);
 
-  py::array_t<float> rt_np({ro.i_size, ro.j_size, ro.k_size});
+  py::array_t<float> rt_np({ro.j_size, ro.k_size});
   auto rt = view_array<float>(rt_np);
 
   py::array_t<float> op_np = eos.eval(ro_np, se_np, "op");
