@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2 &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
+  <title>pyR2D2 &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -15,13 +15,13 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=ac5e0687"></script>
+      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pyR2D2 API Reference" href="api_reference.html" />
+    <link rel="next" title="データ圧縮" href="data_compression.html" />
     <link rel="prev" title="典型的計算例" href="typical_case.html" /> 
 </head>
 
@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#pyr2d2-data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
@@ -92,10 +93,14 @@
 <p>R2D2で実施した計算を取り扱うためのPythonモジュールを公開している。</p>
 <p><a class="reference external" href="https://github.com/hottahd/pyR2D2">https://github.com/hottahd/pyR2D2</a></p>
 <p>You can install it by cloning the repository and running pip install as</p>
-<p>以下のようにしてインストールできる。</p>
+<p>以下のようにしてインストールできる。データの読み込みには <code class="code docutils literal notranslate"><span class="pre">zarr</span></code> パッケージが必要なので、通常は <code class="code docutils literal notranslate"><span class="pre">[zarr]</span></code> を付けてインストールする。</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/hottahd/pyR2D2
 <span class="nb">cd</span><span class="w"> </span>pyR2D2
-pip<span class="w"> </span>install<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>zarr<span class="o">]</span>
+</pre></div>
+</div>
+<p>matplotlibを使ったプロット機能もあわせて使いたい場合は <code class="code docutils literal notranslate"><span class="pre">[all]</span></code> を指定する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>all<span class="o">]</span>
 </pre></div>
 </div>
 <p>Here is a simple example of how to use the pyR2D2 module.</p>
@@ -120,7 +125,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
 <p>などとすると実行環境で、モジュール全体や各関数の簡単な説明を見ることができる。</p>
-<p>最終更新日：Apr 28, 2026</p>
+<p>最終更新日：Jul 27, 2026</p>
 </section>
 </section>
 
@@ -129,7 +134,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="typical_case.html" class="btn btn-neutral float-left" title="典型的計算例" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api_reference.html" class="btn btn-neutral float-right" title="pyR2D2 API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="data_compression.html" class="btn btn-neutral float-right" title="データ圧縮" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

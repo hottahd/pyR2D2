@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.data &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
+  <title>pyR2D2.data &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ac5e0687"></script>
+      <script src="../../_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">pyR2D2 API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
@@ -79,6 +80,7 @@
              
   <h1>Source code for pyR2D2.data</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -162,12 +164,12 @@
         <span class="n">eosdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;input_data&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">eosdir</span> <span class="o">/</span> <span class="s2">&quot;eos_table_sero.npz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eos</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">cpp_util</span><span class="o">.</span><span class="n">EOS</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_ro_e</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">se_e</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_pr_e</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_en_e</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_te_e</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log_op_e</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_ro_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">se_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_pr_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_en_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_te_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_op_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;YinYang&quot;</span><span class="p">:</span>
@@ -191,9 +193,63 @@
             <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="p">)</span>
 
+<div class="viewcode-block" id="Data.zip_time">
+<a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.zip_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zip_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Archive datadir/time into datadir/time.zip.</span>
+
+<span class="sd">        Existing entries in time.zip are skipped.</span>
+<span class="sd">        Newly added files under time/ are appended.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        remove_original : bool, optional</span>
+<span class="sd">            If True, remove the original files after archiving. Default is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time.zip&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Files are only deleted after the zip archive below is fully closed</span>
+        <span class="c1"># (its central directory flushed to disk), so a crash or kill</span>
+        <span class="c1"># partway through archiving cannot delete originals that were never</span>
+        <span class="c1"># actually persisted in a readable zip.</span>
+        <span class="n">pending_removal</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># zipfile.ZIP_STORED is used to avoid compression, which can be slow for many small files.</span>
+        <span class="c1"># allowZip64=True is used to support large zip files.</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span>
+            <span class="n">dst</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_STORED</span><span class="p">,</span> <span class="n">allowZip64</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+            <span class="c1"># set is used to avoid duplicate entries in the zip file</span>
+            <span class="n">existing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+                <span class="c1"># Skip directories and non-files</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Create a relative path for the archive name</span>
+                <span class="n">arcname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">))</span>
+
+                <span class="c1"># Skip if the file already exists in the zip archive</span>
+                <span class="k">if</span> <span class="n">arcname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">:</span>
+                    <span class="n">zf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">arcname</span><span class="p">)</span>
+                    <span class="n">existing</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">arcname</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">remove_original</span><span class="p">:</span>
+                    <span class="n">pending_removal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pending_removal</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Data.time_read">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.time_read">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">time_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_zip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads time at a selected time step</span>
 <span class="sd">        The data is stored in self.t</span>
@@ -204,6 +260,11 @@
 <span class="sd">            selected time step for data</span>
 <span class="sd">        tau : bool</span>
 <span class="sd">            if True time for optical depth (high cadence)</span>
+<span class="sd">        verbose: bool</span>
+<span class="sd">            if True, print a message indicating that the time variable has been stored in self.time</span>
+<span class="sd">        use_zip: bool</span>
+<span class="sd">            if True, read time from time.zip instead of the original files</span>
+<span class="sd">            if False, read from the original file if it exists; otherwise, fall back to time.zip.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -211,19 +272,28 @@
 <span class="sd">            time at a selected time step</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">tau</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="s2">&quot;tau&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                    <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span>
+        <span class="n">subdir</span> <span class="o">=</span> <span class="s2">&quot;tau&quot;</span> <span class="k">if</span> <span class="n">tau</span> <span class="k">else</span> <span class="s2">&quot;mhd&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="n">subdir</span> <span class="o">/</span> <span class="n">filename</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">use_zip</span><span class="p">:</span>
+            <span class="n">zippath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time.zip&quot;</span>
+            <span class="n">arcname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;time/</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zippath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">arcname</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+                    <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="s2">&quot;mhd&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
-                    <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span>
-                <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;### variales are stored in self.time ###&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;### time is stored in self.time ###&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span></div>
 

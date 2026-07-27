@@ -13,13 +13,19 @@ https://github.com/hottahd/pyR2D2
 
 You can install it by cloning the repository and running pip install as
 
-以下のようにしてインストールできる。
+以下のようにしてインストールできる。データの読み込みには :code:`zarr` パッケージが必要なので、通常は :code:`[zarr]` を付けてインストールする。
 
 .. code-block:: bash
 
     git clone https://github.com/hottahd/pyR2D2
     cd pyR2D2
-    pip install .
+    pip install .[zarr]
+
+matplotlibを使ったプロット機能もあわせて使いたい場合は :code:`[all]` を指定する。
+
+.. code-block:: bash
+
+    pip install .[all]
 
 Here is a simple example of how to use the pyR2D2 module.
 

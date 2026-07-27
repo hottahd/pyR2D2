@@ -1,0 +1,6 @@
+eval_tau
+========
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autofunction:: eval_tau

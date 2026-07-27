@@ -1,0 +1,6 @@
+d_x
+===
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autofunction:: d_x

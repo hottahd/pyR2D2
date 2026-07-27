@@ -24,7 +24,7 @@ Markdownを使いたい時は以下のようにする。
 
 .. sourcecode:: shell
 		
-   pip install commonmark recommonmark
+   conda install commonmark recommonmark
 
 HTMLファイルの生成
 --------------------------------

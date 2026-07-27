@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>データ圧縮 &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyR2D2 API Reference" href="api_reference.html" />
+    <link rel="prev" title="pyR2D2" href="pyr2d2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">データ圧縮</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">概要</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compress-zarr">compress(): バイナリファイルをzarrにまとめる</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#check-delete">check() と delete(): 元データの安全な削除</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zip">zip(): ファイル数制限への対策</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#time-zip">time.zip: 時刻ファイルの圧縮</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">典型的なワークフロー</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">データ圧縮</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/data_compression.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>データ圧縮<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>概要<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>R2D2の計算では、1タイムステップごとにMPIランクの数だけバイナリファイルが出力される(<code class="docutils literal notranslate"><span class="pre">data/remap/qq/*/*/qq.dac.NNNNNNNN.MMMMMMMM</span></code> のような形式)。このままでは解析のたびに大量のファイルを読み込む必要があり、ディスク容量も圧迫する。pyR2D2は、これらを <a class="reference external" href="https://zarr.readthedocs.io/">zarr</a> ストアにまとめる <code class="docutils literal notranslate"><span class="pre">compress()</span></code> によって、</p>
+<ul class="simple">
+<li><p><strong>データサイズを小さくする</strong>: 2つの方法を組み合わせている。</p>
+<ol class="arabic simple">
+<li><p>zarr側でBlosc/zstdによる圧縮をかける</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pr</span></code> (圧力) や <code class="docutils literal notranslate"><span class="pre">te</span></code> (温度)、<code class="docutils literal notranslate"><span class="pre">op</span></code> (不透明度) のように、保存されている <code class="docutils literal notranslate"><span class="pre">ro</span></code> (密度) と <code class="docutils literal notranslate"><span class="pre">se</span></code> (エントロピー) からEOS(状態方程式)経由で後から計算できる変数は、デフォルトでは保存しない</p></li>
+</ol>
+</li>
+<li><p><strong>データアクセスを最適化する</strong>(チャンク単位で必要な部分だけを読み込める)</p></li>
+</ul>
+<p>という2つの目的を実現する。</p>
+<p>ただし、zarrストア自体は多数の小さいファイルからなるディレクトリなので、そのままだと今度はディレクトリ内のファイル数が非常に多くなる。Gfarm(HPCI共用ストレージなど)のようにファイル数に厳しい制限があるファイルシステムでは、これが新たな問題になる。そこでpyR2D2は、zarrストアを1つの <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> ファイルにまとめる機能(<code class="docutils literal notranslate"><span class="pre">zip()</span></code>)も用意している。</p>
+<p>このページでは、次の3つの機能を使ったデータ圧縮のワークフローを説明する。</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compress()</span></code>: バラバラのバイナリファイルを1つのzarrストアにまとめる(サイズ削減・アクセス最適化)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check()</span></code> / <code class="docutils literal notranslate"><span class="pre">delete()</span></code>: zarrストアが元データと一致することを確認してから、元のバイナリファイルを削除する</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zip()</span></code> (<code class="docutils literal notranslate"><span class="pre">pyR2D2.zarr_util.zip_zarr</span></code>): zarrストアを1つの <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> ファイルにまとめる(ファイル数制限への対策。後述の通り、目的が異なるので無条件には使わない)</p></li>
+</ol>
+<p>対象となるデータの種類ごとに、 <a class="reference internal" href="api/pyR2D2.FullData.html#pyR2D2.FullData" title="pyR2D2.FullData"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.FullData</span></code></a> (<code class="docutils literal notranslate"><span class="pre">d.qf</span></code>)、<a class="reference internal" href="api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth" title="pyR2D2.OpticalDepth"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.OpticalDepth</span></code></a> (<code class="docutils literal notranslate"><span class="pre">d.qt</span></code>)、<a class="reference internal" href="api/pyR2D2.Slice.html#pyR2D2.Slice" title="pyR2D2.Slice"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Slice</span></code></a> (<code class="docutils literal notranslate"><span class="pre">d.qs</span></code>) が、それぞれ同じ名前のメソッドを提供している。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">delete()</span></code> は元のバイナリファイルを消去する <strong>不可逆な操作</strong> である。必ず <code class="docutils literal notranslate"><span class="pre">check()</span></code> (内部で自動的に呼ばれる)がパスすることを確認してから実行すること。<code class="docutils literal notranslate"><span class="pre">force=True</span></code> を指定するとこの確認をスキップして強制的に削除するので、通常は使用しない方が良い。</p>
+</div>
+</section>
+<section id="compress-zarr">
+<h2>compress(): バイナリファイルをzarrにまとめる<a class="headerlink" href="#compress-zarr" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> インスタンスを作成した後、3次元フルデータであれば <code class="docutils literal notranslate"><span class="pre">d.qf.compress()</span></code> を呼ぶ。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>デフォルトでは、<code class="docutils literal notranslate"><span class="pre">data/remap/qq/zarr/qq.NNNNNNNN.zarr</span></code> にzarrストアが作成される。すでに存在する場合は何もせずメッセージを表示するだけなので、上書きしたい場合は <code class="docutils literal notranslate"><span class="pre">overwrite=True</span></code> を指定する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>デフォルトで保存される変数は <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">vy</span></code>, <code class="docutils literal notranslate"><span class="pre">vz</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code>, <code class="docutils literal notranslate"><span class="pre">by</span></code>, <code class="docutils literal notranslate"><span class="pre">bz</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> の8つ(<code class="docutils literal notranslate"><span class="pre">zarr_keys</span></code>)である。<code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> はこれらから <a class="reference internal" href="api/pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS" title="pyR2D2.cpp_util.EOS"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.cpp_util.EOS</span></code></a> を使って後から計算できるため、デフォルトでは含まれない。これらが必要な場合は <code class="docutils literal notranslate"><span class="pre">keys</span></code> 引数で明示的に指定する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span> <span class="s2">&quot;se&quot;</span><span class="p">,</span> <span class="s2">&quot;pr&quot;</span><span class="p">,</span> <span class="s2">&quot;te&quot;</span><span class="p">,</span> <span class="s2">&quot;op&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>計算領域全体ではなく一部分だけを圧縮したい場合は、<code class="docutils literal notranslate"><span class="pre">i_start</span></code> / <code class="docutils literal notranslate"><span class="pre">i_size</span></code> / <code class="docutils literal notranslate"><span class="pre">j_start</span></code> / <code class="docutils literal notranslate"><span class="pre">j_size</span></code> / <code class="docutils literal notranslate"><span class="pre">k_start</span></code> / <code class="docutils literal notranslate"><span class="pre">k_size</span></code> で範囲を指定できる。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">i_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">i_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>データが大きくメモリに乗らない場合は、<code class="docutils literal notranslate"><span class="pre">lightweight=True</span></code> を指定すると変数を1つずつ読み込んで書き出すので、メモリ使用量を抑えられる。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lightweight</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>光学的厚さ一定面のデータ(<code class="docutils literal notranslate"><span class="pre">d.qt</span></code>)やスライスデータ(<code class="docutils literal notranslate"><span class="pre">d.qs</span></code>)でも同様に使える。スライスデータは方向(<code class="docutils literal notranslate"><span class="pre">'x'</span></code>, <code class="docutils literal notranslate"><span class="pre">'y'</span></code>, <code class="docutils literal notranslate"><span class="pre">'z'</span></code>)の指定が必要である。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qs</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">direc</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="check-delete">
+<h2>check() と delete(): 元データの安全な削除<a class="headerlink" href="#check-delete" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">compress()</span></code> でzarrストアを作成しても、元のバイナリファイルは自動的には消えない。作成したzarrストアが元のバイナリファイルと一致するかを確認するのが <code class="docutils literal notranslate"><span class="pre">check()</span></code> である。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="c1"># -&gt; &quot;Check passed at n=10&quot; のように表示され、True が返る</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">check()</span></code> は、zarrファイルの存在確認・変数の存在確認をした上で、実際にzarr経由とバイナリ経由の両方でデータを読み込み、数値が一致するかどうかを比較する。一致しない場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返す。</p>
+<p><code class="docutils literal notranslate"><span class="pre">delete()</span></code> は、内部で <code class="docutils literal notranslate"><span class="pre">check()</span></code> を呼び、パスした場合のみ元のバイナリファイルを削除する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">check()</span></code> を毎回実行したくない場合(すでに確認済みの場合など)は、<code class="docutils literal notranslate"><span class="pre">force=True</span></code> を指定すると確認をスキップしてそのまま削除する。前述の通り、事故を防ぐためこのオプションは慎重に使うこと。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># checkをスキップして削除。取り扱い注意</span>
+</pre></div>
+</div>
+</section>
+<section id="zip">
+<h2>zip(): ファイル数制限への対策<a class="headerlink" href="#zip" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">compress()</span></code> によってデータサイズ・アクセス速度の問題は解決するが、zarrストアの実体は多数の小さいファイルからなるディレクトリである。Gfarmなどファイル数に制限のあるファイルシステムでは、この点が新たな問題になる。<code class="docutils literal notranslate"><span class="pre">zip()</span></code> はこれを1つの <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> ファイルにまとめることで、ファイル数の問題を解消する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="c1"># -&gt; data/remap/qq/zarr/qq.NNNNNNNN.zarr.zip が作成される</span>
+</pre></div>
+</div>
+<p>zip化の際は圧縮を行わない(<code class="docutils literal notranslate"><span class="pre">ZIP_STORED</span></code>)。zarr側ですでにBlosc/zstdによる圧縮がかかっているため、二重に圧縮する必要がないからである。</p>
+<p>元のzarrディレクトリを消して良い場合は <code class="docutils literal notranslate"><span class="pre">remove_original=True</span></code> を指定する。この場合、zip化した内容が元のディレクトリと(配列の形・dtypeについて)一致することを確認してから削除するので、<code class="docutils literal notranslate"><span class="pre">delete()</span></code> と同様に安全に使える。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> になったデータは、読み込み時に特別な指定をしなくても自動的に認識される。<code class="docutils literal notranslate"><span class="pre">zarr_flag=True</span></code> で読み込む際、<code class="docutils literal notranslate"><span class="pre">.zarr</span></code> ディレクトリと <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> ファイルのどちらが存在してもそのまま読み込める。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">zarr_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>低レベルAPIとして、任意の <code class="docutils literal notranslate"><span class="pre">.zarr</span></code> ディレクトリに対して直接 <code class="docutils literal notranslate"><span class="pre">pyR2D2.zarr_util.zip_zarr</span></code> を呼ぶこともできる。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">zarr_util</span><span class="o">.</span><span class="n">zip_zarr</span><span class="p">(</span><span class="s1">&#39;path/to/data.zarr&#39;</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>zipすべきタイミングについて</strong></p>
+<p>zarrストアはディレクトリのまま(zip化しない)であれば、複数プロセスからの並列アクセスが可能である(ただしpyR2D2側でこれを積極的に活用する実装は現時点では用意されていない)。一方、<code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> にまとめると、そうした並列アクセスの余地は失われる。</p>
+<p>したがって、<code class="docutils literal notranslate"><span class="pre">zip()</span></code> は無条件に実行するのではなく、<strong>Gfarm(HPCI共用ストレージなど)のようにファイル数制限が厳しいシステムに保存する場合に限定して実行する</strong>のが良い。ローカルディスクや通常のPOSIXファイルシステムに置く場合は、zarrストアをディレクトリのまま(zip化せず)残しておく方が、将来的な並列アクセスの余地を残せる。</p>
+</div>
+</section>
+<section id="time-zip">
+<h2>time.zip: 時刻ファイルの圧縮<a class="headerlink" href="#time-zip" title="Link to this heading"></a></h2>
+<p>各タイムステップの出力時刻を記録した <code class="docutils literal notranslate"><span class="pre">data/time/</span></code> 以下のファイル群も、数が多くなりがちである。<a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data.zip_time" title="pyR2D2.Data.zip_time"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Data.zip_time()</span></code></a> を使うと、これらを <code class="docutils literal notranslate"><span class="pre">data/time.zip</span></code> にまとめられる。この操作もファイル数対策としての位置づけであり、<code class="docutils literal notranslate"><span class="pre">zip()</span></code> と同様の考え方(Gfarmなどファイル数制限の厳しい環境で使う)が当てはまる。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">zip_time</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>すでに <code class="docutils literal notranslate"><span class="pre">time.zip</span></code> に含まれているファイルはスキップされ、新しく追加されたファイルだけが追記される。元ファイルを消してよければ <code class="docutils literal notranslate"><span class="pre">remove_original=True</span></code> を指定する。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">zip_time</span><span class="p">(</span><span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">time_read()</span></code> は、デフォルトでは元ファイルを優先して読み込み、存在しない場合に <code class="docutils literal notranslate"><span class="pre">time.zip</span></code> から読み込む。<code class="docutils literal notranslate"><span class="pre">use_zip=True</span></code> を指定すると、常に <code class="docutils literal notranslate"><span class="pre">time.zip</span></code> から読み込む。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">use_zip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>典型的なワークフロー<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>計算が完了したタイムステップについて、まとめて圧縮・確認・削除を行う例を示す。ここでは、通常のディスクに保存する場合(<code class="docutils literal notranslate"><span class="pre">zip()</span></code> は行わない)と、Gfarmのようなファイル数制限の厳しいストレージに保存する場合(<code class="docutils literal notranslate"><span class="pre">zip()</span></code> まで行う)の2通りを示す。</p>
+<p><strong>通常のディスクに保存する場合</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Gfarmなど、ファイル数制限の厳しいストレージに保存する場合</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files&quot;</span><span class="p">)</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">zip_time</span><span class="p">(</span><span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>計算がまだ進行中のディレクトリに対してこの処理を行う場合、計算プロセスが書き込み中のファイルを誤って対象にしないよう注意すること。基本的には、計算が完全に終了した(あるいは十分に古い)タイムステップに対してのみ実行するのが安全である。</p>
+</div>
+<p>最終更新日：Jul 27, 2026</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyr2d2.html" class="btn btn-neutral float-left" title="pyR2D2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_reference.html" class="btn btn-neutral float-right" title="pyR2D2 API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

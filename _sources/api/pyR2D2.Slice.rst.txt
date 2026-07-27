@@ -21,6 +21,7 @@ Slice
       ~Slice.delete
       ~Slice.read
       ~Slice.xyz_slice_select
+      ~Slice.zip
 
    .. rubric:: Attributes Documentation
 
@@ -33,3 +34,4 @@ Slice
    .. automethod:: delete
    .. automethod:: read
    .. automethod:: xyz_slice_select
+   .. automethod:: zip

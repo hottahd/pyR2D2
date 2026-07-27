@@ -1,0 +1,6 @@
+spherical2cartesian
+===================
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autofunction:: spherical2cartesian

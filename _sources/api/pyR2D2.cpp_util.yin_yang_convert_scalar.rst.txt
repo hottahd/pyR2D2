@@ -1,6 +1,0 @@
-yin_yang_convert_scalar
-=======================
-
-.. currentmodule:: pyR2D2.cpp_util
-
-.. autofunction:: yin_yang_convert_scalar

@@ -6,12 +6,30 @@ OpticalDepth
 .. autoclass:: OpticalDepth
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~OpticalDepth.zarr_keys
+
    .. rubric:: Methods Summary
 
    .. autosummary::
 
+      ~OpticalDepth.check
+      ~OpticalDepth.compress
+      ~OpticalDepth.delete
       ~OpticalDepth.read
+      ~OpticalDepth.zip
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: zarr_keys
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: check
+   .. automethod:: compress
+   .. automethod:: delete
    .. automethod:: read
+   .. automethod:: zip

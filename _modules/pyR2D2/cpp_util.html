@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR2D2.cpp_util &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5a6b2f01"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">pyR2D2 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyR2D2.cpp_util</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyR2D2.cpp_util</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utilities backed by the C++ extension module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cpp_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EOS</span><span class="p">,</span>
+    <span class="n">YinYang</span><span class="p">,</span>
+    <span class="n">d_x</span> <span class="k">as</span> <span class="n">_d_x_3d</span><span class="p">,</span>
+    <span class="n">d_y</span> <span class="k">as</span> <span class="n">_d_y_3d</span><span class="p">,</span>
+    <span class="n">d_z</span> <span class="k">as</span> <span class="n">_d_z_3d</span><span class="p">,</span>
+    <span class="n">eval_tau</span><span class="p">,</span>
+    <span class="n">interp</span><span class="p">,</span>
+    <span class="n">spherical2cartesian</span><span class="p">,</span>
+    <span class="n">trace_field_line</span><span class="p">,</span>
+    <span class="n">vertical_upward_rte</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_derivative_input_3d</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;1D・2D入力へsingleton軸を加え、C++コア用の3D viewを返す。&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">qq</span>
+
+    <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">qq</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># d_yでは(y, z)と(x, y)の二通りがある。正方配列など両方に</span>
+        <span class="c1"># 一致する場合は、従来どおり第0軸をyと解釈する。</span>
+        <span class="n">coordinate_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinate</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">coordinate_size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">coordinate_size</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">qq</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;coordinate length must match one axis of a 2D input for d_y&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;qq must be a 1D, 2D, or 3D array&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_differentiate</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">derivative_3d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;3D C++コアを呼び、追加コピーなしで入力shapeのviewへ戻す。&quot;&quot;&quot;</span>
+    <span class="n">input_3d</span> <span class="o">=</span> <span class="n">_derivative_input_3d</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
+    <span class="n">result_3d</span> <span class="o">=</span> <span class="n">derivative_3d</span><span class="p">(</span><span class="n">coordinate</span><span class="p">,</span> <span class="n">input_3d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">result_3d</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result_3d</span>
+    <span class="k">return</span> <span class="n">result_3d</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="d_x">
+<a class="viewcode-back" href="../../api/pyR2D2.cpp_util.d_x.html#pyR2D2.cpp_util.d_x">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">d_x</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">qq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differentiate an array along its x axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : numpy.ndarray</span>
+<span class="sd">        One-dimensional x-coordinate array.</span>
+<span class="sd">    qq : numpy.ndarray</span>
+<span class="sd">        One-, two-, or three-dimensional, C- or F-contiguous,</span>
+<span class="sd">        native-endian float32 or float64 array. Its first axis is x.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        C-contiguous derivative with the same shape and dtype as ``qq``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Singleton axes are added only as views while the three-dimensional C++</span>
+<span class="sd">    core runs. No input copy is made. The first and last two x cells are zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_differentiate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">derivative_3d</span><span class="o">=</span><span class="n">_d_x_3d</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="d_y">
+<a class="viewcode-back" href="../../api/pyR2D2.cpp_util.d_y.html#pyR2D2.cpp_util.d_y">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">d_y</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">qq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differentiate an array along its y axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : numpy.ndarray</span>
+<span class="sd">        One-dimensional y-coordinate array.</span>
+<span class="sd">    qq : numpy.ndarray</span>
+<span class="sd">        One-, two-, or three-dimensional, C- or F-contiguous,</span>
+<span class="sd">        native-endian float32 or float64 array. A 2D input is interpreted as</span>
+<span class="sd">        ``(y, z)`` if its first axis matches ``y``; otherwise as ``(x, y)``</span>
+<span class="sd">        if its second axis matches ``y``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        C-contiguous derivative with the same shape and dtype as ``qq``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Singleton axes are added only as views while the three-dimensional C++</span>
+<span class="sd">    core runs. No input copy is made. The first and last two y cells are zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_differentiate</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">derivative_3d</span><span class="o">=</span><span class="n">_d_y_3d</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="d_z">
+<a class="viewcode-back" href="../../api/pyR2D2.cpp_util.d_z.html#pyR2D2.cpp_util.d_z">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">d_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">qq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differentiate an array along its z axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    z : numpy.ndarray</span>
+<span class="sd">        One-dimensional z-coordinate array.</span>
+<span class="sd">    qq : numpy.ndarray</span>
+<span class="sd">        One-, two-, or three-dimensional, C- or F-contiguous,</span>
+<span class="sd">        native-endian float32 or float64 array. Its last axis is z.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        C-contiguous derivative with the same shape and dtype as ``qq``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Singleton axes are added only as views while the three-dimensional C++</span>
+<span class="sd">    core runs. No input copy is made. The first and last two z cells are zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_differentiate</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">derivative_3d</span><span class="o">=</span><span class="n">_d_z_3d</span><span class="p">)</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;EOS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;YinYang&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d_x&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d_y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d_z&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eval_tau&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;interp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spherical2cartesian&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vertical_upward_rte&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trace_field_line&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

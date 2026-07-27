@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.sync.sync &mdash; R2D2 Document 0.1.2.dev46+dirty documentation</title>
+  <title>pyR2D2.sync.sync &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=c0d794c6"></script>
+      <script src="../../../_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
@@ -136,7 +137,7 @@
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.setup">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span>
-        <span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
+        <span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads setting data from remote server</span>
@@ -154,6 +155,9 @@
 <span class="sd">        dist :str</span>
 <span class="sd">            Destination of data directory</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s2">&quot;--exclude=a.out&quot;</span><span class="p">,</span>
@@ -180,7 +184,7 @@
 
 <div class="viewcode-block" id="Sync.tau">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.tau">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads data at constant optical depth</span>
 
@@ -193,6 +197,9 @@
 <span class="sd">        project : str</span>
 <span class="sd">            Name of project such as &#39;R2D2&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
@@ -219,7 +226,7 @@
 
 <div class="viewcode-block" id="Sync.remap_qq">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.remap_qq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">remap_qq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_qq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads full 3D remap data</span>
 
@@ -234,6 +241,9 @@
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
 
@@ -288,7 +298,7 @@
 <div class="viewcode-block" id="Sync.xselect">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.xselect">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">xselect</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads data at certain height</span>
@@ -304,6 +314,9 @@
 <span class="sd">            project : str</span>
 <span class="sd">                Name of project such as &#39;R2D2&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">i0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">xs</span><span class="p">))</span>
         <span class="n">ir0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2ir</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span>
@@ -366,7 +379,7 @@
 
 <div class="viewcode-block" id="Sync.vc">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.vc">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">vc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads pre analyzed data</span>
 
@@ -379,6 +392,9 @@
 <span class="sd">        project : str</span>
 <span class="sd">            Name of project such as &#39;R2D2&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
         <span class="n">Sync</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">)</span>
@@ -395,7 +411,7 @@
 <div class="viewcode-block" id="Sync.check">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.check">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads checkpoint data</span>
@@ -413,6 +429,9 @@
 <span class="sd">        end_step : bool</span>
 <span class="sd">            If true, checkpoint of end step is read</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">step</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 
@@ -489,7 +508,7 @@
         <span class="n">direc</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
         <span class="n">n_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span>
-        <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads slice data</span>
@@ -509,6 +528,9 @@
 <span class="sd">        project : str</span>
 <span class="sd">            Name of project such as &#39;R2D2&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
@@ -550,7 +572,7 @@
 <div class="viewcode-block" id="Sync.all">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.all">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">all</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method downloads all the data</span>
@@ -566,6 +588,9 @@
 <span class="sd">        dist :str</span>
 <span class="sd">            Destination of data directory</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>

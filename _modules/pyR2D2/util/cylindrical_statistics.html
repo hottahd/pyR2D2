@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR2D2.util.cylindrical_statistics &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5a6b2f01"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            R2D2 Document
+              <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">R2D2 Document</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyR2D2.util.cylindrical_statistics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyR2D2.util.cylindrical_statistics</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">_VALID_STATS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span> <span class="s2">&quot;cov&quot;</span><span class="p">,</span> <span class="s2">&quot;corr&quot;</span><span class="p">})</span>
+<span class="n">_PAIR_STATS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;cov&quot;</span><span class="p">,</span> <span class="s2">&quot;corr&quot;</span><span class="p">})</span>
+
+
+<div class="viewcode-block" id="CylindricalStatistics">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.CylindricalStatistics.html#pyR2D2.util.CylindricalStatistics">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CylindricalStatistics</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes per-x-plane statistics of qq[x, y, z] over concentric radial</span>
+<span class="sd">    bins around a horizontal (y, z) center, producing e.g. qq_mean[x, r],</span>
+<span class="sd">    qq_rms[x, r], and (given a second field) their covariance/correlation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CylindricalStatistics.__init__">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.CylindricalStatistics.html#pyR2D2.util.CylindricalStatistics.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">yc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">zc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        y : ndarray</span>
+<span class="sd">            1D coordinate array along the horizontal y-axis.</span>
+<span class="sd">        z : ndarray</span>
+<span class="sd">            1D coordinate array along the horizontal z-axis.</span>
+<span class="sd">        yc : float, optional</span>
+<span class="sd">            Center of the polar coordinate system along y.</span>
+<span class="sd">        zc : float, optional</span>
+<span class="sd">            Center of the polar coordinate system along z.</span>
+<span class="sd">        dr : float or None, optional</span>
+<span class="sd">            Width of each radial bin, in the same units as y/z.</span>
+<span class="sd">            Determines the resolution of the r-axis in compute()&#39;s</span>
+<span class="sd">            output (see `bin_radius`). Defaults to the mean grid</span>
+<span class="sd">            spacing of `y`, matching the resolution of the source grid.</span>
+<span class="sd">        rmax : float or None, optional</span>
+<span class="sd">            Maximum radius r to include; grid points farther than this are</span>
+<span class="sd">            dropped, and it sets the outer edge of the last radial</span>
+<span class="sd">            bin. Defaults to the largest radius present in the (y, z)</span>
+<span class="sd">            grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">z</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y and z must be 1D coordinate arrays&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">jx</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kx</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dr</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dr</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dr must be a positive value&quot;</span><span class="p">)</span>
+
+        <span class="c1"># shape = (jx, kx)</span>
+        <span class="n">grid_radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span>
+            <span class="n">y</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">yc</span><span class="p">,</span>
+            <span class="n">z</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">zc</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rmax</span> <span class="o">=</span> <span class="n">grid_radius</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">rmax</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmax</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rmax must be a positive value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rmax</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dr</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Grid points to include in the averaging</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">grid_radius</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmax</span>
+
+        <span class="c1"># Flat-array positions of grid points within rmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_grid_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+        <span class="c1"># Radial bin index for each valid grid point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_radial_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
+            <span class="n">grid_radius</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_grid_index</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dr</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin_radius</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dr</span>
+
+        <span class="c1"># Grid point count per bin, shared across all x-planes when there are no NaNs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_radial_bin</span><span class="p">,</span>
+            <span class="n">minlength</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Cache for compute()&#39;s per-chunk_size combined_bin array (see</span>
+        <span class="c1"># compute()), keyed by chunk_size since that is the only compute()</span>
+        <span class="c1"># input it depends on.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache_chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_bin_average</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">combined_bin_valid</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">counts</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">chunk_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">out</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sums `weights` per (plane, bin) via `combined_bin_valid` (see</span>
+<span class="sd">        compute()) and divides by `counts`, writing into `out` if given</span>
+<span class="sd">        (else a fresh NaN-filled buffer). Bins with counts == 0 keep</span>
+<span class="sd">        whatever `out` already held there (NaN, by this class&#39;s</span>
+<span class="sd">        NaN-default convention), since np.divide&#39;s `where` skips them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">chunk_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="n">sums</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
+            <span class="n">combined_bin_valid</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">minlength</span><span class="o">=</span><span class="n">chunk_len</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">chunk_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">)</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">sums</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">counts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="CylindricalStatistics.compute">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.CylindricalStatistics.html#pyR2D2.util.CylindricalStatistics.compute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">qq</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,),</span>
+        <span class="n">qq2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">condition_field</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qq : ndarray, shape (jx, kx) or (ix, jx, kx)</span>
+<span class="sd">            If 2D, treated as a single x-plane.</span>
+<span class="sd">        chunk_size : int</span>
+<span class="sd">            Number of x-planes processed at once. Tune based on</span>
+<span class="sd">            available memory.</span>
+<span class="sd">        stats : sequence of {&quot;mean&quot;, &quot;rms&quot;, &quot;cov&quot;, &quot;corr&quot;}</span>
+<span class="sd">            Which statistics to compute. &quot;rms&quot; is the population standard</span>
+<span class="sd">            deviation (divisor N, not N-1) of qq&#39;s deviation from its own</span>
+<span class="sd">            bin mean. &quot;cov&quot; and &quot;corr&quot; are the population covariance and</span>
+<span class="sd">            Pearson correlation coefficient (also divisor N) between qq</span>
+<span class="sd">            and `qq2`, and require `qq2` to be given. Requesting multiple</span>
+<span class="sd">            stats in one call is cheaper than separate calls, since the</span>
+<span class="sd">            gather and per-bin sums/counts are shared between them.</span>
+<span class="sd">        qq2 : ndarray, shape matching qq, or None</span>
+<span class="sd">            Second field for &quot;cov&quot;/&quot;corr&quot;. A grid point contributes to</span>
+<span class="sd">            &quot;cov&quot;/&quot;corr&quot; only where both qq and qq2 are finite (and pass</span>
+<span class="sd">            `condition`, if given) -- a narrower set than &quot;mean&quot;/&quot;rms&quot;</span>
+<span class="sd">            use for qq alone, so requesting e.g. [&quot;mean&quot;, &quot;cov&quot;] together</span>
+<span class="sd">            does not change what &quot;mean&quot; would have been on its own.</span>
+<span class="sd">        condition_field : ndarray, shape matching qq, or None</span>
+<span class="sd">            Field to evaluate `condition` against for conditional</span>
+<span class="sd">            averaging (e.g. average qq only where vertical velocity is</span>
+<span class="sd">            positive). Gathered and evaluated one chunk at a time, same</span>
+<span class="sd">            as qq, so no full-size mask array is ever materialized.</span>
+<span class="sd">            Defaults to qq itself when `condition` is given. Ignored if</span>
+<span class="sd">            `condition` is None.</span>
+<span class="sd">        condition : callable or None</span>
+<span class="sd">            Called once per chunk as `condition(condition_field_chunk)`,</span>
+<span class="sd">            returning a boolean array of the same shape; grid points</span>
+<span class="sd">            where it is False are excluded from that call&#39;s stats, same</span>
+<span class="sd">            as NaN grid points are. NaN in `condition_field` is always</span>
+<span class="sd">            excluded regardless of what `condition` returns for it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : dict[str, ndarray]</span>
+<span class="sd">            One entry per name in `stats`, each shape (nbin,) if the</span>
+<span class="sd">            input was 2D, (ix, nbin) if 3D.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Average qq only over grid points where qq itself is positive</span>
+<span class="sd">        (`condition_field` defaults to qq)::</span>
+
+<span class="sd">            cyl_stats.compute(qq, condition=lambda v: v &gt; 0)</span>
+
+<span class="sd">        Average temperature only where vertical velocity vz is positive</span>
+<span class="sd">        (conditional averaging on a different field)::</span>
+
+<span class="sd">            cyl_stats.compute(temperature, condition_field=vz, condition=lambda v: v &gt; 0)</span>
+
+<span class="sd">        Covariance and correlation between temperature and vz::</span>
+
+<span class="sd">            cyl_stats.compute(temperature, qq2=vz, stats=[&quot;cov&quot;, &quot;corr&quot;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stats_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">stats_set</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;stats must not be empty&quot;</span><span class="p">)</span>
+
+        <span class="n">unknown</span> <span class="o">=</span> <span class="n">stats_set</span> <span class="o">-</span> <span class="n">_VALID_STATS</span>
+        <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown stats requested: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected a subset of </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_VALID_STATS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">need_mean</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span> <span class="ow">in</span> <span class="n">stats_set</span>
+        <span class="n">need_rms</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span> <span class="ow">in</span> <span class="n">stats_set</span>
+        <span class="n">need_cov</span> <span class="o">=</span> <span class="s2">&quot;cov&quot;</span> <span class="ow">in</span> <span class="n">stats_set</span>
+        <span class="n">need_corr</span> <span class="o">=</span> <span class="s2">&quot;corr&quot;</span> <span class="ow">in</span> <span class="n">stats_set</span>
+        <span class="n">need_pair</span> <span class="o">=</span> <span class="n">need_cov</span> <span class="ow">or</span> <span class="n">need_corr</span>
+
+        <span class="k">if</span> <span class="n">need_pair</span> <span class="ow">and</span> <span class="n">qq2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;stats </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">stats_set</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">_PAIR_STATS</span><span class="p">)</span><span class="si">}</span><span class="s2"> require `qq2` &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;to also be given&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">chunk_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;chunk_size must be a positive integer&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">qq</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;qq.shape must be (jx, kx) or (ix, jx, kx)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">condition_field</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;condition_field requires `condition` to also be given&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">condition_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">condition_field</span> <span class="o">=</span> <span class="n">qq</span>
+
+        <span class="n">squeeze_output</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="n">squeeze_output</span><span class="p">:</span>
+            <span class="n">qq</span> <span class="o">=</span> <span class="n">qq</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="n">ix</span><span class="p">,</span> <span class="n">jx</span><span class="p">,</span> <span class="n">kx</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">jx</span><span class="p">,</span> <span class="n">kx</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;qq&#39;s yz shape </span><span class="si">{</span><span class="p">(</span><span class="n">jx</span><span class="p">,</span><span class="w"> </span><span class="n">kx</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not match &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;the expected </span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jx</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">kx</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">condition_field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">condition_field</span> <span class="o">=</span> <span class="n">condition_field</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="n">condition_field</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;condition_field shape </span><span class="si">{</span><span class="n">condition_field</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;not match qq&#39;s shape </span><span class="si">{</span><span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">condition_field_flat</span> <span class="o">=</span> <span class="n">condition_field</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">jx</span> <span class="o">*</span> <span class="n">kx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">need_pair</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">qq2</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">qq2</span> <span class="o">=</span> <span class="n">qq2</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+            <span class="k">if</span> <span class="n">qq2</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;qq2 shape </span><span class="si">{</span><span class="n">qq2</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match qq&#39;s shape </span><span class="si">{</span><span class="n">qq</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">qq2_flat</span> <span class="o">=</span> <span class="n">qq2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">jx</span> <span class="o">*</span> <span class="n">kx</span><span class="p">)</span>
+
+        <span class="c1"># NaN default: bins with no valid grid points (count == 0) are never</span>
+        <span class="c1"># written below, since np.divide&#39;s `where` skips them. Only the</span>
+        <span class="c1"># requested output(s) are allocated.</span>
+        <span class="n">qq_mean</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_mean</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">qq_rms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_rms</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">qq_cov</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_cov</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">qq_corr</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">need_corr</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="n">qq_flat</span> <span class="o">=</span> <span class="n">qq</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">jx</span> <span class="o">*</span> <span class="n">kx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache_chunk_size</span> <span class="o">!=</span> <span class="n">chunk_size</span><span class="p">:</span>
+            <span class="c1"># np.bincount sums into one flat set of bins, so to average all</span>
+            <span class="c1"># chunk_size planes with a single bincount call below (instead of</span>
+            <span class="c1"># looping per plane), shift each plane&#39;s bin indices into its own</span>
+            <span class="c1"># non-overlapping slice of a combined index space:</span>
+            <span class="c1">#   plane 0 -&gt; bins [0, nbin), plane 1 -&gt; bins [nbin, 2*nbin), ...</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span>
+            <span class="p">)</span>
+
+            <span class="c1"># valid_radial_bin (per grid point, shape (n_valid,)) broadcasts</span>
+            <span class="c1"># against offset (per plane, shape (chunk_size, 1)) to</span>
+            <span class="c1"># (chunk_size, n_valid): row p holds every grid point&#39;s bin index</span>
+            <span class="c1"># shifted into plane p&#39;s slice. This depends only on chunk_size</span>
+            <span class="c1"># and self.valid_radial_bin (fixed at construction), not on qq,</span>
+            <span class="c1"># so it is cached here and reused across compute() calls that</span>
+            <span class="c1"># share the same chunk_size instead of being rebuilt every call.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_radial_bin</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache_chunk_size</span> <span class="o">=</span> <span class="n">chunk_size</span>
+
+        <span class="k">for</span> <span class="n">chunk_start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ix</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+            <span class="n">chunk_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">chunk_start</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">,</span> <span class="n">ix</span><span class="p">)</span>
+            <span class="n">chunk_len</span> <span class="o">=</span> <span class="n">chunk_end</span> <span class="o">-</span> <span class="n">chunk_start</span>
+
+            <span class="c1"># shape = (chunk_len, number of valid yz grid points)</span>
+            <span class="c1"># .take(axis=1) instead of qq_flat[chunk_start:chunk_end,</span>
+            <span class="c1"># self.valid_grid_index]: that fancy-indexing form returns an</span>
+            <span class="c1"># F-contiguous array for this slice+index-array combination,</span>
+            <span class="c1"># which forces the .ravel() below to make a second full copy.</span>
+            <span class="c1"># .take() returns a C-contiguous array directly, so .ravel()</span>
+            <span class="c1"># becomes a free view.</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">qq_flat</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span><span class="o">.</span><span class="n">take</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">valid_grid_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Slice of the cached combined_bin (built above); slicing rows</span>
+            <span class="c1"># off the front of a C-contiguous array keeps it C-contiguous,</span>
+            <span class="c1"># so .ravel() here stays a free view, not a copy. The summed</span>
+            <span class="c1"># bincount result below is reshaped back to (chunk_len, nbin).</span>
+            <span class="n">combined_bin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combined_bin_cache</span><span class="p">[:</span><span class="n">chunk_len</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+            <span class="n">values_flat</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">values_flat</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Gathered/raveled the same way as qq itself (see above),</span>
+                <span class="c1"># so no full-size condition array or mask is ever built.</span>
+                <span class="n">cond_values_flat</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">condition_field_flat</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_grid_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="c1"># NaN in condition_field is always excluded, regardless of</span>
+                <span class="c1"># what `condition` itself returns for it. Kept as its own</span>
+                <span class="c1"># mask (not folded straight into `valid`) so it can also</span>
+                <span class="c1"># gate valid_pair below for cov/corr.</span>
+                <span class="n">cond_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">cond_values_flat</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">condition</span><span class="p">(</span><span class="n">cond_values_flat</span><span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">&amp;</span> <span class="n">cond_mask</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cond_mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">valid</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="c1"># No NaNs and no extra filtering: reuse the grid point</span>
+                <span class="c1"># counts computed once in __init__ instead of recomputing</span>
+                <span class="c1"># them per chunk.</span>
+                <span class="n">counts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+                    <span class="n">minlength</span><span class="o">=</span><span class="n">chunk_len</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">chunk_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">)</span>
+
+            <span class="c1"># rms needs the per-bin mean as an intermediate (it averages</span>
+            <span class="c1"># squared deviations from it), so it is computed whenever</span>
+            <span class="c1"># either output is requested, and the sums/counts bincounts</span>
+            <span class="c1"># above are shared between both rather than redone per output.</span>
+            <span class="k">if</span> <span class="n">need_mean</span> <span class="ow">or</span> <span class="n">need_rms</span><span class="p">:</span>
+                <span class="n">chunk_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+                    <span class="n">values_flat</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+                    <span class="n">counts</span><span class="p">,</span>
+                    <span class="n">chunk_len</span><span class="p">,</span>
+                    <span class="n">out</span><span class="o">=</span><span class="n">qq_mean</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span> <span class="k">if</span> <span class="n">need_mean</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">need_rms</span><span class="p">:</span>
+                <span class="c1"># Broadcast each valid grid point&#39;s own bin mean back out via</span>
+                <span class="c1"># the same combined_bin flat index space used for binning</span>
+                <span class="c1"># (chunk_mean.ravel() is a free view: chunk_mean is always</span>
+                <span class="c1"># C-contiguous, either as a fresh array or a row-slice of one).</span>
+                <span class="n">deviation</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">values_flat</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">-</span> <span class="n">chunk_mean</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">combined_bin</span><span class="p">[</span><span class="n">valid</span><span class="p">]]</span>
+                <span class="p">)</span>
+
+                <span class="n">mean_sq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid</span><span class="p">],</span>
+                    <span class="n">deviation</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+                    <span class="n">counts</span><span class="p">,</span>
+                    <span class="n">chunk_len</span><span class="p">,</span>
+                    <span class="n">out</span><span class="o">=</span><span class="n">qq_rms</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_sq</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">mean_sq</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">need_pair</span><span class="p">:</span>
+                <span class="n">values2</span> <span class="o">=</span> <span class="n">qq2_flat</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span><span class="o">.</span><span class="n">take</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">valid_grid_index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                <span class="p">)</span>
+                <span class="n">values2_flat</span> <span class="o">=</span> <span class="n">values2</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+                <span class="c1"># A point contributes to cov/corr only where qq *and* qq2</span>
+                <span class="c1"># are both finite (plus `condition`, if given) -- generally</span>
+                <span class="c1"># a narrower set than `valid` above, so its own counts must</span>
+                <span class="c1"># be computed separately rather than reusing `counts`.</span>
+                <span class="n">valid_pair</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">values_flat</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">values2_flat</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cond_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">valid_pair</span> <span class="o">=</span> <span class="n">valid_pair</span> <span class="o">&amp;</span> <span class="n">cond_mask</span>
+
+                <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">valid_pair</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="n">counts_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">counts_pair</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
+                        <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                        <span class="n">minlength</span><span class="o">=</span><span class="n">chunk_len</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">chunk_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbin</span><span class="p">)</span>
+
+                <span class="c1"># Own bin means over valid_pair (not the possibly-different</span>
+                <span class="c1"># `chunk_mean` above), so cov/corr are internally consistent</span>
+                <span class="c1"># with the sample they&#39;re actually computed over.</span>
+                <span class="n">mean_qq_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                    <span class="n">values_flat</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                    <span class="n">counts_pair</span><span class="p">,</span>
+                    <span class="n">chunk_len</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">mean_qq2_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                    <span class="n">values2_flat</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                    <span class="n">counts_pair</span><span class="p">,</span>
+                    <span class="n">chunk_len</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">deviation_qq</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">values_flat</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="n">mean_qq_pair</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">]]</span>
+                <span class="p">)</span>
+                <span class="n">deviation_qq2</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">values2_flat</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="n">mean_qq2_pair</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">]]</span>
+                <span class="p">)</span>
+
+                <span class="n">chunk_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                    <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                    <span class="n">deviation_qq</span> <span class="o">*</span> <span class="n">deviation_qq2</span><span class="p">,</span>
+                    <span class="n">counts_pair</span><span class="p">,</span>
+                    <span class="n">chunk_len</span><span class="p">,</span>
+                    <span class="n">out</span><span class="o">=</span><span class="n">qq_cov</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span> <span class="k">if</span> <span class="n">need_cov</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">need_corr</span><span class="p">:</span>
+                    <span class="n">var_qq_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                        <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                        <span class="n">deviation_qq</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="n">counts_pair</span><span class="p">,</span>
+                        <span class="n">chunk_len</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">var_qq2_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bin_average</span><span class="p">(</span>
+                        <span class="n">combined_bin</span><span class="p">[</span><span class="n">valid_pair</span><span class="p">],</span>
+                        <span class="n">deviation_qq2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="n">counts_pair</span><span class="p">,</span>
+                        <span class="n">chunk_len</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_qq_pair</span> <span class="o">*</span> <span class="n">var_qq2_pair</span><span class="p">)</span>
+                    <span class="n">chunk_corr</span> <span class="o">=</span> <span class="n">qq_corr</span><span class="p">[</span><span class="n">chunk_start</span><span class="p">:</span><span class="n">chunk_end</span><span class="p">]</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">chunk_cov</span><span class="p">,</span> <span class="n">denom</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">chunk_corr</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">denom</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">squeeze_output</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">need_mean</span><span class="p">:</span>
+                <span class="n">qq_mean</span> <span class="o">=</span> <span class="n">qq_mean</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">need_rms</span><span class="p">:</span>
+                <span class="n">qq_rms</span> <span class="o">=</span> <span class="n">qq_rms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">need_cov</span><span class="p">:</span>
+                <span class="n">qq_cov</span> <span class="o">=</span> <span class="n">qq_cov</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">need_corr</span><span class="p">:</span>
+                <span class="n">qq_corr</span> <span class="o">=</span> <span class="n">qq_corr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">need_mean</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qq_mean</span>
+        <span class="k">if</span> <span class="n">need_rms</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;rms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qq_rms</span>
+        <span class="k">if</span> <span class="n">need_cov</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;cov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qq_cov</span>
+        <span class="k">if</span> <span class="n">need_corr</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;corr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qq_corr</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

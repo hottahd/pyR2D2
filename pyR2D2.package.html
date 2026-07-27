@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2 Package &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
+  <title>pyR2D2 Package &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=ac5e0687"></script>
+      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyR2D2 Package</a><ul>
@@ -147,7 +148,7 @@
 <td><p>Class for 2D data at certain optical depths</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly" title="pyR2D2.OnTheFly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OnTheFly</span></code></a>(data)</p></td>
-<td><p>Class for on-the-fly analysis data</p></td>
+<td><p>Class for on-the-fly analysis data Mean, RMS, and correlation are done in longitudinal or z directions.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.Slice.html#pyR2D2.Slice" title="pyR2D2.Slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Slice</span></code></a>(data)</p></td>
 <td><p>Class for 2D slice data</p></td>
@@ -166,22 +167,38 @@
 </section>
 <section id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Link to this heading"></a></h2>
-<div class="graphviz"><img src="_images/inheritance-9d6993ad2a730474073ac3af7434dd6d8f8688e1.png" alt="Inheritance diagram of pyR2D2.data.Data, pyR2D2.data_io.parameters.Parameters, pyR2D2.data_io.read.XSelect, pyR2D2.data_io.read.ZSelect, pyR2D2.data_io.read.MPIRegion, pyR2D2.data_io.read.FullData, pyR2D2.data_io.read.RestrictedData, pyR2D2.data_io.read.OpticalDepth, pyR2D2.data_io.read.OnTheFly, pyR2D2.data_io.read.Slice, pyR2D2.data_io.read.TwoDimension, pyR2D2.data_io.read.ModelS, pyR2D2.sync.sync.Sync" usemap="#inheritance0f1133531d" class="inheritance graphviz" /></div>
-<map id="inheritance0f1133531d" name="inheritance0f1133531d">
-<area shape="rect" id="node1" href="api/pyR2D2.Data.html#pyR2D2.Data" target="_top" title="Class for managing R2D2 data" alt="" coords="23,277,95,303"/>
-<area shape="rect" id="node2" href="api/pyR2D2.FullData.html#pyR2D2.FullData" target="_top" title="Class for 3D full data" alt="" coords="383,5,459,31"/>
-<area shape="rect" id="node4" href="api/pyR2D2.MPIRegion.html#pyR2D2.MPIRegion" target="_top" title="Class for 3D data at a selected MPI process" alt="" coords="375,55,466,80"/>
-<area shape="rect" id="node10" href="api/pyR2D2.RestrictedData.html#pyR2D2.RestrictedData" target="_top" title="Class for 3D restricted&#45;volume data" alt="" coords="361,104,480,129"/>
-<area shape="rect" id="node14" href="api/pyR2D2.XSelect.html#pyR2D2.XSelect" target="_top" title="Class for 2D selected data at a certain x" alt="" coords="385,153,457,179"/>
-<area shape="rect" id="node15" href="api/pyR2D2.ZSelect.html#pyR2D2.ZSelect" target="_top" title="Class for 2D selected data at a certain z" alt="" coords="385,203,457,228"/>
-<area shape="rect" id="node5" href="api/pyR2D2.ModelS.html#pyR2D2.ModelS" target="_top" title="Class for Model S based stratification data" alt="" coords="201,153,273,179"/>
-<area shape="rect" id="node7" href="api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly" target="_top" title="Class for on&#45;the&#45;fly analysis data" alt="" coords="195,203,279,228"/>
-<area shape="rect" id="node8" href="api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth" target="_top" title="Class for 2D data at certain optical depths" alt="" coords="183,252,290,277"/>
-<area shape="rect" id="node11" href="api/pyR2D2.Slice.html#pyR2D2.Slice" target="_top" title="Class for 2D slice data" alt="" coords="201,301,273,327"/>
-<area shape="rect" id="node13" href="api/pyR2D2.TwoDimension.html#pyR2D2.TwoDimension" target="_top" title="Class for 2D data" alt="" coords="178,351,295,376"/>
-<area shape="rect" id="node9" href="api/pyR2D2.Parameters.html#pyR2D2.Parameters" target="_top" title="Class for managing R2D2 basic parameters" alt="" coords="11,179,107,204"/>
-<area shape="rect" id="node12" href="api/pyR2D2.Sync.html#pyR2D2.Sync" target="_top" title="Class for downloading data from remote server" alt="" coords="23,129,95,155"/>
-</map></section>
+digraph inheritance0f1133531d {
+bgcolor=transparent;
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;Data&quot; [URL=&quot;api/pyR2D2.Data.html#pyR2D2.Data&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for managing R2D2 data&quot;];
+  &quot;FullData&quot; [URL=&quot;api/pyR2D2.FullData.html#pyR2D2.FullData&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 3D full data&quot;];
+  &quot;_BaseRemapReader&quot; -&gt; &quot;FullData&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;MPIRegion&quot; [URL=&quot;api/pyR2D2.MPIRegion.html#pyR2D2.MPIRegion&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 3D data at a selected MPI process&quot;];
+  &quot;_BaseRemapReader&quot; -&gt; &quot;MPIRegion&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ModelS&quot; [URL=&quot;api/pyR2D2.ModelS.html#pyR2D2.ModelS&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for Model S based stratification data&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;ModelS&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;OnTheFly&quot; [URL=&quot;api/pyR2D2.OnTheFly.html#pyR2D2.OnTheFly&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for on-the-fly analysis data&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;OnTheFly&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;OpticalDepth&quot; [URL=&quot;api/pyR2D2.OpticalDepth.html#pyR2D2.OpticalDepth&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 2D data at certain optical depths&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;OpticalDepth&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;Parameters&quot; [URL=&quot;api/pyR2D2.Parameters.html#pyR2D2.Parameters&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for managing R2D2 basic parameters&quot;];
+  &quot;RestrictedData&quot; [URL=&quot;api/pyR2D2.RestrictedData.html#pyR2D2.RestrictedData&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 3D restricted-volume data&quot;];
+  &quot;_BaseRemapReader&quot; -&gt; &quot;RestrictedData&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;Slice&quot; [URL=&quot;api/pyR2D2.Slice.html#pyR2D2.Slice&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 2D slice data&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;Slice&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;Sync&quot; [URL=&quot;api/pyR2D2.Sync.html#pyR2D2.Sync&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for downloading data from remote server&quot;];
+  &quot;TwoDimension&quot; [URL=&quot;api/pyR2D2.TwoDimension.html#pyR2D2.TwoDimension&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 2D data&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;TwoDimension&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;XSelect&quot; [URL=&quot;api/pyR2D2.XSelect.html#pyR2D2.XSelect&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 2D selected data at a certain x&quot;];
+  &quot;_BaseRemapReader&quot; -&gt; &quot;XSelect&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;ZSelect&quot; [URL=&quot;api/pyR2D2.ZSelect.html#pyR2D2.ZSelect&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for 2D selected data at a certain z&quot;];
+  &quot;_BaseRemapReader&quot; -&gt; &quot;ZSelect&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;_BaseReader&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;Base class for data readers&quot;];
+  &quot;_BaseRemapReader&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,tooltip=&quot;Base class for remap data readers&quot;];
+  &quot;_BaseReader&quot; -&gt; &quot;_BaseRemapReader&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+}
+</section>
 </section>
 <section id="module-pyR2D2.util">
 <span id="pyr2d2-util-package"></span><h1>pyR2D2.util Package<a class="headerlink" href="#module-pyR2D2.util" title="Link to this heading"></a></h1>
@@ -198,32 +215,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.eos.html#pyR2D2.util.eos" title="pyR2D2.util.eos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eos</span></code></a>(data, ro, se, var)</p></td>
 <td><p>Returns the Table equation of state.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.gen_coord.html#pyR2D2.util.gen_coord" title="pyR2D2.util.gen_coord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_coord</span></code></a>(xmax, xmin, ix, margin)</p></td>
-<td><p>Defines uniform geometry</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.gen_coord_ununiform_flex.html#pyR2D2.util.gen_coord_ununiform_flex" title="pyR2D2.util.gen_coord_ununiform_flex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_coord_ununiform_flex</span></code></a>(xmax, xmin, ix, ...)</p></td>
-<td><p>This function defines un-uniform geometry The fine grid is concentrated around x = xc</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.gen_coord_ununiform_top.html#pyR2D2.util.gen_coord_ununiform_top" title="pyR2D2.util.gen_coord_ununiform_top"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_coord_ununiform_top</span></code></a>(xmax, xmin, ix, ...)</p></td>
-<td><p>This function defines ununiform geometry for vertical geometry The fine grid is concentrated around the top boundary</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.get_best_unit.html#pyR2D2.util.get_best_unit" title="pyR2D2.util.get_best_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_unit</span></code></a>(size, unit_multipliers)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.get_best_unit.html#pyR2D2.util.get_best_unit" title="pyR2D2.util.get_best_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_unit</span></code></a>(size, unit_multipliers)</p></td>
 <td><p>Get the best unit for displaying the size.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.get_total_file_size.html#pyR2D2.util.get_total_file_size" title="pyR2D2.util.get_total_file_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_total_file_size</span></code></a>(directory[, unit])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.get_total_file_size.html#pyR2D2.util.get_total_file_size" title="pyR2D2.util.get_total_file_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_total_file_size</span></code></a>(directory[, unit])</p></td>
 <td><p>Evaluate total size of files in directory.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.init.html#pyR2D2.util.init" title="pyR2D2.util.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a>(main_locals[, instance_name, verbose, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.init.html#pyR2D2.util.init" title="pyR2D2.util.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a>(main_locals[, instance_name, verbose, ...])</p></td>
 <td><p>Initialize pyR2D2.Data instance in main program.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.initialize_instance.html#pyR2D2.util.initialize_instance" title="pyR2D2.util.initialize_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_instance</span></code></a>(main_locals, instance_name)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.initialize_instance.html#pyR2D2.util.initialize_instance" title="pyR2D2.util.initialize_instance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_instance</span></code></a>(main_locals, instance_name)</p></td>
 <td><p>Initializes arbitrary instance of pyR2D2.Data object in main program.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.locals_define.html#pyR2D2.util.locals_define" title="pyR2D2.util.locals_define"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locals_define</span></code></a>(data, main_locals)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.locals_define.html#pyR2D2.util.locals_define" title="pyR2D2.util.locals_define"><code class="xref py py-obj docutils literal notranslate"><span class="pre">locals_define</span></code></a>(data, main_locals)</p></td>
 <td><p>Substitute selp.p to main_locals in main program.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.regrid_data.html#pyR2D2.util.regrid_data" title="pyR2D2.util.regrid_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_data</span></code></a>(data, caseid, n, xmin, xmax, ...)</p></td>
-<td><p>This function chabges the resolution and output for the next calculation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.stream_function.html#pyR2D2.util.stream_function" title="pyR2D2.util.stream_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stream_function</span></code></a>(vrr, vth, rr, th)</p></td>
 <td><p>Calculate stream function from vector field in 2D pherical geometry.</p></td>
@@ -238,18 +243,27 @@
 <h2>Classes<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.util.updated_data.html#pyR2D2.util.updated_data" title="pyR2D2.util.updated_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">updated_data</span></code></a>()</p></td>
-<td><p>Temporary class for upgraded data</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Callable</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.util.CylindricalStatistics.html#pyR2D2.util.CylindricalStatistics" title="pyR2D2.util.CylindricalStatistics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CylindricalStatistics</span></code></a>(y, z, *[, yc, zc, dr, ...])</p></td>
+<td><p>Computes per-x-plane statistics of qq[x, y, z] over concentric radial bins around a horizontal (y, z) center, producing e.g. qq_mean[x, r], qq_rms[x, r], and (given a second field) their covariance/correlation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sequence</span></code>()</p></td>
+<td><p>All the operations on a read-only sequence.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="id2">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-<div class="graphviz"><img src="_images/inheritance-e0d95e7e20726546c61716c30c336277d89e8680.png" alt="Inheritance diagram of pyR2D2.util.resolution.updated_data" usemap="#inheritance576e987202" class="inheritance graphviz" /></div>
-<map id="inheritance576e987202" name="inheritance576e987202">
-<area shape="rect" id="node1" href="api/pyR2D2.util.updated_data.html#pyR2D2.util.updated_data" target="_top" title="Temporary class for upgraded data" alt="" coords="5,5,116,31"/>
-</map></section>
+digraph inheritance0ebac39e32 {
+bgcolor=transparent;
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;CylindricalStatistics&quot; [URL=&quot;api/pyR2D2.util.CylindricalStatistics.html#pyR2D2.util.CylindricalStatistics&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Computes per-x-plane statistics of qq[x, y, z] over concentric radial&quot;];
+}
+</section>
 </section>
 <section id="module-pyR2D2.cpp_util">
 <span id="pyr2d2-cpp-util-package"></span><h1>pyR2D2.cpp_util Package<a class="headerlink" href="#module-pyR2D2.cpp_util" title="Link to this heading"></a></h1>
@@ -258,8 +272,29 @@
 <h2>Functions<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.d_x.html#pyR2D2.cpp_util.d_x" title="pyR2D2.cpp_util.d_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">d_x</span></code></a>(x, qq)</p></td>
+<td><p>Differentiate an array along its x axis.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.d_y.html#pyR2D2.cpp_util.d_y" title="pyR2D2.cpp_util.d_y"><code class="xref py py-obj docutils literal notranslate"><span class="pre">d_y</span></code></a>(y, qq)</p></td>
+<td><p>Differentiate an array along its y axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.d_z.html#pyR2D2.cpp_util.d_z" title="pyR2D2.cpp_util.d_z"><code class="xref py py-obj docutils literal notranslate"><span class="pre">d_z</span></code></a>(z, qq)</p></td>
+<td><p>Differentiate an array along its z axis.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.eval_tau.html#pyR2D2.cpp_util.eval_tau" title="pyR2D2.cpp_util.eval_tau"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eval_tau</span></code></a>(ro, se, x, eos[, i_bot])</p></td>
+<td><p>Evaluate the optical depth for given density, specific entropy, and spatial grids.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.interp.html#pyR2D2.cpp_util.interp" title="pyR2D2.cpp_util.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>(x, y, z, xu, yu, zu, qq)</p></td>
+<td><p>Trilinearly interpolate a three-dimensional array.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.spherical2cartesian.html#pyR2D2.cpp_util.spherical2cartesian" title="pyR2D2.cpp_util.spherical2cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spherical2cartesian</span></code></a>(rr, th, ph, qqs, ixc, ...)</p></td>
+<td><p>Interpolate a scalar field from a spherical grid to a Cartesian grid.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.vertical_upward_rte.html#pyR2D2.cpp_util.vertical_upward_rte" title="pyR2D2.cpp_util.vertical_upward_rte"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vertical_upward_rte</span></code></a>(ro, se, x, eos)</p></td>
 <td><p>Solve the vertical upward Radiative Transfer Equation (RTE) using the Feautrier method for given density, specific entropy, and spatial grids.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.cpp_util.trace_field_line.html#pyR2D2.cpp_util.trace_field_line" title="pyR2D2.cpp_util.trace_field_line"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trace_field_line</span></code></a>(x, y, z, bx, by, bz, ...[, ...])</p></td>
+<td><p>Trace a field line through a 3D magnetic field.</p></td>
 </tr>
 </tbody>
 </table>
@@ -279,11 +314,17 @@
 </section>
 <section id="id5">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
-<div class="graphviz"><img src="_images/inheritance-49eff795a37580e478d42e30c87ecd239cc2f4b1.png" alt="Inheritance diagram of pyR2D2.cpp_util.cpp_util.EOS, pyR2D2.cpp_util.cpp_util.YinYang" usemap="#inheritance37c9b78552" class="inheritance graphviz" /></div>
-<map id="inheritance37c9b78552" name="inheritance37c9b78552">
-<area shape="rect" id="node1" href="api/pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS" target="_top" title="Equation of State (EOS) class for evaluating thermodynamic quantities." alt="" coords="183,5,255,31"/>
-<area shape="rect" id="node3" href="api/pyR2D2.cpp_util.YinYang.html#pyR2D2.cpp_util.YinYang" target="_top" title="Class for converting data between Yin&#45;Yang grid and regular spherical grid." alt="" coords="183,55,255,80"/>
-</map></section>
+digraph inheritance37c9b78552 {
+bgcolor=transparent;
+rankdir=LR;
+size=&quot;8.0, 12.0&quot;;
+  &quot;EOS&quot; [URL=&quot;api/pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Equation of State (EOS) class for evaluating thermodynamic quantities.&quot;];
+  &quot;pybind11_object&quot; -&gt; &quot;EOS&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;YinYang&quot; [URL=&quot;api/pyR2D2.cpp_util.YinYang.html#pyR2D2.cpp_util.YinYang&quot;,fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;,target=&quot;_top&quot;,tooltip=&quot;Class for converting data between Yin-Yang grid and regular spherical grid.&quot;];
+  &quot;pybind11_object&quot; -&gt; &quot;YinYang&quot; [arrowsize=0.5,style=&quot;setlinewidth(0.5)&quot;];
+  &quot;pybind11_object&quot; [fillcolor=white,fontname=&quot;Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans&quot;,fontsize=10,height=0.25,shape=box,style=&quot;setlinewidth(0.5),filled&quot;];
+}
+</section>
 </section>
 <section id="module-pyR2D2.write">
 <span id="pyr2d2-write-package"></span><h1>pyR2D2.write Package<a class="headerlink" href="#module-pyR2D2.write" title="Link to this heading"></a></h1>

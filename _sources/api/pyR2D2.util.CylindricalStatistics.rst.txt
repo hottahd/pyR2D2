@@ -1,0 +1,17 @@
+CylindricalStatistics
+=====================
+
+.. currentmodule:: pyR2D2.util
+
+.. autoclass:: CylindricalStatistics
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~CylindricalStatistics.compute
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute

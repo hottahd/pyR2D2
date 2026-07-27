@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZSelect &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
+  <title>ZSelect &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ac5e0687"></script>
+      <script src="../_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
@@ -106,25 +107,33 @@
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>pyR2D2.Data class can access this class as <code class="code docutils literal notranslate"><span class="pre">pyR2D2.Data.qz</span></code></p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ro</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – density</p></li>
-<li><p><strong>vx</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – x velocity</p></li>
-<li><p><strong>vy</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – y velocity</p></li>
-<li><p><strong>vz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – z velocity</p></li>
-<li><p><strong>bx</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – x magnetic field</p></li>
-<li><p><strong>by</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – y magnetic field</p></li>
-<li><p><strong>bz</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – z magnetic field</p></li>
-<li><p><strong>se</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – specific entropy</p></li>
-<li><p><strong>ph</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – div B cleaning variable (not included in zarr file)</p></li>
-<li><p><strong>pr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – pressure (not included in zarr file)</p></li>
-<li><p><strong>te</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – temperature (not included in zarr file)</p></li>
-<li><p><strong>op</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – opacity (not included in zarr file)</p></li>
-</ul>
+<dl class="simple">
+<dt>ro: numpy.ndarray, float</dt><dd><p>density</p>
+</dd>
+<dt>vx: numpy.ndarray, float</dt><dd><p>x velocity</p>
+</dd>
+<dt>vy: numpy.ndarray, float</dt><dd><p>y velocity</p>
+</dd>
+<dt>vz: numpy.ndarray, float</dt><dd><p>z velocity</p>
+</dd>
+<dt>bx: numpy.ndarray, float</dt><dd><p>x magnetic field</p>
+</dd>
+<dt>by: numpy.ndarray, float</dt><dd><p>y magnetic field</p>
+</dd>
+<dt>bz: numpy.ndarray, float</dt><dd><p>z magnetic field</p>
+</dd>
+<dt>se: numpy.ndarray, float</dt><dd><p>specific entropy</p>
+</dd>
+<dt>ph: numpy.ndarray, float</dt><dd><p>div B cleaning variable (not included in zarr file)</p>
+</dd>
+<dt>pr: numpy.ndarray, float</dt><dd><p>pressure (not included in zarr file)</p>
+</dd>
+<dt>te: numpy.ndarray, float</dt><dd><p>temperature (not included in zarr file)</p>
+</dd>
+<dt>op: numpy.ndarray, float</dt><dd><p>opacity (not included in zarr file)</p>
 </dd>
 </dl>
+</div>
 <p class="rubric">Methods Summary</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>

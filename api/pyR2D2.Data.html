@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data &mdash; R2D2 Document 0.1.2.dev57+dirty documentation</title>
+  <title>Data &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ac5e0687"></script>
+      <script src="../_static/documentation_options.js?v=5a6b2f01"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
@@ -117,7 +118,7 @@
 <li><p><strong>qs</strong> (<a class="reference internal" href="pyR2D2.Slice.html#pyR2D2.Slice" title="pyR2D2.Slice"><em>pyR2D2.Slice</em></a>) – Instance of pyR2D2.Slice</p></li>
 <li><p><strong>ms</strong> (<a class="reference internal" href="pyR2D2.ModelS.html#pyR2D2.ModelS" title="pyR2D2.ModelS"><em>pyR2D2.ModelS</em></a>) – Instance of pyR2D2.ModelS</p></li>
 <li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Time at a selected time step. See <a class="reference internal" href="#pyR2D2.Data.time_read" title="pyR2D2.Data.time_read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Data.time_read()</span></code></a></p></li>
-<li><p><strong>qc</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – 3D full data for checkpoint. See <a class="reference internal" href="#pyR2D2.Data.qc_read" title="pyR2D2.Data.qc_read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Data.qc_read()</span></code></a></p></li>
+<li><p><strong>qc</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – 3D full data for checkpoint. See <a class="reference internal" href="#pyR2D2.Data.qc_read" title="pyR2D2.Data.qc_read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Data.qc_read()</span></code></a></p></li>
 <li><p><strong>qp</strong> (<em>pyR2D2.Previous</em>) – Instance of pyR2D2.Previous</p></li>
 <li><p><strong>qa</strong> (<em>pyR2D2.After</em>) – Instance of pyR2D2.After</p></li>
 <li><p><strong>sync</strong> (<a class="reference internal" href="pyR2D2.Sync.html#pyR2D2.Sync" title="pyR2D2.Sync"><em>pyR2D2.Sync</em></a>) – Instance of pyR2D2.Sync</p></li>
@@ -132,8 +133,11 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Data.qc_read" title="pyR2D2.Data.qc_read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qc_read</span></code></a>(n[, end_step])</p></td>
 <td><p>Reads 3D full data for checkpoint The data is stored in self.qc dictionary</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Data.time_read" title="pyR2D2.Data.time_read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_read</span></code></a>(n[, tau, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyR2D2.Data.time_read" title="pyR2D2.Data.time_read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time_read</span></code></a>(n[, tau, verbose, use_zip])</p></td>
 <td><p>Reads time at a selected time step The data is stored in self.t</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyR2D2.Data.zip_time" title="pyR2D2.Data.zip_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zip_time</span></code></a>([remove_original])</p></td>
+<td><p>Archive datadir/time into datadir/time.zip.</p></td>
 </tr>
 </tbody>
 </table>
@@ -155,7 +159,7 @@ The data is stored in self.qc dictionary</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyR2D2.Data.time_read">
-<span class="sig-name descname"><span class="pre">time_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data.html#Data.time_read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Data.time_read" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">time_read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_zip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data.html#Data.time_read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Data.time_read" title="Link to this definition"></a></dt>
 <dd><p>Reads time at a selected time step
 The data is stored in self.t</p>
 <dl class="field-list simple">
@@ -163,6 +167,9 @@ The data is stored in self.t</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – selected time step for data</p></li>
 <li><p><strong>tau</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if True time for optical depth (high cadence)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if True, print a message indicating that the time variable has been stored in self.time</p></li>
+<li><p><strong>use_zip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – if True, read time from time.zip instead of the original files
+if False, read from the original file if it exists; otherwise, fall back to time.zip.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -170,6 +177,19 @@ The data is stored in self.t</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR2D2.Data.zip_time">
+<span class="sig-name descname"><span class="pre">zip_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">remove_original</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data.html#Data.zip_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.Data.zip_time" title="Link to this definition"></a></dt>
+<dd><p>Archive datadir/time into datadir/time.zip.</p>
+<p>Existing entries in time.zip are skipped.
+Newly added files under time/ are appended.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>remove_original</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, remove the original files after archiving. Default is False.</p>
 </dd>
 </dl>
 </dd></dl>

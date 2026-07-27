@@ -1,0 +1,6 @@
+trace_field_line
+================
+
+.. currentmodule:: pyR2D2.cpp_util
+
+.. autofunction:: trace_field_line

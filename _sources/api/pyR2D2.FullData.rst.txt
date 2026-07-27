@@ -21,6 +21,7 @@ FullData
       ~FullData.compress
       ~FullData.delete
       ~FullData.read
+      ~FullData.zip
 
    .. rubric:: Attributes Documentation
 
@@ -33,3 +34,4 @@ FullData
    .. automethod:: compress
    .. automethod:: delete
    .. automethod:: read
+   .. automethod:: zip

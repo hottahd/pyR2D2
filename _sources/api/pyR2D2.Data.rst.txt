@@ -12,8 +12,10 @@ Data
 
       ~Data.qc_read
       ~Data.time_read
+      ~Data.zip_time
 
    .. rubric:: Methods Documentation
 
    .. automethod:: qc_read
    .. automethod:: time_read
+   .. automethod:: zip_time
