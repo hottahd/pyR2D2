@@ -1,1 +1,5 @@
+include README.md PACKAGING.md
 recursive-include pyR2D2/cpp_util *.hpp
+prune doc
+prune py
+prune tests

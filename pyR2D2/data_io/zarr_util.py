@@ -3,10 +3,24 @@ import zipfile
 from pathlib import Path
 
 import numpy as np
-import zarr
+
+
+def _require_zarr():
+    """Import the optional Zarr dependency or raise an actionable error."""
+    try:
+        import zarr
+    except ModuleNotFoundError as exc:
+        if exc.name != "zarr":
+            raise
+        raise ModuleNotFoundError(
+            "Zarr support requires the optional dependency; "
+            "install it with `python -m pip install 'pyR2D2[zarr]'`"
+        ) from exc
+    return zarr
 
 
 def open_zarr_group(path: str, use_zip: bool = False):
+    zarr = _require_zarr()
     path = Path(path)
 
     # normal .zarr directory
@@ -177,6 +191,7 @@ def save(
     ValueError
         If an array with unsupported dimensions is encountered.
     """
+    zarr = _require_zarr()
     root = zarr.open_group(path, mode=mode)
 
     codec_f32 = zarr.codecs.BloscCodec(
