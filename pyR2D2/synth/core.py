@@ -77,13 +77,25 @@ def doppler_shift_rows(logk: np.ndarray, v_los: np.ndarray,
                        resolving_power: float) -> np.ndarray:
     """各深さの不透明度を視線速度で Doppler シフトする。
 
-    等分解能格子 lambda_n = lambda_0 (1+1/R)^n の上では、波長を (1 - v/c) 倍する
-    ことは **添字を一定量ずらす**ことと同じ:
+    **導出** (2026-08-17 に符号を修正。それまで逆だった):
+    観測者へ向かう速度 v (> 0) の物質が出す静止波長 lambda_rest の光は
+    lambda_obs = lambda_rest (1 - v/c) に見える (青方偏移)。逆に解くと
 
-        shift = ln(1 - v/c) / ln(1 + 1/R)   [格子点数]
+        lambda_rest = lambda_obs / (1 - v/c) ~ lambda_obs (1 + v/c)
 
-    観測者の方向 (+x) へ動く要素 (v_los > 0) は青方偏移するので、
-    観測波長 lambda で見える不透明度は共動系の lambda(1 - v/c) の値。
+    したがって**観測波長 lambda_obs で見える不透明度は、共動系の
+    lambda_obs (1 + v/c) の値**である。等分解能格子
+    lambda_n = lambda_0 (1+1/R)^n の上ではこれは添字を一定量ずらすことで、
+
+        shift = ln(1 + v/c) / ln(1 + 1/R)   [格子点数]
+        out[n] = logk[n + shift]
+
+    こうすると静止波長 n0 にある線は n = n0 - shift、すなわち v > 0 で
+    **短波長側 (青) へ動く**。正しい向きである。
+
+    以前は `ln(1 - v/c)` を使っており、上昇流が赤方偏移していた。
+    その結果、対流ブルーシフトが符号ごと反転して合成スペクトルに
+    現れていた (実測: v = +2 km/s で +1940 m/s の赤方偏移)。
 
     Parameters
     ----------
@@ -92,7 +104,7 @@ def doppler_shift_rows(logk: np.ndarray, v_los: np.ndarray,
     """
     nlam = logk.shape[1]
     dln = np.log1p(1.0 / resolving_power)
-    shift = np.log1p(-np.asarray(v_los) / cst.c_light) / dln  # 格子点数
+    shift = np.log1p(np.asarray(v_los) / cst.c_light) / dln  # 格子点数
     out = np.empty_like(logk)
     idx = np.arange(nlam)
     for k in range(logk.shape[0]):
