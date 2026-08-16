@@ -102,11 +102,10 @@ def doppler_shift_rows(logk: np.ndarray, v_los: np.ndarray,
 
 
 def formal_solution(alpha: np.ndarray, source: np.ndarray, dx: np.ndarray,
-                    mu: float = 1.0) -> np.ndarray:
+                    mu: float = 1.0, scheme: str = "log") -> np.ndarray:
     """柱に沿った形式解。上端から出てくる強度を返す。
 
     深さ配列は **上端が先頭** (alpha[0] が最上層) であること。
-    source function が光学的厚みについて区分線形であるとして厳密に積分する。
 
     Parameters
     ----------
@@ -114,29 +113,84 @@ def formal_solution(alpha: np.ndarray, source: np.ndarray, dx: np.ndarray,
     source : (ndepth, nlam)  source function (LTE なら B_lambda)
     dx : (ndepth-1,)         隣り合う深さ点の間隔 [cm] (正)
     mu : float               cos(視線角)
+    scheme : {"log", "linear"}
+        セル内で alpha と S をどう変化させると仮定するか。既定は "log"。
+
+    **なぜ log か** (Hotta & Iijima 2020; Hotta & Toriumi 2020 Appendix A):
+    光球では H^- のせいで kappa が 1 セルの間に桁で変わる。alpha を算術平均
+    すると光学的厚みを系統的に過大評価する。ln(alpha) が経路長について線形
+    (= alpha は指数関数的に変化) と仮定すると、平均は**対数平均**
+
+        <alpha> = (a1 - a0) / ln(a1/a0)
+
+    になる。同様に S も、tau について線形だと急勾配のところで**負になり得る**
+    のに対し、ln(S) が tau について線形なら常に正で、桁で変わる状況に強い。
+    このとき source の寄与は解析的に積分できて
+
+        int_0^dt S exp(-(dt - t')) dt' = (S_d - S_u exp(-dt)) / (1 + r/dt),
+        r = ln(S_d / S_u)
+
+    となる (u = 上流 = 深い側, d = 下流 = 浅い側)。
+    **粗い格子でも精度が落ちにくい**のが利点。
 
     Returns
     -------
     I : (nlam,)  上端での強度
     """
+    if scheme not in ("log", "linear"):
+        raise ValueError(f"未知の scheme: {scheme}")
+    if scheme == "log":
+        # log スキームは alpha, S が正であることを前提にする。
+        # 負の密度・圧力 (k-omega フィルタが上層で作ることがある) が混じると
+        # log(負) で NaN になる。linear スキームはこれを黙って飲み込んでしまい
+        # 気付けないので、ここで明示的に落とす。
+        if not (np.all(alpha > 0.0) and np.all(source > 0.0)):
+            n_a = int(np.sum(alpha <= 0.0))
+            n_s = int(np.sum(source <= 0.0))
+            raise ValueError(
+                f"log スキームには正の alpha と S が要る "
+                f"(alpha <= 0 が {n_a} 点, S <= 0 が {n_s} 点)。"
+                f"入力の密度・圧力・温度が負になっていないか確認すること。")
     ndepth = alpha.shape[0]
     # 最深部は tau >> 1 とみなして S で初期化 (拡散極限)
     I = source[-1].copy()
     for k in range(ndepth - 2, -1, -1):
-        d = 0.5 * (alpha[k] + alpha[k + 1]) * dx[k] / mu
+        a_d, a_u = alpha[k], alpha[k + 1]        # d = 浅い側, u = 深い側
+        s_d, s_u = source[k], source[k + 1]
+
+        if scheme == "linear":
+            d = 0.5 * (a_d + a_u) * dx[k] / mu
+        else:
+            # alpha の対数平均。a_d ~ a_u では 0/0 になるので算術平均に落とす
+            lg = np.log(a_u / a_d)
+            d = np.where(np.abs(lg) < 1e-8,
+                         0.5 * (a_d + a_u),
+                         (a_u - a_d) / np.where(np.abs(lg) < 1e-8, 1.0, lg)
+                         ) * dx[k] / mu
         d = np.maximum(d, 1e-12)
         ex = np.exp(-d)
-        e0 = 1.0 - ex
-        # (e0 - d*ex)/d は d -> 0 で d/2。小さい d では級数展開で桁落ちを防ぐ
-        small = d < 1e-4
-        w1 = np.where(small, 0.5 * d, (e0 - d * ex) / d)
-        I = I * ex + source[k] * e0 + (source[k + 1] - source[k]) * w1
+
+        if scheme == "linear":
+            e0 = 1.0 - ex
+            # (e0 - d*ex)/d は d -> 0 で d/2。小さい d では級数展開で桁落ちを防ぐ
+            w1 = np.where(d < 1e-4, 0.5 * d, (e0 - d * ex) / d)
+            I = I * ex + s_d * e0 + (s_u - s_d) * w1
+        else:
+            # ln(S) が tau について線形。分母 (d + r) が 0 に近いところは
+            # 極限値 S_d * d を使う (b + 1 = 0 の場合に相当)
+            r = np.log(s_d / s_u)
+            den = d + r
+            safe = np.abs(den) > 1e-8
+            integ = np.where(safe,
+                             d * (s_d - s_u * ex) / np.where(safe, den, 1.0),
+                             s_d * d)
+            I = I * ex + integ
     return I
 
 
 def synth_column(T: np.ndarray, P: np.ndarray, rho: np.ndarray,
                  v_los: np.ndarray, x: np.ndarray, table: OpacityTable,
-                 mu: float = 1.0) -> np.ndarray:
+                 mu: float = 1.0, scheme: str = "log") -> np.ndarray:
     """1 本の柱から出射強度スペクトルを作る。
 
     T, P, rho, v_los, x はいずれも **上端が先頭** で並んでいること。
@@ -148,7 +202,7 @@ def synth_column(T: np.ndarray, P: np.ndarray, rho: np.ndarray,
     alpha = (10.0 ** logk) * rho[:, None]
     S = np.array([planck_lambda(table.lam, float(t)) for t in T])
     dx = np.abs(np.diff(x))
-    return formal_solution(alpha, S, dx, mu=mu)
+    return formal_solution(alpha, S, dx, mu=mu, scheme=scheme)
 
 
 def instrument_profile(lam: np.ndarray, spec: np.ndarray,
