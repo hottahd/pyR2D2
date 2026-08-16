@@ -43,6 +43,13 @@ def main():
     ap.add_argument("--table", required=True, help="高分解能不透明度テーブル (h5)")
     ap.add_argument("--run", default="/scr/a000/c0234hotta/odf/run/d001")
     ap.add_argument("--n", type=int, default=-1, help="出力番号 (-1 で最新)")
+    ap.add_argument("--nsnap", type=int, default=1,
+                    help="平均するスナップショット数。**p モード (音波) は箱全体で "
+                         "同位相なので水平平均では消えず、時間平均でしか落ちない**。"
+                         "相関時間 1.5 分に対し出力は 60 秒なので、--snap-step で "
+                         "間隔を空けて 10-20 枚averaging するのが目安")
+    ap.add_argument("--snap-step", type=int, default=3,
+                    help="平均するスナップショットの間隔 (出力番号)")
     ap.add_argument("--stride", type=int, default=4,
                     help="柱を何点おきに使うか (4 なら 64x64 本)")
     ap.add_argument("--xmin", type=float, default=-1.0,
@@ -65,45 +72,44 @@ def main():
     n = int(p.nd) if args.n < 0 else args.n
     print(f"スナップショット: n={n} (t={n*p.dtout/60:.0f} min)")
 
-    d.qr.read(n, keys=["te", "pr", "ro", "vx"])
-    te = np.array(d.qr.te) + np.array(p.te0)[:, None, None]
-    pr = np.array(d.qr.pr) + np.array(p.pr0)[:, None, None]
-    ro = np.array(d.qr.ro) + np.array(p.ro0)[:, None, None]
-    vx = np.array(d.qr.vx)
+    snaps = [n - k * args.snap_step for k in range(args.nsnap)]
+    snaps = [m for m in snaps if m >= 0][::-1]
+    print(f"平均するスナップショット: {len(snaps)} 枚 "
+          f"(n = {snaps[0]}..{snaps[-1]}, 間隔 {args.snap_step*p.dtout:.0f} s, "
+          f"合計 {(snaps[-1]-snaps[0])*p.dtout/60:.0f} 分)")
     x = np.array(p.x)
 
     # 上端が先頭になるよう反転し、深いところは切る (tau >> 1 で寄与しない)
     order = np.argsort(x)[::-1]
-    x, te, pr, ro, vx = x[order], te[order], pr[order], ro[order], vx[order]
+    x = x[order]
     keep = (x - p.rstar) / 1e8 > args.xmin
-    x, te, pr, ro, vx = x[keep], te[keep], pr[keep], ro[keep], vx[keep]
+    x = x[keep]
     print(f"使う深さ: {len(x)} 点 "
-          f"({(x[0]-p.rstar)/1e8:+.2f} .. {(x[-1]-p.rstar)/1e8:+.2f} Mm), "
-          f"T = {te[-1].mean():.0f} K (最深部)")
-
-    ny, nz = te.shape[1], te.shape[2]
-    ys = range(0, ny, args.stride)
-    zs = range(0, nz, args.stride)
-    ncol = len(list(ys)) * len(list(zs))
-    print(f"柱: {ncol} 本 (stride={args.stride})")
+          f"({(x[0]-p.rstar)/1e8:+.2f} .. {(x[-1]-p.rstar)/1e8:+.2f} Mm)")
 
     t0 = time.time()
     acc = np.zeros(len(table.lam))
-    imgs = []
-    for a, iy in enumerate(range(0, ny, args.stride)):
-        row = []
-        for iz in range(0, nz, args.stride):
-            I = synth_column(te[:, iy, iz], pr[:, iy, iz], ro[:, iy, iz],
-                             vx[:, iy, iz], x, table)
-            acc += I
-            row.append(I)
-        imgs.append(row)
-        if a == 0:
+    ncol_total = 0
+    for si, ns in enumerate(snaps):
+        d.qr.read(ns, keys=["te", "pr", "ro", "vx"])
+        te = np.array(d.qr.te) + np.array(p.te0)[:, None, None]
+        pr = np.array(d.qr.pr) + np.array(p.pr0)[:, None, None]
+        ro = np.array(d.qr.ro) + np.array(p.ro0)[:, None, None]
+        vx = np.array(d.qr.vx)
+        te, pr, ro, vx = te[order], pr[order], ro[order], vx[order]
+        te, pr, ro, vx = te[keep], pr[keep], ro[keep], vx[keep]
+
+        ny, nz = te.shape[1], te.shape[2]
+        for iy in range(0, ny, args.stride):
+            for iz in range(0, nz, args.stride):
+                acc += synth_column(te[:, iy, iz], pr[:, iy, iz], ro[:, iy, iz],
+                                    vx[:, iy, iz], x, table)
+                ncol_total += 1
+        if si == 0:
             dt = time.time() - t0
-            print(f"  1 行 ({len(row)} 柱) に {dt:.1f} s → "
-                  f"全体 {dt*len(list(range(0,ny,args.stride)))/60:.1f} 分の見込み")
-    mean_spec = acc / ncol
-    print(f"合成 {time.time()-t0:.1f} s")
+            print(f"  1 枚に {dt:.1f} s → 全体 {dt*len(snaps)/60:.1f} 分の見込み")
+    mean_spec = acc / ncol_total
+    print(f"合成 {time.time()-t0:.1f} s ({ncol_total} 柱 x 波長)")
 
     # 連続光で規格化
     cont = np.percentile(mean_spec, 99)
