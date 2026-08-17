@@ -51,7 +51,7 @@ def main():
     ap.add_argument("--n", type=int, default=-1)
     ap.add_argument("--stride", type=int, default=16)
     ap.add_argument("--xmin", type=float, default=-0.5)
-    ap.add_argument("--lam-core", type=float, default=6303.244,
+    ap.add_argument("--lam-core", type=float, default=6303.2436,
                     help="線中心の真空波長 [A] (Fe I 6301.5012 空気)")
     ap.add_argument("--out", default="/scr/a000/c0234hotta/odf/figs/contribution.png")
     args = ap.parse_args()
