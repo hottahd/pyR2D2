@@ -57,6 +57,11 @@ def main():
     ap.add_argument("--R-inst", type=float, default=3.0e5,
                     help="装置分解能 (岡山の分光器を想定)")
     ap.add_argument("--out", default="notebooks/r2d2_spectrum.png")
+    ap.add_argument("--remove-mean-vx", action="store_true",
+                    help="各高さで水平平均した vx を引く (箱全体のピストン運動 "
+                         "= k_h=0 の成分を落とす)。**k-omega フィルタが使えない "
+                         "粗いケーデンスのデータのための代用**。ここで使うのは "
+                         "その代用が k-omega とどれだけ一致するかを測るため")
     ap.add_argument("--save-npz", default=None)
     ap.add_argument("--filtered", default=None,
                     help="kw_filter.py の出力 (h5)。指定すると 3D 出力の代わりに "
@@ -135,6 +140,8 @@ def main():
             vx = fil["vx"][i]
         te, pr, ro, vx = te[order], pr[order], ro[order], vx[order]
         te, pr, ro, vx = te[keep], pr[keep], ro[keep], vx[keep]
+        if args.remove_mean_vx:
+            vx = vx - vx.mean(axis=(1, 2))[:, None, None]
 
         ny, nz = te.shape[1], te.shape[2]
         acc_s = np.zeros(len(table.lam))
