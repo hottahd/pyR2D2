@@ -217,6 +217,190 @@ def synth_column(T: np.ndarray, P: np.ndarray, rho: np.ndarray,
     return formal_solution(alpha, S, dx, mu=mu, scheme=scheme)
 
 
+def _wrap_bilinear(a3, fy, fz):
+    """3D 配列 (nx, ny, nz) を各高さで水平方向に双線形補間する。
+
+    `fy[k]`, `fz[k]` は高さ k での**格子単位の**位置 (実数、周期で巻く)。
+    返り値は (nx,)。
+
+    **周期境界は添字を剰余で巻く**。`fmod` は負の値に対して負を返すので
+    `% n` を使うこと (2026-08-18: 学生さんの C++ 実装で同じ罠を指摘した)。
+    """
+    nx, ny, nz = a3.shape
+    j0 = np.floor(fy).astype(np.int64) % ny
+    k0 = np.floor(fz).astype(np.int64) % nz
+    j1 = (j0 + 1) % ny
+    k1 = (k0 + 1) % nz
+    wy = fy - np.floor(fy)
+    wz = fz - np.floor(fz)
+    i = np.arange(nx)
+    return (a3[i, j0, k0] * (1 - wy) * (1 - wz)
+            + a3[i, j1, k0] * wy * (1 - wz)
+            + a3[i, j0, k1] * (1 - wy) * wz
+            + a3[i, j1, k1] * wy * wz)
+
+
+def _wrap_trilinear(a3, fx, fy, fz):
+    """3D 配列を (鉛直, 水平, 水平) の 3 次元線形補間する。
+
+    `fx` は**格子単位の鉛直位置** (実数、範囲内に丸める)、
+    `fy`, `fz` は水平位置 (周期で巻く)。返り値は `fx` と同じ長さ。
+
+    **なぜ要るか (2026-08-18)**: 最初は「立方体全体を鉛直に細分してから
+    水平補間する」実装にしていたが、これは**光線 1 本ごとに 128x128 柱を
+    全部内挿する**ので実用にならなかった (30 分で 1 例も終わらず)。
+    光線が通る点だけを補間すれば無駄がない。
+    """
+    nx, ny, nz = a3.shape
+    fx = np.clip(fx, 0.0, nx - 1.0)
+    i0 = np.minimum(np.floor(fx).astype(np.int64), nx - 2)
+    i1 = i0 + 1
+    wx = fx - i0
+    j0 = np.floor(fy).astype(np.int64) % ny
+    k0 = np.floor(fz).astype(np.int64) % nz
+    j1 = (j0 + 1) % ny
+    k1 = (k0 + 1) % nz
+    wy = fy - np.floor(fy)
+    wz = fz - np.floor(fz)
+
+    def plane(i):
+        return (a3[i, j0, k0] * (1 - wy) * (1 - wz)
+                + a3[i, j1, k0] * wy * (1 - wz)
+                + a3[i, j0, k1] * (1 - wy) * wz
+                + a3[i, j1, k1] * wy * wz)
+
+    return plane(i0) * (1 - wx) + plane(i1) * wx
+
+
+def ray_geometry(x, mu, phi, dy, dz, iy0=0.0, iz0=0.0):
+    """傾いた光線が各高さで通る水平位置を、**格子単位**で返す。
+
+    Parameters
+    ----------
+    x : (nx,)   高さ [cm]、**上端が先頭** (降順)
+    mu : float  cos(視線角)。1 が視線中心
+    phi : float 方位角 [rad]。視線の水平成分の向き
+    dy, dz : float  水平格子幅 [cm]
+    iy0, iz0 : float  **上端で**光線が通る位置 [格子単位]
+
+    Returns
+    -------
+    fy, fz : (nx,)  各高さでの水平位置 [格子単位]
+    ds : (nx-1,)    隣り合う高さの間の**経路長** [cm]
+
+    **幾何**: 観測者の方向を n = (mu, sqrt(1-mu^2) cos phi,
+    sqrt(1-mu^2) sin phi) とする (x が鉛直上向き)。光線は +n 方向へ進んで
+    観測者に届くので、上端から深部へ辿るときは -n 方向へ動く:
+
+        r(s) = r_top - s n,   x(s) = x_top - s mu
+
+    したがって高さ x での水平位置は
+
+        y = y_top - (x_top - x) n_y / mu
+
+    経路長は鉛直間隔 Delta x に対し **Delta s = Delta x / mu**。
+    """
+    x = np.asarray(x, dtype=float)
+    st = np.sqrt(max(0.0, 1.0 - mu * mu))
+    ny_dir, nz_dir = st * np.cos(phi), st * np.sin(phi)
+    drop = (x[0] - x) / mu                      # 経路長 [cm] (上端から)
+    fy = iy0 - drop * ny_dir / dy
+    fz = iz0 - drop * nz_dir / dz
+    ds = np.abs(np.diff(x)) / mu
+    return fy, fz, ds
+
+
+def synth_ray(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
+              mu=1.0, phi=0.0, iy0=0.0, iz0=0.0, scheme="log", nsub=1):
+    """**傾いた光線**に沿って形式解を解き、出射強度を返す。
+
+    `synth_column` の 3D 版。光線は箱の下端から上端まで**一本の長特性**として
+    通し切り、水平の周期性は**強度を側面から入れ直すのではなく座標を巻く**
+    ことで扱う。こうすると初期条件の無い面が現れないので**反復が要らない**
+    (`docs/12` 6.1 節。R2D2 本体の RTE が反復しているのは、全セルの J が要る +
+    MPI で領域分割している + 短特性、という別条件のため)。
+
+    Parameters
+    ----------
+    T3, P3, rho3, vx3, vy3, vz3 : (nx, ny, nz)
+        **上端が先頭** (x[0] が最上層)。vx は鉛直 (上向きが正)。
+    x : (nx,)      高さ [cm]、降順
+    dy, dz : float 水平格子幅 [cm]
+    mu : float     cos(視線角)
+    phi : float    方位角 [rad]
+    iy0, iz0 : float  上端での光線の水平位置 [格子単位]
+    nsub : int
+        鉛直 1 格子あたりの分割数。**1 格子進む間に水平へ 1 格子以上ずれると
+        構造を飛び越す**ので、その場合は 2 以上にする
+        (:func:`substeps_needed` が必要数を返す)。
+
+    Returns
+    -------
+    I : (nlam,)  上端での強度
+
+    **視線速度**: v_los = mu vx + sqrt(1-mu^2) (vy cos phi + vz sin phi)。
+    観測者向きが正で、`doppler_shift_rows` の約束と一致する。
+
+    **補間**: 正値の量 (T, P, rho) は **log 空間**、速度は線形。
+    形式解が「alpha が経路長に対して指数関数」を仮定している以上、
+    端点の値も log で補間しないと一貫しない (HI20 eq. A2 と同じ流儀)。
+    """
+    x = np.asarray(x, dtype=float)
+    nx = len(x)
+
+    # 光線上の標本点を**格子単位の鉛直位置**で作る。nsub=1 なら格子点そのもの。
+    # **立方体全体を細分してはいけない** (光線 1 本ごとに全柱を内挿すること
+    # になり実用にならない。2026-08-18 に一度その実装で詰まった)。
+    if nsub > 1:
+        fx = np.concatenate([np.arange(nx - 1)[:, None]
+                             + np.linspace(0.0, 1.0, nsub, endpoint=False)[None, :]
+                             ]).ravel()
+        fx = np.append(fx, float(nx - 1))
+    else:
+        fx = np.arange(nx, dtype=float)
+    # 標本点の高さ [cm] (x は等間隔とは限らないので線形内挿で求める)
+    xs = np.interp(fx, np.arange(nx), x)
+
+    st = np.sqrt(max(0.0, 1.0 - mu * mu))
+    ny_dir, nz_dir = st * np.cos(phi), st * np.sin(phi)
+    drop = (x[0] - xs) / mu                     # 上端からの経路長 [cm]
+    fy = iy0 - drop * ny_dir / dy
+    fz = iz0 - drop * nz_dir / dz
+    ds = np.abs(np.diff(xs)) / mu               # 真の経路長 [cm]
+
+    T = np.exp(_wrap_trilinear(np.log(T3), fx, fy, fz))
+    P = np.exp(_wrap_trilinear(np.log(P3), fx, fy, fz))
+    rho = np.exp(_wrap_trilinear(np.log(rho3), fx, fy, fz))
+    vx = _wrap_trilinear(vx3, fx, fy, fz)
+    vy = _wrap_trilinear(vy3, fx, fy, fz)
+    vz = _wrap_trilinear(vz3, fx, fy, fz)
+    v_los = mu * vx + st * (vy * np.cos(phi) + vz * np.sin(phi))
+
+    logk = table.interpolate_column(T, P)
+    if np.any(v_los != 0.0):
+        logk = doppler_shift_rows(logk, v_los, table.resolving_power)
+    alpha = (10.0 ** logk) * rho[:, None]
+    S = np.array([planck_lambda(table.lam, float(t)) for t in T])
+    # ds は既に真の経路長なので、形式解には mu=1 を渡す
+    return formal_solution(alpha, S, ds, mu=1.0, scheme=scheme)
+
+
+def substeps_needed(x, mu, dy, dz, safety=1.0):
+    """鉛直 1 格子あたり何分割すれば構造を飛び越さないかを返す。
+
+    鉛直に Delta x 進む間の水平移動は `Delta x sqrt(1-mu^2)/mu`。
+    これが水平格子幅を超えたら分割する。R2D2 本体の RTE が
+    `Delta l = min(Delta x/mu_x, Delta y/mu_y, Delta z/mu_z)` で刻むのと
+    同じ考え方 (`docs/12` 6.2 節)。
+    """
+    if mu >= 1.0:
+        return 1
+    st = np.sqrt(max(0.0, 1.0 - mu * mu))
+    dx = np.abs(np.diff(np.asarray(x, dtype=float))).max()
+    shift = dx * st / mu
+    return max(1, int(np.ceil(safety * shift / min(dy, dz))))
+
+
 def instrument_profile(lam: np.ndarray, spec: np.ndarray,
                        resolving_power: float) -> np.ndarray:
     """装置プロファイル (Gauss) で畳み込んで分解能を落とす。
