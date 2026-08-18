@@ -117,6 +117,9 @@ def main():
     t0 = time.time()
     acc = np.zeros(len(table.lam))
     ncol_total = 0
+    # **1 枚ごと** のスペクトルも貯める。スナップショット間のばらつきが
+    # そのまま「粒状斑起源の RV jitter」の推定になる (docs/12 7 章)。
+    per_snap = []
     for si, ns in enumerate(snaps):
         if fil is None:
             d.qr.read(ns, keys=["te", "pr", "ro", "vx"])
@@ -134,11 +137,16 @@ def main():
         te, pr, ro, vx = te[keep], pr[keep], ro[keep], vx[keep]
 
         ny, nz = te.shape[1], te.shape[2]
+        acc_s = np.zeros(len(table.lam))
+        ncol_s = 0
         for iy in range(0, ny, args.stride):
             for iz in range(0, nz, args.stride):
-                acc += synth_column(te[:, iy, iz], pr[:, iy, iz], ro[:, iy, iz],
-                                    vx[:, iy, iz], x, table)
-                ncol_total += 1
+                acc_s += synth_column(te[:, iy, iz], pr[:, iy, iz], ro[:, iy, iz],
+                                      vx[:, iy, iz], x, table)
+                ncol_s += 1
+        acc += acc_s
+        ncol_total += ncol_s
+        per_snap.append(acc_s / ncol_s)
         if si == 0:
             dt = time.time() - t0
             print(f"  1 枚に {dt:.1f} s → 全体 {dt*len(snaps)/60:.1f} 分の見込み")
@@ -161,7 +169,11 @@ def main():
 
     if args.save_npz:
         np.savez(args.save_npz, lam=table.lam, mean=mean_spec, norm=norm,
-                 degraded=degraded, n=n)
+                 degraded=degraded, n=n,
+                 per_snap=np.array(per_snap, dtype=np.float32),
+                 snaps=np.array(snaps),
+                 ncol_per_snap=ncol_total // max(len(snaps), 1),
+                 box_mm=float((p.y[-1] - p.y[0]) / 1e8))
         print(f"wrote {args.save_npz}")
 
     # --- 図 ------------------------------------------------------------------
