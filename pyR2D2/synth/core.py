@@ -310,40 +310,24 @@ def ray_geometry(x, mu, phi, dy, dz, iy0=0.0, iz0=0.0):
     return fy, fz, ds
 
 
-def synth_ray(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
-              mu=1.0, phi=0.0, iy0=0.0, iz0=0.0, scheme="log", nsub=1):
-    """**傾いた光線**に沿って形式解を解き、出射強度を返す。
+def _ray_sample(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz,
+                mu=1.0, phi=0.0, iy0=0.0, iz0=0.0, nsub=1):
+    """傾いた光線の標本点を作り、そこでの物理量を返す。
 
-    `synth_column` の 3D 版。光線は箱の下端から上端まで**一本の長特性**として
-    通し切り、水平の周期性は**強度を側面から入れ直すのではなく座標を巻く**
-    ことで扱う。こうすると初期条件の無い面が現れないので**反復が要らない**
-    (`docs/12` 6.1 節。R2D2 本体の RTE が反復しているのは、全セルの J が要る +
-    MPI で領域分割している + 短特性、という別条件のため)。
-
-    Parameters
-    ----------
-    T3, P3, rho3, vx3, vy3, vz3 : (nx, ny, nz)
-        **上端が先頭** (x[0] が最上層)。vx は鉛直 (上向きが正)。
-    x : (nx,)      高さ [cm]、降順
-    dy, dz : float 水平格子幅 [cm]
-    mu : float     cos(視線角)
-    phi : float    方位角 [rad]
-    iy0, iz0 : float  上端での光線の水平位置 [格子単位]
-    nsub : int
-        鉛直 1 格子あたりの分割数。**1 格子進む間に水平へ 1 格子以上ずれると
-        構造を飛び越す**ので、その場合は 2 以上にする
-        (:func:`substeps_needed` が必要数を返す)。
+    :func:`synth_ray` と :func:`ray_contribution` の共通部分。
+    **視線速度は鉛直成分と水平成分に分けたまま**返す。限界効果 (limb effect)
+    が観測の 2 倍強い原因を、`mu vx` と `sqrt(1-mu^2) v_h` のどちらが
+    作っているかで切り分けるため (`docs/12` 13.8 節)。
 
     Returns
     -------
-    I : (nlam,)  上端での強度
+    xs : (m,)       標本点の高さ [cm] (上端が先頭)
+    ds : (m-1,)     隣り合う標本点の**真の経路長** [cm]
+    T, P, rho : (m,)
+    v_vert : (m,)   `mu * vx`                                     [cm/s]
+    v_horiz : (m,)  `sqrt(1-mu^2) * (vy cos phi + vz sin phi)`     [cm/s]
 
-    **視線速度**: v_los = mu vx + sqrt(1-mu^2) (vy cos phi + vz sin phi)。
-    観測者向きが正で、`doppler_shift_rows` の約束と一致する。
-
-    **補間**: 正値の量 (T, P, rho) は **log 空間**、速度は線形。
-    形式解が「alpha が経路長に対して指数関数」を仮定している以上、
-    端点の値も log で補間しないと一貫しない (HI20 eq. A2 と同じ流儀)。
+    どちらも符号は :func:`doppler_shift_rows` の約束 (観測者向きが正)。
     """
     x = np.asarray(x, dtype=float)
     nx = len(x)
@@ -374,7 +358,56 @@ def synth_ray(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
     vx = _wrap_trilinear(vx3, fx, fy, fz)
     vy = _wrap_trilinear(vy3, fx, fy, fz)
     vz = _wrap_trilinear(vz3, fx, fy, fz)
-    v_los = mu * vx + st * (vy * np.cos(phi) + vz * np.sin(phi))
+    v_vert = mu * vx
+    v_horiz = st * (vy * np.cos(phi) + vz * np.sin(phi))
+    return xs, ds, T, P, rho, v_vert, v_horiz
+
+
+def synth_ray(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
+              mu=1.0, phi=0.0, iy0=0.0, iz0=0.0, scheme="log", nsub=1,
+              wvert=1.0, whoriz=1.0):
+    """**傾いた光線**に沿って形式解を解き、出射強度を返す。
+
+    `synth_column` の 3D 版。光線は箱の下端から上端まで**一本の長特性**として
+    通し切り、水平の周期性は**強度を側面から入れ直すのではなく座標を巻く**
+    ことで扱う。こうすると初期条件の無い面が現れないので**反復が要らない**
+    (`docs/12` 6.1 節。R2D2 本体の RTE が反復しているのは、全セルの J が要る +
+    MPI で領域分割している + 短特性、という別条件のため)。
+
+    Parameters
+    ----------
+    T3, P3, rho3, vx3, vy3, vz3 : (nx, ny, nz)
+        **上端が先頭** (x[0] が最上層)。vx は鉛直 (上向きが正)。
+    x : (nx,)      高さ [cm]、降順
+    dy, dz : float 水平格子幅 [cm]
+    mu : float     cos(視線角)
+    phi : float    方位角 [rad]
+    iy0, iz0 : float  上端での光線の水平位置 [格子単位]
+    nsub : int
+        鉛直 1 格子あたりの分割数。**1 格子進む間に水平へ 1 格子以上ずれると
+        構造を飛び越す**ので、その場合は 2 以上にする
+        (:func:`substeps_needed` が必要数を返す)。
+    wvert, whoriz : float
+        視線速度の**鉛直成分・水平成分に掛ける係数** (既定は 1.0 = そのまま)。
+        `whoriz=0` にすると水平速度を消した合成ができる。限界効果が
+        どちらの成分で決まっているかを切り分ける実験用 (`docs/12` 13.8 節)。
+        **物理を変える操作なので、既定値以外を使ったら必ず記録すること。**
+
+    Returns
+    -------
+    I : (nlam,)  上端での強度
+
+    **視線速度**: v_los = mu vx + sqrt(1-mu^2) (vy cos phi + vz sin phi)。
+    観測者向きが正で、`doppler_shift_rows` の約束と一致する。
+
+    **補間**: 正値の量 (T, P, rho) は **log 空間**、速度は線形。
+    形式解が「alpha が経路長に対して指数関数」を仮定している以上、
+    端点の値も log で補間しないと一貫しない (HI20 eq. A2 と同じ流儀)。
+    """
+    xs, ds, T, P, rho, v_vert, v_horiz = _ray_sample(
+        T3, P3, rho3, vx3, vy3, vz3, x, dy, dz,
+        mu=mu, phi=phi, iy0=iy0, iz0=iz0, nsub=nsub)
+    v_los = wvert * v_vert + whoriz * v_horiz
 
     logk = table.interpolate_column(T, P)
     if np.any(v_los != 0.0):
@@ -383,6 +416,74 @@ def synth_ray(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
     S = np.array([planck_lambda(table.lam, float(t)) for t in T])
     # ds は既に真の経路長なので、形式解には mu=1 を渡す
     return formal_solution(alpha, S, ds, mu=1.0, scheme=scheme)
+
+
+def ray_contribution(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
+                     lam_idx, mu=1.0, phi=0.0, iy0=0.0, iz0=0.0, nsub=1,
+                     wvert=1.0, whoriz=1.0):
+    """傾いた光線に沿った**寄与関数**と、視線速度の 2 成分を返す。
+
+    出射強度は経路長 s について
+
+        I = int CF ds,      CF(s) = S exp(-tau) alpha
+
+    と書ける (`scripts/contribution_function.py` と同じ定義。ただしあちらは
+    mu=1 の鉛直柱専用)。**線位置は「CF で重みを付けた視線速度の平均」で
+    ほぼ決まる**ので、その重みを使って `mu vx` と `sqrt(1-mu^2) v_h` の
+    寄与を分けて出せる (`docs/12` 13.8 節の分解)。
+
+    Parameters
+    ----------
+    lam_idx : array_like of int
+        寄与関数を返す波長の添字 (例: 線コアと連続光の 2 点)。
+        **全波長を返すと (深さ x 波長) が大きくなる**ので絞ること。
+    その他 : :func:`synth_ray` と同じ
+
+    Returns
+    -------
+    dict
+        ``xs``     (m,)          標本点の高さ [cm]
+        ``T``      (m,)          標本点の温度 [K] (下端の S を作るのに要る)
+        ``w``      (m,)          CF に掛ける経路長要素 [cm] (sum(CF*w) = I)
+        ``tau``    (m, nsel)     上端から積んだ光学的厚み
+        ``cf``     (m, nsel)     寄与関数 S exp(-tau) alpha
+        ``v_vert`` (m,)          視線速度の鉛直成分 [cm/s]
+        ``v_horiz``(m,)          視線速度の水平成分 [cm/s]
+
+    **注意**: tau は :func:`formal_solution` と同じ対数平均で積むが、
+    CF の台形積分と log スキームの形式解は厳密には一致しない。
+    絶対値ではなく**重みとして**使うこと。
+    """
+    lam_idx = np.atleast_1d(np.asarray(lam_idx, dtype=int))
+    xs, ds, T, P, rho, v_vert, v_horiz = _ray_sample(
+        T3, P3, rho3, vx3, vy3, vz3, x, dy, dz,
+        mu=mu, phi=phi, iy0=iy0, iz0=iz0, nsub=nsub)
+    v_los = wvert * v_vert + whoriz * v_horiz
+
+    logk = table.interpolate_column(T, P)
+    if np.any(v_los != 0.0):
+        logk = doppler_shift_rows(logk, v_los, table.resolving_power)
+    alpha = (10.0 ** logk[:, lam_idx]) * rho[:, None]
+    lam_sel = table.lam[lam_idx]
+    S = np.array([planck_lambda(lam_sel, float(t)) for t in T])
+
+    # 上端から積んだ光学的厚み (alpha の対数平均。formal_solution と同じ流儀)
+    lg = np.log(alpha[1:] / alpha[:-1])
+    amean = np.where(np.abs(lg) < 1e-8, 0.5 * (alpha[:-1] + alpha[1:]),
+                     (alpha[1:] - alpha[:-1]) / np.where(np.abs(lg) < 1e-8, 1.0, lg))
+    tau = np.empty_like(alpha)
+    tau[0] = 0.0
+    tau[1:] = np.cumsum(amean * ds[:, None], axis=0)
+
+    # 標本点あたりの経路長要素 (両端は半分)
+    w = np.empty(len(xs))
+    w[0] = 0.5 * ds[0]
+    w[-1] = 0.5 * ds[-1]
+    w[1:-1] = 0.5 * (ds[:-1] + ds[1:])
+
+    return {"xs": xs, "T": T, "w": w, "tau": tau,
+            "cf": S * np.exp(-tau) * alpha,
+            "v_vert": v_vert, "v_horiz": v_horiz}
 
 
 def substeps_needed(x, mu, dy, dz, safety=1.0):
