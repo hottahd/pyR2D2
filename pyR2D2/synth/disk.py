@@ -47,6 +47,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from odfgen.r2d2io import check_snapshots
 from odfgen.synth import OpacityTable, substeps_needed, synth_ray
 
 C_KMS = 2.99792458e5
@@ -114,6 +115,8 @@ def main():
     print(f"  重み (mu dmu 込み、規格化): {np.round(wmu,3)}")
 
     snaps = [args.n - k * args.snap_step for k in range(args.nsnap)][::-1]
+    check_snapshots(d.p["datadir"] if isinstance(d.p, dict) else args.run + "/data",
+                    snaps)
     Imu = np.zeros((args.nmu, len(tab.lam)))
     # **1 枚ごとの円盤積分も残す**。佐藤さんが欲しいのは平均ではなく
     # **変動**なので、平均だけ保存すると後から測り直せない
