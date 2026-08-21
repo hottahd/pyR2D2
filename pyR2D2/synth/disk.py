@@ -107,8 +107,12 @@ def main():
 
     snaps = [args.n - k * args.snap_step for k in range(args.nsnap)][::-1]
     Imu = np.zeros((args.nmu, len(tab.lam)))
+    # **1 枚ごとの円盤積分も残す**。佐藤さんが欲しいのは平均ではなく
+    # **変動**なので、平均だけ保存すると後から測り直せない
+    # (`docs/15`)。20 枚 x 6350 点なら 1 MB 程度
+    Imu_snap = np.zeros((len(snaps), args.nmu, len(tab.lam)))
     t0 = time.time()
-    for ns in snaps:
+    for isnap, ns in enumerate(snaps):
         d.qr.read(ns, keys=["te", "pr", "ro", "vx", "vy", "vz"])
         te = np.array(d.qr.te) + np.array(p.te0)[:, None, None]
         pr = np.array(d.qr.pr) + np.array(p.pr0)[:, None, None]
@@ -135,11 +139,27 @@ def main():
                                          nsub=nsub)
                         nc += 1
             Imu[im] += acc / nc
+            Imu_snap[isnap, im] = acc / nc
             print(f"  n={ns} mu={mu:.3f} (細分 {nsub}, {nc} 本) "
                   f"{time.time()-t0:.0f} s", flush=True)
     Imu /= len(snaps)
 
     # --- 円盤積分 -----------------------------------------------------------
+    def integrate(imu):
+        """mu ごとの強度 -> 円盤積分したスペクトル (自転込み)。"""
+        if args.vrot > 0:
+            psis_ = np.linspace(0.0, 2 * np.pi, args.npsi, endpoint=False)
+            out = np.zeros(len(tab.lam))
+            for im_, mu_ in enumerate(mus):
+                st_ = np.sqrt(max(0.0, 1.0 - mu_ * mu_))
+                for ps_ in psis_:
+                    out += wmu[im_] / args.npsi * shift_spectrum(
+                        tab.lam, imu[im_], args.vrot * st_ * np.sin(ps_))
+            return out
+        return (wmu[:, None] * imu).sum(axis=0)
+
+    F_snap = np.array([integrate(Imu_snap[k]) for k in range(len(snaps))])
+
     if args.vrot > 0:
         psis = np.linspace(0.0, 2 * np.pi, args.npsi, endpoint=False)
         F = np.zeros(len(tab.lam))
@@ -165,7 +185,8 @@ def main():
     if args.save_npz:
         np.savez(args.save_npz, lam=tab.lam, mean=F, norm=norm,
                  degraded=norm, n=args.n, mus=mus, wmu=wmu, Imu=Imu,
-                 vrot=args.vrot)
+                 vrot=args.vrot, per_snap=F_snap, snaps=np.array(snaps),
+                 Imu_snap=Imu_snap)
         print(f"wrote {args.save_npz}")
 
 
