@@ -84,6 +84,14 @@ def main():
     ap.add_argument("--vrot", type=float, default=2.0,
                     help="赤道自転速度 [km/s]。0 にすると自転を入れない")
     ap.add_argument("--xmin", type=float, default=-0.5)
+    ap.add_argument("--mu-fixed-below", type=float, default=0.0,
+                    help="この mu 未満の求積点は**最初の 1 枚だけ計算して"
+                         "全スナップショットで使い回す**。"
+                         "低 mu は (a) 光線が箱を何周もするので d001 では"
+                         "そもそも無効 (`docs/12` 9.1 節)、(b) 計算量が "
+                         "sqrt(1-mu^2)/mu で効いて全体の 86%% を占める。"
+                         "円盤積分の重みは正しいまま**時間変動だけ**を"
+                         "落とす近似。0.3 で重みの 6.7%% が固定になる。")
     ap.add_argument("--save-npz", default=None)
     args = ap.parse_args()
 
@@ -128,6 +136,10 @@ def main():
         ny, nz = te.shape[1], te.shape[2]
 
         for im, mu in enumerate(mus):
+            if mu < args.mu_fixed_below and isnap > 0:
+                Imu_snap[isnap, im] = Imu_snap[0, im]   # 1 枚目を使い回す
+                Imu[im] += Imu_snap[0, im]
+                continue
             nsub = substeps_needed(x, mu, dy, dz)
             acc = np.zeros(len(tab.lam))
             nc = 0
