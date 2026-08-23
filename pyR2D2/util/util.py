@@ -307,6 +307,17 @@ def eos(data, ro, se, var):
     Warning
     -------
     This method is very slow for large numpy array. Please consider using fortraun code.
+    It also only accepts scalars; use :func:`pyR2D2.util.eos_table` for arrays.
+
+    Warning
+    -------
+    **This reads the table unconditionally, which is not what R2D2 does.**
+    The code switches to the linearized EOS whenever the relative amplitude
+    ``ct = max(|ro1|/ro0, |se1|/se0)`` stays below ``ct0 = 3e-3``, and in a
+    deep-convection run that is everywhere.  Comparing a plain table lookup
+    against the ``pr``/``te`` in the output files can be off by four orders of
+    magnitude *of the signal amplitude*, not four decimal places.  Use
+    :func:`pyR2D2.util.eos_switch` to reproduce what the code actually did.
     """
 
     import numpy as np
@@ -334,3 +345,165 @@ def eos(data, ro, se, var):
         / data.dse_e
     )
     return qq
+
+
+def eos_table(data, ro, se, var):
+    """
+    Returns the table equation of state, vectorized over numpy arrays.
+
+    This is the array-capable counterpart of :func:`pyR2D2.util.eos`, which
+    only accepts scalars (it calls ``int()`` on the index).  The interpolation
+    itself is identical: bilinear in ``(log rho, s)`` on the logarithm of the
+    tabulated quantity, exponentiated afterwards.  Everything is done in
+    float64, whereas ``pyR2D2.Data.eos.eval`` (the C++ helper) works in
+    float32.
+
+    Parameters
+    ----------
+    data : pyR2D2.Data, or, pyR2D2.Read
+        Instance of pyR2D2.Data or pyR2D2.Read classes
+    ro : float or numpy.ndarray
+        Total density (background + perturbation)
+    se : float or numpy.ndarray
+        Total entropy (background + perturbation)
+    var : str
+        Variable name; pr, te, en, op, or dprdro
+
+    Returns
+    -------
+    qq : numpy.ndarray
+        Corresponding variable, same shape as ``ro``
+    """
+
+    import numpy as np
+
+    log_table = np.asarray(data.p.__dict__["log_" + var + "_e"], dtype=np.float64)
+    log_ro_e = np.asarray(data.log_ro_e, dtype=np.float64)
+    se_e = np.asarray(data.se_e, dtype=np.float64)
+    dlogro_e = float(data.dlogro_e)
+    dse_e = float(data.dse_e)
+
+    log_ro = np.log(np.asarray(ro, dtype=np.float64))
+    se = np.asarray(se, dtype=np.float64)
+
+    # R2D2 (eos_proc.F95 の eos_calc_init) と同じく、両端で 2x2 ステンシルが
+    # 表からはみ出さないところまでクランプする。範囲外は外挿になる。
+    iro = np.clip(((log_ro - log_ro_e[0]) / dlogro_e).astype(int), 0, log_ro_e.size - 2)
+    ise = np.clip(((se - se_e[0]) / dse_e).astype(int), 0, se_e.size - 2)
+
+    dlogro = log_ro - log_ro_e[iro]
+    dse = se - se_e[ise]
+
+    # fmt: off
+    return np.exp(
+        (
+            + log_table[iro    , ise    ] * (dlogro_e - dlogro) * (dse_e - dse)
+            + log_table[iro + 1, ise    ] * (           dlogro) * (dse_e - dse)
+            + log_table[iro    , ise + 1] * (dlogro_e - dlogro) * (          dse)
+            + log_table[iro + 1, ise + 1] * (           dlogro) * (          dse)
+        )
+        / dlogro_e
+        / dse_e
+    )
+    # fmt: on
+
+
+def eos_switch(data, ro1, se1, var, ct0=3.0e-3):
+    """
+    Returns the equation of state **as R2D2 itself evaluates it**, i.e. with
+    the switch between the table EOS and the linearized EOS.
+
+    Why this exists
+    ---------------
+    :func:`pyR2D2.util.eos`, :func:`pyR2D2.util.eos_table` and
+    ``pyR2D2.Data.eos.eval`` all read the table unconditionally.  R2D2 does
+    not.  Wherever the code needs pressure, temperature or internal energy it
+    computes the relative amplitude
+
+    .. math:: c_t = \\max(|\\rho_1|/\\rho_0, |s_1|/s_0)
+
+    and uses the **linearized** EOS when :math:`c_t \\le c_{t0}`
+    (``ct0 = 3e-3``, ``eos_def.F90``), falling back to the table only above
+    it.  The switch is hard, not smooth::
+
+        feos = sign(0.5, ct - ct0) + 0.5
+
+    and appears identically in ``runge_kutta_cartesian.F90`` /
+    ``runge_kutta_spherical.F90`` (pressure), ``artdif_cartesian.F90`` /
+    ``artdif_spherical.F90`` (temperature and enthalpy), ``cfl.F90``
+    (``dprdro``, hence the sound speed) and ``remap_calc.F90`` (the pr/te/en
+    written into ``remap/vl``).
+
+    In a deep-convection run :math:`c_t` never reaches :math:`c_{t0}`, so the
+    code runs entirely on the linearized EOS while a plain table lookup
+    returns something else.  That is the discrepancy this function removes.
+
+    Parameters
+    ----------
+    data : pyR2D2.Data, or, pyR2D2.Read
+        Instance of pyR2D2.Data or pyR2D2.Read classes
+    ro1 : numpy.ndarray
+        Density **perturbation**, i.e. ``d.qq['ro']`` as stored in the output.
+        The first axis must be the vertical one (size ``ix``).
+    se1 : numpy.ndarray
+        Entropy **perturbation**, same shape as ``ro1``
+    var : str
+        Variable name; pr, te, en, op, or dprdro
+    ct0 : float
+        Switching threshold, ``eos_def.F90``'s ``ct0``.  Change it only to
+        experiment; the code itself compiles it in as 3e-3.
+
+    Returns
+    -------
+    qq : numpy.ndarray
+        For ``pr``, ``te`` and ``en``: the **perturbation**, matching what
+        ``remap_calc.F90`` writes into the output files (add ``d.p.pr0`` etc.
+        for the total).  For ``op`` and ``dprdro``: the value itself, since
+        neither has a linearized perturbation form.  ``op`` is never switched
+        (the table is the only source); ``dprdro`` switches to the background
+        profile ``d.p.dprdro``.
+    """
+
+    import numpy as np
+
+    ro1 = np.asarray(ro1, dtype=np.float64)
+    se1 = np.asarray(se1, dtype=np.float64)
+    if ro1.shape != se1.shape:
+        raise ValueError(
+            f"ro1 and se1 must have the same shape, got {ro1.shape} and {se1.shape}"
+        )
+
+    def background(name):
+        """鉛直1D の背景量を ro1 の形へ broadcast する。"""
+        a = np.asarray(data.p.__dict__[name], dtype=np.float64)
+        if ro1.ndim == 0:
+            raise ValueError(
+                "eos_switch needs arrays whose first axis is the vertical one; "
+                "for a single point, index the background yourself and use eos_table"
+            )
+        if a.size != ro1.shape[0]:
+            raise ValueError(
+                f"the first axis of ro1 (size {ro1.shape[0]}) must be the vertical one "
+                f"(background '{name}' has size {a.size})"
+            )
+        return a.reshape((a.size,) + (1,) * (ro1.ndim - 1))
+
+    ro0 = background("ro0")
+    se0 = background("se0")
+    table = eos_table(data, ro1 + ro0, se1 + se0, var)
+
+    # 不透明度には線形化した対応物が無く、R2D2 も常に表を引く
+    # (rte_multiray.F90, rte_io.F90, remap_calc.F90)。
+    if var == "op":
+        return table
+
+    # ct = max(|ro1|/ro0, |se1|/se0)、feos は 0 か 1 のどちらか。
+    ct = np.maximum(np.abs(ro1) / ro0, np.abs(se1) / se0)
+    feos = np.where(ct > ct0, 1.0, 0.0)
+
+    # dprdro の線形側は背景プロファイルそのものである (cfl.F90)。
+    if var == "dprdro":
+        return table * feos + background("dprdro") * (1.0 - feos)
+
+    linear = background("d" + var + "dro") * ro1 + background("d" + var + "dse") * se1
+    return (table - background(var + "0")) * feos + linear * (1.0 - feos)

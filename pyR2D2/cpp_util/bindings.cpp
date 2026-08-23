@@ -305,6 +305,14 @@ PYBIND11_MODULE(cpp_util, m)
       -------
       numpy.ndarray
           Array of evaluated EOS variables.
+
+      Warning
+      -------
+      This reads the table unconditionally, which is not what R2D2 does. The
+      code switches to the linearized EOS whenever the relative amplitude
+      ct = max(|ro1|/ro0, |se1|/se0) stays below ct0 = 3e-3, and in a
+      deep-convection run that is everywhere. Use pyR2D2.util.eos_switch to
+      reproduce what the code actually did.
       )doc");
     // clang-format on
 

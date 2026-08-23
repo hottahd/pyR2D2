@@ -42,6 +42,13 @@ class Parameters:
         with open(self.datadir / "param" / "params.dac", "r") as f:
             for line in f:
                 parts = line.split()
+                # 値が空の行がありうる (SERVER を指定せずに走らせると
+                # "                     server c" のように値が空文字になる)。
+                # その場合 parts は 2 つしか無いので、値を "" として扱う。
+                if len(parts) == 2:
+                    parts = [""] + parts
+                elif len(parts) < 2:
+                    continue
                 key = parts[1]
                 value = parts[0]
                 value_type = parts[2]
