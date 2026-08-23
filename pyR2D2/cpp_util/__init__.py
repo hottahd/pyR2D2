@@ -10,6 +10,7 @@ from .cpp_util import (
     interp,
     spherical2cartesian,
     trace_field_line,
+    trace_field_lines,
     vertical_upward_rte,
 )
 
@@ -140,4 +141,5 @@ __all__ = [
     "spherical2cartesian",
     "vertical_upward_rte",
     "trace_field_line",
+    "trace_field_lines",
 ]

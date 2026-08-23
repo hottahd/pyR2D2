@@ -419,34 +419,40 @@ PYBIND11_MODULE(cpp_util, m)
     Trace a field line through a 3D magnetic field.
     Parameters
     ----------
-    x_np : numpy.ndarray
-        1D array of x-coordinates.
-    y_np : numpy.ndarray
-        1D array of y-coordinates.
-    z_np : numpy.ndarray
-        1D array of z-coordinates.
-    bx_np : numpy.ndarray
-        3D array of x-components of the magnetic field.
-    by_np : numpy.ndarray
-        3D array of y-components of the magnetic field.
-    bz_np : numpy.ndarray
-        3D array of z-components of the magnetic field.
-    x0 : double
-        Initial x-coordinate.
-    y0 : double
-        Initial y-coordinate.
-    z0 : double
-        Initial z-coordinate.
+    x, y, z : numpy.ndarray
+        1D coordinate arrays. Must be uniform (checked, with an error rather
+        than silent corruption). Read as float64; positions are integrated in
+        double as offsets from x[0], y[0], z[0], so a large absolute offset no
+        longer eats into the precision.
+    bx, by, bz : numpy.ndarray
+        3D magnetic field components.
+    fields : dict
+        Extra 3D arrays to interpolate along the line.
+    x0, y0, z0 : double
+        Starting point, in the same absolute coordinates as x, y, z.
     ds : double
-        Step size for tracing.
-    n_steps : size_t
-        Number of steps for tracing.
+        Arc-length step.
+    n_steps : int
+        Maximum number of points.
     sign : double, optional
-        Sign for the tracing direction (default is 1.0).
+        +1 traces along B, -1 against it. Default +1.
+    method : str, optional
+        'implicit_midpoint' (default) is time symmetric, so tracing back with
+        -ds retraces the same points to tolerance. 'explicit_midpoint' is the
+        pre-2026-08-23 behaviour, kept for comparison.
+    max_iter : int, optional
+        Fixed-point iterations allowed per step for the implicit scheme.
+    tol : double, optional
+        Convergence tolerance, relative to ds.
+
     Returns
     -------
-    FieldLine
-        The traced field line.
+    dict
+        'x', 'y', 'z' : float64 positions, truncated at n_valid
+        each key of `fields` : float32 values along the line
+        'n_valid' : number of points produced
+        'status'  : 0 ran out of steps, 1 left the domain, 2 |B| vanished,
+                    3 iteration did not converge
     )doc",
         py::arg("x"),
         py::arg("y"),
@@ -460,5 +466,67 @@ PYBIND11_MODULE(cpp_util, m)
         py::arg("z0"),
         py::arg("ds"),
         py::arg("n_steps"),
-        py::arg("sign") = 1.0);
+        py::arg("sign") = 1.0,
+        py::arg("method") = "implicit_midpoint",
+        py::arg("max_iter") = 20,
+        py::arg("tol") = 1e-10);
+
+    m.def(
+        "trace_field_lines",
+        &trace_field_lines,
+        R"doc(
+    Trace many field lines at once (OpenMP parallel).
+
+    Same physics as :func:`trace_field_line`, but the seeds are arrays and the
+    output is rectangular, which avoids one Python call per line.
+
+    Parameters
+    ----------
+    x, y, z : numpy.ndarray
+        1D coordinate arrays. Must be uniform (checked).
+    bx, by, bz : numpy.ndarray
+        3D magnetic field components.
+    fields : dict
+        Extra 3D arrays to interpolate along each line.
+    x0, y0, z0 : numpy.ndarray
+        1D arrays of seed coordinates, one entry per line.
+    ds : double
+        Arc-length step.
+    n_steps : int
+        Maximum number of points per line.
+    sign : double, optional
+        +1 traces along B, -1 against it. Default +1.
+    method : str, optional
+        'implicit_midpoint' (default, time symmetric) or 'explicit_midpoint'
+        (the pre-2026-08-23 behaviour, kept for comparison).
+    max_iter : int, optional
+        Fixed-point iterations allowed per step for the implicit scheme.
+    tol : double, optional
+        Convergence tolerance, relative to ds.
+
+    Returns
+    -------
+    dict
+        'x', 'y', 'z' : (n_lines, n_steps) float64, NaN past the end of a line
+        each key of `fields` : (n_lines, n_steps) float32, NaN past the end
+        'n_valid' : (n_lines,) int64, number of populated points
+        'status'  : (n_lines,) int32, 0 ran out of steps, 1 left the domain,
+                    2 |B| vanished, 3 iteration did not converge
+    )doc",
+        py::arg("x"),
+        py::arg("y"),
+        py::arg("z"),
+        py::arg("bx"),
+        py::arg("by"),
+        py::arg("bz"),
+        py::arg("fields"),
+        py::arg("x0"),
+        py::arg("y0"),
+        py::arg("z0"),
+        py::arg("ds"),
+        py::arg("n_steps"),
+        py::arg("sign") = 1.0,
+        py::arg("method") = "implicit_midpoint",
+        py::arg("max_iter") = 20,
+        py::arg("tol") = 1e-10);
 }
