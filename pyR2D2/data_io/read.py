@@ -1173,6 +1173,8 @@ class OpticalDepth(_BaseReader):
     Each attibutes have three values at optical depths 1, 0.1, and 0.01
     These correspond to, for example, rt, rt01, and rt001
 
+    R2D2plus の多群輻射輸送 (m_in > 13 のファイル) では、群別の射出強度が
+    rt1, rt2, ... という属性で読める (rt と同じく tau = 1 の面のみ)。
 
     """
 
@@ -1335,6 +1337,19 @@ class OpticalDepth(_BaseReader):
                     self.__dict__[key + tau] = qq.reshape(
                         (self.m_tu, self.m_in, self.jx, self.kx), order="F"
                     )[mt, mk, :, :]
+
+            # R2D2plus の多群輻射輸送 (DEC-277) は群別の射出強度を 14 番目
+            # 以降に追記する (m_in = 13 + ngroup)。従来のファイル (m_in = 13、
+            # Fortran 版 R2D2 を含む) では n_groups = 0 になり、この節は
+            # 何もしない (後方互換)。群別は rt1, rt2, ... という属性になり、
+            # rt と同じく tau = 1 の面だけ意味を持つ (rt1_01 等は 0 のまま)。
+            n_groups = self.m_in - len(self.value_keys)
+            for g in range(n_groups):
+                key = f"rt{g + 1}"
+                for tau, mt in zip(["", "01", "001"], range(3)):
+                    self.__dict__[key + tau] = qq.reshape(
+                        (self.m_tu, self.m_in, self.jx, self.kx), order="F"
+                    )[mt, len(self.value_keys) + g, :, :]
 
     def compress(
         self,
