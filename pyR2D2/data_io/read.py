@@ -1515,6 +1515,13 @@ class OnTheFly(_BaseReader):
             self.__dict__[self.cl[m + self.m2d_xy + self.m2d_xz]] = vl[:, :, m]
 
         # read spectra
+        #
+        # 注意 (2026-08-25): degreeスペクトル (fvxl〜fsel) の定義が
+        # R2D2plus (C++版, DEC-258) で変わった。旧Fortran(-DSPEX)は m != 0 の
+        # パワーが2倍過剰 (|a0|^2 + 4S)、R2D2plusは正しい定義 (|a0|^2 + 2S)。
+        # orderスペクトル (fvxm〜fsem) = |a0|^2 は不変。新旧を混ぜて比べる
+        # ときは 新degree = (旧degree + 旧order) / 2 で換算する。
+        # 詳細は KNOWN_ISSUES.md「データ定義の変更の周知」。
         if self.geometry == "YinYang":
             with open(
                 self.datadir / "remap" / "vl" / f"vl_spex.dac.{n:08d}", "rb"
