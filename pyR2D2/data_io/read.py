@@ -1489,6 +1489,10 @@ class OnTheFly(_BaseReader):
             for m in range(m_total):
                 self.__dict__[self.cl[m]] = None
 
+        # ⟨ρe⟩ (R2D2plus が追加した C++ 独自の vl_et.dac)。cl には載らない
+        # 追加変数なので個別に初期化する。Fortran のランでは None のまま。
+        self.etm = None
+
         self._generate_docstring()
 
     def read(self, n):
@@ -1529,6 +1533,9 @@ class OnTheFly(_BaseReader):
         for m in range(self.m2d_flux):
             self.__dict__[self.cl[m + self.m2d_xy + self.m2d_xz]] = vl[:, :, m]
 
+        # read mean internal energy density (R2D2plus only)
+        self.read_et(n)
+
         # read spectra
         #
         # 注意 (2026-08-25): degreeスペクトル (fvxl〜fsel) の定義が
@@ -1549,6 +1556,33 @@ class OnTheFly(_BaseReader):
                 self.__dict__[
                     self.cl[m + self.m2d_xy + self.m2d_xz + self.m2d_flux]
                 ] = vl[:, :, m]
+
+    def read_et(self, n):
+        """
+        Reads mean internal energy density ⟨ρe⟩ (``vl_et.dac``, R2D2plus only).
+
+        ``vl_et.dac`` は R2D2plus (C++版) が 2026-08-31 に追加した独自の
+        1変数で、全内部エネルギー密度 (ρ0+ρ1)(e0+e1) の経度方向平均である。
+        統計的に定常でないランで ∂z F_tot = −∂t⟨E⟩ の形の流束検査をするのに
+        使う (⟨ρ⟩⟨e⟩ 近似は過補正になる。⟨E⟩ の運動・磁気は ekm・emm)。
+        形状 (ix, jx)・単精度・Fortran 順は vl_xy と同じ。
+
+        Fortran 版のランにはこのファイルが無いので、無ければ ``self.etm``
+        を ``None`` にして黙って戻る (後方互換)。
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data
+        """
+        path = self.datadir / "remap" / "vl" / f"vl_et.dac.{n:08d}"
+        if not path.exists():
+            self.etm = None
+            return
+        with open(path, "rb") as f:
+            self.etm = np.fromfile(
+                f, self.endian + "f", self.ix * self.jx
+            ).reshape((self.ix, self.jx), order="F")
 
     def _update_json_template(
         self,

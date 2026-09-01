@@ -120,3 +120,36 @@ pyR2D2 は `vl_spex.dac` の生の値をそのまま読むだけなので**コ�
 あわせて DEC-258 では「YinYang では `xyz.dac` を書かない」(旧方針) も撤回
 された。pyR2D2 の `Parameters` 初期化が `xyz.dac` を無条件に開くため、
 R2D2plus の YinYang 出力もネイティブに開けることを確認済み。
+
+### R2D2plus (C++) ランの読み方 — 2026-09-01 追記 (vl_et と EOS 表)
+
+R2D2plus のランを pyR2D2 で読むときの差分 2 点に対応した。
+
+**(1) `vl_et.dac` (C++ 独自の追加変数) を読めるようにした。**
+R2D2plus が 2026-08-31 に追加した on-the-fly 出力で、全内部エネルギー密度
+⟨ρe⟩ = ⟨(ρ0+ρ1)(e0+e1)⟩ の経度方向平均 1 変数 (統計的に定常でないランの
+流束検査 ∂z F = −∂t⟨E⟩ 用。`enm` は比エネルギーの平均なので代用できない)。
+`OnTheFly.read(n)` が自動で読んで `vc.etm` に入る。**Fortran ランには
+ファイルが無いので `etm = None` のまま**——既存の解析は一切影響を受けない。
+c.dac / params.dac は R2D2plus 側が意図的に変えていないので、変数リスト
+`cl` にも載らない (個別属性)。
+
+**(2) EOS 表を明示パスで読めるようにした (`Parameters.read_eos_table`)。**
+従来は `<run>/input_data/eos_table_sero.npz` の固定名だけを探していたが、
+**R2D2plus のランはランディレクトリに input_data を持たない** (設定 toml が
+リポジトリ中央の表を絶対パスで指す) ため、EOS 属性が黙って未設定になる。
+`data.p.read_eos_table(path)` で任意の npz を後から読めるようにした。
+表の寸法・刻みはファイルから取るので、**A2 拡張表 (177×166、R2D2plus
+DEC-279/283) もそのまま読める**ことを確認済み:
+
+- 拡張 npz (`R2D2plus/input_data/eos_table_sero_a2ext.npz`) は旧 128×128 と
+  重なる範囲で軸・pr・en・te・dprdro が**ビット同一** (正確な splice)。
+- `op` だけは旧表で `Inf` だった OPAL 域外 2074 セル (R2D2plus DEC-207) が
+  解析値 (Thomson+Kramers) で埋まっている。有限セルは全部ビット同一。
+- 刻みは同刻み延長なので、`dlogro_e = ro[1]-ro[0]` の等間隔仮定も成り立つ。
+
+どのランがどの表を使ったかは、R2D2plus の設定 toml の `eos_table` キーと
+`run.log` の `cfg input.eos_table = ...` 行に絶対パスで残っている。
+なお params.dac の `uuid_eos` は、R2D2plus 側で作った拡張表に UUID を
+振っていないため現状 "unknown" になる (R2D2_pre の `eos.py` が書く
+`uuid_eos.txt` 一式が無い。R2D2plus 側の課題として記録済み)。

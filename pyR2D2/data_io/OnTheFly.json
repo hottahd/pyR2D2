@@ -16,6 +16,7 @@
     "tem": "mean temperature",
     "prm": "mean pressure",
     "enm": "mean internal energy / unit mass",
+    "etm": "mean internal energy density <rho*e> (R2D2plus only, vl_et.dac; None for Fortran runs)",
     "opm": "mean opacity",
     "tum": "mean optical depth",
     "wxm": "mean x vorticity",

@@ -277,22 +277,7 @@ class Parameters:
                     self.z_slice = slice["z_slice"].reshape(self.nz_slice, order="F")
 
         # read equation of state
-        eosdir = self.datadir.parent / "input_data"
-        if os.path.exists(eosdir / "eos_table_sero.npz"):
-            eos_d = np.load(eosdir / "eos_table_sero.npz")
-            self.log_ro_e = eos_d["ro"]  # density is defined in logarithmic scale
-            self.se_e = eos_d["se"]
-            self.ix_e = len(self.log_ro_e)
-            self.jx_e = len(self.se_e)
-
-            self.log_pr_e = np.log(eos_d["pr"] + 1.0e-200)
-            self.log_en_e = np.log(eos_d["en"] + 1.0e-200)
-            self.log_te_e = np.log(eos_d["te"] + 1.0e-200)
-            self.log_op_e = np.log(eos_d["op"] + 1.0e-200)
-            self.log_dprdro_e = np.log(eos_d["dprdro"] + 1.0e-200)
-
-            self.dlogro_e = self.log_ro_e[1] - self.log_ro_e[0]
-            self.dse_e = self.se_e[1] - self.se_e[0]
+        self.read_eos_table()
 
         # read original data
         if os.path.exists(self.datadir / "cont_log.txt"):
@@ -302,6 +287,52 @@ class Parameters:
             self.origin = "N/A"
 
         self._generate_docstring()
+
+    def read_eos_table(self, path=None):
+        """
+        Read an EoS table (npz) and set the interpolation attributes
+        (``log_ro_e``, ``se_e``, ``log_pr_e``, ..., ``dlogro_e``, ``dse_e``).
+
+        Parameters
+        ----------
+        path : str or pathlib.Path, optional
+            npz file to read. 省略時は従来どおり
+            ``<run>/input_data/eos_table_sero.npz`` を探し、無ければ黙って
+            何もしない (Fortran ランの従来挙動)。
+
+            **R2D2plus (C++版) のランはランディレクトリに input_data を
+            持たない**ので、省略時はEOS属性が設定されない。使った表は設定
+            toml の ``eos_table`` キーと run.log に絶対パスで残っているから、
+            その npz 版を明示的に渡すこと。例::
+
+                data.p.read_eos_table(
+                    "/scr/.../R2D2plus/input_data/eos_table_sero_a2ext.npz")
+
+            表の寸法と刻みはファイルから取るので、A2 拡張表 (177x166、
+            旧 128x128 の同刻み延長。R2D2plus DEC-279/283) もそのまま読める。
+            拡張 npz は旧表と重なる範囲でビット同一であることを確認済み
+            (op だけは旧表で Inf だった OPAL 域外 2074 セルが解析値で
+            埋まっている)。
+        """
+        if path is None:
+            path = self.datadir.parent / "input_data" / "eos_table_sero.npz"
+            if not os.path.exists(path):
+                return
+
+        eos_d = np.load(path)
+        self.log_ro_e = eos_d["ro"]  # density is defined in logarithmic scale
+        self.se_e = eos_d["se"]
+        self.ix_e = len(self.log_ro_e)
+        self.jx_e = len(self.se_e)
+
+        self.log_pr_e = np.log(eos_d["pr"] + 1.0e-200)
+        self.log_en_e = np.log(eos_d["en"] + 1.0e-200)
+        self.log_te_e = np.log(eos_d["te"] + 1.0e-200)
+        self.log_op_e = np.log(eos_d["op"] + 1.0e-200)
+        self.log_dprdro_e = np.log(eos_d["dprdro"] + 1.0e-200)
+
+        self.dlogro_e = self.log_ro_e[1] - self.log_ro_e[0]
+        self.dse_e = self.se_e[1] - self.se_e[0]
 
     def yinyang_setup(self):
         """
