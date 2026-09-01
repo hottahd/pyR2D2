@@ -90,3 +90,31 @@ def test_read_eos_table_default_missing_is_silent(tmp_path):
     p.datadir = datadir
     p.read_eos_table()
     assert not hasattr(p, "log_ro_e")
+
+
+def test_read_eos_table_r2d2plus_table_format(tmp_path):
+    # r2d2plus-table 1 (単一ファイル形式、R2D2plus DEC-432) も読める
+    nro, nse = 6, 4
+    log_ro = np.linspace(-40.0, -5.0, nro)
+    se = np.linspace(1.0e9, 7.0e9, nse)
+    pr = np.exp(np.add.outer(0.1 * log_ro, 1.0e-9 * se))
+    arrays = {"ro": log_ro, "se": se, "pr": pr, "en": 2 * pr, "te": 3 * pr,
+              "op": 4 * pr, "dprdro": 5 * pr}
+    header = ["r2d2plus-table 1", "kind eos_table_sero",
+              "uuid 00000000-0000-0000-0000-000000000000",
+              "layout row_major little_endian float64", "binary_offset 512"]
+    for k, a in arrays.items():
+        header.append("array " + k + " " + " ".join(str(n) for n in a.shape))
+    header.append("end")
+    text = ("\n".join(header) + "\n").encode()
+    path = tmp_path / "eos_table_sero.tbl"
+    with open(path, "wb") as f:
+        f.write(text + b"\n" * (512 - len(text)))
+        for a in arrays.values():
+            f.write(np.ascontiguousarray(a, dtype="<f8").tobytes())
+
+    p = Parameters.__new__(Parameters)
+    p.read_eos_table(path)
+    assert p.ix_e == nro and p.jx_e == nse
+    np.testing.assert_array_equal(p.log_ro_e, log_ro)
+    np.testing.assert_allclose(p.log_pr_e, np.log(pr + 1.0e-200))

@@ -6,6 +6,34 @@ import numpy as np
 import pyR2D2
 
 
+def _read_r2d2plus_table(path):
+    """r2d2plus-table 1 (R2D2plus specification.md 11.32) を {name: array} で返す。
+
+    ASCIIヘッダ(1行1項目、"end"まで) + パディング + little-endian float64 の
+    ペイロード。2次元は行優先 (n_ro, n_se)。
+    """
+    with open(path, "rb") as f:
+        head = f.read(65536).decode("utf-8", errors="replace")
+        if not head.startswith("r2d2plus-table 1"):
+            raise ValueError(f"{path}: not a r2d2plus-table")
+        arrays_decl, offset = [], None
+        for line in head.splitlines()[1:]:
+            if line == "end":
+                break
+            key, _, rest = line.partition(" ")
+            if key == "array":
+                w = rest.split()
+                arrays_decl.append((w[0], tuple(int(v) for v in w[1:])))
+            elif key == "binary_offset":
+                offset = int(rest)
+        f.seek(offset)
+        out = {}
+        for name, shape in arrays_decl:
+            n = int(np.prod(shape))
+            out[name] = np.fromfile(f, dtype="<f8", count=n).reshape(shape)
+    return out
+
+
 class Parameters:
     """
     Class for managing R2D2 basic parameters
@@ -319,7 +347,14 @@ class Parameters:
             if not os.path.exists(path):
                 return
 
-        eos_d = np.load(path)
+        # r2d2plus-table (単一ファイルの自己記述形式、R2D2plus DEC-432)。
+        # npz と同じキーの dict にして下の共通処理へ流す。
+        with open(path, "rb") as f:
+            magic = f.read(15)
+        if magic == b"r2d2plus-table ":
+            eos_d = _read_r2d2plus_table(path)
+        else:
+            eos_d = np.load(path)
         self.log_ro_e = eos_d["ro"]  # density is defined in logarithmic scale
         self.se_e = eos_d["se"]
         self.ix_e = len(self.log_ro_e)
