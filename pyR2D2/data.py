@@ -14,41 +14,51 @@ class Data:
     Attributes
     ----------
     p : pyR2D2.Parameters
-        Instance of pyR2D2.Parameters
-    qx : pyR2D2.XSelect
-        Instance of pyR2D2.XSelect
-    qz : pyR2D2.ZSelect
-        Instance of pyR2D2.ZSelect
-    qm : pyR2D2.MPIRegion
-        Instance of pyR2D2.MPIRegion
+        Run parameters and grids (``x, y, z, nx, ...``); also reachable directly as
+        ``d.x``, ``d.nx``, ... (attribute lookup falls through to ``d.p``).
     qf : pyR2D2.FullData
-        Instance of pyR2D2.FullData
+        Full 3D data (``remap/qq``).
+        ``d.qf.read(n)`` -> ``d.qf.ro, vx, vy, vz, bx, by, bz, se, pr, te, op``
+    qx : pyR2D2.XSelect
+        2D plane at a given x.
+        ``d.qx.read(xs, n)`` -> ``d.qx.ro, vx, vy, vz, bx, by, bz, se, ...``
+    qz : pyR2D2.ZSelect
+        2D plane at a given z.
+        ``d.qz.read(zs, n)`` -> ``d.qz.ro, vx, ...``
+    qm : pyR2D2.MPIRegion
+        3D data of one remap MPI region.
+        ``d.qm.read(ixrt, n)`` -> ``d.qm.ro, ...``
     qr : pyR2D2.RestrictedData
-        Instance of pyR2D2.RestrictedData
+        3D data inside a sub-volume.
+        ``d.qr.read(n, keys, x0=..., x1=..., ...)`` -> ``d.qr.ro, ...``
     qt : pyR2D2.OpticalDepth
-        Instance of pyR2D2.OpticalDepth
+        2D data on optical-depth surfaces (tau = 1, 0.1, 0.01).
+        ``d.qt.read(n)`` -> ``d.qt.rt, he, fr, ro, se, vx, ...``
+        (``rt`` at tau=1, ``rt01`` at 0.1, ``rt001`` at 0.01; multigroup ``rt1, rt2, ...``)
     vc : pyR2D2.OnTheFly
-        Instance of pyR2D2.OnTheFly
+        On-the-fly means, RMS, correlations and xy/xz cuts (``remap/vl``).
+        ``d.vc.read(n)`` -> ``d.vc.rom, sem, serms, se_xz, bx_xy, ...``;
+        ``d.vc.read_et(n)`` -> ``d.vc.etm`` (R2D2plus only)
     qs : pyR2D2.Slice
-        Instance of pyR2D2.Slice
+        2D slice output (``slice/``).
+        ``d.qs.read(n_slice, direc, n)`` -> ``d.qs.ro, vx, ..., pr, te``
+    q2 : pyR2D2.TwoDimension
+        Full data of a 2D run (dict access).
+        ``d.q2.read(n)`` -> ``d.q2['ro'], d.q2['tu'], ...``
     ms : pyR2D2.ModelS
-        Instance of pyR2D2.ModelS
+        Model S based stratification.  ``d.ms.read()``
+    qp, qa : pyR2D2.Previous, pyR2D2.After
+        Checkpoint before / after step n.
+        ``d.qp.read(n, n_prev)``, ``d.qa.read(n, n_aftr)``
     time : float
-        Time at a selected time step. See :meth:`pyR2D2.Data.time_read`
+        Time at a selected step. See :meth:`pyR2D2.Data.time_read`
     qc : numpy.ndarray, float
-        3D full data for checkpoint. See :meth:`pyR2D2.Data.qc_read`
-    qp : pyR2D2.Previous
-        Instance of pyR2D2.Previous
-    qa : pyR2D2.After
-        Instance of pyR2D2.After
-
+        3D checkpoint data. See :meth:`pyR2D2.Data.qc_read`
     sync : pyR2D2.Sync
-        Instance of pyR2D2.Sync
     eos : pyR2D2.cpp_util.EOS
-        Instance of pyR2D2.cpp_util.EOS
-    yinyang: pyR2D2.cpp_util.YinYang
-        Instance of pyR2D2.cpp_util.YinYang
+    yinyang : pyR2D2.cpp_util.YinYang
 
+    ``help(d.qt)`` (or ``d.qt?`` in IPython) shows how to read and which variables appear.
     """
 
     def __init__(self, datadir, verbose=False, self_old=None):

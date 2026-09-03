@@ -208,6 +208,11 @@ class XSelect(_BaseRemapReader):
     """
     Class for 2D selected data at a certain x
 
+    Usage
+    -----
+    ``d.qx.read(xs, n)`` reads the plane at the grid nearest to ``x = xs`` at step ``n``.
+    Then use ``d.qx.ro, d.qx.vx, ...`` (see Attributes).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qx`
@@ -356,6 +361,11 @@ class ZSelect(_BaseRemapReader):
     """
     Class for 2D selected data at a certain z
 
+    Usage
+    -----
+    ``d.qz.read(zs, n)`` reads the plane at the grid nearest to ``z = zs`` at step ``n``.
+    Then use ``d.qz.ro, d.qz.vx, ...`` (see Attributes).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qz`
@@ -417,6 +427,11 @@ class MPIRegion(_BaseRemapReader):
     """
     Class for 3D data at a selected MPI process
 
+    Usage
+    -----
+    ``d.qm.read(ixrt, n)`` reads the ``ixrt``-th remap region (x direction) at step ``n``.
+    Then use ``d.qm.ro, d.qm.vx, ...`` (see Attributes).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qm`
@@ -475,6 +490,11 @@ class MPIRegion(_BaseRemapReader):
 class FullData(_BaseRemapReader):
     """
     Class for 3D full data
+
+    Usage
+    -----
+    ``d.qf.read(n)`` reads the whole 3D box at step ``n``.
+    Then use ``d.qf.ro, d.qf.vx, ...`` (see Attributes).
 
     Important
     ---------
@@ -649,7 +669,7 @@ class FullData(_BaseRemapReader):
         k_start: int = None,
         k_size: int = None,
         chunks3d: tuple = None,
-        keys: list = zarr_keys,
+        keys: list | None = None,
         overwrite: bool = False,
         max_workers: int = 1,
         lightweight: bool = False,
@@ -687,6 +707,8 @@ class FullData(_BaseRemapReader):
             If True, the function reads and writes each variable separately to save memory. This is useful when the data is too large to fit in memory. By default False (all variables are read and written together).
 
         """
+        if keys is None:
+            keys = self.zarr_keys
 
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_remap_zarr(n)
@@ -784,7 +806,7 @@ class FullData(_BaseRemapReader):
     def check(
         self,
         n: int,
-        keys: list = zarr_keys,
+        keys: list | None = None,
         max_workers: int = 1,
         lightweight: bool = False,
     ):
@@ -800,6 +822,8 @@ class FullData(_BaseRemapReader):
         lightweight : bool
             If True, check is done for each value separately to save memory. This is useful when the data is too large to fit in memory. By default, False (all values are checked together).
         """
+        if keys is None:
+            keys = self.zarr_keys
 
         zarr_filepath = self._get_filepath_remap_zarr(n)
         if not zarr_filepath.exists():
@@ -941,6 +965,11 @@ class FullData(_BaseRemapReader):
 class RestrictedData(_BaseRemapReader):
     """
     Class for 3D restricted-volume data
+
+    Usage
+    -----
+    ``d.qr.read(n, keys, x0=..., x1=..., y0=..., y1=..., z0=..., z1=...)`` reads only the
+    sub-volume at step ``n``. Then use ``d.qr.ro, ...`` (see Attributes).
 
     Important
     ---------
@@ -1134,6 +1163,12 @@ class RestrictedData(_BaseRemapReader):
 class OpticalDepth(_BaseReader):
     """
     Class for 2D data at certain optical depths
+
+    Usage
+    -----
+    ``d.qt.read(n)`` reads the tau = 1, 0.1, 0.01 surfaces at step ``n``.
+    Then use ``d.qt.rt, d.qt.he, d.qt.fr, d.qt.ro, ...`` for tau = 1,
+    ``d.qt.rt01`` for tau = 0.1 and ``d.qt.rt001`` for tau = 0.01 (see Attributes).
 
     Important
     ---------
@@ -1355,9 +1390,11 @@ class OpticalDepth(_BaseReader):
         self,
         n: int,
         zarr_filepath: str = None,
-        keys: list = zarr_keys,
+        keys: list | None = None,
         overwrite: bool = False,
     ):
+        if keys is None:
+            keys = self.zarr_keys
 
         if zarr_filepath is None:
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
@@ -1382,7 +1419,7 @@ class OpticalDepth(_BaseReader):
             zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
         )
 
-    def check(self, n: int, keys: list = zarr_keys):
+    def check(self, n: int, keys: list | None = None):
         """
         Check if the tau/qq/ file exists for a given time step n
 
@@ -1393,6 +1430,8 @@ class OpticalDepth(_BaseReader):
         keys : list or str
             List of values to check. If the check fails for any of the values, the function returns False. By default, all values are checked.
         """
+        if keys is None:
+            keys = self.zarr_keys
 
         zarr_filepath = self._get_filepath_optical_depth_zarr(n)
         if not zarr_filepath.exists():
@@ -1469,6 +1508,13 @@ class OnTheFly(_BaseReader):
     """
     Class for on-the-fly analysis data
     Mean, RMS, and correlation are done in longitudinal or z directions.
+
+    Usage
+    -----
+    ``d.vc.read(n)`` reads all on-the-fly diagnostics at step ``n``.
+    Then use e.g. ``d.vc.rom, d.vc.sem, d.vc.serms`` (means/RMS vs height) and
+    ``d.vc.se_xz, d.vc.bx_xy`` (2D cuts). ``d.vc.read_et(n)`` adds ``d.vc.etm``
+    (R2D2plus only). See Attributes for the full list.
 
 
     Important
@@ -1649,6 +1695,11 @@ class OnTheFly(_BaseReader):
 class Slice(_BaseReader):
     """
     Class for 2D slice data
+
+    Usage
+    -----
+    ``d.qs.read(n_slice, direc, n)`` reads slice number ``n_slice`` in direction ``direc``
+    (``'x'``, ``'y'`` or ``'z'``) at step ``n``. Then use ``d.qs.ro, d.qs.vx, ...`` (see Attributes).
 
     Important
     ---------
@@ -1867,7 +1918,7 @@ class Slice(_BaseReader):
         j_size: int = None,
         k_start: int = None,
         k_size: int = None,
-        keys: list = zarr_keys,
+        keys: list | None = None,
         overwrite: bool = False,
     ):
         """
@@ -1898,6 +1949,8 @@ class Slice(_BaseReader):
         overwrite : bool, optional
             Whether to overwrite the existing zarr file, by default False
         """
+        if keys is None:
+            keys = self.zarr_keys
 
         postfixes = self._get_postfixes()
 
@@ -1998,8 +2051,10 @@ class Slice(_BaseReader):
         self,
         n: int,
         direc: str,
-        keys: list = zarr_keys,
+        keys: list | None = None,
     ):
+        if keys is None:
+            keys = self.zarr_keys
 
         postfixes = self._get_postfixes()
         zarr_filepath = self._get_filepath_slice_zarr(n, direc)
@@ -2099,6 +2154,12 @@ class Slice(_BaseReader):
 class TwoDimension(_BaseReader):
     """
     Class for 2D data
+
+    Usage
+    -----
+    ``d.q2.read(n)`` reads the full data of a 2D run at step ``n``.
+    Access by key: ``d.q2['ro'], d.q2['se'], d.q2['tu'], ...``
+    (``ro, vx, vy, vz, bx, by, bz, se, pr, te, op, tu`` ...).
     """
 
     def __init__(self, data):
@@ -2158,6 +2219,10 @@ class TwoDimension(_BaseReader):
 class ModelS(_BaseReader):
     """
     Class for Model S based stratification data
+
+    Usage
+    -----
+    ``d.ms.read()`` reads the stratification from ``input_data``. Then use ``d.ms.<name>``.
     """
 
     def __init__(self, data):
@@ -2639,7 +2704,11 @@ class _BasePrevAftr(_BaseReader):
 
 class Previous(_BasePrevAftr):
     """
-    Class for previous and after time step data
+    Class for the checkpoint just before a time step
+
+    Usage
+    -----
+    ``d.qp.read(n, n_prev)``. Then use ``d.qp.ro, d.qp.vx, ...``.
     """
 
     prev_aftr = "prev"
@@ -2723,6 +2792,14 @@ class Previous(_BasePrevAftr):
 
 
 class After(_BasePrevAftr):
+    """
+    Class for the checkpoint just after a time step
+
+    Usage
+    -----
+    ``d.qa.read(n, n_aftr)``. Then use ``d.qa.ro, d.qa.vx, ...``.
+    """
+
     prev_aftr = "aftr"
 
     def read(self, n: int, n_aftr: int, zarr_flag: bool = False):
