@@ -66,3 +66,35 @@ Before committing a packaging change:
    modules.
 6. Inspect the wheel extension for absolute RPATH entries and unexpected
    dynamic libraries.
+
+## Wheels
+
+Wheels are built by `cibuildwheel`; the configuration lives in `[tool.cibuildwheel]`
+in `pyproject.toml`, and `.github/workflows/wheels.yml` runs it on a tag push
+(`v*`) for Linux and macOS, attaching the results to the GitHub Release.
+
+- Linux wheels target **manylinux_2_28** (glibc 2.28), which is the oldest
+  destination in use (the Fugaku login node runs RHEL 8). The same wheel also
+  works on the lab machines (glibc 2.39-2.43).
+- macOS wheels are arm64 only. `setup.py` does not add `-fopenmp` on macOS, so
+  no `libomp` is required.
+- CPython 3.12 and 3.13. pybind11 does not support the stable ABI, so one wheel
+  per minor version is needed.
+
+### Building locally
+
+**Build from an sdist, not from the working tree.**
+
+```bash
+uv build --sdist --out-dir dist
+uvx cibuildwheel --platform linux dist/pyr2d2-*.tar.gz
+```
+
+An editable install (`pip install -e .`) leaves `cpp_util.*.so` in the working
+tree and under `build/`. Building from the working tree packs those into the
+wheel, and `auditwheel repair` then rejects it because they were linked against
+the host's newer glibc. The sdist contains only tracked sources, so this cannot
+happen. CI checks out a clean tree and is unaffected.
+
+Do **not** add a cleaning `before-build` step for this: it would delete the
+`.so` that a local editable install depends on.

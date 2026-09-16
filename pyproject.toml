@@ -50,3 +50,22 @@ include = ["pyR2D2", "pyR2D2.*"]
 version_scheme = "guess-next-dev"
 local_scheme = "dirty-tag"
 version_file = "pyR2D2/_version.py"
+
+[tool.cibuildwheel]
+# Python 3.12 / 3.13 の2枚。pybind11 は abi3 に対応しないので版ごとに要る。
+# 3.14 は numpy/scipy のホイールが揃ってから足す。
+build = "cp312-* cp313-*"
+skip = "*-musllinux_* *_i686 pp*"
+# setuptools_scm が git を読むので、bind mount の所有者違いで止まらないようにする
+before-all = "git config --global --add safe.directory '*'"
+test-command = 'python -c "import pyR2D2; from pyR2D2.cpp_util import cpp_util; print(pyR2D2.__version__)"'
+
+[tool.cibuildwheel.linux]
+# いちばん古い行き先(富岳のログインノード = RHEL8 = glibc 2.28)に合わせる。
+# これで富岳も研究室の5台(glibc 2.39〜2.43)も動く。
+manylinux-x86_64-image = "manylinux_2_28"
+archs = ["x86_64"]
+
+[tool.cibuildwheel.macos]
+archs = ["arm64"]
+# Mac は setup.py が -fopenmp を付けないので libomp は要らない
