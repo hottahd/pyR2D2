@@ -2,7 +2,9 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include "const.hpp"
 #include "view_array.hpp"
 #include "eos.hpp"

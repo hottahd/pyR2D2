@@ -76,8 +76,11 @@ in `pyproject.toml`, and `.github/workflows/wheels.yml` runs it on a tag push
 - Linux wheels target **manylinux_2_28** (glibc 2.28), which is the oldest
   destination in use (the Fugaku login node runs RHEL 8). The same wheel also
   works on the lab machines (glibc 2.39-2.43).
-- macOS wheels are arm64 only. `setup.py` does not add `-fopenmp` on macOS, so
-  no `libomp` is required.
+- macOS wheels are arm64 only. `setup.py` does not add `-fopenmp` on macOS, and
+  every `#include <omp.h>` is guarded by `#ifdef _OPENMP`, so no `libomp` is
+  required. The `#pragma omp` directives are simply ignored without OpenMP.
+  (Two headers included `omp.h` unconditionally until 2026-09-16, which broke
+  the build on macOS because Apple clang ships no `omp.h`.)
 - CPython 3.12 and 3.13. pybind11 does not support the stable ABI, so one wheel
   per minor version is needed.
 
