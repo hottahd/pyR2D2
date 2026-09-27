@@ -7,6 +7,7 @@
 """
 
 import hashlib
+import os
 import tomllib
 from pathlib import Path
 
@@ -33,7 +34,7 @@ def unsent_hint(datadir):
                 sent_sha = tomllib.load(f).get("sent", {}).get("run_summary_sha256")
         if sent_sha == sha:
             return None
-        run_parent = datadir.resolve().parent.parent
+        run_parent = Path(os.path.abspath(os.fspath(datadir))).parent.parent
         return f"台帳へ未送信の変更があります: r2d2plus-ledger push {run_parent}"
     except Exception:
         return None

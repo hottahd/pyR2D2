@@ -596,9 +596,23 @@ def find_runs(path):
     return sorted(runs, key=_sort_key)
 
 
+def logical_path(path):
+    """シンボリックリンクを**たどらない**絶対パス。
+
+    ``run/d003/data -> /storage/d003_output`` のように data を別の場所へ置く運用では、
+    ``resolve()`` するとラン(d003)ではなく置き場所を指してしまう(Codex の指摘、2026-09-27)。
+    """
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def run_dir_of(datadir):
+    """``<run>/data`` から ``<run>`` を返す(data がシンボリックリンクでもランを指す)。"""
+    return logical_path(datadir).parent
+
+
 def project_name(path):
     """シート名の既定 (プロジェクトのディレクトリ名)。"""
-    path = Path(path).resolve()
+    path = logical_path(path)
     if (path / "data").is_dir():  # ラン 1 本: <project>/run/dNNN
         return path.parents[1].name
     return path.parent.name

@@ -5,6 +5,7 @@ Google には一切接続しない。シートは gspread.Worksheet の最小限
 """
 
 import datetime
+import os
 import re
 import shutil
 import sys
@@ -506,7 +507,7 @@ def test_set_cells_gspread_uses_header_names(project, monkeypatch):
 def test_unsent_hint(project, tmp_path):
     datadir = project / "d001" / "data"
     msg = unsent_hint(datadir)
-    assert msg == f"台帳へ未送信の変更があります: r2d2plus-ledger push {project.resolve()}"
+    assert msg == f"台帳へ未送信の変更があります: r2d2plus-ledger push {os.path.abspath(project)}"
     rec = collect.collect_run(project / "d001", server="astana", du=False)
     collect.write_sent(rec, "sunspot")
     assert unsent_hint(datadir) is None
@@ -688,3 +689,42 @@ def test_d000_never_overwrites_the_header_row():
     assert all(text not in ("d000",) for row, col, text in plan.cells if row == 1)
     assert [c for c, _ in plan.skipped] == ["d000"]
     assert any(row == 2 and text == "d001" for row, col, text in plan.cells)
+
+
+def test_symlinked_data_directory_keeps_the_run_identity(tmp_path, monkeypatch):
+    """``run/d003/data -> storage/...`` でもランは d003 のまま(Codex の再現、2026-09-27)。
+
+    以前は ``Path(datadir).resolve().parent`` で置き場所の側を読み、Case ID が ``storage``、
+    step が空になった。
+    """
+    import pyR2D2.write.google.google as g
+
+    make_run(tmp_path / "storage", "actual_d003_output", step=123)
+    run = tmp_path / "sunspot" / "run" / "d003"
+    run.mkdir(parents=True)
+    (run / "data").symlink_to(tmp_path / "storage" / "actual_d003_output" / "data")
+    datadir = run / "data"
+
+    assert collect.run_dir_of(datadir) == run
+    rec = collect.collect_run(collect.run_dir_of(datadir), server="astana", du=False)
+    assert rec.caseid == "d003"
+    assert str(rec.values.get("step")) == "123"
+    assert collect.project_name(run) == "sunspot"
+    assert unsent_hint(datadir).endswith(f"r2d2plus-ledger push {tmp_path / 'sunspot' / 'run'}")
+
+    ws = FakeWorksheet(real_sheet())
+    before = _human_snapshot(ws)
+
+    class Book:
+        sheet1 = ws
+
+    class Client:
+        def open(self, name):
+            return Book()
+
+    monkeypatch.setattr(g, "init_gspread", lambda key, project: Client())
+    monkeypatch.setattr(collect, "default_server", lambda: "astana")
+    g.set_cells_gspread(type("D", (), {"datadir": datadir})(), json_key="dummy", project="sunspot")
+    assert ws.get(4, ws.col("Case ID")) == "d003"
+    assert ws.get(4, ws.col("step")) == "123"
+    assert _human_snapshot(ws) == before
