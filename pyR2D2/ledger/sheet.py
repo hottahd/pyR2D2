@@ -17,7 +17,9 @@
 ----------------
 量の列は、送る行の値と、**送らない行 (他のサーバのラン・手元に無いラン) の
 セルを今の見出しの単位 (またはセル内の ``[単位]``) で読んだ値**を合わせて単位を
-選ぶ (:func:`units.choose_unit`)。単位が変わったら見出しを書き換え、送らない行の
+選ぶ (:func:`units.choose_unit`)。対になる列 (xmin/xmax、ymin/ymax、zmin/zmax、
+到達時刻/t_end) は値を合わせて同じ単位にし、単位を変えるときは組で一緒に変える
+(:data:`collect.UNIT_GROUPS`)。単位が変わったら見出しを書き換え、送らない行の
 セルも読んだ値を新しい単位へ換算して書き直す。元の値は表示の 2 桁までしか
 残っていないので、その丸めの分だけ誤差が入る (送る行は手元のファイルから
 計算し直すので誤差は無い)。数として読めないセルは触らず警告する。
@@ -29,7 +31,7 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
-from .collect import COLUMNS, QUANTITY_COLUMNS, case_row
+from .collect import COLUMNS, QUANTITY_COLUMNS, UNIT_GROUPS, case_row
 from .units import Quantity, UNITS, choose_unit, parse_cell, render, split_header
 
 _ALIASES = {}
@@ -81,48 +83,61 @@ def _cell(values, row, col):
     return ""
 
 
-def decide_quantity_column(name, header_text, new, existing):
-    """量の列 1 本の見出しとセルの文字列を決める。
+def decide_quantity_group(columns):
+    """単位を共有する量の列の組 (1 本でもよい) の見出しとセルの文字列を決める。
+
+    ``xmin``/``xmax`` のように対になる列は、両方の値を合わせて 1 つの単位を選ぶ。
+    今の見出しの単位を保つのは、組の全列の見出しが同じ単位で、合わせた値に対して
+    帯 (:func:`units.choose_unit`) に収まるときだけ。見出しの単位が列ごとに違えば
+    選び直して、組の全列を同じ単位へ換算する。
 
     Parameters
     ----------
-    name : str
-        管理列の名前
-    header_text : str or None
-        今の見出し (無ければ ``None``)
-    new : dict
-        キー → 送る値 (:class:`Quantity` / 文字列 / ``None``)
-    existing : dict
-        キー → 送らない行の今のセルの文字列
+    columns : list of (name, header_text, new, existing)
+        name : 管理列の名前
+        header_text : 今の見出し (無ければ ``None``)
+        new : キー → 送る値 (:class:`Quantity` / 文字列 / ``None``)
+        existing : キー → 送らない行の今のセルの文字列
 
     Returns
     -------
-    header : str
-    new_texts : dict
-        キー → 送る行のセルの文字列
-    rewrites : dict
-        キー → 送らない行のうち書き直すセルの文字列
-    warnings : list of str
+    dict
+        列名 → ``(header, new_texts, rewrites, warnings)``。``new_texts`` は送る行の
+        セルの文字列、``rewrites`` は送らない行のうち書き直すセルの文字列。
     """
-    _, header_unit = split_header(header_text) if header_text else (name, None)
-    parsed = {}
-    unparsed = []
-    for key, text in existing.items():
-        r = parse_cell(text, header_unit)
-        if r is None:
-            if text.strip():
-                unparsed.append(key)
-        else:
-            parsed[key] = r
+    info = []
+    for name, header_text, new, existing in columns:
+        _, header_unit = split_header(header_text) if header_text else (name, None)
+        parsed, unparsed = {}, []
+        for key, text in existing.items():
+            r = parse_cell(text, header_unit)
+            if r is None:
+                if text.strip():
+                    unparsed.append(key)
+            else:
+                parsed[key] = r
+        info.append((name, header_text, header_unit, new, parsed, unparsed))
 
-    quantities = [q for q in new.values() if isinstance(q, Quantity)]
-    quantities += [r[0] for r in parsed.values()]
+    quantities = []
+    for _, _, _, new, parsed, _ in info:
+        quantities += [q for q in new.values() if isinstance(q, Quantity)]
+        quantities += [r[0] for r in parsed.values()]
     families = {q.family for q in quantities}
 
     def current_unit(family):
-        if header_unit and header_unit in {u for u, _, _ in UNITS[family]}:
-            return header_unit
-        units = Counter(r[1] for r in parsed.values() if r[0].family == family)
+        names = {u for u, _, _ in UNITS[family]}
+        header_units = {hu for _, ht, hu, _, _, _ in info if ht is not None}
+        header_units = {hu for hu in header_units if hu in names}
+        if len(header_units) > 1:
+            return None  # 組の見出しの単位が食い違う → 選び直す
+        if header_units:
+            return next(iter(header_units))
+        units = Counter(
+            r[1]
+            for *_, parsed, _ in info
+            for r in parsed.values()
+            if r[0].family == family
+        )
         return units.most_common(1)[0][0] if units else None
 
     chosen = {}
@@ -131,43 +146,69 @@ def decide_quantity_column(name, header_text, new, existing):
         chosen[family] = choose_unit(family, vals, current_unit(family))
 
     embed = len(families) > 1
-    if embed:
-        header = name
-    elif families:
-        header = f"{name} [{chosen[next(iter(families))]}]"
-    else:
-        header = header_text if header_text else name
-
-    new_texts = {}
-    for key, q in new.items():
-        if isinstance(q, Quantity):
-            new_texts[key] = render(q, chosen[q.family], embed)
+    out = {}
+    for name, header_text, header_unit, new, parsed, unparsed in info:
+        if embed:
+            header = name
+        elif families:
+            header = f"{name} [{chosen[next(iter(families))]}]"
         else:
-            new_texts[key] = "" if q is None else str(q)
+            header = header_text if header_text else name
 
-    rewrites = {}
-    for key, (q, unit, was_embedded) in parsed.items():
-        if unit != chosen[q.family] or was_embedded != embed:
-            rewrites[key] = render(q, chosen[q.family], embed)
+        new_texts = {}
+        for key, q in new.items():
+            if isinstance(q, Quantity):
+                new_texts[key] = render(q, chosen[q.family], embed)
+            else:
+                new_texts[key] = "" if q is None else str(q)
 
-    warnings = []
-    header_changed = split_header(header)[1] != header_unit
-    if unparsed and header_changed:
-        warnings.append(
-            f"列 {name}: 単位を {header_unit} → {split_header(header)[1]} に変えたが、"
-            f"数として読めないセルが {len(unparsed)} 個あり、そのままにした"
-        )
-    return header, new_texts, rewrites, warnings
+        rewrites = {}
+        for key, (q, unit, was_embedded) in parsed.items():
+            if unit != chosen[q.family] or was_embedded != embed:
+                rewrites[key] = render(q, chosen[q.family], embed)
+
+        warnings = []
+        if unparsed and split_header(header)[1] != header_unit:
+            warnings.append(
+                f"列 {name}: 単位を {header_unit} → {split_header(header)[1]} に変えたが、"
+                f"数として読めないセルが {len(unparsed)} 個あり、そのままにした"
+            )
+        out[name] = (header, new_texts, rewrites, warnings)
+    return out
+
+
+def decide_quantity_column(name, header_text, new, existing):
+    """量の列 1 本だけの :func:`decide_quantity_group`。"""
+    return decide_quantity_group([(name, header_text, new, existing)])[name]
+
+
+def _unit_groups():
+    """量の列を、単位を共有する組に分ける (COLUMNS の順)。"""
+    groups, seen = [], set()
+    for name, _, is_qty in COLUMNS:
+        if not is_qty or name in seen:
+            continue
+        group = next((g for g in UNIT_GROUPS if name in g), (name,))
+        groups.append(group)
+        seen.update(group)
+    return groups
 
 
 def render_records(records):
     """シートを使わずに、ランの並びから見出しと各行の文字列を作る (export 用)。"""
     headers = []
     rows = [[None] * len(COLUMNS) for _ in records]
+    decided = {}
+    for group in _unit_groups():
+        cols = [
+            (n, None, {i: r.values.get(n) for i, r in enumerate(records)}, {})
+            for n in group
+        ]
+        decided.update(decide_quantity_group(cols))
     for j, (name, _, is_qty) in enumerate(COLUMNS):
         new = {i: r.values.get(name) for i, r in enumerate(records)}
         if is_qty:
-            header, texts, _, _ = decide_quantity_column(name, None, new, {})
+            header, texts, _, _ = decided[name]
         else:
             header = name
             texts = {i: "" if v is None else str(v) for i, v in new.items()}
@@ -224,19 +265,27 @@ def plan_updates(values, records, server, force=False):
 
     other_rows = [r for r in range(2, len(values) + 1) if r not in rows]
 
+    def new_values(name):
+        return {row: rec.values[name] for row, rec in rows.items() if name in rec.values}
+
+    # 量の列は単位を共有する組ごとに決める
+    decided = {}
+    for group in _unit_groups():
+        cols = []
+        for name in group:
+            new = new_values(name)
+            # 送らない行と、この列を測っていない送る行 (--no-du の容量) は今の値のまま
+            keep = other_rows + [r for r in rows if r not in new]
+            existing = {r: _cell(values, r, positions[name]) for r in keep}
+            cols.append((name, header_texts.get(name), new, existing))
+        decided.update(decide_quantity_group(cols))
+
     for name, _, _ in COLUMNS:
         col = positions[name]
         old_header = header_texts.get(name)
-        new = {
-            row: rec.values[name] for row, rec in rows.items() if name in rec.values
-        }
+        new = new_values(name)
         if name in QUANTITY_COLUMNS:
-            # 送らない行と、この列を測っていない送る行 (--no-du の容量) は今の値のまま
-            keep = other_rows + [r for r in rows if r not in new]
-            existing = {r: _cell(values, r, col) for r in keep}
-            header, texts, rewrites, warns = decide_quantity_column(
-                name, old_header, new, existing
-            )
+            header, texts, rewrites, warns = decided[name]
             plan.warnings.extend(warns)
         else:
             header = old_header if old_header is not None else name

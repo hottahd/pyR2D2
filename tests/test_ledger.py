@@ -614,3 +614,65 @@ def test_console_script_entry_point():
         scripts = tomllib.load(f)["project"]["scripts"]
     module, _, func = scripts["r2d2plus-ledger"].partition(":")
     assert callable(getattr(importlib.import_module(module), func))
+
+
+# ---------------------------------------------------------------------------
+# 対になる列は単位を共有する
+# ---------------------------------------------------------------------------
+
+
+def _record(caseid, **values):
+    rec = collect.RunRecord(caseid=caseid, run_dir=Path("/nonexistent") / caseid)
+    rec.values = {name: None for name in collect.COLUMN_NAMES}
+    rec.values["Case ID"] = caseid
+    rec.values.update(values)
+    return rec
+
+
+def test_pairs_share_unit_in_export():
+    # odf の Fortran ランと同じ: xmin -5.44 Mm、xmax +0.70 Mm (単独なら 700 km)
+    L = lambda v: Quantity("length", (v,))  # noqa: E731
+    T = lambda v: Quantity("time", (v,))  # noqa: E731
+    recs = [
+        _record("d001", xmin=L(-5.44e8), xmax=L(7.0e7), 到達時刻=T(240.0),
+                t_end=T(3 * 86400.0), dtout=T(1.0e9), dtout_tau=T(30.0)),  # fmt: skip
+        _record("d002", xmin=L(-5.44e8), xmax=L(1.0e8), 到達時刻=T(600.0),
+                t_end=T(3 * 86400.0), dtout=T(1.0e9), dtout_tau=T(30.0)),  # fmt: skip
+    ]
+    headers, rows = sheet.render_records(recs)
+    col = {sheet.managed_name(h): i for i, h in enumerate(headers)}
+    assert headers[col["xmin"]] == "xmin [Mm]"
+    assert headers[col["xmax"]] == "xmax [Mm]"
+    assert rows[0][col["xmax"]] == "0.70" and rows[1][col["xmax"]] == "1.00"
+    # 到達時刻と t_end は同じ単位 (比べられるように)
+    u1 = headers[col["到達時刻"]].split("[")[1]
+    u2 = headers[col["t_end"]].split("[")[1]
+    assert u1 == u2
+    # dtout と dtout_tau は独立
+    assert headers[col["dtout"]] == "dtout [yr]"
+    assert headers[col["dtout_tau"]] == "dtout_tau [s]"
+
+
+def test_pair_with_different_header_units_is_unified(project):
+    header = ["Case ID", "xmin [Mm]", "xmax [km]", "Note"]
+    rows = [header] + [[""] * 4 for _ in range(19)]
+    rows.append(["d020", "-5.44", "700.00", "他のサーバ"])  # 21 行目 (手元に無い)
+    ws = FakeWorksheet(rows)
+    cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    assert ws.get(1, 2) == "xmin [Mm]"
+    assert ws.get(1, 3) == "xmax [Mm]"
+    assert ws.get(21, 2) == "-5.44"
+    assert ws.get(21, 3) == "0.70"  # 700 km を Mm へ換算
+    assert ws.get(2, 3) == "0.70"
+    assert ws.get(21, 4) == "他のサーバ"
+
+
+def test_pair_switches_together(project):
+    # 両方 [s] の見出しに 100 日の値 → 帯を外れるので組で d に替える
+    header = ["Case ID", "到達時刻 [s]", "t_end [s]"]
+    rows = [header] + [[""] * 3 for _ in range(19)]
+    rows.append(["d020", "259200", "8640000"])
+    ws = FakeWorksheet(rows)
+    cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    assert ws.get(1, 2) == "到達時刻 [d]" and ws.get(1, 3) == "t_end [d]"
+    assert ws.get(21, 2) == "3.00" and ws.get(21, 3) == "100.00"

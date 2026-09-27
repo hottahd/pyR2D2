@@ -69,6 +69,15 @@ COLUMNS = [
 COLUMN_NAMES = [c[0] for c in COLUMNS]
 QUANTITY_COLUMNS = {c[0] for c in COLUMNS if c[2]}
 
+# 単位を共有する量の列の組 (値を合わせて 1 つの単位を選び、変えるときは一緒に変える)。
+# dtout と dtout_tau は独立。dx の「下端 上端」の 2 つの数はもとから同じ単位。
+UNIT_GROUPS = [
+    ("xmin", "xmax"),
+    ("ymin", "ymax"),
+    ("zmin", "zmax"),
+    ("到達時刻", "t_end"),
+]
+
 # ハッシュに入れない列 (容量は du が要るので status では測らない)
 HASH_EXCLUDE = {"容量"}
 
