@@ -124,7 +124,7 @@ R2D2では、Pythonから直接Googleスプレッドシートに送信する方�
 .. code:: shell
 
     pip install gspread
-    pip install oauth2client
+    pip install google-auth
 
 プロキシなどの影響でpipが使えない時は以下のようにする
 
@@ -224,6 +224,47 @@ https://docs.google.com/spreadsheets/create
     :width: 400 px
 
 共有をクリックし、ダウンロードしたjsonファイルの中のclient_email行のEメールアドレスをコピーして、貼り付け。ここまでで、R2D2からGoogleスプレッドシートにアクセスできるようになる。
+
+台帳の送信 (r2d2plus-ledger)
+||||||||||||||||||||||||||||||
+
+``pyR2D2.Data`` を読み込まずに、プロジェクトの全ラン (``<project>/run/dNNN``) の設定と
+状態をシートへ送るコマンド ``r2d2plus-ledger`` がある (pyR2D2 を入れると入る)。
+``push`` にだけ ``gspread`` と ``google-auth`` が要る (``pip install "pyR2D2[ledger]"``)。
+計算ノードでは動かさず、ログインノードか手元で使う。
+
+.. code:: shell
+
+    r2d2plus-ledger status ~/work/proj/run            # 各ランの状態と「未送信の変更」の有無 (送らない)
+    r2d2plus-ledger export ~/work/proj/run -o ledger.csv
+    r2d2plus-ledger push   ~/work/proj/run --dry-run  # 書くセルを表示するだけ (Google に接続しない)
+    r2d2plus-ledger push   ~/work/proj/run            # シート名 = プロジェクト名 (proj)
+    r2d2plus-ledger push   ~/work/proj/run --sheet-id <ID> --only d001,d005
+
+- 読むのは ``data/param`` の ``params.dac``・``back.dac``・``run_summary.toml``・``origin.toml``・
+  ``runs/<最新>/effective_config.txt``・``run.log`` の末尾と ``restart/*/meta.toml`` の ``[modifiers]``、
+  および ``data/`` の使用量 (``--no-du`` で省略) だけ。Fortran 版のラン (``run_summary.toml`` が無い)
+  も ``params.dac`` と ``cont_log.txt`` から従来どおりの列を埋める。
+- **コードが管理する列**は ``Case ID, Mstar, (ix,jx,kx), xmin … zmax, uni, dx, m ray, dtout, dtout_tau,
+  al, RSST, Om, Geometry, origin, update time, Server, 状態, 到達時刻, t_end, step, 形式, 容量, 加工,
+  commit, backend, ranks, ms/step``。列は見出しの**単位を除いた名前**で探す (``dtout [s]`` も
+  ``dtout [min]`` も ``dtout``。``Gemetry`` は ``Geometry`` の別名)。シートに無い管理列は見出しの右端に
+  足す。**それ以外の列 (Note・Finish など) は人の列で、読みも書きもしない**。書くのは管理列のセル
+  だけ (セル単位の ``batch_update``) で、行ごと書き戻さない。
+- 行は Case ID の番号で決まる (d001 は 2 行目)。欠番の空行や人のメモだけの行はそのまま残る。
+  その行の ``Server`` が送り手 (既定はホスト名、``--server`` で指定) と違えば、警告して飛ばす
+  (``--force`` で上書き)。
+- 単位は列ごとに値に合わせて自動で選び、見出しに書く (時刻 s/min/h/d/yr、長さ km/Mm、容量 MB/GB/TB、
+  球・YinYang の動径は R_star、角度は deg)。表示値が 1〜1000 に入る単位のうち、慣用の繰り上がり
+  (1000 s 未満は s、48 h 未満は h など) で 1 つに決める。今の見出しの単位で 0.1〜1e4 に収まる間は
+  単位を変えない。単位が変わると、手元に無いランの行のセルも見出しの旧単位で読んで換算し書き直す
+  (表示の 2 桁の丸めの分だけ誤差が入る)。1 列に長さと角度が混ざるときは、見出しを単位なしにして
+  各セルに ``6.14 [Mm]`` の形で単位を書く。直交座標の xmin/xmax は従来どおり rstar からの距離。
+- 送ると各ランの ``data/param/ledger_sent.toml`` に管理列のハッシュを残す。``status`` はこれと
+  比べて未送信の変更を示し、``pyR2D2.Data`` でそのランを開いたときにも
+  「台帳へ未送信の変更があります: r2d2plus-ledger push …」と 1 行出る (R2D2plus のランだけ)。
+- 従来の ``pyR2D2.write.google.set_cells_gspread`` も同じ処理で書くようになった
+  (以前は A〜T 列を位置で上書きし、``Server`` が落ちていた)。
 
 IDLコードの環境設定
 ----------------------------------------
