@@ -617,9 +617,11 @@ def test_two_dimension(tmp_path):
     L, Cd = pyR2D2.Data(legacy), pyR2D2.Data(comp)
     L.q2.read(1)
     Cd.q2.read(1)
+    # 従来形式は 13 項目すべてをファイルから読む (以前は mtype=9 個で止まり te/op/tu/fr が 0)
+    for k in L.q2.value_keys:
+        _bitwise(L.q2.__dict__[k], state[k])
     for k in VARS8:
         _bitwise(Cd.q2.__dict__[k], L.q2.__dict__[k])
-    # 従来の読み手は pr まで (添字 8) しか埋めないので、残りはファイルの値と比べる
     _close_f32(Cd.q2.pr, L.q2.pr, np.broadcast_to(Cd.pr0[:, None], L.q2.pr.shape))
     _close_f32(Cd.q2.te, state["te"], np.broadcast_to(Cd.te0[:, None], state["te"].shape))
     _close_f32(Cd.q2.op, state["op"], state["op"])

@@ -2466,10 +2466,11 @@ class TwoDimension(_BaseReader):
         with open(self.datadir / "remap" / "qq" / f"qq.dac.{n:08d}", "rb") as f:
             qq = np.fromfile(f, dtype=dtype, count=1)
 
-        for key, m in zip(self.value_keys, range(self.mtype)):
-            self.__dict__[key] = qq["qq"].reshape(
-                (self.mtype + 5, self.ix, self.jx), order="F"
-            )[m, :, :]
+        # 1 セル mtype + 5 個: ro..se(ph は pr で上書き), te, op, tu, fr, 未使用。
+        # Fortran 版 remap2d.F90 も R2D2plus も同じ並び。
+        qq = qq["qq"].reshape((self.mtype + 5, self.ix, self.jx), order="F")
+        for m, key in enumerate(self.value_keys):
+            self.__dict__[key] = qq[m, :, :]
 
 
     def _read_compressed(self, n):
