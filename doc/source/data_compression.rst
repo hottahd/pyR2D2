@@ -224,4 +224,30 @@ R2D2plus (C++版) は ``[output] format = "compressed"`` で、計算の時点�
         "data/remap/qq/00000/00000000/qq.z.00000001.00000000")
     state, meta = compressed.read_restart_state("data/restart/e", rank=0)
 
+前の出力を R2D2plus の初期条件にする
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:py:func:`pyR2D2.write_initial_state` は R2D2plus の初期状態ファイル(``r2d2plus-z``、``kind = "initial_state"``)を書く。R2D2plus 側では ``[initial_condition] type = "file"``、``[initial_condition.params] path = "..."`` で読む。変数名と軸は pyR2D2 の 3D 配列と同じ(``vx``, ``bx`` が鉛直成分、形は ``(ix, jx, kx)``、領域全体の物理セルのみ)なので、``d.qf.read(n)`` で読んだ配列をそのまま渡せばよい(従来形式・新形式のどちらのランでも同じ)。
+
+.. warning::
+
+    ``ro`` と ``se`` は **背景からの摂動** (``d.qf.ro``, ``d.qf.se`` と同じ量) を渡す。全量 (``ro0 + ro``) を渡してはならない。
+
+.. code:: python
+
+    import pyR2D2
+
+    d = pyR2D2.Data('../run/d001/data')
+    n = 120
+    keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+    d.qf.read(n, keys=keys)
+    pyR2D2.write_initial_state(
+        "initial_state.z",
+        {k: d.qf.__dict__[k] for k in keys},
+        attributes={"source": str(d.datadir), "nd": n,
+                    "time": float(d.time_read(n, verbose=False))},
+    )
+
+書き出しには ``xxhash`` が要る(``pip install xxhash``、または ``pyR2D2[compressed]``)。R2D2plus は変数ごとの XXH3-64 を照合して読むので、チェックサムを省略できない。
+
 最終更新日：|today|

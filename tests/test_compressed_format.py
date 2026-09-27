@@ -680,3 +680,82 @@ def test_r2d2plus_fixture_matches_legacy():
     state, meta = C.read_restart_state(FIXTURE / "comp_3d" / "data" / "restart" / "e", 0)
     assert state["ro"].shape == (64, 64, 128)
     assert meta["restart"]["nd"] == 7
+
+
+# ---------------------------------------------------------------------------
+# 初期状態ファイルの書き出し (write_initial_state)
+# ---------------------------------------------------------------------------
+
+
+def test_write_initial_state_roundtrip(tmp_path):
+    pytest.importorskip("xxhash")
+    rng = np.random.default_rng(4)
+    shape = (6, 5, 4)  # (ix, jx, kx) = (鉛直, 第1水平, 第2水平)
+    fields = {k: rng.standard_normal(shape) for k in VARS8}
+    fields["vx"] = np.asfortranarray(fields["vx"])  # 並びの違う入力でもよい
+    fields["se"] = fields["se"].astype(np.float32)  # float64 に広げて書く
+    attrs = {"source": 'run "d001"', "nd": 120, "time": 3600.0, "restart": False}
+    path = pyR2D2.write_initial_state(tmp_path / "init.z", fields, attributes=attrs)
+
+    header, arrays = C.read_r2d2plus_z(path, verify=True)  # XXH3 も照合する
+    assert header["kind"] == "initial_state"
+    assert header["attributes"] == attrs
+    assert [v["name"] for v in header["variables"]] == VARS8
+    for v in header["variables"]:
+        assert v["dtype"] == "float64" and v["order"] == "F" and v["shape"] == list(shape)
+    for k in VARS8:
+        _bitwise(arrays[k], np.asarray(fields[k], dtype=np.float64))
+    # 鉛直 (第 0 軸) が最速で並んでいること: 生バイトを直接見る
+    raw = C._unshuffle(C._zstd_decompress(
+        open(path, "rb").read()[header["data_offset"]:][:header["variables"][0]["stored_bytes"]],
+        header["variables"][0]["raw_bytes"]), "<f8")
+    np.testing.assert_array_equal(raw[: shape[0]], fields["ro"][:, 0, 0])
+
+
+def test_write_initial_state_rejects_bad_input(tmp_path):
+    pytest.importorskip("xxhash")
+    good = np.zeros((4, 3, 2))
+    with pytest.raises(ValueError, match="unknown"):
+        pyR2D2.write_initial_state(tmp_path / "a.z", {"pr": good})
+    with pytest.raises(ValueError, match="shape"):
+        pyR2D2.write_initial_state(tmp_path / "a.z", {"ro": good, "se": np.zeros((4, 3, 3))})
+    with pytest.raises(ValueError, match="3D"):
+        pyR2D2.write_initial_state(tmp_path / "a.z", {"ro": np.zeros((4, 3))})
+    with pytest.warns(UserWarning, match="perturbation"):
+        pyR2D2.write_initial_state(tmp_path / "a.z", {"ro": good + 1e-7})
+
+
+def test_write_initial_state_needs_xxhash(tmp_path, monkeypatch):
+    import builtins
+
+    original_import = builtins.__import__
+
+    def no_xxhash(name, *args, **kwargs):
+        if name == "xxhash":
+            raise ImportError("blocked by test")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", no_xxhash)
+    with pytest.raises(ImportError, match="xxhash"):
+        pyR2D2.write_initial_state(tmp_path / "a.z", {"ro": np.zeros((2, 2, 2))})
+
+
+@pytest.mark.skipif(
+    not (FIXTURE / "comp_3d" / "data" / "param" / "format.toml").exists(),
+    reason="R2D2plus I/O fixture not available",
+)
+def test_fixture_checksums_and_initial_state_from_output(tmp_path):
+    pytest.importorskip("xxhash")
+    # xxhash の XXH3-64 が R2D2plus (XXH3_64bits) と同じであること
+    C.read_r2d2plus_z(
+        FIXTURE / "comp_3d" / "data" / "remap" / "qq" / "00000" / "00000002"
+        / "qq.z.00000004.00000002", verify=True)
+    # 前の出力を初期条件にする (従来形式のランから)
+    d = pyR2D2.Data(FIXTURE / "legacy_3d" / "data")
+    d.qf.read(6, keys=VARS8)
+    fields = {k: d.qf.__dict__[k] for k in VARS8}
+    path = pyR2D2.write_initial_state(tmp_path / "init.z", fields, attributes={"nd": 6})
+    _, arrays = C.read_r2d2plus_z(path, verify=True)
+    for k in VARS8:
+        assert arrays[k].shape == (d.ix, d.jx, d.kx)
+        _bitwise(arrays[k], d.qf.__dict__[k].astype(np.float64))

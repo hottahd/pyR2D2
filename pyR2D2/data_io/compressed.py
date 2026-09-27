@@ -22,6 +22,7 @@
 ------------------------
 * :func:`read_r2d2plus_z` : ``r2d2plus-z`` ファイル 1 個を読む
 * :func:`read_format_toml` : ``param/format.toml`` を読む
+* :func:`write_initial_state` : R2D2plus の初期状態ファイル (``[initial_condition] type = "file"``) を書く
 * :func:`read_restart_meta`, :func:`read_restart_state` : R2D2plus の
   リスタート (``restart/<slot>``) を読む (**実験的**)
 """
@@ -230,6 +231,226 @@ def read_r2d2plus_z(path, names=None, verify=None):
                     )
             arrays[v["name"]] = flat.reshape(tuple(v["shape"]), order=v.get("order", "C"))
     return header, arrays
+
+
+def _zstd_compress(data, level):
+    """zstd で圧縮する (読み口と同じく、使えるものを順に試す)。"""
+    try:
+        from compression import zstd as _std_zstd  # Python 3.14+
+
+        return _std_zstd.compress(data, level=level)
+    except ImportError:
+        pass
+    try:
+        import numcodecs
+
+        return bytes(numcodecs.Zstd(level=level).encode(data))
+    except ImportError:
+        pass
+    try:
+        import zstandard
+    except ImportError:
+        raise ImportError(
+            "writing a r2d2plus-z file needs a zstd encoder: install numcodecs "
+            "(`pip install numcodecs`) or zstandard"
+        ) from None
+    return zstandard.ZstdCompressor(level=level).compress(data)
+
+
+def _require_xxh3():
+    try:
+        import xxhash
+    except ImportError:
+        raise ImportError(
+            "writing a r2d2plus-z file needs the xxhash module (`pip install xxhash`, "
+            "or pyR2D2[compressed]): R2D2plus verifies the XXH3-64 checksum of every "
+            "variable, and there is no practical pure-Python XXH3"
+        ) from None
+    return xxhash
+
+
+def _toml_scalar(key, value):
+    """[attributes] の 1 行。R2D2plus が受け付けるのはスカラー (文字列・整数・実数・真偽)。"""
+    import json
+    import math
+
+    if not isinstance(key, str) or not key or not all(c.isalnum() or c == "_" for c in key) \
+            or not key.isascii():
+        raise ValueError(f"attribute name must be [A-Za-z0-9_]+, got {key!r}")
+    if isinstance(value, np.generic):
+        value = value.item()
+    if isinstance(value, bool):
+        text = "true" if value else "false"
+    elif isinstance(value, int):
+        text = str(value)
+    elif isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError(f"attribute {key!r} must be finite, got {value}")
+        text = repr(value)
+        if "." not in text and "e" not in text and "E" not in text:
+            text += ".0"
+    elif isinstance(value, (str, os.PathLike)):
+        text = json.dumps(os.fspath(value))  # JSON の文字列は TOML の basic string でもある
+    else:
+        raise TypeError(f"attribute {key!r} must be a str/int/float/bool scalar, got {type(value)}")
+    return f"{key} = {text}\n"
+
+
+def write_r2d2plus_z(path, kind, variables, attributes=None, level=3):
+    """
+    ``r2d2plus-z`` ファイルを書く (R2D2plus ``CompressedFileWriter`` と同じ形)。
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        書き出し先。一時ファイルに書いてから置き換える。
+    kind : str
+        ヘッダの ``kind``
+    variables : list of (name, numpy.ndarray, order)
+        変数。dtype は float32 か float64 (little endian で書く)、``order`` は
+        ``"F"`` か ``"C"`` (``shape`` はその並びで解釈される)。
+    attributes : dict, optional
+        ``[attributes]`` に書くスカラー
+    level : int
+        zstd の圧縮レベル
+
+    Notes
+    -----
+    各変数の XXH3-64 (R2D2plus が読むときに照合する) の計算に ``xxhash`` が要る。
+    """
+    xxhash = _require_xxh3()
+    blocks, entries, offset = [], [], 0
+    seen = set()
+    for name, array, order in variables:
+        if not isinstance(name, str) or not name or len(name) > 64 or not name.isascii() \
+                or not all(c.isalnum() or c == "_" for c in name) or name in seen:
+            raise ValueError(f"bad or duplicate variable name {name!r}")
+        seen.add(name)
+        if order not in ("F", "C"):
+            raise ValueError(f"order must be 'F' or 'C', got {order!r}")
+        array = np.asarray(array)
+        dtype_name = {"f4": "float32", "f8": "float64"}.get(array.dtype.str[1:])
+        if array.dtype.kind != "f" or dtype_name is None:
+            raise TypeError(f"{name}: dtype must be float32 or float64, got {array.dtype}")
+        raw = np.asarray(array, dtype=array.dtype.newbyteorder("<")).tobytes(order=order)
+        es = array.dtype.itemsize
+        shuffled = np.frombuffer(raw, np.uint8).reshape(-1, es).T.tobytes()
+        stored = _zstd_compress(shuffled, level)
+        blocks.append(stored)
+        entries.append(
+            "\n[[variables]]\n"
+            f'name = "{name}"\ndtype = "{dtype_name}"\norder = "{order}"\n'
+            f"shape = [{', '.join(str(int(s)) for s in array.shape)}]\n"
+            'codec = "shuffle+zstd"\n'
+            f"offset = {offset}\nstored_bytes = {len(stored)}\nraw_bytes = {len(raw)}\n"
+            f'xxh3 = "{xxhash.xxh3_64_intdigest(raw):016x}"\n'
+        )
+        offset += len(stored)
+    header = f'format = "r2d2plus-z"\nversion = 1\nkind = "{kind}"\n\n[attributes]\n'
+    header += "".join(_toml_scalar(k, v) for k, v in (attributes or {}).items())
+    header += "".join(entries)
+    header = header.encode("utf-8")
+
+    path = Path(path)
+    temporary = path.with_name(path.name + ".tmp")
+    with open(temporary, "wb") as f:
+        f.write(R2D2PLUS_Z_MAGIC)
+        f.write(f"{len(header):016x}\n".encode())
+        f.write(header)
+        for b in blocks:
+            f.write(b)
+    os.replace(temporary, path)
+    return path
+
+
+INITIAL_STATE_VARIABLES = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se", "ph"]
+
+
+def write_initial_state(path, fields, attributes=None, level=3):
+    """
+    R2D2plus の初期状態ファイル (``r2d2plus-z``、``kind = "initial_state"``) を書く。
+
+    R2D2plus では次のように指定して読む::
+
+        [initial_condition]
+        type = "file"
+        [initial_condition.params]
+        path = "/path/to/initial_state.z"
+
+    **ro と se は背景からの摂動である。** 従来形式の ``d.qf.ro`` / ``d.qf.se``
+    (``remap/qq``) が返すものと同じ量で、全量 (``ro0 + ro``) を渡してはならない。
+    速度・磁場・``ph`` はそのままの値。
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        書き出し先
+    fields : dict of numpy.ndarray
+        ``{name: array}``。名前は ``ro, vx, vy, vz, bx, by, bz, se, ph`` から。
+        **名前と軸は pyR2D2 の 3D 配列 (Fortran の並び) と同じ**: ``vx``, ``bx`` が
+        鉛直成分、配列の形は ``(ix, jx, kx)`` = (鉛直, 第1水平, 第2水平)、
+        領域全体の物理セルのみ (margin 無し)。``d.qf.read(n)`` で読んだ配列を
+        そのまま渡せばよい。すべて同じ形であること。
+    attributes : dict, optional
+        ``[attributes]`` に書くスカラー (文字列・整数・実数・真偽)。例:
+        ``{"source": "d001", "nd": 120, "time": 3600.0}``
+    level : int, optional
+        zstd の圧縮レベル (既定 3)
+
+    Returns
+    -------
+    path : pathlib.Path
+
+    Notes
+    -----
+    各変数は float64、``order = "F"`` (鉛直が最速)、``shape = list(array.shape)``
+    で書く。XXH3-64 のチェックサムを R2D2plus が照合するので ``xxhash`` が必要
+    (``pip install xxhash``)。zstd には numcodecs (または zstandard) を使う。
+
+    Examples
+    --------
+    前の出力を初期条件にする (従来形式・新形式どちらのランでも同じ)::
+
+        import pyR2D2
+        d = pyR2D2.Data("../run/d001/data")
+        n = 120
+        d.qf.read(n, keys=["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"])
+        fields = {k: d.qf.__dict__[k] for k in
+                  ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]}
+        pyR2D2.write_initial_state(
+            "initial_state.z", fields,
+            attributes={"source": str(d.datadir), "nd": n,
+                        "time": float(d.time_read(n, verbose=False))})
+    """
+    if not fields:
+        raise ValueError("fields is empty")
+    unknown = [k for k in fields if k not in INITIAL_STATE_VARIABLES]
+    if unknown:
+        raise ValueError(f"unknown variable(s) {unknown}; allowed: {INITIAL_STATE_VARIABLES}")
+    shape = None
+    variables = []
+    for name in INITIAL_STATE_VARIABLES:  # 並びは固定 (Fortran の成分順)
+        if name not in fields:
+            continue
+        array = np.asarray(fields[name], dtype=np.float64)
+        if array.ndim != 3:
+            raise ValueError(f"{name}: expected a 3D array (ix, jx, kx), got shape {array.shape}")
+        if shape is None:
+            shape = array.shape
+        elif array.shape != shape:
+            raise ValueError(f"{name}: shape {array.shape} differs from {shape}")
+        if not np.all(np.isfinite(array)):
+            raise ValueError(f"{name}: contains NaN or Inf")
+        variables.append((name, array, "F"))
+    if "ro" in fields and np.all(variables[0][1] > 0) and variables[0][0] == "ro":
+        import warnings
+
+        warnings.warn(
+            "ro is positive everywhere: initial-state ro must be the perturbation from "
+            "the background (as d.qf.ro), not the total density",
+            stacklevel=2,
+        )
+    return write_r2d2plus_z(path, "initial_state", variables, attributes, level)
 
 
 # ---------------------------------------------------------------------------
