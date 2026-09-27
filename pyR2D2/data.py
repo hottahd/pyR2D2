@@ -59,6 +59,15 @@ class Data:
     yinyang : pyR2D2.cpp_util.YinYang
 
     ``help(d.qt)`` (or ``d.qt?`` in IPython) shows how to read and which variables appear.
+
+    Output format
+    -------------
+    The format is detected automatically: when ``<datadir>/param/format.toml`` says
+    ``format = "compressed"`` (R2D2plus DEC-576) the readers above read the new files
+    with the same arguments, attribute names and array shapes, and compute ``pr``,
+    ``te``, ``op`` from ``ro``, ``se`` with ``param/eos_table.tbl`` (not stored in that
+    format). ``d.p.output_format`` is ``"legacy"`` or ``"compressed"``.
+    See :py:mod:`pyR2D2.data_io.compressed`.
     """
 
     def __init__(self, datadir, verbose=False, self_old=None):
@@ -87,7 +96,11 @@ class Data:
             self.summary()
 
         eosdir = self.datadir.parent / "input_data"
-        if (eosdir / "eos_table_sero.npz").exists():
+        # 新出力形式 (R2D2plus DEC-576) は param/eos_table.tbl を Parameters が読んでいる
+        compressed_with_table = self.p.output_format == "compressed" and hasattr(
+            self.p, "log_ro_e"
+        )
+        if (eosdir / "eos_table_sero.npz").exists() or compressed_with_table:
             self.eos = pyR2D2.cpp_util.EOS(
                 self.log_ro_e.astype(np.float32),
                 self.se_e.astype(np.float32),

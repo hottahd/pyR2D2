@@ -8,6 +8,8 @@ import numpy as np
 
 import pyR2D2
 
+from . import compressed as _compressed
+
 
 def _zarr_zarrzip_exists(path):
     path = Path(path)
@@ -18,6 +20,10 @@ class _BaseReader:
     """
     Base class for data readers
     """
+
+    def _is_compressed(self):
+        """R2D2plus の新出力形式 (``param/format.toml`` が ``format = "compressed"``) か。"""
+        return getattr(self.data, "output_format", "legacy") == "compressed"
 
     def __getattr__(self, name):
         """
@@ -144,6 +150,11 @@ class _BaseRemapReader(_BaseReader):
         filepath : pathlib.Path
             file path of remap/qq/
         """
+        if self._is_compressed():
+            # 新出力形式 (R2D2plus DEC-576): r2d2plus-z コンテナ
+            return _compressed.format_path(
+                self.datadir, self.format_info, "remap_qq", rank=int(np0), nd=n
+            )
         if (self.datadir / "remap" / "qq" / "00000").is_dir():
             cnou = f"{np0//1000:05d}"
             cno = f"{np0:08d}"
@@ -171,6 +182,56 @@ class _BaseRemapReader(_BaseReader):
         """
 
         return self.datadir / "remap" / "qq" / "zarr" / f"qq.{n:08d}.zarr"
+
+    def _compressed_keys(self, keys_input, all_requested):
+        """
+        新出力形式で読む変数を決める。
+
+        書かれていない ``ph`` は、``keys="all"`` なら黙って外し (属性は None)、
+        明示的に要求されたら例外にする。``pr``, ``te``, ``op`` は計算する。
+        """
+        stored = self.format_info["variables"]
+        out = []
+        for key in keys_input:
+            if key in stored or key in _compressed.CompressedEOS.quantities:
+                out.append(key)
+            elif all_requested:
+                self.__dict__[key] = None
+            else:
+                raise ValueError(
+                    f"'{key}' is not written in this run (R2D2plus compressed output, "
+                    f"variables = {stored}); add it to [output] variables to write it"
+                )
+        return out
+
+    def _read_remap_compressed(self, n, np0, keys, sl=None):
+        """
+        新出力形式の 1 ランク分を読み、要求された変数の dict を返す。
+
+        各配列は従来形式と同じ ``(iixl, jjxl, kx)`` (Fortran 順) に ``sl`` を
+        適用したもの。``pr``, ``te``, ``op`` は ``ro``, ``se`` から
+        :py:meth:`pyR2D2.data_io.compressed.CompressedEOS.remap` で計算する。
+        """
+        stored = [k for k in keys if k in self.format_info["variables"]]
+        derived = [k for k in keys if k not in stored]
+        names = set(stored)
+        if derived:
+            names |= {"ro", "se"}
+        _, qq = _compressed.read_r2d2plus_z(
+            self._get_filepath_remap_qq(n, np0), names=names
+        )
+        shape = (self.iixl[np0], self.jjxl[np0], self.kx)
+        if sl is None:
+            sl = (slice(None),) * 3
+        out = {k: qq[k][sl] for k in names}
+        if derived:
+            eos = _compressed.compressed_eos(self.data.p)
+            iz = np.broadcast_to(
+                np.arange(self.iss[np0], self.iss[np0] + shape[0]).reshape(-1, 1, 1), shape
+            )[sl]
+            for key in derived:
+                out[key] = eos.remap(key, out["ro"], out["se"], iz)
+        return {k: out[k] for k in keys}
 
     def _add_docstring(self):
         docstring = "\n"
@@ -306,6 +367,8 @@ class XSelect(_BaseRemapReader):
                     print("return")
                     return
 
+            if self._is_compressed():
+                keys_input = self._compressed_keys(keys_input, keys == "all")
             self._allocate_remap_qq(ijk=[self.jx, self.kx], keys=keys_input)
             dtype = np.dtype(self.endian + "f4")
 
@@ -317,6 +380,12 @@ class XSelect(_BaseRemapReader):
                     target_nps.append(np0)
 
             def _read_one(np0: int):
+                if self._is_compressed():
+                    out = self._read_remap_compressed(
+                        n, np0, keys_input, sl=(i0 - self.iss[np0], slice(None), slice(None))
+                    )
+                    return (np0, self.jss[np0], self.jee[np0] + 1, out)
+
                 n_ijk = self.iixl[np0] * self.jjxl[np0] * self.kx
                 byte_n_ijk = n_ijk * 4  # for float32
                 byte_n_ijk_mtype = byte_n_ijk * self.mtype
@@ -386,6 +455,24 @@ class ZSelect(_BaseRemapReader):
 
         """
         k0 = np.argmin(np.abs(self.z - zs))
+
+        if self._is_compressed():
+            keys = self._compressed_keys(self.remap_keys + self.remap_keys_add, True)
+            self._allocate_remap_qq(ijk=[self.ix, self.jx], keys=keys)
+            for ir0 in range(1, self.ixr + 1):
+                for jr0 in range(1, self.jxr + 1):
+                    np0 = self.np_ijr[ir0 - 1, jr0 - 1]
+                    out = self._read_remap_compressed(
+                        n, np0, keys, sl=(slice(None), slice(None), k0)
+                    )
+                    for key, arr in out.items():
+                        self.__dict__[key][
+                            self.iss[np0] : self.iee[np0] + 1,
+                            self.jss[np0] : self.jee[np0] + 1,
+                        ] = arr
+            self.info = {}
+            self.info["zs"] = self.z[k0]
+            return
 
         self._allocate_remap_qq(ijk=[self.ix, self.jx])
 
@@ -458,6 +545,16 @@ class MPIRegion(_BaseRemapReader):
         nps = np.where(self.ir - 1 == ixrt)[0]
         # correnponding i range
         self.i_ixrt = np.where(self.i2ir - 1 == ixrt)[0]
+
+        if self._is_compressed():
+            keys = self._compressed_keys(self.remap_keys + self.remap_keys_add, True)
+            self._allocate_remap_qq(ijk=[len(self.i_ixrt), self.jx, self.kx], keys=keys)
+            for np0 in nps:
+                if self.iixl[np0] != 0:
+                    out = self._read_remap_compressed(n, np0, keys)
+                    for key, arr in out.items():
+                        self.__dict__[key][:, self.jss[np0] : self.jee[np0] + 1, :] = arr
+            return
 
         self._allocate_remap_qq(ijk=[len(self.i_ixrt), self.jx, self.kx])
 
@@ -610,6 +707,8 @@ class FullData(_BaseRemapReader):
                     print("return")
                     return
 
+            if self._is_compressed():
+                keys_input = self._compressed_keys(keys_input, keys == "all")
             self._allocate_remap_qq(ijk=[self.ix, self.jx, self.kx], keys=keys_input)
             dtype = np.dtype(self.endian + "f4")
 
@@ -621,6 +720,12 @@ class FullData(_BaseRemapReader):
                         target_nps.append(np0)
 
             def _read_one(np0: int):
+                if self._is_compressed():
+                    out = self._read_remap_compressed(n, np0, keys_input)
+                    i0, i1 = self.iss[np0], self.iee[np0] + 1
+                    j0, j1 = self.jss[np0], self.jee[np0] + 1
+                    return (np0, i0, i1, j0, j1, out)
+
                 n_ijk = self.iixl[np0] * self.jjxl[np0] * self.kx
                 byte_n_ijk = n_ijk * 4  # for float32
                 byte_n_ijk_mtype = byte_n_ijk * self.mtype
@@ -1091,6 +1196,9 @@ class RestrictedData(_BaseRemapReader):
             else:
                 raise TypeError("keys must be str, list, or tuple")
 
+            if self._is_compressed():
+                keys_input = self._compressed_keys(keys_input, keys == "all")
+
             for key in keys_input:
                 self.__dict__[key] = np.zeros((ixr, jxr, kxr), dtype=np.float32)
 
@@ -1104,6 +1212,31 @@ class RestrictedData(_BaseRemapReader):
                         or self.jss[np0] > j1
                         or self.jee[np0] < j0
                     ):
+
+                        if self._is_compressed():
+                            isrt_rcv = max([0, self.iss[np0] - i0])
+                            iend_rcv = min([ixr, self.iee[np0] - i0 + 1])
+                            jsrt_rcv = max([0, self.jss[np0] - j0])
+                            jend_rcv = min([jxr, self.jee[np0] - j0 + 1])
+                            isrt_snd = isrt_rcv - (self.iss[np0] - i0)
+                            iend_snd = isrt_snd + (iend_rcv - isrt_rcv)
+                            jsrt_snd = jsrt_rcv - (self.jss[np0] - j0)
+                            jend_snd = jsrt_snd + (jend_rcv - jsrt_rcv)
+                            out = self._read_remap_compressed(
+                                n,
+                                np0,
+                                keys_input,
+                                sl=(
+                                    slice(isrt_snd, iend_snd),
+                                    slice(jsrt_snd, jend_snd),
+                                    slice(k0, k1 + 1),
+                                ),
+                            )
+                            for key, arr in out.items():
+                                self.__dict__[key][
+                                    isrt_rcv:iend_rcv, jsrt_rcv:jend_rcv, :
+                                ] = arr
+                            continue
 
                         dtype = self._dtype_remap_qq(np0)
                         filepath = self._get_filepath_remap_qq(n, np0)
@@ -1211,6 +1344,10 @@ class OpticalDepth(_BaseReader):
     R2D2plus の多群輻射輸送 (m_in > 13 のファイル) では、群別の射出強度が
     rt1, rt2, ... という属性で読める (rt と同じく tau = 1 の面のみ)。
 
+    R2D2plus の新出力形式 (``format = "compressed"``) では、pr, te は tau 面の
+    ro, se から計算した値、he は ``rstar + height`` (倍精度の半径)。書かれた
+    ``r - rstar`` [cm] は height, height01, height001 で読める。
+
     """
 
     zarr_keys = [
@@ -1270,7 +1407,67 @@ class OpticalDepth(_BaseReader):
                 self.__dict__[key + tau] = None
 
     def _get_filepath_optical_depth(self, n: int):
+        if self._is_compressed():
+            return _compressed.format_path(self.datadir, self.format_info, "tau", nd_tau=n)
         return self.datadir / "tau" / f"qq.dac.{n:08d}"
+
+    def _read_compressed(self, n: int):
+        """
+        新出力形式 (R2D2plus DEC-576) の tau を読み、従来と同じ属性にする。
+
+        並びは ``format.toml`` の ``tau_quantities`` (既定は ``in, ro, se, vx, vy,
+        vz, bx, by, bz, height, fr``) + 多群の群別強度。従来との違いと対応:
+
+        * ``in`` → ``rt`` (射出強度)
+        * ``pr``, ``te`` は書かれないので、tau 面の ``ro``, ``se`` (全量) から
+          R2D2plus と同じ式 (単精度の総量を倍精度へ広げて表を引き、単精度へ丸める)
+          で計算する。
+        * ``height`` は ``r - rstar`` [cm] (単精度)。そのまま ``height``,
+          ``height01``, ``height001`` として読める。従来の ``he`` (中心からの半径)
+          は ``rstar + height`` を**倍精度**で返す。従来の単精度の半径は
+          約 82 m 刻みだったが、こちらはその丸めを含まない
+          (従来値との差は単精度の半径の丸め幅 4096 cm 以下)。
+        """
+        info = self.format_info
+        quantities = list(info["tau_quantities"])
+        # params.dac の m_in は従来の値 (13 [+ 群の数]) のまま書かれる
+        n_groups = self.m_in - len(self.value_keys)
+        m_in = len(quantities) + n_groups
+        with open(self._get_filepath_optical_depth(n), "rb") as f:
+            qq = np.fromfile(f, self.endian + "f", self.m_tu * m_in * self.jx * self.kx)
+        qq = qq.reshape((self.m_tu, m_in, self.jx, self.kx), order="F")
+
+        rename = {"in": "rt"}
+        taus = ["", "01", "001"]
+        for mk, name in enumerate(quantities):
+            key = rename.get(name, name)
+            for mt, tau in enumerate(taus):
+                self.__dict__[key + tau] = qq[mt, mk, :, :]
+        for g in range(n_groups):
+            for mt, tau in enumerate(taus):
+                self.__dict__[f"rt{g + 1}" + tau] = qq[mt, len(quantities) + g, :, :]
+
+        if "height" in quantities:
+            if info.get("tau_height_origin", "rstar") == "rstar":
+                origin = float(info.get("rstar", self.rstar))
+            else:
+                origin = 0.0
+            for tau in taus:
+                self.__dict__["he" + tau] = origin + self.__dict__["height" + tau].astype(
+                    np.float64
+                )
+
+        if "ro" in quantities and "se" in quantities:
+            eos = None
+            for tau in taus:
+                for key in ["pr", "te"]:
+                    if key in quantities:
+                        continue
+                    if eos is None:
+                        eos = _compressed.compressed_eos(self.data.p)
+                    self.__dict__[key + tau] = eos.total(
+                        key, self.__dict__["ro" + tau], self.__dict__["se" + tau]
+                    )
 
     def _get_filepath_optical_depth_zarr(self, n: int):
         return self.datadir / "tau" / "zarr" / f"qq.{n:08d}.zarr"
@@ -1359,6 +1556,9 @@ class OpticalDepth(_BaseReader):
             }
 
             return
+
+        elif self._is_compressed():
+            self._read_compressed(n)
 
         else:
 
@@ -1741,9 +1941,59 @@ class Slice(_BaseReader):
             self.__dict__[key] = None
 
     def _get_filepath_slice(self, n_slice, direc, n, postfix):
+        if self._is_compressed():
+            return _compressed.format_path(
+                self.datadir,
+                self.format_info,
+                "slice",
+                name=f"qq{direc}{postfix}",
+                nd_tau=n,
+                n=n_slice + 1,
+            )
         return (
             self.datadir / "slice" / f"qq{direc}{postfix}.dac.{n:08d}.{n_slice+1:08d}"
         )
+
+    def _read_compressed(self, n_slice, direc, n):
+        """
+        新出力形式 (R2D2plus DEC-576) の slice を読む。
+
+        並びは従来と同じ ``(n1, n2, 変数)`` (Fortran 順) で、変数は ``format.toml`` の
+        ``variables``。書かれない ``pr``, ``te`` は ``ro``, ``se`` から R2D2plus と同じ
+        切り替え付きの式で計算する (R2D2plus は倍精度の状態から作っていたので、
+        単精度の ``ro``, ``se`` から作るこちらとは入力の丸めの分だけ違いうる)。
+        """
+        variables = list(self.format_info["variables"])
+        nv = len(variables)
+        for postfix in self._get_postfixes():
+            if direc == "x":
+                if self.geometry == "YinYang":
+                    n1, n2 = self.jx_yy + 2 * self.margin, self.kx_yy + 2 * self.margin
+                else:
+                    n1, n2 = self.jx, self.kx
+            elif direc == "y":
+                n1, n2 = self.ix, self.kx
+            elif direc == "z":
+                n1, n2 = self.ix, self.jx
+            else:
+                raise ValueError("direc should be 'x', 'y', or 'z'")
+            with open(self._get_filepath_slice(n_slice, direc, n, postfix), "rb") as f:
+                qq = np.fromfile(f, self.endian + "f", nv * n1 * n2)
+            qq = qq.reshape((n1, n2, nv), order="F")
+            for m, key in enumerate(variables):
+                self.__dict__[key + postfix] = qq[:, :, m]
+
+            if "ro" in variables and "se" in variables:
+                if direc == "x":
+                    # 動径の断面。鉛直位置は断面の座標に一番近い格子点
+                    iz = np.argmin(np.abs(self.x - self.x_slice[n_slice]))
+                else:
+                    iz = np.arange(self.ix).reshape(-1, 1)
+                eos = _compressed.compressed_eos(self.data.p)
+                for key in ["pr", "te"]:
+                    self.__dict__[key + postfix] = eos.slice(
+                        key, self.__dict__["ro" + postfix], self.__dict__["se" + postfix], iz
+                    )
 
     def _get_filepath_slice_zarr(self, n, direc):
         return self.datadir / "slice" / "zarr" / direc / f"qq.{n:08d}.zarr"
@@ -1869,6 +2119,8 @@ class Slice(_BaseReader):
             )
             for key, value in qq.items():
                 self.__dict__[key] = value.squeeze()
+        elif self._is_compressed():
+            self._read_compressed(n_slice, direc, n)
         else:
             for postfix in postfixes:
                 with open(
@@ -2204,6 +2456,10 @@ class TwoDimension(_BaseReader):
             for key in self.value_keys:
                 self.__dict__[key] = np.zeros((self.ix, self.jx))
 
+        if self._is_compressed():
+            self._read_compressed(n)
+            return
+
         dtype = np.dtype(
             [("qq", self.endian + str((self.mtype + 5) * self.ix * self.jx) + "f")]
         )
@@ -2214,6 +2470,32 @@ class TwoDimension(_BaseReader):
             self.__dict__[key] = qq["qq"].reshape(
                 (self.mtype + 5, self.ix, self.jx), order="F"
             )[m, :, :]
+
+
+    def _read_compressed(self, n):
+        """
+        新出力形式 (R2D2plus DEC-576) の 2D remap を読む。
+
+        並びは従来と同じ ``(変数, ix, jx)`` (Fortran 順) で、変数は ``format.toml``
+        の ``variables`` + ``remap_2d_extra`` (``tu``, ``fr``)。書かれない ``pr``,
+        ``te``, ``op`` は R2D2plus の従来形式と同じく**切り替え無しの表の値**
+        (``pr``, ``te`` は背景を引いた摂動) を ``ro``, ``se`` から計算する。
+        """
+        info = self.format_info
+        names = list(info["variables"]) + list(info["remap_2d_extra"])
+        nv = len(names)
+        path = _compressed.format_path(self.datadir, info, "remap_2d", nd=n)
+        with open(path, "rb") as f:
+            qq = np.fromfile(f, self.endian + "f", nv * self.ix * self.jx)
+        qq = qq.reshape((nv, self.ix, self.jx), order="F")
+        for m, key in enumerate(names):
+            self.__dict__[key] = qq[m, :, :]
+        if "ro" in names and "se" in names:
+            eos = _compressed.compressed_eos(self.data.p)
+            iz = np.arange(self.ix).reshape(-1, 1)
+            for key in ["pr", "te", "op"]:
+                if key not in names:
+                    self.__dict__[key] = eos.remap2d(key, self.ro, self.se, iz)
 
 
 class ModelS(_BaseReader):
@@ -2282,6 +2564,10 @@ class _BasePrevAftr(_BaseReader):
         if not hasattr(self.data, "ib_rte_bot"):
             self.ib_rte_bot = 0
         self.ix_prev_aftr = (self.ix0 - self.ib_rte_bot) * self.nx
+        # 初回の read で _allocate_prev_aftr_qq が self.ro を参照するので、
+        # 未確保であることを示す None を置いておく (無いと AttributeError だった)
+        for key in self.prev_aftr_kind:
+            self.__dict__[key] = None
 
     def _allocate_prev_aftr_qq(self, dtype):
         """
@@ -2334,6 +2620,17 @@ class _BasePrevAftr(_BaseReader):
         np0 : int
             A selected MPI process number
         """
+        if self._is_compressed():
+            # 新出力形式 (R2D2plus DEC-576): 単精度の r2d2plus-z
+            return _compressed.format_path(
+                self.datadir,
+                self.format_info,
+                prev_aftr,
+                rank=int(np0),
+                nd=n,
+                index=n_prev_aftr,
+            )
+
         cnou = "{0:05d}".format(np0 // 1000)
         cno = "{0:08d}".format(np0)
 
@@ -2469,6 +2766,30 @@ class _BasePrevAftr(_BaseReader):
             self.x_prev_aftr = self.data.x[-self.ix_prev_aftr :]
             self.y_prev_aftr = self.data.y
             self.z_prev_aftr = self.data.z
+
+            if self._is_compressed():
+                # 新出力形式は単精度 (従来は倍精度)。値は書かれたとおり単精度で返す。
+                for key in self.prev_aftr_kind:
+                    self.__dict__[key] = np.zeros(
+                        (self.ix_prev_aftr, self.jx, self.kx), dtype=np.float32
+                    )
+                for np0 in range(self.npe):
+                    ib, jb, kb = self.xyz[np0]
+                    if ib >= self.ib_rte_bot:
+                        ibt = ib - self.ib_rte_bot
+                        filepath = self._get_filepath_prev_aftr_qq(
+                            n, n_prev_aftr, np0, prev_aftr=self.prev_aftr
+                        )
+                        _, qqq = _compressed.read_r2d2plus_z(
+                            filepath, names=self.prev_aftr_kind
+                        )
+                        for key in self.prev_aftr_kind:
+                            self.__dict__[key][
+                                ibt * self.nx : (ibt + 1) * self.nx,
+                                jb * self.ny : (jb + 1) * self.ny,
+                                kb * self.nz : (kb + 1) * self.nz,
+                            ] = qqq[key]
+                return
 
             self._allocate_prev_aftr_qq(dtype=np.float64)
             dtype = self._dtype_prev_aftr_qq(kind="d")

@@ -307,6 +307,21 @@ class Parameters:
         # read equation of state
         self.read_eos_table()
 
+        # 出力形式 (R2D2plus DEC-576)。param/format.toml が無ければ従来形式。
+        # 新形式 ("compressed") は pr/te/op を書かないので、読むときに EOS 表
+        # (param/eos_table.tbl) から計算する。その表をここで読んでおく。
+        from .compressed import read_format_toml
+
+        self.format_info = read_format_toml(self.datadir)
+        if self.format_info is None:
+            self.output_format = "legacy"
+        else:
+            self.output_format = self.format_info.get("format", "legacy")
+            if self.output_format == "compressed":
+                table = self.datadir / "param" / self.format_info["eos_table"]
+                if table.exists():
+                    self.read_eos_table(table)
+
         # read original data
         if os.path.exists(self.datadir / "cont_log.txt"):
             with open(self.datadir / "cont_log.txt") as f:
@@ -328,7 +343,12 @@ class Parameters:
             ``<run>/input_data/eos_table_sero.npz`` を探し、無ければ黙って
             何もしない (Fortran ランの従来挙動)。
 
-            **R2D2plus (C++版) のランはランディレクトリに input_data を
+            新出力形式 (``param/format.toml`` が ``format = "compressed"``、
+            R2D2plus DEC-576) のランでは、出力に同梱された
+            ``param/eos_table.tbl`` を :py:class:`pyR2D2.Data` が自動で読む
+            (pr/te/op はこの表から計算する)。
+
+            **R2D2plus (C++版) の従来形式のランはランディレクトリに input_data を
             持たない**ので、省略時はEOS属性が設定されない。使った表は設定
             toml の ``eos_table`` キーと run.log に絶対パスで残っているから、
             その npz 版を明示的に渡すこと。例::
@@ -355,6 +375,9 @@ class Parameters:
             eos_d = _read_r2d2plus_table(path)
         else:
             eos_d = np.load(path)
+        # 新出力形式の pr/te/op の計算 (data_io/compressed.py) が生の表を読み直す
+        self.eos_table_path = str(path)
+        self.__dict__.pop("_compressed_eos", None)
         self.log_ro_e = eos_d["ro"]  # density is defined in logarithmic scale
         self.se_e = eos_d["se"]
         self.ix_e = len(self.log_ro_e)
