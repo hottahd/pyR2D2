@@ -95,6 +95,17 @@ class Data:
         if verbose:
             self.summary()
 
+        # 台帳 (r2d2plus-ledger) へ未送信の変更があれば 1 行だけ知らせる。
+        # R2D2plus のラン (run_summary.toml がある) だけ。失敗しても黙る。
+        try:
+            from .ledger import unsent_hint
+
+            hint = unsent_hint(self.datadir)
+            if hint:
+                print(hint)
+        except Exception:
+            pass
+
         eosdir = self.datadir.parent / "input_data"
         # 新出力形式 (R2D2plus DEC-576) は param/eos_table.tbl を Parameters が読んでいる
         compressed_with_table = self.p.output_format == "compressed" and hasattr(

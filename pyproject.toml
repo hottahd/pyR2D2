@@ -25,12 +25,18 @@ dependencies = [
     "scipy>=1.10,<2",
 ]
 
+[project.scripts]
+# ランの一覧 (台帳) を Google スプレッドシートへ送る。push だけ gspread と google-auth が要る
+r2d2plus-ledger = "pyR2D2.ledger.cli:main"
+
 [project.optional-dependencies]
 zarr = ["zarr>=3.0.8,<4"]
 plot = ["matplotlib>=3.7"]
 # R2D2plus の新出力形式 (format = "compressed"): zstd (zarr を入れれば入る) と
 # 初期状態ファイルを書くときの XXH3-64 (write_initial_state)
 compressed = ["numcodecs>=0.13", "xxhash>=3"]
+# r2d2plus-ledger push (Google スプレッドシート)
+ledger = ["gspread>=5", "google-auth>=2"]
 all = [
     "zarr>=3.0.8,<4",
     "matplotlib>=3.7",

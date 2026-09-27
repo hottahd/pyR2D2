@@ -71,6 +71,9 @@ def set_top_line(json_key=None, project=None):
     """
     This function set top line of google spreadsheet
 
+    台帳の管理列 (:py:mod:`pyR2D2.ledger`) のうちシートに無い見出しを、
+    既存の見出しの右端に足す。既存の列 (人が書く列を含む) は動かさない。
+
     Parameters
     ----------
     json_key : str
@@ -82,6 +85,8 @@ def set_top_line(json_key=None, project=None):
     -------
         None
     """
+    from pyR2D2.ledger import collect, sheet
+
     if project == None:
         project = os.getcwd().split("/")[-2]
 
@@ -90,41 +95,18 @@ def set_top_line(json_key=None, project=None):
     gc = init_gspread(json_key, project)
     wks = gc.open(project).sheet1
 
-    cells = wks.range("A1:T1")
-    keys = [
-        "Case ID",
-        "Mstar",
-        "(ix,jx,kx)",
-        "xmin [Mm]",
-        "xmax [Mm]",
-        "ymin",
-        "ymax",
-        "zmin",
-        "zmax",
-        "uni",
-        "dx [km]",
-        "m ray",
-        "dtout [s]",
-        "dtout_tau [s]",
-        "al",
-        "RSST",
-        "Om",
-        "Geometry",
-        "origin",
-        "update time",
-        "Server",
-    ]
-
-    for cell, key in zip(cells, keys):
-        cell.value = key
-
-    wks.update_cells(cells)
+    plan = sheet.plan_updates(wks.get_all_values(), [], collect.default_server())
+    sheet.apply_plan(wks, plan)
 
 
 ################################################################################
 def set_cells_gspread(data, json_key=None, project=None, caseid=None):
     """
     Outputs parameters to Google spreadsheet
+
+    ``r2d2plus-ledger push`` と同じ処理 (:py:func:`pyR2D2.ledger.cli.push_records`)
+    で、そのランの管理列のセルだけを見出しの名前で探して書く。人が書く列には
+    触らない (以前は A〜T 列を位置で上書きし、21 個目の Server が落ちていた)。
 
     Parameters
     ----------
@@ -138,11 +120,9 @@ def set_cells_gspread(data, json_key=None, project=None, caseid=None):
         Case ID
 
     """
-    import datetime
+    from pathlib import Path
 
-    import numpy as np
-
-    import pyR2D2
+    from pyR2D2.ledger import cli, collect
 
     if project == None:
         project = os.getcwd().split("/")[-2]
@@ -150,67 +130,13 @@ def set_cells_gspread(data, json_key=None, project=None, caseid=None):
     if json_key == None:
         json_key = glob.glob(os.environ["HOME"] + "/json/*")[0]
 
-    if caseid is None:
-        caseid = data.datadir.parts[-2]
+    run_dir = Path(data.datadir).resolve().parent
+    server = collect.default_server()
+    record = collect.collect_run(run_dir, server=server)
+    if caseid is not None:
+        record.caseid = caseid
+        record.values["Case ID"] = caseid
 
     gc = init_gspread(json_key, project)
     wks = gc.open(project).sheet1
-    str_id = str(int(caseid[1:]) + 1)
-    cells = wks.range("A" + str_id + ":" + "T" + str_id)
-
-    keys = [caseid]
-    if hasattr(data.p, "mstar"):
-        keys.append("{:.2f}".format(data.mstar / pyR2D2.constant.MSUN))
-    else:
-        keys.append("1.00")  # solar mass
-    keys.append(str(data.ix) + " " + str(data.jx) + " " + str(data.kx))
-    keys.append("{:6.2f}".format((data.xmin - data.rstar) * 1.0e-8))
-    keys.append("{:6.2f}".format((data.xmax - data.rstar) * 1.0e-8))
-
-    if data.geometry == "Cartesian":
-        keys.append("{:6.2f}".format(data.ymin * 1.0e-8) + " [Mm]")
-        keys.append("{:6.2f}".format(data.ymax * 1.0e-8) + " [Mm]")
-        keys.append("{:6.2f}".format(data.zmin * 1.0e-8) + " [Mm]")
-        keys.append("{:6.2f}".format(data.zmax * 1.0e-8) + " [Mm]")
-
-    if data.geometry == "Spherical":
-        pi2rad = 180 / np.pi
-        keys.append("{:6.2f}".format(data.ymin * pi2rad) + " [deg]")
-        keys.append("{:6.2f}".format(data.ymax * pi2rad) + " [deg]")
-        keys.append("{:6.2f}".format(data.zmin * pi2rad) + " [deg]")
-        keys.append("{:6.2f}".format(data.zmax * pi2rad) + " [deg]")
-
-    if data.geometry == "YinYang":
-        pi2rad = 180 / np.pi
-        keys.append("0 [deg]")
-        keys.append("180 [deg]")
-        keys.append("-180 [deg]")
-        keys.append("180 [deg]")
-
-    if data.ununiform_flag:
-        keys.append("F")
-    else:
-        keys.append("T")
-
-    dx0 = (data.x[1] - data.x[0]) * 1.0e-5
-    dx1 = (data.x[data.ix - 1] - data.x[data.ix - 2]) * 1.0e-5
-    keys.append("{:6.2f}".format(dx0) + " " + "{:6.2f}".format(dx1))
-    keys.append(data.rte)
-    keys.append("{:6.2f}".format(data.dtout))
-    keys.append("{:6.2f}".format(data.dtout_tau))
-    keys.append("{:5.2f}".format(data.potential_alpha))
-    if data.xi.max() == 1.0:
-        keys.append("F")
-    else:
-        keys.append("T")
-
-    keys.append("{:5.1f}".format(data.omfac))
-    keys.append(data.geometry)
-    keys.append(data.origin)
-    keys.append(str(datetime.datetime.now()).split(".")[0])
-    keys.append(data.server)
-
-    for cell, key in zip(cells, keys):
-        cell.value = key
-
-    wks.update_cells(cells)
+    cli.push_records([record], wks, server, project)
