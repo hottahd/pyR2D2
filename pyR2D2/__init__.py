@@ -19,7 +19,7 @@ from .constant import constant
 from .cpp_util import EOS
 from .data import Data
 from .data_io import zarr_util
-from .data_io.compressed import write_initial_state
+from .data_io.compressed import write_boundary_series, write_initial_state
 from .data_io.parameters import Parameters
 from .data_io.read import (
     After,
@@ -57,6 +57,7 @@ __all__ = [
     "util",
     "cpp_util",
     "write_initial_state",
+    "write_boundary_series",
 ]
 
 try:

@@ -23,6 +23,7 @@
 * :func:`read_r2d2plus_z` : ``r2d2plus-z`` ファイル 1 個を読む
 * :func:`read_format_toml` : ``param/format.toml`` を読む
 * :func:`write_initial_state` : R2D2plus の初期状態ファイル (``[initial_condition] type = "file"``) を書く
+* :func:`write_boundary_series` : R2D2plus の境界条件 ``"file"`` 用の境界値の時系列を書く
 * :func:`read_restart_meta`, :func:`read_restart_state` : R2D2plus の
   リスタート (``restart/<slot>``) を読む (**実験的**)
 """
@@ -451,6 +452,84 @@ def write_initial_state(path, fields, attributes=None, level=3):
             stacklevel=2,
         )
     return write_r2d2plus_z(path, "initial_state", variables, attributes, level)
+
+
+def write_boundary_series(path, times, values, attributes=None, level=3):
+    """
+    R2D2plus の境界値の時系列ファイル (``r2d2plus-z``、``kind = "boundary_series"``) を書く。
+
+    R2D2plus の汎用境界条件の規則 ``"file"`` が読む。例::
+
+        [boundary.params]
+        bottom.vz = "file"
+        bottom.vz_file = "/path/to/bottom_vz.z"
+
+    値はその壁の ghost 層すべてに使われ、時間方向にはステップ開始時刻で線形内挿
+    される (範囲外は端の値で止める)。
+
+    **[boundary.params] の変数名は C++ の成分名である** (``ro, vx, vy, vz, bx, by,
+    bz, se, ps``、**C++ では z が鉛直**)。pyR2D2 の 3D 配列 (Fortran の名前) とは
+    速度と磁場の名前がずれる:
+
+    ============================  ==========================
+    pyR2D2 / Fortran の名前       R2D2plus [boundary.params]
+    ============================  ==========================
+    ``vx`` (鉛直)                 ``vz``
+    ``vy`` (第1水平)              ``vx``
+    ``vz`` (第2水平)              ``vy``
+    ``bx``, ``by``, ``bz``        ``bz``, ``bx``, ``by``
+    ``ph``                        ``ps``
+    ``ro``, ``se``                ``ro``, ``se`` (同じ)
+    ============================  ==========================
+
+    つまり鉛直速度を与えるなら ``d.qf.vx`` 由来の値を ``bottom.vz`` に指定する。
+    **ro と se の値は背景からの摂動** (``d.qf.ro``, ``d.qf.se`` と同じ量)。
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        書き出し先
+    times : array_like, shape (nt,)
+        時刻 [s]。狭義単調増加であること。
+    values : numpy.ndarray, shape (n1, n2, nt)
+        境界値。``n1`` = 第1水平 (pyR2D2 の ``jx``、Fortran y = C++ x)、
+        ``n2`` = 第2水平 (``kx``、Fortran z = C++ y)、領域全体の物理セルのみ。
+        **時刻は最後の軸**。例えば ``d.qf.vx[0]`` (下端の面、形 ``(jx, kx)``) を
+        時刻ごとに集めて ``np.stack(planes, axis=-1)`` とすればよい。
+    attributes : dict, optional
+        ``[attributes]`` に書くスカラー
+    level : int, optional
+        zstd の圧縮レベル (既定 3)
+
+    Returns
+    -------
+    path : pathlib.Path
+
+    Notes
+    -----
+    変数は ``time`` (float64, ``[nt]``) と ``value`` (float64, order ``"F"``、
+    ``[n1, n2, nt]``、第1水平が最速) の 2 つ。XXH3-64 の計算に ``xxhash`` が要る。
+    """
+    times = np.asarray(times, dtype=np.float64)
+    values = np.asarray(values, dtype=np.float64)
+    if times.ndim != 1 or times.size == 0:
+        raise ValueError(f"times must be a non-empty 1D array, got shape {times.shape}")
+    if not np.all(np.isfinite(times)) or np.any(np.diff(times) <= 0):
+        raise ValueError("times must be finite and strictly increasing")
+    if values.ndim != 3 or values.shape[2] != times.size:
+        raise ValueError(
+            f"values must have shape (n1, n2, nt) with nt = {times.size} (time last), "
+            f"got {values.shape}"
+        )
+    if not np.all(np.isfinite(values)):
+        raise ValueError("values contains NaN or Inf")
+    return write_r2d2plus_z(
+        path,
+        "boundary_series",
+        [("time", times, "F"), ("value", values, "F")],
+        attributes,
+        level,
+    )
 
 
 # ---------------------------------------------------------------------------

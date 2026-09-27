@@ -250,4 +250,28 @@ R2D2plus (C++版) は ``[output] format = "compressed"`` で、計算の時点�
 
 書き出しには ``xxhash`` が要る(``pip install xxhash``、または ``pyR2D2[compressed]``)。R2D2plus は変数ごとの XXH3-64 を照合して読むので、チェックサムを省略できない。
 
+境界値の時系列を R2D2plus の境界条件に与える
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:py:func:`pyR2D2.write_boundary_series` は R2D2plus の汎用境界条件の規則 ``"file"`` が読む時系列(``kind = "boundary_series"``)を書く。``values`` の形は ``(n1, n2, nt)`` (``n1`` = 第1水平 ``jx``、``n2`` = 第2水平 ``kx``、**時刻が最後の軸**)、``times`` は狭義単調増加。値はその壁の ghost 層すべてに使われ、ステップ開始時刻で線形内挿される(範囲外は端の値)。
+
+.. warning::
+
+    ``[boundary.params]`` の変数名は **C++ の成分名** (``ro, vx, vy, vz, bx, by, bz, se, ps``、C++ では **z が鉛直**) である。pyR2D2 (Fortran の名前) の ``vx`` (鉛直) は ``vz``、``vy`` は ``vx``、``vz`` は ``vy`` になる(磁場も同様、``ph`` は ``ps``)。``ro``, ``se`` は背景からの摂動を与える。
+
+.. code:: python
+
+    import numpy as np
+    import pyR2D2
+
+    d = pyR2D2.Data('../run/d001/data')
+    steps = range(100, 121)
+    planes, times = [], []
+    for n in steps:
+        d.qf.read(n, keys=["vx"])
+        planes.append(d.qf.vx[0].copy())   # 下端の面の鉛直速度 (jx, kx)
+        times.append(d.time_read(n, verbose=False))
+    pyR2D2.write_boundary_series("bottom_vz.z", times, np.stack(planes, axis=-1))
+    # R2D2plus 側: [boundary.params] bottom.vz = "file", bottom.vz_file = "bottom_vz.z"
+
 最終更新日：|today|

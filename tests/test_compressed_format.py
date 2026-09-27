@@ -759,3 +759,31 @@ def test_fixture_checksums_and_initial_state_from_output(tmp_path):
     for k in VARS8:
         assert arrays[k].shape == (d.ix, d.jx, d.kx)
         _bitwise(arrays[k], d.qf.__dict__[k].astype(np.float64))
+
+
+def test_write_boundary_series_roundtrip(tmp_path):
+    pytest.importorskip("xxhash")
+    rng = np.random.default_rng(5)
+    n1, n2, nt = 5, 4, 3
+    times = np.array([0.0, 10.0, 25.5])
+    values = rng.standard_normal((n1, n2, nt))
+    path = pyR2D2.write_boundary_series(tmp_path / "bottom_vz.z", times, values,
+                                        attributes={"wall": "bottom"})
+    header, arrays = C.read_r2d2plus_z(path, verify=True)
+    assert header["kind"] == "boundary_series"
+    assert header["attributes"] == {"wall": "bottom"}
+    assert [v["name"] for v in header["variables"]] == ["time", "value"]
+    for v, shape in zip(header["variables"], [[nt], [n1, n2, nt]]):
+        assert v["dtype"] == "float64" and v["order"] == "F" and v["shape"] == shape
+    _bitwise(arrays["time"], times)
+    _bitwise(arrays["value"], values)
+    # 第1水平が最速: 生バイトの先頭 n1 個は values[:, 0, 0]
+    v = header["variables"][1]
+    blob = open(path, "rb").read()[header["data_offset"] + v["offset"]:][: v["stored_bytes"]]
+    raw = C._unshuffle(C._zstd_decompress(blob, v["raw_bytes"]), "<f8")
+    np.testing.assert_array_equal(raw[:n1], values[:, 0, 0])
+
+    with pytest.raises(ValueError, match="increasing"):
+        pyR2D2.write_boundary_series(tmp_path / "x.z", [0.0, 0.0, 1.0], values)
+    with pytest.raises(ValueError, match="time last"):
+        pyR2D2.write_boundary_series(tmp_path / "x.z", times, values.transpose(2, 0, 1))
