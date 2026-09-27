@@ -676,3 +676,15 @@ def test_pair_switches_together(project):
     cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
     assert ws.get(1, 2) == "到達時刻 [d]" and ws.get(1, 3) == "t_end [d]"
     assert ws.get(21, 2) == "3.00" and ws.get(21, 3) == "100.00"
+
+
+def test_d000_never_overwrites_the_header_row():
+    """d000 は「番号 + 1 行目」だと 1 行目(見出し)に重なるので送らない。"""
+    recs = [
+        collect.RunRecord(caseid="d000", run_dir=Path("d000"), values={"Case ID": "d000", "Mstar": "1.00"}),
+        collect.RunRecord(caseid="d001", run_dir=Path("d001"), values={"Case ID": "d001", "Mstar": "1.00"}),
+    ]
+    plan = sheet.plan_updates([["Case ID", "Mstar", "Note"]], recs, "astana")
+    assert all(text not in ("d000",) for row, col, text in plan.cells if row == 1)
+    assert [c for c, _ in plan.skipped] == ["d000"]
+    assert any(row == 2 and text == "d001" for row, col, text in plan.cells)

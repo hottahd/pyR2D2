@@ -247,6 +247,10 @@ def plan_updates(values, records, server, force=False):
         if row is None:
             plan.skipped.append((rec.caseid, "Case ID が dNNN の形でない"))
             continue
+        if row < 2:
+            # d000 は「番号 + 1 行目」の規則だと見出しの行(1 行目)に重なる。見出しを壊さない。
+            plan.skipped.append((rec.caseid, "1 行目は見出しなので送らない(d000)"))
+            continue
         cur_case = _cell(values, row, positions["Case ID"]).strip()
         cur_server = _cell(values, row, positions["Server"]).strip()
         if cur_case and cur_case != rec.caseid and not force:
