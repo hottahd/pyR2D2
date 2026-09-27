@@ -48,7 +48,11 @@ compress(): バイナリファイルをzarrにまとめる
 
     d.qf.compress(n, overwrite=True)
 
-デフォルトで保存される変数は ``ro``, ``vx``, ``vy``, ``vz``, ``bx``, ``by``, ``bz``, ``se`` の8つ(``zarr_keys``)である。``pr``, ``te``, ``op`` はこれらから :py:class:`pyR2D2.cpp_util.EOS` を使って後から計算できるため、デフォルトでは含まれない。これらが必要な場合は ``keys`` 引数で明示的に指定する。
+デフォルトで保存される変数は ``ro``, ``vx``, ``vy``, ``vz``, ``bx``, ``by``, ``bz``, ``se`` の8つ(``zarr_keys``)である。``pr``, ``te``, ``op`` はデフォルトでは含まれない。これらが必要な場合は ``keys`` 引数で明示的に指定する。
+
+.. warning::
+
+    ``pr``, ``te``, ``op`` を後から ``ro``, ``se`` と :py:class:`pyR2D2.cpp_util.EOS` (あるいは :py:func:`pyR2D2.util.eos_table`) で計算しても、出力ファイルの値とは一致しない。これらは常に表を引くが、R2D2 本体は相対振幅 ``ct = max(|ro1|/ro0, |se1|/se0)`` が ``3e-3`` を下回る点では線形化した EOS を使っている(硬い切り替え)。深部の計算ではほぼ全域が線形側である。本体と同じ値が要るなら :py:func:`pyR2D2.util.eos_switch` を使うこと(単精度の丸めの位置まで同じではないので最終桁は違いうる)。解析で ``pr``, ``te``, ``op`` を使うなら ``keys`` に入れて保存しておくのが確実である。
 
 .. code:: python
 
@@ -198,5 +202,26 @@ time.zip: 時刻ファイルの圧縮
 .. note::
 
     計算がまだ進行中のディレクトリに対してこの処理を行う場合、計算プロセスが書き込み中のファイルを誤って対象にしないよう注意すること。基本的には、計算が完全に終了した(あるいは十分に古い)タイムステップに対してのみ実行するのが安全である。
+
+R2D2plus の新出力形式 (``format = "compressed"``)
+------------------------------------------------------
+
+R2D2plus (C++版) は ``[output] format = "compressed"`` で、計算の時点で圧縮した出力を書ける(R2D2plus DEC-576)。上の ``compress()`` とは別物で、pyR2D2 側の操作は要らない。``param/format.toml`` があり ``format = "compressed"`` と書かれていれば :py:class:`pyR2D2.Data` が自動で見分け、``d.qf.read(n)``, ``d.qx``, ``d.qz``, ``d.qm``, ``d.qr``, ``d.qt``, ``d.qs``, ``d.q2``, ``d.qp``/``d.qa`` をこれまでと同じ引数・同じ属性名・同じ配列の形で使える(``d.vc`` は従来形式と同じファイル)。従来形式(Fortran R2D2 と R2D2plus の ``format = "legacy"``)の読み方は変わらない。
+
+* 3D の ``remap/qq`` は 1 ランク 1 ファイルの ``r2d2plus-z`` コンテナ(変数ごとに byte shuffle + zstd)。中身は従来形式とビット単位で同一。読むには zstd の復号器が要る(``pip install numcodecs``。``pyR2D2[zarr]`` を入れていれば入っている)。
+* ``pr``, ``te``, ``op`` は書かれない。pyR2D2 は要求されたとき(``keys="all"`` の既定も含む)に、出力に同梱された ``param/eos_table.tbl`` を使って ``ro``, ``se`` から計算する。式は R2D2plus の従来形式の書き出しと同じで、単精度の丸めの位置まで写してあるので、3D の ``remap/qq`` と tau の ``pr``, ``te``, ``op`` は従来形式のファイルとビット単位で一致する(対照ランで確認)。slice と 2D の ``pr``, ``te`` は R2D2plus が倍精度の状態から作っていたので、単精度の出力から計算するこちらとは最終桁が違いうる(対照ランの slice で背景量に対し 2e-8 以内)。
+* ``ph`` (発散クリーニングの変数) は既定では書かれない。``keys="all"`` では属性が ``None`` になり、明示的に要求すると例外になる。
+* tau の高さは ``r - rstar`` [cm] で書かれる。``d.qt.height`` (と ``height01``, ``height001``) でそのまま読める。従来の ``d.qt.he`` (中心からの半径) は ``rstar + height`` を倍精度で返す(従来の単精度の半径は約 82 m 刻みだった)。
+* ``d.qp``, ``d.qa`` の配列は単精度(従来形式は倍精度)。値は同じ。
+
+``r2d2plus-z`` のファイル 1 個や、R2D2plus のリスタートを直接読む関数もある(リスタートは実験的)。
+
+.. code:: python
+
+    from pyR2D2.data_io import compressed
+
+    header, qq = compressed.read_r2d2plus_z(
+        "data/remap/qq/00000/00000000/qq.z.00000001.00000000")
+    state, meta = compressed.read_restart_state("data/restart/e", rank=0)
 
 最終更新日：|today|
