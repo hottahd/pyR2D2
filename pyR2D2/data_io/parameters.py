@@ -7,7 +7,7 @@ import pyR2D2
 
 
 def _read_r2d2plus_table(path):
-    """r2d2plus-table 1 (R2D2plus specification.md 11.32) を {name: array} で返す。
+    """r2d2plus-table 1 (形式の正本は R2D2plus docs/formats/r2d2plus-table.md) を {name: array} で返す。
 
     ASCIIヘッダ(1行1項目、"end"まで) + パディング + little-endian float64 の
     ペイロード。2次元は行優先 (n_ro, n_se)。
