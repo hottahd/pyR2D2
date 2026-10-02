@@ -6,11 +6,11 @@
 
 使い方:
     # 1) 不透明度テーブルを作る (1 回だけ)
-    python scripts/build_opacity_table.py --lam-min 6280 --lam-max 6320 \
+    python R2D2plus-input/opacity/scripts/build_opacity_table.py --lam-min 6280 --lam-max 6320 \
         --resolving-power 1e6 --out $ODF_PROJECT_ROOT/work/opac_fe6302.h5
 
     # 2) 合成
-    python scripts/synth_spectrum.py --table $ODF_PROJECT_ROOT/work/opac_fe6302.h5 \
+    python -m pyR2D2.synth.spectrum --table $ODF_PROJECT_ROOT/work/opac_fe6302.h5 \
         --run $ODF_PROJECT_ROOT/run/d001 --n -1 --stride 4 --R-inst 3e5
 
 注意:

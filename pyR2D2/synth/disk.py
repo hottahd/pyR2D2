@@ -32,7 +32,7 @@ psi は円盤中心まわりの方位角。投影面積要素は
 **円盤積分にとってはこちらが正しい相手**である。
 
 使い方:
-    python scripts/synth_disk.py --table $W/opac_fe6302_vald.h5 \
+    python -m pyR2D2.synth.disk --table $W/opac_fe6302_vald.h5 \
         --n 141 --nmu 6 --nphi 4 --stride 16 --save-npz $W/disk.npz
 """
 

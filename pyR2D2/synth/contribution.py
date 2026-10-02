@@ -15,7 +15,7 @@
 「強度の何 % が上端から何 km 以内で作られるか」を測る。
 
 使い方:
-    python scripts/contribution_function.py --table $ODF_PROJECT_ROOT/work/opac_fe6302.h5 \
+    python -m pyR2D2.synth.contribution --table $ODF_PROJECT_ROOT/work/opac_fe6302.h5 \
         --run $ODF_PROJECT_ROOT/run/d002 --n 78
 """
 

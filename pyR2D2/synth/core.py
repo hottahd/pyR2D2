@@ -9,7 +9,7 @@ gray または多群で作った R2D2 のスナップショットから、視線
 前提と近似:
     * LTE (S_lambda = B_lambda(T))。散乱は吸収として扱う
     * 不透明度は (T,P) グリッド上に事前計算した高分解能テーブルから補間
-      (`scripts/build_opacity_table.py`)
+      (R2D2plus-input の `opacity/scripts/build_opacity_table.py`)
     * 視線速度による Doppler シフトは、等分解能格子上の**添字のずらし**で入れる
     * まず mu = 1 (disk center) の鉛直光線。傾いた光線は将来の拡張
       (箱の中を斜めに補間して辿る必要がある)
@@ -427,7 +427,7 @@ def ray_contribution(T3, P3, rho3, vx3, vy3, vz3, x, dy, dz, table,
 
         I = int CF ds,      CF(s) = S exp(-tau) alpha
 
-    と書ける (`scripts/contribution_function.py` と同じ定義。ただしあちらは
+    と書ける (`pyR2D2.synth.contribution` と同じ定義。ただしあちらは
     mu=1 の鉛直柱専用)。**線位置は「CF で重みを付けた視線速度の平均」で
     ほぼ決まる**ので、その重みを使って `mu vx` と `sqrt(1-mu^2) v_h` の
     寄与を分けて出せる (`docs/12` 13.8 節の分解)。

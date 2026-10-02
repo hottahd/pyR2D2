@@ -17,7 +17,7 @@
     * 周縁減光の曲線と、アトラスから読んだ値との比較
 
 使い方:
-    python scripts/synth_mu_images.py --table $W/opac_fe6302_vald.h5 \
+    python -m pyR2D2.synth.mu_images --table $W/opac_fe6302_vald.h5 \
         --n 141 --stride 2 --out notebooks/mu_images.png
 """
 
