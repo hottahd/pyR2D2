@@ -1,0 +1,27 @@
+name: tests
+
+# pytest を push と pull request ごとに回す（2026-10-02 まで CI はホイールを作って import するだけだった。R2D2plus DEC-606）。
+# R2D2plus の各版の出力の見本（tests/data/r2d2plus_fixtures/）を読む互換試験もここで走る。
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # setuptools_scm が版をタグから作る
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: install
+        run: python -m pip install -e ".[all,synth]" pytest zstandard
+      - name: pytest
+        run: python -m pytest -q tests
