@@ -796,12 +796,15 @@ def read_restart_state(slot_dir, rank, state_subdir="", verify=None):
         raw = f.read()
 
     checksums = meta.get("checksum", {}).get("values")
-    if verify is not False and checksums is not None and rank < len(checksums):
+    # checksum は world rank 順 (YinYang は Yin 0..P-1、Yang P..2P-1。R2D2plus restart.hpp)。
+    # 2026-10-02 まで Yang 側も rank で引いており、Yin 側の値と比べていた。
+    world = rank + (mpi["size_x"] * mpi["size_y"] * mpi["size_z"] if state_subdir == "yang" else 0)
+    if verify is not False and checksums is not None and world < len(checksums):
         digest = _xxh3_hex(raw)
         if digest is None and verify:
             raise ImportError("verify=True needs the xxhash module")
-        if digest is not None and digest != checksums[rank]:
-            raise ValueError(f"{path}: XXH3 mismatch ({digest} != {checksums[rank]})")
+        if digest is not None and digest != checksums[world]:
+            raise ValueError(f"{path}: XXH3 checksum mismatch ({digest} != {checksums[world]})")
 
     if raw.startswith(R2D2PLUS_Z_MAGIC):
         _, arrays = read_r2d2plus_z(path, names=["state"], verify=verify)

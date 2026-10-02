@@ -21,6 +21,7 @@ from .data import Data
 from .data_io import zarr_util
 from .data_io.compressed import write_boundary_series, write_initial_state
 from .data_io.parameters import Parameters
+from .data_io.restart import Restart, read_restart, restart_slots
 from .data_io.read import (
     After,
     FullData,
