@@ -13,11 +13,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-14]   # macos-14 は Apple Silicon
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0               # setuptools_scm がタグを読むため
       - uses: pypa/cibuildwheel@v4.2.1
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: write                  # Releases に貼るため
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: dist
           merge-multiple: true
