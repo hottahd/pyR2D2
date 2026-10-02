@@ -91,7 +91,8 @@ def test_rtable_written_by_r2d2plus_input(path):
     got = load_eos_table_raw(path)
     assert set(got) == set(want)
     for k, v in want.items():
-        np.testing.assert_array_equal(got[k], v, err_msg=k)
+        # np.exp は機械で 1 ulp 違う (GitHub の CI で 1.4e-16)。読み違いなら桁ごと違うので相対 1e-14 で比べる
+        np.testing.assert_allclose(got[k], v, rtol=1e-14, atol=0, err_msg=k)
     p = Parameters.__new__(Parameters)
     p.read_eos_table(path)
     assert p.ix_e == 7 and p.jx_e == 5
