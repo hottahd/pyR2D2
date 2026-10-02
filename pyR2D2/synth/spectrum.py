@@ -32,9 +32,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from odfgen.synth import (OpacityTable, bisector, instrument_profile,
+from pyR2D2.synth.core import (OpacityTable, bisector, instrument_profile,
                           synth_column)
 
 

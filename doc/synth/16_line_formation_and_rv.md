@@ -1,5 +1,12 @@
 # 16. 吸収線の形と視線速度 (教科書編)
 
+> **置き場について（2026-10-02、R2D2plus DEC-589）**: この文書は ODF-radiation から pyR2D2 に移した。本文の旧パスは次のとおり読み替える。
+> `odfgen/synth.py` → `pyR2D2/synth/core.py`（`from pyR2D2.synth import synth_ray` など）、
+> `scripts/synth_spectrum.py` → `python -m pyR2D2.synth.spectrum`、`scripts/synth_disk.py` → `pyR2D2.synth.disk`、
+> `scripts/synth_mu_images.py` → `pyR2D2.synth.mu_images`、`scripts/contribution_function.py` → `pyR2D2.synth.contribution`。
+> 不透明度表の生成（`scripts/build_opacity_table.py`、`odfgen/binning.py` など）は R2D2plus-input の `opacity/` に移った。
+> それ以外の `scripts/*`・`odfgen/iag.py`（研究・観測との比較）は ODF-radiation に残っている。
+
 **「3D 計算から視線速度 (RV) を予言する」とは何をすることなのか**を、
 線が非対称になる理由から順に説明する。式はすべて CGS、波長は真空 Angstrom。
 実装がどこにあるかは各節の末尾に示す。

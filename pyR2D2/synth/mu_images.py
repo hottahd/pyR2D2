@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """**傾けた視線**での出射強度の画像を作り、周縁減光を観測と比べる。
 
-**なぜこれが検証になるか**: 傾いた光線の実装 (`odfgen.synth.synth_ray`) が
+**なぜこれが検証になるか**: 傾いた光線の実装 (`pyR2D2.synth.synth_ray`) が
 正しければ、mu を振って得た強度から**周縁減光**が出る。そして
 
     <I> / I(mu=1) = 2 * int_0^1 I(mu) mu dmu / I(1)
@@ -30,9 +30,8 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from odfgen.synth import OpacityTable, substeps_needed, synth_ray
+from pyR2D2.synth.core import OpacityTable, substeps_needed, synth_ray
 
 MUS = (1.0, 0.8, 0.6, 0.4, 0.2)
 

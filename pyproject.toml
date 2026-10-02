@@ -35,6 +35,8 @@ plot = ["matplotlib>=3.7"]
 # R2D2plus の新出力形式 (format = "compressed"): zstd (zarr を入れれば入る) と
 # 初期状態ファイルを書くときの XXH3-64 (write_initial_state)
 compressed = ["numcodecs>=0.13", "xxhash>=3"]
+# 3D スナップショットからのスペクトル合成 (pyR2D2.synth、R2D2plus DEC-589)。不透明度表 (.h5) を読む
+synth = ["h5py>=3.8"]
 # r2d2plus-ledger push (Google スプレッドシート)
 ledger = ["gspread>=5", "google-auth>=2"]
 all = [
@@ -42,6 +44,7 @@ all = [
     "matplotlib>=3.7",
     "numcodecs>=0.13",
     "xxhash>=3",
+    "h5py>=3.8",
 ]
 
 [project.urls]

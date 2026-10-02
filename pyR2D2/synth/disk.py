@@ -45,10 +45,9 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from odfgen.r2d2io import check_snapshots
-from odfgen.synth import OpacityTable, substeps_needed, synth_ray
+from pyR2D2.synth.snapshots import check_snapshots
+from pyR2D2.synth.core import OpacityTable, substeps_needed, synth_ray
 
 C_KMS = 2.99792458e5
 

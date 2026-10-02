@@ -31,10 +31,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from odfgen.means import planck_lambda
-from odfgen.synth import OpacityTable, doppler_shift_rows
+from pyR2D2.synth._physics import planck_lambda
+from pyR2D2.synth.core import OpacityTable, doppler_shift_rows
 
 
 def log_mean(a0, a1):

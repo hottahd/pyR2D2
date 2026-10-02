@@ -24,8 +24,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from . import constants as cst
-from .means import planck_lambda
+from . import _physics as cst
+from ._physics import planck_lambda
 
 
 @dataclass
