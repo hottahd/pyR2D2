@@ -728,3 +728,27 @@ def test_symlinked_data_directory_keeps_the_run_identity(tmp_path, monkeypatch):
     assert ws.get(4, ws.col("Case ID")) == "d003"
     assert ws.get(4, ws.col("step")) == "123"
     assert _human_snapshot(ws) == before
+
+
+def test_run_note_columns(tmp_path):
+    """ランのメモ (R2D2plus DEC-600) が 目的・保存・結論 の列に入る。"""
+    run = make_run(tmp_path, "d001")
+    (run / "data" / "param" / "run_note.toml").write_text(
+        '[note]\npurpose = "粘性を 10 倍にした感度"\nretention = "thin"\n'
+        'expires = "2026-12-31"\ncited_in = ["DEC-533", "DEC-600"]\n'
+    )
+    v = collect.collect_run(run, server="astana", du=False).values
+    assert v["目的"] == "粘性を 10 倍にした感度"
+    assert v["保存"] == "間引いて残す (2026-12-31 まで残す)"
+    assert v["結論"] == "DEC-533, DEC-600"
+
+
+def test_note_columns_absent_do_not_change_hash(tmp_path):
+    """メモの無いランは、メモの列を足す前と同じハッシュになる (既存のランを「未送信」にしない)。"""
+    run = make_run(tmp_path, "d001")
+    rec = collect.collect_run(run, server="astana", du=False)
+    assert rec.values["目的"] is None and rec.values["保存"] is None and rec.values["結論"] is None
+    with_none = rec.digest()
+    for name in collect.HASH_IF_SET:
+        del rec.values[name]
+    assert rec.digest() == with_none

@@ -10,6 +10,7 @@
 * ``data/param/runs/<最新>/effective_config.txt`` と ``run.log`` の末尾
 * ``data/param/format.toml``、``data/restart/<slot>/meta.toml`` の ``[modifiers]``
 * ``data/param/ledger_sent.toml`` (前回送ったときの要約のハッシュ)
+* ``data/param/run_note.toml`` (人が書くランのメモ。R2D2plus DEC-600。目的・保存の扱い・結論に使った決定)
 
 容量 (``data/`` の使用量) だけは全ファイルの stat が要るので、``du=False`` で省ける。
 """
@@ -65,6 +66,10 @@ COLUMNS = [
     ("backend", (), False),
     ("ranks", (), False),
     ("ms/step", (), False),
+    # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。
+    ("目的", (), False),
+    ("保存", (), False),
+    ("結論", (), False),
 ]
 COLUMN_NAMES = [c[0] for c in COLUMNS]
 QUANTITY_COLUMNS = {c[0] for c in COLUMNS if c[2]}
@@ -80,6 +85,15 @@ UNIT_GROUPS = [
 
 # ハッシュに入れない列 (容量は du が要るので status では測らない)
 HASH_EXCLUDE = {"容量"}
+# 値があるときだけハッシュに入れる列 (2026-10-02 に足したメモの列。メモの無い既存のランを「未送信」にしないため)
+HASH_IF_SET = {"目的", "保存", "結論"}
+
+RETENTION_LABELS = {
+    "keep": "全部残す",
+    "thin": "間引いて残す",
+    "regen_only": "再生成の情報だけ",
+    "auto": "自動 (DEC-599)",
+}
 
 STATUS_LABELS = {
     "running": "走行中",
@@ -335,6 +349,8 @@ class RunRecord:
             if name in HASH_EXCLUDE:
                 continue
             v = self.values.get(name)
+            if name in HASH_IF_SET and v is None:
+                continue
             canon[name] = v.canonical() if isinstance(v, Quantity) else v
         blob = json.dumps(canon, ensure_ascii=False, sort_keys=True)
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
@@ -563,6 +579,15 @@ def collect_run(run_dir, server=None, du=True, now=None):
 
     ms = read_ms_per_step(segment)
     v["ms/step"] = f"{ms:.2f}" if ms is not None else None
+
+    # ランのメモ (R2D2plus DEC-600)
+    note = ((_read_toml(param_dir / "run_note.toml") or {}).get("note")) or {}
+    v["目的"] = note.get("purpose") or None
+    if note.get("retention") or note.get("expires"):
+        label = RETENTION_LABELS.get(note.get("retention", "auto"), note.get("retention"))
+        v["保存"] = label + (f" ({note['expires']} まで残す)" if note.get("expires") else "")
+    cited = note.get("cited_in") or []
+    v["結論"] = ", ".join(str(c) for c in cited) if cited else None
 
     if du and data_dir.is_dir():
         v["容量"] = Quantity("bytes", (float(disk_usage(data_dir)),))
