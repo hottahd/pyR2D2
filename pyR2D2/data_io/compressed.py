@@ -554,9 +554,11 @@ class CompressedEOS:
 
     Parameters
     ----------
-    table : dict
+    table : dict or None
         EOS 表の生の値 (``ro`` = log ρ 軸、``se`` 軸、``pr``, ``te``, ``op``
-        の 2 次元配列 (n_ro, n_se))
+        の 2 次元配列 (n_ro, n_se))。``None`` は表を使わないラン (deep の線形 EOS、
+        ``format.toml`` の ``eos_table = ""``) で、R2D2plus と同じく ``pr``, ``te`` は
+        線形側だけ、``op`` は 0 になる。
     param : pyR2D2.Parameters
         背景量 (``ro0``, ``se0``, ``pr0``, ``te0``, ``dprdro``, ``dprdse``,
         ``dtedro``, ``dtedse``) を持つもの
@@ -565,6 +567,14 @@ class CompressedEOS:
     quantities = ("pr", "te", "op")
 
     def __init__(self, table, param):
+        # 背景 (margin を除いた鉛直 1D)。倍精度と、単精度へ落としたもの
+        # (3D remap の書き出しは単精度の背景を使う)。
+        names = ["ro0", "se0", "pr0", "te0", "dprdro", "dprdse", "dtedro", "dtedse"]
+        self.bg64 = {k: np.asarray(getattr(param, k), dtype=np.float64) for k in names}
+        self.bg32 = {k: v.astype(np.float32) for k, v in self.bg64.items()}
+        self.has_table = table is not None
+        if not self.has_table:
+            return
         self.log_rho_axis = np.asarray(table["ro"], dtype=np.float64)
         self.se_axis = np.asarray(table["se"], dtype=np.float64)
         self.d_log_rho = self.log_rho_axis[1] - self.log_rho_axis[0]
@@ -579,11 +589,12 @@ class CompressedEOS:
             else:
                 self.log_value[q] = np.log(v + 1.0e-200)
 
-        # 背景 (margin を除いた鉛直 1D)。倍精度と、単精度へ落としたもの
-        # (3D remap の書き出しは単精度の背景を使う)。
-        names = ["ro0", "se0", "pr0", "te0", "dprdro", "dprdse", "dtedro", "dtedse"]
-        self.bg64 = {k: np.asarray(getattr(param, k), dtype=np.float64) for k in names}
-        self.bg32 = {k: v.astype(np.float32) for k, v in self.bg64.items()}
+    def _require_table(self, what):
+        if not self.has_table:
+            raise ValueError(
+                f"{what} needs the EoS table, but this run was made without one "
+                '(format.toml has eos_table = "")'
+            )
 
     def interpolate(self, q, rho, se):
         """
@@ -634,6 +645,11 @@ class CompressedEOS:
         bg = self.bg32
         ro = np.asarray(ro, dtype=f32)
         se = np.asarray(se, dtype=f32)
+        if not self.has_table:
+            # R2D2plus legacy_state_writer.cpp: 表が無ければ線形側だけ、op は 0。
+            if q == "op":
+                return np.zeros(np.broadcast(ro, iz).shape, dtype=f32)
+            return bg[f"d{q}dro"][iz] * ro + bg[f"d{q}dse"][iz] * se
         ro0 = bg["ro0"][iz]
         se0 = bg["se0"][iz]
         rho_total = (ro + ro0).astype(np.float64)
@@ -656,6 +672,7 @@ class CompressedEOS:
         R2D2plus はその単精度値を倍精度へ広げて表を引き、単精度へ丸めている
         (切り替え無し)。面が見つからなかった点 (``ro == se == 0``) は 0 にする。
         """
+        self._require_table("pr/te on the tau surface")
         ro_total = np.asarray(ro_total)
         se_total = np.asarray(se_total)
         value = self.interpolate(q, ro_total.astype(np.float64), se_total.astype(np.float64))
@@ -677,6 +694,9 @@ class CompressedEOS:
         se0 = bg["se0"][iz]
         with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
             linear = bg[f"d{q}dro"][iz] * ro + bg[f"d{q}dse"][iz] * se
+            if not self.has_table:
+                # R2D2plus slice_writer.cpp: 表が無ければ線形側だけ。
+                return linear.astype(np.float32)
             ct = np.maximum(np.abs(ro) / ro0, np.abs(se) / se0)
             feos = np.where(ct - 3.0e-3 >= 0.0, 1.0, 0.0)
             table = self.interpolate(q, ro + ro0, se + se0) - bg[f"{q}0"][iz]
@@ -689,6 +709,7 @@ class CompressedEOS:
         **切り替え無しの表の値**を倍精度の状態から作っている。ここでは単精度で
         出力された ``ro``, ``se`` から同じ式で作る。
         """
+        self._require_table("pr/te/op of the 2D remap")
         bg = self.bg64
         ro = np.asarray(ro, dtype=np.float64)
         se = np.asarray(se, dtype=np.float64)
@@ -716,6 +737,11 @@ def compressed_eos(param):
     if eos is not None:
         return eos
     path = param.__dict__.get("eos_table_path")
+    if (path is None or not os.path.exists(path)) and param.format_info.get("eos_table", "") == "":
+        # 表を使わないラン (deep の線形 EOS)。R2D2plus と同じ線形の式で作る。
+        eos = CompressedEOS(None, param)
+        param.__dict__["_compressed_eos"] = eos
+        return eos
     if path is None or not os.path.exists(path):
         raise FileNotFoundError(
             "this run uses the R2D2plus compressed output format, which does not store "

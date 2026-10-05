@@ -317,9 +317,12 @@ class Parameters:
             self.output_format = "legacy"
         else:
             self.output_format = self.format_info.get("format", "legacy")
-            if self.output_format == "compressed":
-                table = self.datadir / "param" / self.format_info["eos_table"]
-                if table.exists():
+            # 表を使わないラン (deep の線形 EOS) は eos_table = "" を書く。空の名前を
+            # つなぐと param/ そのものになるので、ファイルのときだけ読む。
+            name = self.format_info.get("eos_table", "")
+            if self.output_format == "compressed" and name:
+                table = self.datadir / "param" / name
+                if table.is_file():
                     self.read_eos_table(table)
 
         # read original data

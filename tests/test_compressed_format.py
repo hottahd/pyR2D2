@@ -789,3 +789,40 @@ def test_write_boundary_series_roundtrip(tmp_path):
         pyR2D2.write_boundary_series(tmp_path / "x.z", [0.0, 0.0, 1.0], values)
     with pytest.raises(ValueError, match="time last"):
         pyR2D2.write_boundary_series(tmp_path / "x.z", times, values.transpose(2, 0, 1))
+
+
+def test_compressed_eos_without_table_is_linear():
+    # 表を使わないラン (deep の線形 EOS、format.toml の eos_table = "")。
+    # R2D2plus と同じく pr, te は線形側だけ、op は 0 (2026-10-05、d021 の富岳ラン)。
+    from types import SimpleNamespace
+
+    from pyR2D2.data_io.compressed import CompressedEOS
+
+    nz = 5
+    bg = {
+        "ro0": np.linspace(0.37, 0.2, nz),
+        "se0": np.full(nz, 1.7e9),
+        "pr0": np.linspace(3.1e13, 2.0e13, nz),
+        "te0": np.linspace(2.2e6, 1.4e6, nz),
+        "dprdro": np.linspace(4.3e13, 3.0e13, nz),
+        "dprdse": np.linspace(0.021, 0.013, nz),
+        "dtedro": np.linspace(-3.7e5, -2.9e5, nz),
+        "dtedse": np.linspace(1.3e-3, 0.9e-3, nz),
+    }
+    eos = CompressedEOS(None, SimpleNamespace(**bg))
+    iz = np.arange(nz)[:, None]
+    ro = np.full((nz, 3), 3.7e-9, dtype=np.float32)
+    se = np.full((nz, 3), 0.37, dtype=np.float32)
+
+    pr = eos.remap("pr", ro, se, iz)
+    expected = bg["dprdro"].astype(np.float32)[iz] * ro + bg["dprdse"].astype(np.float32)[iz] * se
+    assert pr.dtype == np.float32
+    np.testing.assert_array_equal(pr, expected)
+    np.testing.assert_array_equal(eos.remap("op", ro, se, iz), np.zeros((nz, 3), np.float32))
+
+    te = eos.slice("te", ro, se, iz)
+    expected = (bg["dtedro"][iz] * ro.astype(np.float64) + bg["dtedse"][iz] * se).astype(np.float32)
+    np.testing.assert_array_equal(te, expected)
+
+    with pytest.raises(ValueError):
+        eos.total("pr", ro, se)
