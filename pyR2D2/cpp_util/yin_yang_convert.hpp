@@ -28,8 +28,8 @@ inline std::array<T, 4> lagrange_interpolation_weight_3rd(const std::array<T, 4>
 // Yin-Yang grid, th_yy: theta grid points in Yin-Yang grid, ph_yy: phi grid points in Yin-Yang grid
 // qq_yy: 3D array of the quantity to be interpolated in Yin-Yang grid (i, j, k)
 // Returns the interpolated value at (tht, pht) in regular spherical geometry
-template <typename T>
-inline std::vector<T> lagrange_interpolation_3rd(double tht, double dth_yy_o, double pht, double dph_yy_o, auto const &th_yy, auto const &ph_yy, auto const &qq_yy, const size_t k_size)
+template <typename T, typename ThView, typename PhView, typename QqView>
+inline std::vector<T> lagrange_interpolation_3rd(double tht, double dth_yy_o, double pht, double dph_yy_o, ThView const &th_yy, PhView const &ph_yy, QqView const &qq_yy, const size_t k_size)
 {
     // i_s below reads th_yy(ic-1 .. ic+2), so ic must stay within
     // [1, th_yy.size - 3]. Clamp in double precision, before ever casting

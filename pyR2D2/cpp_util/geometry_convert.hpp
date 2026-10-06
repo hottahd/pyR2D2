@@ -3,12 +3,12 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <numbers>
 #include <string>
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include "const.hpp"
 #include "numpy_util.hpp"
 
 namespace py = pybind11;
@@ -134,8 +134,8 @@ py::tuple spherical_to_cartesian_3d(
   const double *phi_values = ph.data();
   const double phi_period = phi_values[nph - 1] - phi_values[0];
   const double period_tolerance =
-      1.0e-6 * std::max(1.0, 2.0 * std::numbers::pi);
-  if (std::abs(phi_period - 2.0 * std::numbers::pi) > period_tolerance)
+      1.0e-6 * std::max(1.0, 2.0 * cst::pi);
+  if (std::abs(phi_period - 2.0 * cst::pi) > period_tolerance)
     throw py::value_error("ph must span one complete 2*pi period");
 
   const double maximum_radius = radius_values[nr - 1];

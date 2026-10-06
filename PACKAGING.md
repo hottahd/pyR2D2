@@ -17,7 +17,10 @@ only one authoritative extension build configuration.
 
 ## Compiler policy
 
-- C++20 is required.
+- C++17 is required (lowered from C++20 in 2026-10 so that the system g++ 8.5 of
+  the Fugaku login node, RHEL 8, builds the extension; a newer GCC from spack links
+  against a newer `libstdc++` than the system provides). Keep the code strict C++17:
+  `g++ -std=c++17 -pedantic-errors` must accept `bindings.cpp`.
 - Linux builds enable OpenMP by default and therefore require a compiler and
   runtime providing `libgomp` or an equivalent OpenMP implementation.
 - Portable builds do not use `-march=native`.

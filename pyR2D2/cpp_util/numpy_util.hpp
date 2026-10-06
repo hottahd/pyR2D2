@@ -1,7 +1,8 @@
 #pragma once
 
-#include <bit>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <string>
 
 #include <pybind11/numpy.h>
@@ -48,6 +49,15 @@ using CoordinateArray =
  * バイト列を誤って解釈する。ここでは巨大な暗黙byteswapコピーを避けるため、
  * そのような配列は変換せず明示的に拒否する。
  */
+// CPU のバイト順(C++17 には std::endian が無いので、1 を書いた先頭バイトで判定する)。
+inline bool native_is_little_endian()
+{
+  const std::uint16_t one = 1;
+  unsigned char first = 0;
+  std::memcpy(&first, &one, 1);
+  return first == 1;
+}
+
 template <typename T>
 inline bool is_native_float_dtype(const py::dtype &dtype)
 {
@@ -55,8 +65,8 @@ inline bool is_native_float_dtype(const py::dtype &dtype)
   const bool native_byte_order =
       byte_order == '=' ||
       byte_order == '|' ||
-      (byte_order == '<' && std::endian::native == std::endian::little) ||
-      (byte_order == '>' && std::endian::native == std::endian::big);
+      (byte_order == '<' && native_is_little_endian()) ||
+      (byte_order == '>' && !native_is_little_endian());
   return dtype.kind() == 'f' &&
          dtype.itemsize() == static_cast<py::ssize_t>(sizeof(T)) &&
          native_byte_order;

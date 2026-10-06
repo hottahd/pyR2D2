@@ -3,7 +3,7 @@ Python code for analyzing results of R2D2 simulation.
 
 ## Installation
 
-pyR2D2 requires Python 3.11 or newer and a C++20 compiler. On Linux the C++
+pyR2D2 requires Python 3.11 or newer and a C++17 compiler. On Linux the C++
 extension is built with OpenMP support.
 
 ```bash
