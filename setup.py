@@ -24,6 +24,11 @@ def _compiler_flags():
     if sys.platform == "linux":
         compile_args.append("-fopenmp")
         link_args.append("-fopenmp")
+        # The C++ runtime goes into the module, so a module built by a newer
+        # GCC (e.g. spack's on the Fugaku login node) still imports where the
+        # system libstdc++ is older. PYR2D2_SHARED_LIBSTDCXX=1 opts out.
+        if os.environ.get("PYR2D2_SHARED_LIBSTDCXX", "") != "1":
+            link_args += ["-static-libstdc++", "-static-libgcc"]
         if _native_optimization_enabled():
             compile_args.append("-march=native")
     return compile_args, link_args

@@ -25,6 +25,11 @@ only one authoritative extension build configuration.
   runtime providing `libgomp` or an equivalent OpenMP implementation.
 - Portable builds do not use `-march=native`.
 - A machine-local build may opt in with `PYR2D2_NATIVE=1`.
+- Linux links `libstdc++` and `libgcc` statically (`-static-libstdc++ -static-libgcc`),
+  so the extension imports regardless of which GCC built it (on the Fugaku login
+  node a spack GCC 15 in `PATH` otherwise produced a module needing a newer
+  `libstdc++` than RHEL 8 has). `libgomp` stays shared; check that the module's
+  `GOMP_*` symbol versions exist on the target. `PYR2D2_SHARED_LIBSTDCXX=1` opts out.
 - Absolute build-environment RPATH entries are removed from the extension link
   command. A wheel intended for distribution must still be inspected in a
   clean build environment with a platform tool such as `auditwheel`.
