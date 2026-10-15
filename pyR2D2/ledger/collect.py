@@ -114,6 +114,17 @@ def default_server():
     return socket.gethostname().split(".")[0]
 
 
+def sent_server(run_dir):
+    """前回 ``push`` したときのサーバ名 (``ledger_sent.toml``)。無ければ ``None``。
+
+    ``--server`` を省いたときの既定はこれ、無ければホスト名。富岳のようにログインノードが
+    何台もある機械で、``--server fugaku`` で送った後の ``status`` や ``push`` がホスト名に戻って
+    「未送信」「別のサーバ」と誤らないため。
+    """
+    sent = _read_toml(Path(run_dir) / "data" / "param" / SENT_FILE)
+    return ((sent or {}).get("sent", {}).get("server") or "").strip() or None
+
+
 def case_row(caseid):
     """Case ID ``dNNN`` を置くシートの行番号 (1 始まり。d001 → 2)。dNNN でなければ ``None``。"""
     m = _CASE_RE.match(caseid)
@@ -382,7 +393,7 @@ def collect_run(run_dir, server=None, du=True, now=None):
     run_dir = Path(run_dir)
     data_dir = run_dir / "data"
     param_dir = data_dir / "param"
-    server = server or default_server()
+    server = server or sent_server(run_dir) or default_server()
     now = now or datetime.datetime.now(datetime.timezone.utc)
 
     p = None

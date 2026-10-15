@@ -393,6 +393,30 @@ def test_push_skips_other_server_unless_forced(project):
     assert ws.get(2, ws.col("Server")) == "astana"
 
 
+def test_server_defaults_to_last_push(project, monkeypatch):
+    # 富岳のようにログインノードが何台もある機械: --server fugaku で送った後、--server を
+    # 省いた status・push は別のホスト名からでも前回の名前を使い、「未送信」「別のサーバ」と誤らない
+    ws = FakeWorksheet([list(REAL_HEADER)])
+    monkeypatch.setattr(collect, "default_server", lambda: "fn01sv01")
+    cli.push(project, worksheet=ws, server="fugaku", du=False, out=lambda *a: None)
+    assert ws.get(2, ws.col("Server")) == "fugaku"
+
+    monkeypatch.setattr(collect, "default_server", lambda: "fn01sv02")
+    lines = []
+    cli.cmd_status(type("A", (), {"path": project, "server": None})(), out=lines.append)
+    assert all(line.rstrip().endswith("-") for line in lines[1:])
+
+    ws.updated.clear()
+    plan = cli.push(project, worksheet=ws, du=False, out=lambda *a: None)
+    assert plan.skipped == [] or all("dNNN" in why or "見出し" in why for _, why in plan.skipped)
+    assert ws.updated == []
+
+    # 送ったことのないランはホスト名が既定
+    assert collect.sent_server(project / "d001") == "fugaku"
+    (project / "d001" / "data" / "param" / "ledger_sent.toml").unlink()
+    assert collect.collect_run(project / "d001", du=False).values["Server"] == "fn01sv02"
+
+
 def test_unit_change_converts_other_rows(project):
     header = ["Case ID", "t_end [s]", "ymin", "Note"]
     rows = [header]

@@ -131,7 +131,7 @@ def set_cells_gspread(data, json_key=None, project=None, caseid=None):
         json_key = glob.glob(os.environ["HOME"] + "/json/*")[0]
 
     run_dir = collect.run_dir_of(data.datadir)  # data がリンクでもランのディレクトリを指す
-    server = collect.default_server()
+    server = collect.sent_server(run_dir) or collect.default_server()
     record = collect.collect_run(run_dir, server=server)
     if caseid is not None:
         record.caseid = caseid

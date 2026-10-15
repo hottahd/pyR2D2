@@ -219,7 +219,10 @@ def render_records(records):
 
 
 def plan_updates(values, records, server, force=False):
-    """シートの今の値 ``values`` (``get_all_values()``) に対する書き換えを計画する。"""
+    """シートの今の値 ``values`` (``get_all_values()``) に対する書き換えを計画する。
+
+    ``server`` が ``None`` なら、ランごとの ``Server`` の値 (前回の送り手かホスト名) と比べる。
+    """
     plan = Plan()
     header_row = list(values[0]) if values else []
     while header_row and not header_row[-1].strip():
@@ -258,9 +261,10 @@ def plan_updates(values, records, server, force=False):
                 (rec.caseid, f"{row} 行目の Case ID が {cur_case} (--force で上書き)")
             )
             continue
-        if cur_server and cur_server != server and not force:
+        sender = server or rec.values.get("Server")
+        if cur_server and cur_server != sender and not force:
             plan.skipped.append(
-                (rec.caseid, f"Server が {cur_server} (送り手は {server}。--force で上書き)")
+                (rec.caseid, f"Server が {cur_server} (送り手は {sender}。--force で上書き)")
             )
             continue
         rows[row] = rec

@@ -133,7 +133,6 @@ def push(
     -------
     plan : sheet.Plan
     """
-    server = server or collect.default_server()
     records = _records(path, server, du=du, only=only)
     label = sheet_id or sheet_name or collect.project_name(path)
 
@@ -196,7 +195,7 @@ def build_parser():
 
     def common(p):
         p.add_argument("path", help="<project>/run (またはラン 1 本のディレクトリ)")
-        p.add_argument("--server", default=None, help="サーバ名 (既定: ホスト名)")
+        p.add_argument("--server", default=None, help="サーバ名 (既定: 前回送ったときの名前、無ければホスト名)")
 
     p = sub.add_parser("status", help="各ランの要約と未送信の有無 (送らない)")
     common(p)
