@@ -562,15 +562,26 @@ class CompressedEOS:
     param : pyR2D2.Parameters
         背景量 (``ro0``, ``se0``, ``pr0``, ``te0``, ``dprdro``, ``dprdse``,
         ``dtedro``, ``dtedse``) を持つもの
+    offset : dict or None
+        表と線形の合成のずれ ``δq = 表(ρ0, s0) − q0`` (``"pr"``, ``"te"``。鉛直 1D、
+        margin を除く)。R2D2plus DEC-651 の式で走ったランの ``param/eos_offset.txt``
+        (``format.toml`` の ``eos_offset``)。``None`` は従来の式 (δ = 0)。
+        圧力は表の側から δp を引き、温度は線形の側に δT を足す。
     """
 
     quantities = ("pr", "te", "op")
 
-    def __init__(self, table, param):
+    def __init__(self, table, param, offset=None):
         # 背景 (margin を除いた鉛直 1D)。倍精度と、単精度へ落としたもの
         # (3D remap の書き出しは単精度の背景を使う)。
         names = ["ro0", "se0", "pr0", "te0", "dprdro", "dprdse", "dtedro", "dtedse"]
         self.bg64 = {k: np.asarray(getattr(param, k), dtype=np.float64) for k in names}
+        n = self.bg64["ro0"].size
+        for q in ("pr", "te"):
+            value = np.zeros(n) if offset is None else np.asarray(offset[q], dtype=np.float64)
+            if value.size != n:
+                raise ValueError(f"eos_offset {q}: {value.size} points, background has {n}")
+            self.bg64[f"d{q}0"] = value
         self.bg32 = {k: v.astype(np.float32) for k, v in self.bg64.items()}
         self.has_table = table is not None
         if not self.has_table:
@@ -660,10 +671,14 @@ class CompressedEOS:
             ct = np.maximum(np.abs(ro) / ro0, np.abs(se) / se0)
             feos = (ct.astype(np.float64) - 3.0e-3 >= 0.0).astype(f32)
             linear = bg[f"d{q}dro"][iz] * ro + bg[f"d{q}dse"][iz] * se
-            table = (
-                self.interpolate(q, rho_total, se_total) - bg[f"{q}0"][iz].astype(np.float64)
-            ).astype(f32)
-            return table * feos + linear * (f32(1.0) - feos)
+            # DEC-651: 圧力は表の側から δp を引き、温度は線形の側に δT を足す (δ は単精度)。
+            offset = bg[f"d{q}0"][iz]
+            table = self.interpolate(q, rho_total, se_total) - bg[f"{q}0"][iz].astype(np.float64)
+            if q == "pr":
+                table = table - offset.astype(np.float64)
+            else:
+                linear = linear + offset
+            return table.astype(f32) * feos + linear * (f32(1.0) - feos)
 
     # --- tau (R2D2plus tau_surface_writer.cpp) ------------------------------
     def total(self, q, ro_total, se_total):
@@ -700,6 +715,11 @@ class CompressedEOS:
             ct = np.maximum(np.abs(ro) / ro0, np.abs(se) / se0)
             feos = np.where(ct - 3.0e-3 >= 0.0, 1.0, 0.0)
             table = self.interpolate(q, ro + ro0, se + se0) - bg[f"{q}0"][iz]
+            # DEC-651: 圧力は表の側から δp を引き、温度は線形の側に δT を足す。
+            if q == "pr":
+                table = table - bg["dpr0"][iz]
+            else:
+                linear = linear + bg["dte0"][iz]
             return (table * feos + linear * (1.0 - feos)).astype(np.float32)
 
     # --- 2D remap (R2D2plus remap2d_writer.cpp) -----------------------------
@@ -749,9 +769,23 @@ def compressed_eos(param):
             f"{Path(param.datadir) / 'param' / param.format_info['eos_table']}). "
             "Read ro/se etc. only, or give the table with d.p.read_eos_table(path)."
         )
-    eos = CompressedEOS(load_eos_table_raw(path), param)
+    eos = CompressedEOS(load_eos_table_raw(path), param, read_eos_offset(param))
     param.__dict__["_compressed_eos"] = eos
     return eos
+
+
+def read_eos_offset(param):
+    """
+    ``format.toml`` の ``eos_offset`` が指す ``param/`` のファイル (R2D2plus DEC-651) を読む。
+
+    列は ``pr te en`` で、行は鉛直の物理セル (margin を除く、下から)。キーが無ければ
+    ``None`` (従来の式で走ったラン)。
+    """
+    name = param.format_info.get("eos_offset", "")
+    if not name:
+        return None
+    values = np.loadtxt(Path(param.datadir) / "param" / name, ndmin=2)
+    return {"pr": values[:, 0], "te": values[:, 1], "en": values[:, 2]}
 
 
 def format_path(datadir, info, kind, **fields):

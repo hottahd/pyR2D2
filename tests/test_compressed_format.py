@@ -826,3 +826,49 @@ def test_compressed_eos_without_table_is_linear():
 
     with pytest.raises(ValueError):
         eos.total("pr", ro, se)
+
+
+def test_compressed_eos_applies_the_table_background_offset():
+    # R2D2plus DEC-651: 表と線形の合成のずれ δ = 表(ρ0, s0) − q0 で走ったラン
+    # (param/eos_offset.txt)。圧力は表の側から δp を引き、温度は線形の側に δT を足す。
+    from types import SimpleNamespace
+
+    from pyR2D2.data_io.compressed import CompressedEOS
+
+    log_rho = np.linspace(np.log(1e-8), np.log(1e-5), 16)
+    se_axis = np.linspace(1.0e9, 2.0e9, 16)
+    lr, sa = np.meshgrid(log_rho, se_axis, indexing="ij")
+    table = {
+        "ro": log_rho,
+        "se": se_axis,
+        "pr": np.exp(30.0 + 1.6 * lr + 1.0e-9 * sa),
+        "te": np.exp(9.0 + 0.6 * lr + 1.2e-9 * sa),
+        "op": np.ones_like(lr),
+    }
+    nz = 3
+    bg = {
+        "ro0": np.full(nz, 1.0e-6),
+        "se0": np.full(nz, 1.5e9),
+        "pr0": np.full(nz, 1.0e5),
+        "te0": np.full(nz, 6.0e3),
+        "dprdro": np.full(nz, 1.0e11),
+        "dprdse": np.full(nz, 1.0e-4),
+        "dtedro": np.full(nz, -1.0e9),
+        "dtedse": np.full(nz, 4.0e-6),
+    }
+    offset = {"pr": np.array([10.0, 20.0, 30.0]), "te": np.array([1.0, 2.0, 3.0])}
+    plain = CompressedEOS(table, SimpleNamespace(**bg))
+    shifted = CompressedEOS(table, SimpleNamespace(**bg), offset)
+    iz = np.arange(nz)[:, None]
+    # 列 0 は ct < 3e-3 (線形の側)、列 1 は ct > 3e-3 (表の側)
+    ro = np.array([[1.0e-10, 1.0e-8]] * nz)
+    se = np.zeros((nz, 2))
+    for kind, f in (("slice", np.float64), ("remap", np.float32)):
+        pr0 = getattr(plain, kind)("pr", ro.astype(f), se.astype(f), iz)
+        pr1 = getattr(shifted, kind)("pr", ro.astype(f), se.astype(f), iz)
+        te0 = getattr(plain, kind)("te", ro.astype(f), se.astype(f), iz)
+        te1 = getattr(shifted, kind)("te", ro.astype(f), se.astype(f), iz)
+        np.testing.assert_array_equal(pr1[:, 0], pr0[:, 0])
+        np.testing.assert_allclose(pr0[:, 1] - pr1[:, 1], offset["pr"], rtol=1e-3)
+        np.testing.assert_allclose(te1[:, 0] - te0[:, 0], offset["te"], rtol=1e-3)
+        np.testing.assert_array_equal(te1[:, 1], te0[:, 1])
