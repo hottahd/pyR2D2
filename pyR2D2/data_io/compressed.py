@@ -571,7 +571,7 @@ class CompressedEOS:
 
     quantities = ("pr", "te", "op")
 
-    def __init__(self, table, param, offset=None):
+    def __init__(self, table, param, offset=None, switch_ramp=None):
         # 背景 (margin を除いた鉛直 1D)。倍精度と、単精度へ落としたもの
         # (3D remap の書き出しは単精度の背景を使う)。
         names = ["ro0", "se0", "pr0", "te0", "dprdro", "dprdse", "dtedro", "dtedse"]
@@ -583,6 +583,14 @@ class CompressedEOS:
                 raise ValueError(f"eos_offset {q}: {value.size} points, background has {n}")
             self.bg64[f"d{q}0"] = value
         self.bg32 = {k: v.astype(np.float32) for k, v in self.bg64.items()}
+        # 表と線形の切り替えの重み (R2D2plus DEC-652)。None は硬い切り替え (ct >= 3e-3 で 1)。
+        # 直線なら feos = clip((ct - lo) / (hi - lo), 0, 1) を、R2D2plus と同じく
+        # 逆数 1 / (hi - lo) を掛けて作る。
+        if switch_ramp is None:
+            self.switch_lo, self.switch_inv_width = 0.0, 0.0
+        else:
+            lo, hi = float(switch_ramp[0]), float(switch_ramp[1])
+            self.switch_lo, self.switch_inv_width = lo, 1.0 / (hi - lo)
         self.has_table = table is not None
         if not self.has_table:
             return
@@ -599,6 +607,13 @@ class CompressedEOS:
                 self.log_value[q] = np.log(np.maximum(v, 1.0e-20))
             else:
                 self.log_value[q] = np.log(v + 1.0e-200)
+
+    def switch_factor(self, ct):
+        """切り替えの重み (倍精度)。R2D2plus ``EosTableView::switch_factor`` と同じ式。"""
+        ct = np.asarray(ct, dtype=np.float64)
+        if self.switch_inv_width > 0.0:
+            return np.minimum(1.0, np.maximum(0.0, (ct - self.switch_lo) * self.switch_inv_width))
+        return np.where(ct - 3.0e-3 >= 0.0, 1.0, 0.0)
 
     def _require_table(self, what):
         if not self.has_table:
@@ -669,7 +684,7 @@ class CompressedEOS:
             return self.interpolate("op", rho_total, se_total).astype(f32)
         with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
             ct = np.maximum(np.abs(ro) / ro0, np.abs(se) / se0)
-            feos = (ct.astype(np.float64) - 3.0e-3 >= 0.0).astype(f32)
+            feos = self.switch_factor(ct).astype(f32)
             linear = bg[f"d{q}dro"][iz] * ro + bg[f"d{q}dse"][iz] * se
             # DEC-651: 圧力は表の側から δp を引き、温度は線形の側に δT を足す (δ は単精度)。
             offset = bg[f"d{q}0"][iz]
@@ -713,7 +728,7 @@ class CompressedEOS:
                 # R2D2plus slice_writer.cpp: 表が無ければ線形側だけ。
                 return linear.astype(np.float32)
             ct = np.maximum(np.abs(ro) / ro0, np.abs(se) / se0)
-            feos = np.where(ct - 3.0e-3 >= 0.0, 1.0, 0.0)
+            feos = self.switch_factor(ct)
             table = self.interpolate(q, ro + ro0, se + se0) - bg[f"{q}0"][iz]
             # DEC-651: 圧力は表の側から δp を引き、温度は線形の側に δT を足す。
             if q == "pr":
@@ -769,7 +784,12 @@ def compressed_eos(param):
             f"{Path(param.datadir) / 'param' / param.format_info['eos_table']}). "
             "Read ro/se etc. only, or give the table with d.p.read_eos_table(path)."
         )
-    eos = CompressedEOS(load_eos_table_raw(path), param, read_eos_offset(param))
+    eos = CompressedEOS(
+        load_eos_table_raw(path),
+        param,
+        read_eos_offset(param),
+        param.format_info.get("eos_switch_ramp"),
+    )
     param.__dict__["_compressed_eos"] = eos
     return eos
 

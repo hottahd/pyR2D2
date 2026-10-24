@@ -872,3 +872,18 @@ def test_compressed_eos_applies_the_table_background_offset():
         np.testing.assert_allclose(pr0[:, 1] - pr1[:, 1], offset["pr"], rtol=1e-3)
         np.testing.assert_allclose(te1[:, 0] - te0[:, 0], offset["te"], rtol=1e-3)
         np.testing.assert_array_equal(te1[:, 1], te0[:, 1])
+
+
+def test_compressed_eos_switch_ramp():
+    # R2D2plus DEC-652: format.toml の eos_switch_ramp = [lo, hi] で、切り替えの重みを
+    # ct ∈ [lo, hi] の直線にする。無ければ硬い切り替え (ct >= 3e-3 で 1)。
+    from types import SimpleNamespace
+
+    from pyR2D2.data_io.compressed import CompressedEOS
+
+    bg = {k: np.ones(2) for k in ["ro0", "se0", "pr0", "te0", "dprdro", "dprdse", "dtedro", "dtedse"]}
+    hard = CompressedEOS(None, SimpleNamespace(**bg))
+    ramp = CompressedEOS(None, SimpleNamespace(**bg), switch_ramp=[1.0e-3, 5.0e-3])
+    ct = np.array([0.0, 1.0e-3, 2.0e-3, 2.999e-3, 3.0e-3, 4.0e-3, 5.0e-3, 1.0e-2])
+    np.testing.assert_array_equal(hard.switch_factor(ct), [0, 0, 0, 0, 1, 1, 1, 1])
+    np.testing.assert_allclose(ramp.switch_factor(ct), [0, 0, 0.25, 0.49975, 0.5, 0.75, 1, 1])
