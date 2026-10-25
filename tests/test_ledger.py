@@ -796,3 +796,34 @@ def test_note_columns_absent_do_not_change_hash(tmp_path):
     for name in collect.HASH_IF_SET:
         del rec.values[name]
     assert rec.digest() == with_none
+
+
+def test_five_digit_rename_keeps_rows_and_skips_alias(project):
+    """5 桁化 (2026-10-25): d001 を d00001 にして旧名をリンクで残しても、行は 2 行目のまま 1 回だけ送る。"""
+    ws = FakeWorksheet([list(REAL_HEADER)])
+    cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    assert ws.get(2, ws.col("Case ID")) == "d001"
+
+    (project / "d001").rename(project / "d00001")
+    (project / "d001").symlink_to("d00001")  # 旧名は別名として残す
+    assert [p.name for p in collect.find_runs(project)] == ["d00001", "d003"]
+
+    plan = cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    assert "d00001" in {r.caseid for r in plan.written}  # 同じ番号なので --force なしで上書きできる
+    assert ws.get(2, ws.col("Case ID")) == "d00001"
+
+
+def test_two_names_for_one_row_are_not_both_sent(project):
+    """d001 と d00001 が両方ランとしてあると同じ行を上書きし合うので、5 桁の方だけを送る。"""
+    make_run(project, "d00001")
+    ws = FakeWorksheet([list(REAL_HEADER)])
+    plan = cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    assert [c for c, _ in plan.skipped] == ["d001"]
+    assert ws.get(2, ws.col("Case ID")) == "d00001"
+
+
+def test_link_to_another_disk_is_a_run(project, tmp_path):
+    """別のディスクを指す run/dNNNNN は、旧名の別名ではなくランとして数える。"""
+    make_run(tmp_path / "z000", "d00004")
+    (project / "d00004").symlink_to(tmp_path / "z000" / "d00004")
+    assert "d00004" in [p.name for p in collect.find_runs(project)]

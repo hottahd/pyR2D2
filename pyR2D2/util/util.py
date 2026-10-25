@@ -106,7 +106,8 @@ def caseid_select(main_locals, force_read=False):
     END = "\033[0m"
 
     if force_read or not "caseid" in main_locals:
-        caseid = "d" + str(input(RED + "input caseid id (3 digit): " + END)).zfill(3)
+        # Fortran R2D2 は 3 桁 (012)、R2D2plus のプロダクトランは 5 桁 (00012、2026-10-25)。打った桁はそのまま使う
+        caseid = "d" + str(input(RED + "input caseid id (e.g. 012, 00012): " + END)).zfill(3)
     else:
         caseid = main_locals["caseid"]
 

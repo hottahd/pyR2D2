@@ -628,18 +628,28 @@ def collect_run(run_dir, server=None, du=True, now=None):
 
 def _sort_key(path):
     m = _CASE_RE.match(path.name)
-    return (0, int(m.group(1)), "") if m else (1, 0, path.name)
+    # 同じ番号で桁の違う名前が並んだら桁の多い方 (d00001 < d001) を先にする (同じ行は先に来た方だけを送る)
+    return (0, int(m.group(1)), path.name) if m else (1, 0, path.name)
 
 
 def find_runs(path):
     """``<project>/run`` の下のランディレクトリ (``data/`` を持つもの) を返す。
 
     ``path`` 自体が ``data/`` を持てば、そのラン 1 本とみなす。
+    ``run/`` の中の別のランを指すシンボリックリンク (番号を付け替えたときに残す旧名、例 ``d001 -> d00001``) は
+    同じランの別名なので数えない。別のディスクを指すリンク (``run/d00004 -> /vol0300/.../d00004``) はランとして数える。
     """
     path = Path(path)
     if (path / "data").is_dir():
         return [path]
-    runs = [d for d in path.iterdir() if d.is_dir() and (d / "data").is_dir()]
+    here = os.path.realpath(path)
+    runs = [
+        d
+        for d in path.iterdir()
+        if d.is_dir()
+        and (d / "data").is_dir()
+        and not (d.is_symlink() and os.path.dirname(os.path.realpath(d)) == here)
+    ]
     return sorted(runs, key=_sort_key)
 
 

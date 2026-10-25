@@ -254,9 +254,14 @@ def plan_updates(values, records, server, force=False):
             # d000 は「番号 + 1 行目」の規則だと見出しの行(1 行目)に重なる。見出しを壊さない。
             plan.skipped.append((rec.caseid, "1 行目は見出しなので送らない(d000)"))
             continue
+        if row in rows:
+            # d012 と d00012 のように桁の違う名前が同じ番号を指す (同じ行を上書きし合う)
+            plan.skipped.append((rec.caseid, f"{rows[row].caseid} と同じ {row} 行目になる"))
+            continue
         cur_case = _cell(values, row, positions["Case ID"]).strip()
         cur_server = _cell(values, row, positions["Server"]).strip()
-        if cur_case and cur_case != rec.caseid and not force:
+        # 同じ番号で桁だけ違う名前 (d001 → d00001、2026-10-25 の 5 桁化) は同じランとして上書きしてよい
+        if cur_case and case_row(cur_case) != row and not force:
             plan.skipped.append(
                 (rec.caseid, f"{row} 行目の Case ID が {cur_case} (--force で上書き)")
             )
