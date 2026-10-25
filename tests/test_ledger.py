@@ -765,6 +765,25 @@ def test_run_note_columns(tmp_path):
     assert v["目的"] == "粘性を 10 倍にした感度"
     assert v["保存"] == "間引いて残す (2026-12-31 まで残す)"
     assert v["結論"] == "DEC-533, DEC-600"
+    assert v["プロジェクト"] is None
+
+
+def test_project_and_actual_location_columns(tmp_path):
+    """所属プロジェクト (run_note の project) と、リンクで別の場所に置いたデータの実体 (2026-10-25)。"""
+    make_run(tmp_path / "z000", "d004", step=7)
+    (tmp_path / "z000" / "d004" / "data" / "param" / "run_note.toml").write_text(
+        '[note]\npurpose = "コロナ"\nproject = "lowmass_network"\nretention = "keep"\ncited_in = []\n'
+    )
+    root = tmp_path / "z001" / "R2D2plus" / "run"
+    root.mkdir(parents=True)
+    (root / "d004").symlink_to(tmp_path / "z000" / "d004")
+    rec = collect.collect_run(root / "d004", server="astana", du=False)
+    assert rec.caseid == "d004"
+    assert rec.values["プロジェクト"] == "lowmass_network"
+    assert rec.values["実体"] == str((tmp_path / "z000" / "d004" / "data").resolve())
+
+    plain = make_run(tmp_path, "d001")
+    assert collect.collect_run(plain, server="astana", du=False).values["実体"] is None
 
 
 def test_note_columns_absent_do_not_change_hash(tmp_path):
@@ -772,6 +791,7 @@ def test_note_columns_absent_do_not_change_hash(tmp_path):
     run = make_run(tmp_path, "d001")
     rec = collect.collect_run(run, server="astana", du=False)
     assert rec.values["目的"] is None and rec.values["保存"] is None and rec.values["結論"] is None
+    assert rec.values["プロジェクト"] is None and rec.values["実体"] is None
     with_none = rec.digest()
     for name in collect.HASH_IF_SET:
         del rec.values[name]

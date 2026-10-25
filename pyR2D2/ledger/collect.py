@@ -10,7 +10,10 @@
 * ``data/param/runs/<最新>/effective_config.txt`` と ``run.log`` の末尾
 * ``data/param/format.toml``、``data/restart/<slot>/meta.toml`` の ``[modifiers]``
 * ``data/param/ledger_sent.toml`` (前回送ったときの要約のハッシュ)
-* ``data/param/run_note.toml`` (人が書くランのメモ。R2D2plus DEC-600。目的・保存の扱い・結論に使った決定)
+* ``data/param/run_note.toml`` (人が書くランのメモ。R2D2plus DEC-600。目的・所属プロジェクト・保存の扱い・結論に使った決定)
+
+``run/dNNN`` (またはその ``data``) がシンボリックリンクで別のディスクを指すときは、指す先を「実体」の列に書く
+(R2D2plus-project ``docs/run_data.md``: 置き場の名前は 2 か所に固定し、データは容量に合わせて別のディスクに置く)。
 
 容量 (``data/`` の使用量) だけは全ファイルの stat が要るので、``du=False`` で省ける。
 """
@@ -70,6 +73,10 @@ COLUMNS = [
     ("目的", (), False),
     ("保存", (), False),
     ("結論", (), False),
+    # 2026-10-25 に足した列 (R2D2plus-project docs/run_data.md)。所属プロジェクト (run_note の project) と、
+    # run/dNNN をリンクにして別のディスクに置いたときのデータの実体
+    ("プロジェクト", (), False),
+    ("実体", (), False),
 ]
 COLUMN_NAMES = [c[0] for c in COLUMNS]
 QUANTITY_COLUMNS = {c[0] for c in COLUMNS if c[2]}
@@ -86,7 +93,7 @@ UNIT_GROUPS = [
 # ハッシュに入れない列 (容量は du が要るので status では測らない)
 HASH_EXCLUDE = {"容量"}
 # 値があるときだけハッシュに入れる列 (2026-10-02 に足したメモの列。メモの無い既存のランを「未送信」にしないため)
-HASH_IF_SET = {"目的", "保存", "結論"}
+HASH_IF_SET = {"目的", "保存", "結論", "プロジェクト", "実体"}
 
 RETENTION_LABELS = {
     "keep": "全部残す",
@@ -537,6 +544,9 @@ def collect_run(run_dir, server=None, du=True, now=None):
 
     # 状態・時刻
     v["Server"] = server
+    # データの実体 (リンクの先)。リンクでなければ空 (2026-10-25 に足した列。既存のランのハッシュを変えない)
+    actual = os.path.realpath(data_dir)
+    v["実体"] = actual if actual != str(logical_path(data_dir)) else None
     if rs is not None:
         updated = _parse_updated(st.get("updated"))
         if updated is not None:
@@ -594,6 +604,7 @@ def collect_run(run_dir, server=None, du=True, now=None):
     # ランのメモ (R2D2plus DEC-600)
     note = ((_read_toml(param_dir / "run_note.toml") or {}).get("note")) or {}
     v["目的"] = note.get("purpose") or None
+    v["プロジェクト"] = note.get("project") or None
     if note.get("retention") or note.get("expires"):
         label = RETENTION_LABELS.get(note.get("retention", "auto"), note.get("retention"))
         v["保存"] = label + (f" ({note['expires']} まで残す)" if note.get("expires") else "")
