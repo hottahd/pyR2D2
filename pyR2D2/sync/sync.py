@@ -1,13 +1,33 @@
 import os
+import re
 import subprocess
 from pathlib import Path
 
 import numpy as np
 
+try:  # Python 3.11+
+    import tomllib
+except ImportError:  # pragma: no cover
+    tomllib = None
+
+# R2D2plus がランの記録として data/param/ に写すソース一式と実行ファイル (DEC-638)。
+# 解析には使わないので、どのメソッドでも持ってこない。
+_PROVENANCE_EXCLUDES = [
+    "--exclude=data/param/source",
+    "--exclude=data/param/bin",
+]
+
 
 class Sync:
     """
     Class for downloading data from remote server
+
+    Both the legacy output (Fortran R2D2 and R2D2plus ``format = "legacy"``) and
+    the R2D2plus compressed output (``data/param/format.toml``, DEC-576) are
+    supported. For the compressed output, the file names are taken from the
+    local ``param/format.toml``, which :py:meth:`setup` downloads.
+    The copies of the source and the executable that R2D2plus keeps in
+    ``data/param/source`` and ``data/param/bin`` are never downloaded.
     """
 
     def __init__(self, data):
@@ -31,6 +51,36 @@ class Sync:
         raise AttributeError(
             f"'{type(self).__name__}' object has no attribute '{name}'"
         )
+
+    def _is_compressed(self):
+        """R2D2plus の新出力形式 (``param/format.toml`` が ``format = "compressed"``) か。"""
+        return getattr(self.data.p, "output_format", "legacy") == "compressed"
+
+    def _format_pattern(self, kind, **fields):
+        """
+        ``format.toml`` のパスの雛形 ``kind`` を埋めて ``data/`` からの相対パスにする。
+        値が ``None`` の欄は rsync (リモートのシェル) のワイルドカード ``*`` にする。
+        """
+        pattern = self.format_info[kind]
+        if "rank" in fields and fields["rank"] is not None:
+            fields.setdefault("group", fields["rank"] // 1000)
+        for key in [k for k, v in fields.items() if v is None]:
+            pattern = re.sub(r"\{" + key + r"(:[^}]*)?\}", "*", pattern)
+            del fields[key]
+        return pattern.format(**fields)
+
+    @staticmethod
+    def _remote_data(project, caseid):
+        return Path("work") / project / "run" / caseid / "data"
+
+    @staticmethod
+    def _remote_exists(server, path, ssh="ssh"):
+        ssh_result = subprocess.run(
+            [ssh, server, "ls " + str(path)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        return ssh_result.returncode == 0
 
     @staticmethod
     def rsync_subprocess_wrapper(args):
@@ -81,6 +131,10 @@ class Sync:
             "--exclude=data/tau/qq*",
             "--exclude=data/aftr",
             "--exclude=data/prev",
+            # R2D2plus: restart と光球スラブ (DEC-641) は大きいので個別に持ってくる
+            "--exclude=data/restart",
+            "--exclude=data/photosphere",
+            *_PROVENANCE_EXCLUDES,
             "--exclude=output.*",
             "-e",
             ssh,
@@ -98,6 +152,8 @@ class Sync:
         ----------
         server : str
             Name of remote server
+        n : int
+            Step to be downloaded. If None, all the steps (and data/time/) are downloaded
         ssh : str
             Type of ssh command
         project : str
@@ -107,27 +163,61 @@ class Sync:
         if project is None:
             project = os.getcwd().split("/")[-2]
 
-        if n is None:
-            filename = "*"
-        else:
-            filename = f"tau/qq.dac.{n:08d}"
-
         caseid = self._caseid()
-        args = [
-            "--exclude=param",
-            "--exclude=qq",
-            "--exclude=remap",
-            "--exclude=slice",
-            "--exclude=time/mhd",
-            "-e",
-            ssh,
-            server
-            + ":"
-            + str(Path("work") / project / "run" / caseid / "data" / filename),
-            str(self.datadir / filename),
-        ]
+        remote_data = self._remote_data(project, caseid)
+
+        if n is None:
+            # data/ 以下から tau/ と time/ だけを持ってくる
+            args = [
+                "--include=/tau/",
+                "--include=/tau/**",
+                "--exclude=/time/mhd",
+                "--include=/time/",
+                "--include=/time/**",
+                "--exclude=*",
+                "-e",
+                ssh,
+                server + ":" + str(remote_data) + "/",
+                str(self.datadir) + "/",
+            ]
+        else:
+            if self._is_compressed():
+                filename = self._format_pattern("tau", nd_tau=n)
+            else:
+                filename = f"tau/qq.dac.{n:08d}"
+            (self.datadir / filename).parent.mkdir(parents=True, exist_ok=True)
+            args = [
+                "-e",
+                ssh,
+                server + ":" + str(remote_data / filename),
+                str(self.datadir / filename),
+            ]
 
         result = Sync.rsync_subprocess_wrapper(args)
+
+    def _remap_rank_file(self, remote_data, n, ns):
+        """ランク ``ns`` の 3D remap のファイル (リモートのパス) とローカルの置き場所。"""
+        if self._is_compressed():
+            rel = self._format_pattern("remap_qq", rank=int(ns), nd=n)
+            return remote_data / rel, self.datadir / Path(rel).parent
+
+        par_dir = f"{int(ns) // 1000:05d}"
+        chi_dir = f"{int(ns):08d}"
+        nd = "*" if n is None else f"{n:08d}"
+        remote_file = (
+            remote_data / "remap" / "qq" / par_dir / chi_dir / f"qq.dac.{nd}.{ns}"
+        )
+        return remote_file, self.datadir / "remap" / "qq" / par_dir / chi_dir
+
+    def _remap_nested(self, server, remote_data, ssh):
+        """従来形式の remap/qq がランクごとの小ディレクトリに入っているか。新形式は常に入れ子。"""
+        if self._is_compressed():
+            return True
+        return self._remote_exists(
+            server,
+            remote_data / "remap/qq/00000/00000000/qq.dac.00000000.00000000",
+            ssh,
+        )
 
     def remap_qq(self, server, n, ssh="ssh", project=None):
         """
@@ -149,42 +239,13 @@ class Sync:
             project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
-
-        # check if file exists
-        ssh_result = subprocess.run(
-            [
-                ssh,
-                server,
-                "ls work/"
-                + project
-                + "/run/"
-                + caseid
-                + "/data/remap/qq/00000/00000000/qq.dac.00000000.00000000",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        remote_data = self._remote_data(project, caseid)
 
         # remapを行ったMPIランクの洗い出し
-        if ssh_result.returncode == 0:
+        if self._remap_nested(server, remote_data, ssh):
             nps = np.char.zfill(self.np_ijr.flatten().astype(str), 8)
             for ns in nps:
-                par_dir = f"{int(ns) // 1000:05d}"
-                chi_dir = f"{int(ns):08d}"
-
-                remote_base = (
-                    Path("work")
-                    / project
-                    / "run"
-                    / caseid
-                    / "data"
-                    / "remap"
-                    / "qq"
-                    / par_dir
-                    / chi_dir
-                )
-                remote_file = remote_base / f"qq.dac.{n:08d}.{ns}"
-                local_dir = self.datadir / "remap" / "qq" / par_dir / chi_dir
+                remote_file, local_dir = self._remap_rank_file(remote_data, n, ns)
                 local_dir.mkdir(parents=True, exist_ok=True)
 
                 args = [
@@ -209,6 +270,8 @@ class Sync:
                 Height to be downloaded
             server : str
                 Name of remote server
+            n : int
+                Step to be downloaded. If None, all the steps are downloaded
             ssh : str
                 Type of ssh command
             project : str
@@ -223,56 +286,24 @@ class Sync:
 
         nps = np.char.zfill(self.np_ijr[ir0 - 1, :].astype(str), 8)
         caseid = self._caseid()
+        remote_data = self._remote_data(project, caseid)
 
-        if n is None:
-            filename_part = "qq.dac.*."
-        else:
-            filename_part = f"qq.dac.{n:08d}."
-
-        # check if file exists
-        ssh_result = subprocess.run(
-            [
-                ssh,
-                server,
-                "ls work/"
-                + project
-                + "/run/"
-                + caseid
-                + "/data/remap/qq/00000/00000000/qq.dac.00000000.00000000",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        nested = self._remap_nested(server, remote_data, ssh)
 
         for ns in nps:
-            if ssh_result.returncode == 0:
-                par_dir = f"{int(ns) // 1000:05d}"
-                chi_dir = f"{int(ns):08d}"
+            if nested:
+                remote_file, local_dir = self._remap_rank_file(remote_data, n, ns)
             else:
-                par_dir = ""
-                chi_dir = ""
+                nd = "*" if n is None else f"{n:08d}"
+                remote_file = remote_data / "remap" / "qq" / f"qq.dac.{nd}.{ns}"
+                local_dir = self.datadir / "remap" / "qq"
 
-            remote_base = (
-                Path("work")
-                / project
-                / "run"
-                / caseid
-                / "data"
-                / "remap"
-                / "qq"
-                / par_dir
-                / chi_dir
-            )
-            remote_file = remote_base / (filename_part + ns)
-
-            (self.datadir / "remap" / "qq" / par_dir / chi_dir).mkdir(
-                parents=True, exist_ok=True
-            )
+            local_dir.mkdir(parents=True, exist_ok=True)
             args = [
                 "-e",
                 ssh,
                 server + ":" + str(remote_file),
-                str(self.datadir / "remap" / "qq" / par_dir / chi_dir),
+                str(local_dir),
             ]
             Sync.rsync_subprocess_wrapper(args)
 
@@ -310,6 +341,11 @@ class Sync:
         """
         Downloads checkpoint data
 
+        For R2D2plus runs (``data/restart/`` exists on the remote server), the
+        restart slot ``data/restart/<n:08d>/`` is downloaded (only the generation
+        that ``meta.toml`` points to). With ``end_step=True``, the newer one of
+        the alternating slots ``e`` and ``o`` is downloaded.
+
         Parameters
         ----------
         n : int
@@ -327,6 +363,13 @@ class Sync:
         if project is None:
             project = os.getcwd().split("/")[-2]
 
+        caseid = self._caseid()
+        remote_data = self._remote_data(project, caseid)
+
+        if self._remote_exists(server, remote_data / "restart", ssh):
+            self._check_restart(server, n, ssh, remote_data, end_step)
+            return
+
         step = str(n).zfill(8)
 
         if end_step:
@@ -335,18 +378,7 @@ class Sync:
             if np.mod(self.nd, 2) == 1:
                 step = "o"
 
-        caseid = self._caseid()
-        ssh_result = subprocess.run(
-            [
-                ssh,
-                server,
-                "ls work/" + project + "/run/" + caseid + "/data/qq/00000",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-
-        if ssh_result.returncode == 0:
+        if self._remote_exists(server, remote_data / "qq" / "00000", ssh):
             io_type = "posixio"
         else:
             io_type = "mpiio"
@@ -356,16 +388,7 @@ class Sync:
                 par_dir = f"{int(ns) // 1000:05d}"
                 chi_dir = f"{int(ns):08d}"
 
-                remote_base = (
-                    Path("work")
-                    / project
-                    / "run"
-                    / caseid
-                    / "data"
-                    / "qq"
-                    / par_dir
-                    / chi_dir
-                )
+                remote_base = remote_data / "qq" / par_dir / chi_dir
                 remote_file = remote_base / f"qq.dac.{step}.{ns:08d}"
                 local_dir = self.datadir / "qq" / par_dir / chi_dir
 
@@ -381,16 +404,72 @@ class Sync:
             args = [
                 "-e",
                 ssh,
-                server
-                + ":work/"
-                + project
-                + "/run/"
-                + caseid
-                + "/data/qq/qq.dac."
-                + step,
+                server + ":" + str(remote_data / "qq" / ("qq.dac." + step)),
                 str(self.datadir / "qq") + "/",
             ]
             Sync.rsync_subprocess_wrapper(args)
+
+    def _fetch_restart_meta(self, server, slot, ssh, remote_data):
+        """リモートの ``restart/<slot>/meta.toml`` をローカルへ写して読む。無ければ ``None``。"""
+        local_dir = self.datadir / "restart" / slot
+        local_dir.mkdir(parents=True, exist_ok=True)
+        args = [
+            "-e",
+            ssh,
+            server + ":" + str(remote_data / "restart" / slot / "meta.toml"),
+            str(local_dir) + "/",
+        ]
+        Sync.rsync_subprocess_wrapper(args)
+        meta = local_dir / "meta.toml"
+        if not meta.exists():
+            return None
+        if tomllib is None:  # pragma: no cover
+            raise ImportError("downloading R2D2plus restart needs Python >= 3.11 (tomllib)")
+        with open(meta, "rb") as f:
+            return tomllib.load(f)
+
+    def _check_restart(self, server, n, ssh, remote_data, end_step):
+        """R2D2plus の restart (``data/restart/<slot>/``, DEC-076) を持ってくる。"""
+        if end_step:
+            # e と o は交代で書かれるので、step の大きい方が最新
+            metas = {}
+            for slot in ["e", "o"]:
+                meta = self._fetch_restart_meta(server, slot, ssh, remote_data)
+                if meta is not None:
+                    metas[slot] = meta
+            if not metas:
+                print("Restart (e/o) does not exist in " + server)
+                return
+            slot = max(metas, key=lambda s: int(metas[s]["restart"]["step"]))
+            meta = metas[slot]
+        else:
+            slot = f"{n:08d}"
+            meta = self._fetch_restart_meta(server, slot, ssh, remote_data)
+            if meta is None:
+                print(f"Restart {slot} does not exist in " + server)
+                return
+
+        remote_slot = remote_data / "restart" / slot
+        local_slot = self.datadir / "restart" / slot
+        generation = meta["restart"].get("generation")
+        if generation:
+            # v2: meta.toml が指す世代のディレクトリだけ (古い世代は持ってこない)
+            args = [
+                "-e",
+                ssh,
+                server + ":" + str(remote_slot / generation) + "/",
+                str(local_slot / generation) + "/",
+            ]
+        else:
+            # v1: slot の直下の state.<rank>.bin
+            args = [
+                "--exclude=.generation-*",
+                "-e",
+                ssh,
+                server + ":" + str(remote_slot) + "/",
+                str(local_slot) + "/",
+            ]
+        Sync.rsync_subprocess_wrapper(args)
 
     def slice(
         self,
@@ -423,38 +502,34 @@ class Sync:
         if project is None:
             project = os.getcwd().split("/")[-2]
 
-        if n is None:
-            step = "*"
-        else:
-            step = str(n).zfill(8)
-
-        if n_slice is None:
-            n_slice_str = "*"
-        else:
-            n_slice_str = str(n_slice).zfill(8)
-
         caseid = self._caseid()
+        remote_data = self._remote_data(project, caseid)
+        (self.datadir / "slice").mkdir(parents=True, exist_ok=True)
+
+        # 断面の位置 (slice.dac) と個数 (params.dac)
         args = [
             "-e",
             ssh,
-            server + ":work/" + project + "/run/" + caseid + "/data/slice/slice.dac",
-            str(self.datadir / "slice"),
+            server + ":" + str(remote_data / "slice" / "slice.dac"),
+            server + ":" + str(remote_data / "slice" / "params.dac"),
+            str(self.datadir / "slice") + "/",
         ]
         Sync.rsync_subprocess_wrapper(args)
+
+        if self._is_compressed():
+            # YinYang の _yin/_yan も拾うよう、方向の後ろにも * を付ける
+            filename = self._format_pattern(
+                "slice", name="qq" + direc + "*", nd_tau=n, n=n_slice
+            )
+        else:
+            step = "*" if n is None else str(n).zfill(8)
+            n_slice_str = "*" if n_slice is None else str(n_slice).zfill(8)
+            filename = "slice/qq" + direc + ".dac." + step + "." + n_slice_str
+
         args = [
             "-e",
             ssh,
-            server
-            + ":work/"
-            + project
-            + "/run/"
-            + caseid
-            + "/data/slice/qq"
-            + direc
-            + ".dac."
-            + step
-            + "."
-            + n_slice_str,
+            server + ":" + str(remote_data / filename),
             str(self.datadir / "slice") + "/",
         ]
         Sync.rsync_subprocess_wrapper(args)
@@ -464,6 +539,9 @@ class Sync:
     ):
         """
         This method downloads all the data
+
+        The copies of the source and the executable that R2D2plus keeps in
+        ``data/param/source`` and ``data/param/bin`` are not downloaded.
 
         Parameters
         ----------
@@ -482,6 +560,7 @@ class Sync:
 
         caseid = self._caseid()
         args = [
+            *_PROVENANCE_EXCLUDES,
             "-e",
             ssh,
             server + ":work/" + project + "/run/" + caseid + "/",
