@@ -530,7 +530,7 @@ def test_slice(runs3d):
 
 
 def test_slice_variables_subset(tmp_path):
-    """断面だけの変数 (R2D2plus DEC-656): format.toml 版 2 の slice_variables の並びで読む。"""
+    """断面だけの変数 (R2D2plus DEC-657): format.toml 版 2 の slice_variables の並びで読む。"""
     _, comp, _ = _make_3d_runs(tmp_path)
     full = pyR2D2.Data(comp)
     ref = {}
