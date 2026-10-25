@@ -283,7 +283,8 @@ class Parameters:
             self.jss = self.jss - 1
             self.jee = self.jee - 1
 
-            if os.path.isdir(self.datadir / "slice"):
+            # 断面を書かないラン (R2D2plus DEC-656) では slice/ や params.dac が無い
+            if os.path.isfile(self.datadir / "slice" / "params.dac"):
                 with open(self.datadir / "slice" / "params.dac", "r") as f:
                     line = f.readline()
                     while line:

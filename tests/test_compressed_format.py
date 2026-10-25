@@ -529,6 +529,46 @@ def test_slice(runs3d):
             _close_f32(Cd.qs.__dict__[k], ref, np.maximum(np.abs(ref), 1e-3 * np.abs(ref).max()))
 
 
+def test_slice_variables_subset(tmp_path):
+    """断面だけの変数 (R2D2plus DEC-656): format.toml 版 2 の slice_variables の並びで読む。"""
+    _, comp, _ = _make_3d_runs(tmp_path)
+    full = pyR2D2.Data(comp)
+    ref = {}
+    for direc in ["x", "y", "z"]:
+        full.qs.read(0, direc, 1)
+        ref[direc] = {k: np.array(full.qs.__dict__[k]) for k in ["se", "vx"]}
+    picked = ["se", "vx"]
+    for f in sorted((comp / "slice").glob("qq*.c.*")):
+        direc = f.name[2]
+        n1, n2 = ref[direc]["se"].shape
+        buf = np.fromfile(f, "<f4").reshape((n1, n2, len(VARS8)), order="F")
+        np.stack([buf[:, :, VARS8.index(k)] for k in picked], axis=-1).ravel(order="F").tofile(f)
+    text = FORMAT_TOML.replace("version = 1", "version = 2")
+    text += 'slice_variables = ["se", "vx"]\n'
+    (comp / "param" / "format.toml").write_text(text)
+    d = pyR2D2.Data(comp)
+    for direc in ["x", "y", "z"]:
+        d.qs.read(0, direc, 1)
+        for k in picked:
+            _bitwise(d.qs.__dict__[k], ref[direc][k])
+
+
+def test_no_slices_and_unknown_version(tmp_path):
+    """断面を書かないラン (slice_variables = []) は Data が開け、断面の読み込みだけが止まる。"""
+    _, comp, _ = _make_3d_runs(tmp_path)
+    import shutil
+
+    shutil.rmtree(comp / "slice")
+    (comp / "param" / "format.toml").write_text(FORMAT_TOML + "slice_variables = []\n")
+    d = pyR2D2.Data(comp)
+    d.qf.read(1, keys=["ro"])
+    with pytest.raises(ValueError, match="did not write slices"):
+        d.qs.read(0, "x", 1)
+    (comp / "param" / "format.toml").write_text(FORMAT_TOML.replace("version = 1", "version = 3"))
+    with pytest.raises(ValueError, match="unsupported format.toml version"):
+        pyR2D2.Data(comp)
+
+
 def test_prev_aftr(runs3d):
     L, Cd, _ = runs3d
     for a, b in [(L.qp, Cd.qp), (L.qa, Cd.qa)]:

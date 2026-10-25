@@ -1959,11 +1959,15 @@ class Slice(_BaseReader):
         新出力形式 (R2D2plus DEC-576) の slice を読む。
 
         並びは従来と同じ ``(n1, n2, 変数)`` (Fortran 順) で、変数は ``format.toml`` の
-        ``variables``。書かれない ``pr``, ``te`` は ``ro``, ``se`` から R2D2plus と同じ
+        ``slice_variables`` (無ければ ``variables``、R2D2plus DEC-656)。書かれない ``pr``, ``te`` は ``ro``, ``se`` から R2D2plus と同じ
         切り替え付きの式で計算する (R2D2plus は倍精度の状態から作っていたので、
         単精度の ``ro``, ``se`` から作るこちらとは入力の丸めの分だけ違いうる)。
         """
-        variables = list(self.format_info["variables"])
+        variables = list(self.format_info["slice_variables"])
+        if not variables:
+            raise ValueError(
+                "this run did not write slices ([output] slice_variables = [], R2D2plus DEC-656)"
+            )
         nv = len(variables)
         for postfix in self._get_postfixes():
             if direc == "x":
@@ -2064,6 +2068,12 @@ class Slice(_BaseReader):
             k0 = 0
         if k1 is None:
             k1 = self.kx
+
+        # 断面を書かないラン (R2D2plus DEC-656、slice_variables = [])
+        if self._is_compressed() and not self.format_info["slice_variables"]:
+            raise ValueError(
+                "this run did not write slices ([output] slice_variables = [], R2D2plus DEC-656)"
+            )
 
         postfixes = self._get_postfixes()
 

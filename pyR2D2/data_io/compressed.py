@@ -40,6 +40,9 @@ except ImportError:  # pragma: no cover
 
 R2D2PLUS_Z_MAGIC = b"R2D2PLUS-Z 1\n"
 
+# 読める format.toml の版 (R2D2plus DEC-576 の 1、DEC-656 の 2)
+_SUPPORTED_FORMAT_VERSIONS = {1, 2}
+
 # format.toml が無い項目の既定値 (R2D2plus DEC-576 の version 1)
 _FORMAT_DEFAULTS = {
     "variables": ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"],
@@ -87,8 +90,16 @@ def read_format_toml(datadir):
         return None
     with open(path, "rb") as f:
         info = _load_toml(f.read().decode("utf-8"))
+    # 版 2 (R2D2plus DEC-656) は断面の変数が 3D と違うランだけ。知らない版は読み違えないように拒否する。
+    if info.get("version", 1) not in _SUPPORTED_FORMAT_VERSIONS:
+        raise ValueError(
+            f"{path}: unsupported format.toml version {info.get('version')} "
+            f"(this pyR2D2 reads {sorted(_SUPPORTED_FORMAT_VERSIONS)})"
+        )
     for key, value in _FORMAT_DEFAULTS.items():
         info.setdefault(key, value)
+    # 断面の変数 (DEC-656)。キーが無ければ 3D と同じ。空なら断面を書いていない。
+    info.setdefault("slice_variables", list(info["variables"]))
     return info
 
 
