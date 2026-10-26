@@ -529,6 +529,18 @@ def test_slice(runs3d):
             _close_f32(Cd.qs.__dict__[k], ref, np.maximum(np.abs(ref), 1e-3 * np.abs(ref).max()))
 
 
+def test_missing_output_raises(runs3d):
+    """出力の無い番号は例外にする（以前は前の配列を残したまま黙って返った。R2D2plus knowledge.md、2026-10-26）"""
+    for d in runs3d[:2]:
+        with pytest.raises(FileNotFoundError):
+            d.qf.read(99)
+        with pytest.raises(FileNotFoundError):
+            d.qt.read(99)
+        for direc in ["x", "y", "z"]:
+            with pytest.raises(FileNotFoundError):
+                d.qs.read(0, direc, 99)
+
+
 def test_slice_variables_subset(tmp_path):
     """断面だけの変数 (R2D2plus DEC-657): format.toml 版 2 の slice_variables の並びで読む。"""
     _, comp, _ = _make_3d_runs(tmp_path)

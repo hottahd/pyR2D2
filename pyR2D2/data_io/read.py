@@ -674,8 +674,7 @@ class FullData(_BaseRemapReader):
 
             zarr_filepath = self._get_filepath_remap_zarr(n)
             if not _zarr_zarrzip_exists(zarr_filepath):
-                print(f"zarr or zarr.zip file does not exist at n={n}.")
-                return
+                raise FileNotFoundError(f"no output at n={n} (neither the binary files nor {zarr_filepath} exist)")
 
             qq, params = pyR2D2.zarr_util.load(
                 zarr_filepath, with_attrs=True, names=names
@@ -1167,8 +1166,7 @@ class RestrictedData(_BaseRemapReader):
 
             zarr_filepath = self._get_filepath_remap_zarr(n)
             if not _zarr_zarrzip_exists(zarr_filepath):
-                print(f"Zarr file does not exist at n={n}.")
-                return
+                raise FileNotFoundError(f"no output at n={n} (neither the binary files nor {zarr_filepath} exist)")
 
             qq, params = pyR2D2.zarr_util.load(
                 zarr_filepath,
@@ -1539,9 +1537,7 @@ class OpticalDepth(_BaseReader):
 
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
             if not _zarr_zarrzip_exists(zarr_filepath):
-                if verbose:
-                    print(f"zarr or zarr.zip file does not exist at n={n}.")
-                return
+                raise FileNotFoundError(f"no tau output at n={n} (neither the binary file nor {zarr_filepath} exists)")
 
             qq = pyR2D2.zarr_util.load(
                 zarr_filepath, names=names, i0=j0, i1=j1, j0=k0, j1=k1
@@ -2093,10 +2089,9 @@ class Slice(_BaseReader):
         if zarr_flag:
             zarr_filepath = self._get_filepath_slice_zarr(n, direc)
             if not _zarr_zarrzip_exists(zarr_filepath):
-                print(
-                    f"zarr or zarr.zip file does not exist at n={n} for slice {direc}."
+                raise FileNotFoundError(
+                    f"no slice output at n={n} for slice {direc} (neither the binary files nor {zarr_filepath} exist)"
                 )
-                return
 
             self.info = {}
             self.info["x"] = self.x[i0:i1]
