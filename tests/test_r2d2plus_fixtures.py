@@ -67,6 +67,68 @@ def test_restart(fixture_dir, fmt):
         assert digest(r.state[k]) == exp["state"][k], k
 
 
+TAU = ["ro", "se", "pr", "te", "vx", "vy", "vz", "bx", "by", "bz", "fr"]
+SLICE = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+
+
+def test_tau_slice_formats_agree(fixture_dir):
+    """tau 面と slice を compressed と legacy で読み比べる (tau 面のある見本だけ。v1.1.0-1800 以降)。
+
+    R2D2plus の ctest pyr2d2_roundtrip と同じ規則。高さ he は、compressed が単精度の r - rstar に倍精度で rstar を
+    足して返すので単精度の 1 ulp まで違ってよく、面が無い所は legacy が 0・compressed の height が 0。slice の pr・te は
+    compressed が単精度の ro・se から計算するので相対 1e-6 まで。2026-10-27 に、astana の 2.4 GB の実ラン
+    (io_fixture_20260927) を読んでいた試験をこれに置き換えた。
+    """
+    pytest.importorskip("zstandard")
+    if not any((fixture_dir / "legacy" / "data" / "tau").glob("qq.dac.*")):
+        pytest.skip("この見本には tau 面が無い")
+    dc = pyR2D2.Data(str(fixture_dir / "compressed" / "data"), verbose=False)
+    dl = pyR2D2.Data(str(fixture_dir / "legacy" / "data"), verbose=False)
+    found = 0
+    for n in range(int(dl.p.nd_tau) + 1):
+        dc.qt.read(n)
+        dl.qt.read(n)
+        for t in ["", "01", "001"]:
+            for k in TAU + (["rt"] if not t else []):
+                np.testing.assert_array_equal(getattr(dc.qt, k + t), getattr(dl.qt, k + t), err_msg=f"tau {n} {k + t}")
+            he, y, h = getattr(dc.qt, "he" + t), getattr(dl.qt, "he" + t), getattr(dc.qt, "height" + t)
+            assert np.where(y == 0, h == 0, np.abs(he - y) <= np.spacing(y)).all(), f"tau {n} he{t}"
+            found += int(np.count_nonzero(y))
+        for direc in ["x", "y", "z"]:
+            dc.qs.read(0, direc, n)
+            dl.qs.read(0, direc, n)
+            for k in SLICE:
+                np.testing.assert_array_equal(getattr(dc.qs, k), getattr(dl.qs, k), err_msg=f"slice {direc} {n} {k}")
+            for k in ["pr", "te"]:
+                y = getattr(dl.qs, k)
+                np.testing.assert_allclose(getattr(dc.qs, k), y, rtol=0, atol=1e-6 * np.abs(y).max(),
+                                           err_msg=f"slice {direc} {n} {k}")
+    assert found > 0, "tau 面がどこにも見つかっていない (比べたのが 0 だけ)"
+
+
+def test_checksums_and_initial_state_from_output(fixture_dir, tmp_path):
+    """R2D2plus が書いた .z の XXH3-64 を照合でき、legacy の出力を初期条件 (write_initial_state) に書き直せる。
+
+    2026-10-27 まで astana の io_fixture_20260927 (128^3、4 ランク) で行っていた試験を見本に移した。
+    """
+    pytest.importorskip("xxhash")
+    from pyR2D2.data_io.compressed import read_r2d2plus_z
+
+    zfiles = sorted((fixture_dir / "compressed" / "data" / "remap" / "qq").rglob("qq.z.*"))
+    assert zfiles
+    for f in zfiles:
+        read_r2d2plus_z(f, verify=True)  # xxhash の XXH3-64 が R2D2plus (XXH3_64bits) と同じ
+    d = pyR2D2.Data(str(fixture_dir / "legacy" / "data"), verbose=False)
+    keys = ["ro", "vx", "vy", "vz", "bx", "by", "bz", "se"]
+    d.qf.read(0, keys=keys)
+    fields = {k: getattr(d.qf, k) for k in keys}
+    path = pyR2D2.write_initial_state(tmp_path / "init.z", fields, attributes={"nd": 0})
+    _, arrays = read_r2d2plus_z(path, verify=True)
+    for k in keys:
+        assert arrays[k].shape == (d.ix, d.jx, d.kx)
+        np.testing.assert_array_equal(arrays[k], getattr(d.qf, k).astype(np.float64), err_msg=k)
+
+
 # R2D2plus-input の書き手 (contracts/rtable.write_table) が書いた r2d2plus-table。
 # R2D2plus-input の tests/make_pyr2d2_table_fixture.py が作る。配列はそちらと同じ式で作り直して比べる。
 TABLES = sorted((Path(__file__).parent / "data" / "r2d2plus_fixtures").glob("rtable-*.tbl"))

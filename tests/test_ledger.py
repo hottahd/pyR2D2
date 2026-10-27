@@ -562,7 +562,8 @@ _SCRATCH = Path(
     "/home/sc/c0234hotta/tmp/claude-40234/-scr-a000-c0234hotta-Repository-R2D2plus/"
     "59364ee3-4d14-480c-ac49-4376767e1fd5/scratchpad/proj1/run"
 )
-_COMP3D = Path("/scr/a000/c0234hotta/io_fixture_20260927/comp_3d")
+# R2D2plus の出力の見本 (test_r2d2plus_fixtures.py と同じ。台帳が読む param を持つ版)
+_FIXTURE = Path(__file__).parent / "data" / "r2d2plus_fixtures" / "r2d2plus-v1.1.0-1800-gdd517c7b.tar.xz"
 _FORTRAN = Path("/scr/a000/c0234hotta/odf/run/d001")
 
 
@@ -607,14 +608,19 @@ def test_real_cpp_runs(tmp_path):
     assert ws.get(2, ws.col("(ix,jx,kx)")) == "24 6 10"
 
 
-@pytest.mark.skipif(not _COMP3D.is_dir(), reason="comp_3d の fixture が無い")
 def test_real_compressed_run(tmp_path):
-    run = _copy_small(_COMP3D, tmp_path / "proj" / "run" / "comp_3d")
+    # R2D2plus が書いた compressed のラン (小さな Sod、rstar = 1 cm、鉛直 0〜1e8 cm)
+    import tarfile
+
+    with tarfile.open(_FIXTURE) as tar:
+        tar.extractall(tmp_path / "x", filter="data")
+    run = _copy_small(tmp_path / "x" / "compressed", tmp_path / "proj" / "run" / "comp")
     v = collect.collect_run(run, server="astana").values
     assert v["形式"] == "compressed"
-    assert v["(ix,jx,kx)"] == "128 128 128"
-    assert v["ranks"] == "4"
-    assert v["xmin"].values[0] == pytest.approx(-5.44e8, rel=1e-3)
+    assert v["(ix,jx,kx)"] == "64 4 4"
+    assert v["ranks"] == "1"
+    assert v["xmin"].values[0] == pytest.approx(-1.0)
+    assert v["状態"] == "正常終了"
     assert collect.project_name(run) == "proj"
 
 

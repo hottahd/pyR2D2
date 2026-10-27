@@ -794,27 +794,6 @@ def test_write_initial_state_needs_xxhash(tmp_path, monkeypatch):
         pyR2D2.write_initial_state(tmp_path / "a.z", {"ro": np.zeros((2, 2, 2))})
 
 
-@pytest.mark.skipif(
-    not (FIXTURE / "comp_3d" / "data" / "param" / "format.toml").exists(),
-    reason="R2D2plus I/O fixture not available",
-)
-def test_fixture_checksums_and_initial_state_from_output(tmp_path):
-    pytest.importorskip("xxhash")
-    # xxhash の XXH3-64 が R2D2plus (XXH3_64bits) と同じであること
-    C.read_r2d2plus_z(
-        FIXTURE / "comp_3d" / "data" / "remap" / "qq" / "00000" / "00000002"
-        / "qq.z.00000004.00000002", verify=True)
-    # 前の出力を初期条件にする (従来形式のランから)
-    d = pyR2D2.Data(FIXTURE / "legacy_3d" / "data")
-    d.qf.read(6, keys=VARS8)
-    fields = {k: d.qf.__dict__[k] for k in VARS8}
-    path = pyR2D2.write_initial_state(tmp_path / "init.z", fields, attributes={"nd": 6})
-    _, arrays = C.read_r2d2plus_z(path, verify=True)
-    for k in VARS8:
-        assert arrays[k].shape == (d.ix, d.jx, d.kx)
-        _bitwise(arrays[k], d.qf.__dict__[k].astype(np.float64))
-
-
 def test_write_boundary_series_roundtrip(tmp_path):
     pytest.importorskip("xxhash")
     rng = np.random.default_rng(5)
