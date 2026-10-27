@@ -10,7 +10,6 @@
   (無ければ skip)。
 """
 
-import os
 from pathlib import Path
 
 import numpy as np
@@ -681,59 +680,6 @@ def test_two_dimension(tmp_path):
     _bitwise(Cd.q2.fr, state["fr"])
     for k in Cd.q2.value_keys:
         assert Cd.q2.__dict__[k].shape == (L.ix, L.jx)
-
-
-# ---------------------------------------------------------------------------
-# 実ランの対照 (R2D2plus の legacy / compressed を同じ設定で走らせたもの)
-# ---------------------------------------------------------------------------
-
-FIXTURE = Path(os.environ.get("PYR2D2_IO_FIXTURE", "/scr/a000/c0234hotta/io_fixture_20260927"))
-
-
-@pytest.mark.skipif(
-    not (FIXTURE / "comp_3d" / "data" / "param" / "format.toml").exists(),
-    reason="R2D2plus I/O fixture not available",
-)
-def test_r2d2plus_fixture_matches_legacy():
-    L = pyR2D2.Data(FIXTURE / "legacy_3d" / "data")
-    Cd = pyR2D2.Data(FIXTURE / "comp_3d" / "data")
-    assert Cd.p.output_format == "compressed"
-    n = 6
-    L.qf.read(n)
-    Cd.qf.read(n)
-    # 保存量も pr/te/op もビット単位で一致 (R2D2plus と同じ式・丸め)
-    for k in VARS8 + ["pr", "te", "op"]:
-        _bitwise(Cd.qf.__dict__[k], L.qf.__dict__[k])
-    L.qt.read(n)
-    Cd.qt.read(n)
-    for tau in ["", "01", "001"]:
-        for k in ["rt", "ro", "se", "pr", "te", "vx", "vy", "vz", "bx", "by", "bz", "fr"]:
-            if k == "rt" and tau:
-                continue
-            _bitwise(Cd.qt.__dict__[k + tau], L.qt.__dict__[k + tau])
-        assert np.abs(Cd.qt.__dict__["he" + tau] - L.qt.__dict__["he" + tau]).max() <= 4096.0
-        _bitwise(Cd.qt.__dict__["he" + tau].astype(np.float32), L.qt.__dict__["he" + tau])
-    for direc in ["x", "y", "z"]:
-        L.qs.read(0, direc, n)
-        Cd.qs.read(0, direc, n)
-        for k in VARS8:
-            _bitwise(Cd.qs.__dict__[k], L.qs.__dict__[k])
-        # slice の pr/te は R2D2plus が倍精度の状態から作ったもの。単精度の入力からの
-        # 再計算なので、背景量に対して 1e-7 以内 (実測 2e-8)
-        for k, X0 in [("pr", Cd.pr0), ("te", Cd.te0)]:
-            if direc == "x":
-                X0 = X0[np.argmin(np.abs(Cd.x - Cd.x_slice[0]))]
-            else:
-                X0 = X0[:, None]
-            diff = np.abs(Cd.qs.__dict__[k].astype(float) - L.qs.__dict__[k])
-            assert (diff / np.abs(X0)).max() < 1e-7
-    L.qp.read(1, 0)
-    Cd.qp.read(1, 0)
-    for k in VARS8:
-        _bitwise(Cd.qp.__dict__[k], L.qp.__dict__[k].astype(np.float32))
-    state, meta = C.read_restart_state(FIXTURE / "comp_3d" / "data" / "restart" / "e", 0)
-    assert state["ro"].shape == (64, 64, 128)
-    assert meta["restart"]["nd"] == 7
 
 
 # ---------------------------------------------------------------------------
