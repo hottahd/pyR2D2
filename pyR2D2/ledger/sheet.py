@@ -72,6 +72,7 @@ class Plan:
     n_cols: int = 0  # 必要な列数
     n_rows: int = 0  # 必要な行数
     headers: dict = field(default_factory=dict)  # 列名 → 見出しの文字列
+    header_after: list = field(default_factory=list)  # 書いた後の見出し行 (列の並べ替えに使う)
 
 
 def _cell(values, row, col):
@@ -307,10 +308,74 @@ def plan_updates(values, records, server, force=False):
         plan.headers[name] = header
         if header != old_header:
             plan.cells.append((1, col, header))
+        while len(header_row) < col:
+            header_row.append("")
+        header_row[col - 1] = header
         for row, text in list(texts.items()) + list(rewrites.items()):
             if text != _cell(values, row, col):
                 plan.cells.append((row, col, text))
+    plan.header_after = header_row
     return plan
+
+
+def column_moves(header_row):
+    """管理列を :data:`collect.COLUMNS` の順に並べ替える列の移動の列を返す (2026-10-28、利用者の指示)。
+
+    人の列 (管理列でない見出し・空の見出し・同じ管理列の 2 つ目) は今の位置のまま残し、
+    管理列が占めている位置に、管理列を COLUMNS の順で詰める。
+
+    Returns
+    -------
+    moves : list of (int, int)
+        ``(元の位置, 移す先)`` (0 始まり)。前から順に実行する (Sheets API の moveDimension で
+        ``destinationIndex`` が移す先になるもの)。
+    final : list of str
+        並べ替えた後の見出し行
+    """
+    managed, seen = [], set()
+    for i, text in enumerate(header_row):
+        name = managed_name(text) if text.strip() else None
+        if name is not None and name not in seen:
+            seen.add(name)
+            managed.append(i)
+    order = {name: k for k, (name, _, _) in enumerate(COLUMNS)}
+    ranked = sorted(managed, key=lambda i: order[managed_name(header_row[i])])
+    final = list(header_row)
+    for slot, src in zip(managed, ranked):
+        final[slot] = header_row[src]
+    # 前から 1 列ずつ、あるべき列をその位置へ移す (移した後の位置で数える)
+    ids = list(range(len(header_row)))
+    target = list(range(len(header_row)))
+    for slot, src in zip(managed, ranked):
+        target[slot] = src
+    moves = []
+    for t, want in enumerate(target):
+        c = ids.index(want)
+        if c != t:
+            moves.append((c, t))
+            ids.insert(t, ids.pop(c))
+    return moves, final
+
+
+def apply_column_moves(worksheet, moves):
+    """:func:`column_moves` の移動を 1 回の ``batch_update`` で実行する (書式・列幅も一緒に動く)。"""
+    if not moves:
+        return
+    requests = [
+        {
+            "moveDimension": {
+                "source": {
+                    "sheetId": worksheet.id,
+                    "dimension": "COLUMNS",
+                    "startIndex": c,
+                    "endIndex": c + 1,
+                },
+                "destinationIndex": t,
+            }
+        }
+        for c, t in moves
+    ]
+    worksheet.spreadsheet.batch_update({"requests": requests})
 
 
 def apply_plan(worksheet, plan, chunk=500):

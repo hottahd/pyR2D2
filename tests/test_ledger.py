@@ -56,6 +56,8 @@ class FakeWorksheet:
         self.row_count = row_count
         self.col_count = col_count or max([len(r) for r in rows] + [26])
         self.updated = []  # batch_update で書かれた (行, 列)
+        self.id = 0
+        self.spreadsheet = self  # moveDimension は spreadsheet.batch_update({"requests": ...}) で来る
 
     def get_all_values(self):
         if not self.cells:
@@ -77,6 +79,18 @@ class FakeWorksheet:
         self.row_count += n
 
     def batch_update(self, data):
+        if isinstance(data, dict):  # spreadsheet.batch_update: 列の移動
+            for req in data["requests"]:
+                mv = req["moveDimension"]
+                assert mv["source"]["dimension"] == "COLUMNS"
+                c, t = mv["source"]["startIndex"] + 1, mv["destinationIndex"] + 1
+                assert mv["source"]["endIndex"] == c and t < c
+                nc = max([cc for _, cc in self.cells] + [self.col_count])
+                perm = list(range(1, nc + 1))
+                perm.insert(t - 1, perm.pop(c - 1))  # 新しい位置 k に元の列 perm[k-1]
+                where = {old: new for new, old in enumerate(perm, start=1)}
+                self.cells = {(r, where[cc]): v for (r, cc), v in self.cells.items()}
+            return
         for item in data:
             row, col = _parse_a1(item["range"])
             assert row <= self.row_count and col <= self.col_count
@@ -342,10 +356,13 @@ def test_push_protects_human_columns(project):
     assert ws.get(10, ws.col("Note")) == "計算していない"
 
     # 見出しは既存の位置のまま、無い管理列は右端 (ISEE の次) から COLUMNS の順に足された
+    # 人の列は元の位置のまま、管理列は残りの位置に COLUMNS の順で並ぶ (2026-10-28)
     header = ws.header()
-    assert header[: len(REAL_HEADER)][17] == "Gemetry"
-    added = [sheet.managed_name(h) for h in header[len(REAL_HEADER) : len(REAL_HEADER) + 5]]
-    assert added == ["プロジェクト", "目的", "保存", "容量", "Server"]
+    for h in HUMAN:
+        assert header.index(h) == REAL_HEADER.index(h)
+    managed = [sheet.managed_name(h) for h in header if h not in HUMAN]
+    assert managed == collect.COLUMN_NAMES
+    assert "Gemetry" in header  # 見出しの文字は書き換えない
     assert ws.col_count >= len(header)
 
     # 行は Case ID の番号 (d001 → 2 行目、d003 → 4 行目)
@@ -425,13 +442,15 @@ def test_unit_change_converts_other_rows(project):
     rows.append(["d020", "8640000", "1.00 [Mm]", "他のサーバのラン"])  # 21 行目
     ws = FakeWorksheet(rows)
     cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
+    t, y = ws.col("t_end"), ws.col("ymin")
+    assert ws.col("Note") == 4  # 人の列は動かない
     # 送る 2 本の t_end は 100 日 → 列の単位は d
-    assert ws.get(1, 2) == "t_end [d]"
-    assert ws.get(2, 2) == "100.00"
+    assert ws.get(1, t) == "t_end [d]"
+    assert ws.get(2, t) == "100.00"
     # 手元に無い d020 の値も換算される
-    assert ws.get(21, 2) == "100.00"
-    assert ws.get(1, 3) == "ymin [Mm]"
-    assert ws.get(21, 3) == "1.00"
+    assert ws.get(21, t) == "100.00"
+    assert ws.get(1, y) == "ymin [Mm]"
+    assert ws.get(21, y) == "1.00"
     assert ws.get(21, 4) == "他のサーバのラン"
 
 
@@ -439,9 +458,10 @@ def test_mixed_families_embed_units(project, tmp_path):
     ws = FakeWorksheet([["Case ID", "ymax"], ["", ""], ["", ""], ["", ""],
                         ["d004", "90.00 [deg]"]])  # fmt: skip
     cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
-    assert ws.get(1, 2) == "ymax"
-    assert ws.get(2, 2) == "6.14 [Mm]"
-    assert ws.get(5, 2) == "90.00 [deg]"
+    y = ws.col("ymax")
+    assert ws.get(1, y) == "ymax"
+    assert ws.get(2, y) == "6.14 [Mm]"
+    assert ws.get(5, y) == "90.00 [deg]"
 
 
 def test_empty_sheet_gets_full_header(project):
@@ -691,11 +711,13 @@ def test_pair_with_different_header_units_is_unified(project):
     rows.append(["d020", "-5.44", "700.00", "他のサーバ"])  # 21 行目 (手元に無い)
     ws = FakeWorksheet(rows)
     cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
-    assert ws.get(1, 2) == "xmin [Mm]"
-    assert ws.get(1, 3) == "xmax [Mm]"
-    assert ws.get(21, 2) == "-5.44"
-    assert ws.get(21, 3) == "0.70"  # 700 km を Mm へ換算
-    assert ws.get(2, 3) == "0.70"
+    a, b = ws.col("xmin"), ws.col("xmax")
+    assert ws.col("Note") == 4
+    assert ws.get(1, a) == "xmin [Mm]"
+    assert ws.get(1, b) == "xmax [Mm]"
+    assert ws.get(21, a) == "-5.44"
+    assert ws.get(21, b) == "0.70"  # 700 km を Mm へ換算
+    assert ws.get(2, b) == "0.70"
     assert ws.get(21, 4) == "他のサーバ"
 
 
@@ -706,8 +728,9 @@ def test_pair_switches_together(project):
     rows.append(["d020", "259200", "8640000"])
     ws = FakeWorksheet(rows)
     cli.push(project, worksheet=ws, server="astana", out=lambda *a: None)
-    assert ws.get(1, 2) == "到達時刻 [d]" and ws.get(1, 3) == "t_end [d]"
-    assert ws.get(21, 2) == "3.00" and ws.get(21, 3) == "100.00"
+    a, b = ws.col("到達時刻"), ws.col("t_end")
+    assert ws.get(1, a) == "到達時刻 [d]" and ws.get(1, b) == "t_end [d]"
+    assert ws.get(21, a) == "3.00" and ws.get(21, b) == "100.00"
 
 
 def test_d000_never_overwrites_the_header_row():
@@ -943,3 +966,37 @@ def test_note_update_keeps_other_bytes(tmp_path):
     p.write_text('[note]  # メモ\npurpose = "x" # 理由\ncited_in = ["DEC-1"]')
     note.update(run, {"purpose": "y", "project": "p"})
     assert p.read_text() == '[note]  # メモ\npurpose = "y"\ncited_in = ["DEC-1"]\nproject = "p"\n'
+
+
+def test_push_reorders_managed_columns_only(project):
+    """管理列は決まった順に並べ替え、人の列とセルの中身は位置ごと保つ。--keep-column-order なら動かさない。"""
+    ws = FakeWorksheet(real_sheet())
+    keep = FakeWorksheet(real_sheet())
+    # 容量は送るたびに ledger_sent.toml の分だけ変わるので測らない
+    cli.push(project, worksheet=keep, server="astana", du=False, reorder=False, out=lambda *a: None)
+    def names(header):
+        return [sheet.managed_name(h) or h for h in header]
+
+    assert names(keep.header())[: len(REAL_HEADER)] == names(REAL_HEADER)
+
+    cli.push(project, worksheet=ws, server="astana", du=False, out=lambda *a: None)
+    # 並べ替えた後も、どの見出しの列も中身は並べ替えないときと同じ
+    def by_name(w):
+        v = w.get_all_values()
+        return {v[0][j]: [r[j] for r in v] for j in range(len(v[0]))}
+
+    assert by_name(ws) == by_name(keep)
+    # 2 回目は動かさない
+    moves, _ = sheet.column_moves(ws.header())
+    assert moves == []
+
+
+def test_column_moves_keep_human_positions():
+    h = ["Case ID", "Mstar", "Note", "目的", "プロジェクト", "", "容量 [GB]", "保存"]
+    moves, final = sheet.column_moves(h)
+    assert final == ["Case ID", "プロジェクト", "Note", "目的", "保存", "", "容量 [GB]", "Mstar"]
+    ids = list(h)
+    for c, t in moves:
+        assert c > t
+        ids.insert(t, ids.pop(c))
+    assert ids == final

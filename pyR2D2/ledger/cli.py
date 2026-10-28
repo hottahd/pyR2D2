@@ -117,6 +117,7 @@ def push(
     force=False,
     only=None,
     du=True,
+    reorder=True,
     out=print,
 ):
     """ランの管理列をシートへ送る。
@@ -142,11 +143,13 @@ def push(
             sheet_name=None if sheet_id else label, sheet_id=sheet_id, json_key=json_key
         )
     return push_records(
-        records, worksheet, server, label, dry_run=dry_run, force=force, out=out
+        records, worksheet, server, label, dry_run=dry_run, force=force, reorder=reorder, out=out
     )
 
 
-def push_records(records, worksheet, server, label, dry_run=False, force=False, out=print):
+def push_records(
+    records, worksheet, server, label, dry_run=False, force=False, reorder=True, out=print
+):
     """集めた :class:`collect.RunRecord` の並びを worksheet へ送る (:func:`push` の本体)。"""
     values = worksheet.get_all_values() if worksheet is not None else []
     plan = sheet.plan_updates(values, records, server, force=force)
@@ -155,8 +158,12 @@ def push_records(records, worksheet, server, label, dry_run=False, force=False, 
         out(f"警告: {caseid} を飛ばした: {reason}")
     for w in plan.warnings:
         out(f"警告: {w}")
+    # 管理列を COLUMNS の順に並べ替える (人の列は動かさない)。書いた後の見出しで決める
+    moves, final = sheet.column_moves(plan.header_after) if reorder else ([], [])
 
     if dry_run:
+        if moves:
+            out("列を並べ替える: " + ", ".join(h for h in final if h))
         if worksheet is None:
             out(f"(dry-run: シート {label} には接続していない。空のシートに対する計画)")
         for r, c, text in sorted(plan.cells):
@@ -165,6 +172,9 @@ def push_records(records, worksheet, server, label, dry_run=False, force=False, 
         return plan
 
     sheet.apply_plan(worksheet, plan)
+    if moves:
+        sheet.apply_column_moves(worksheet, moves)
+        out(f"管理列を決まった順に並べ替えた ({len(moves)} 回の移動)")
     for rec in plan.written:
         collect.write_sent(rec, label)
     out(f"{len(plan.written)} 本のランをシート {label} に送った ({len(plan.cells)} セル)")
@@ -271,6 +281,7 @@ def cmd_push(args, out=print):
         force=args.force,
         only=only,
         du=not args.no_du,
+        reorder=not args.keep_column_order,
         out=out,
     )
 
@@ -306,6 +317,11 @@ def build_parser():
     p.add_argument("--force", action="store_true", help="Server の違う行も上書きする")
     p.add_argument("--only", default=None, help="送るラン (例: d001,d005)")
     p.add_argument("--no-du", action="store_true", help="容量 (data/ の使用量) を測らない")
+    p.add_argument(
+        "--keep-column-order",
+        action="store_true",
+        help="管理列を決まった順 (Case ID, プロジェクト, 目的, 保存, 容量, …) に並べ替えない",
+    )
     p.set_defaults(func=cmd_push)
 
     p = sub.add_parser(
