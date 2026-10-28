@@ -340,11 +340,10 @@ def test_push_protects_human_columns(project):
     assert _human_snapshot(ws) == before
     assert ws.get(10, ws.col("Note")) == "計算していない"
 
-    # 見出しは既存の位置のまま、無い管理列は右端 (ISEE の次) から足された
+    # 見出しは既存の位置のまま、無い管理列は右端 (ISEE の次) から COLUMNS の順に足された
     header = ws.header()
     assert header[: len(REAL_HEADER)][17] == "Gemetry"
-    assert header[len(REAL_HEADER)] == "Server"
-    assert header[len(REAL_HEADER) + 1] == "状態"
+    assert header[len(REAL_HEADER) : len(REAL_HEADER) + 4] == ["プロジェクト", "目的", "Server", "状態"]
     assert ws.col_count >= len(header)
 
     # 行は Case ID の番号 (d001 → 2 行目、d003 → 4 行目)

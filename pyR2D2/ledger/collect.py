@@ -38,6 +38,10 @@ from .units import Quantity
 # (名前, 別名, 量の列か)
 COLUMNS = [
     ("Case ID", (), False),
+    # 所属プロジェクト (run_note の project) と目的は Case ID のすぐ後 (2026-10-28、利用者の指示)。
+    # 既にあるシートは見出しの名前で探すので、列を動かしても送れる。
+    ("プロジェクト", (), False),
+    ("目的", (), False),
     ("Mstar", (), False),
     ("(ix,jx,kx)", (), False),
     ("xmin", (), True),
@@ -69,13 +73,10 @@ COLUMNS = [
     ("backend", (), False),
     ("ranks", (), False),
     ("ms/step", (), False),
-    # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。
-    ("目的", (), False),
+    # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。目的は上
     ("保存", (), False),
     ("結論", (), False),
-    # 2026-10-25 に足した列 (R2D2plus-project docs/run_data.md)。所属プロジェクト (run_note の project) と、
-    # run/dNNN をリンクにして別のディスクに置いたときのデータの実体
-    ("プロジェクト", (), False),
+    # 2026-10-25 に足した列 (R2D2plus-project docs/run_data.md)。run/dNNN をリンクにして別のディスクに置いたときのデータの実体
     ("実体", (), False),
 ]
 COLUMN_NAMES = [c[0] for c in COLUMNS]
