@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import sys
+import tomllib
 from pathlib import Path
 
 import numpy as np
@@ -343,7 +344,8 @@ def test_push_protects_human_columns(project):
     # 見出しは既存の位置のまま、無い管理列は右端 (ISEE の次) から COLUMNS の順に足された
     header = ws.header()
     assert header[: len(REAL_HEADER)][17] == "Gemetry"
-    assert header[len(REAL_HEADER) : len(REAL_HEADER) + 4] == ["プロジェクト", "目的", "Server", "状態"]
+    added = [sheet.managed_name(h) for h in header[len(REAL_HEADER) : len(REAL_HEADER) + 5]]
+    assert added == ["プロジェクト", "目的", "保存", "容量", "Server"]
     assert ws.col_count >= len(header)
 
     # 行は Case ID の番号 (d001 → 2 行目、d003 → 4 行目)
@@ -832,3 +834,112 @@ def test_link_to_another_disk_is_a_run(project, tmp_path):
     make_run(tmp_path / "z000", "d00004")
     (project / "d00004").symlink_to(tmp_path / "z000" / "d00004")
     assert "d00004" in [p.name for p in collect.find_runs(project)]
+
+
+# ---------------------------------------------------------------------------
+# pull: シートで書き換えた目的などを手元のメモへ戻す (2026-10-28)
+# ---------------------------------------------------------------------------
+
+
+def _pushed_sheet(project):
+    ws = FakeWorksheet([])
+    cli.push(project, worksheet=ws, server="astana", du=False, out=lambda *a: None)
+    return ws
+
+
+def _answers(*seq):
+    it = iter(seq)
+    asked = []
+
+    def ask(prompt):
+        asked.append(prompt)
+        return next(it)
+
+    ask.asked = asked
+    return ask
+
+
+def test_pull_asks_and_writes_only_note_columns(project):
+    note_file = project / "d001" / "data" / "param" / "run_note.toml"
+    note_file.write_text(
+        "# 人のコメント\n[note]\npurpose = \"古い目的\"  \nretention = \"auto\"\ncited_in = []\n\n[extra]\nx = 1\n"
+    )
+    ws = _pushed_sheet(project)
+    ws.cells[(2, ws.col("目的"))] = "新しい目的"
+    ws.cells[(2, ws.col("プロジェクト"))] = "sunspot"
+    ws.cells[(2, ws.col("保存"))] = "全部残す (2027-03-31 まで残す)"
+    ws.cells[(2, ws.col("結論"))] = "DEC-600、DEC-606"
+    ws.cells[(2, ws.col("状態"))] = "人が書き換えた状態"  # 機械の列は戻さない
+    ws.cells[(4, ws.col("目的"))] = "d003 の目的"
+
+    ask = _answers("n", "y", "y", "y", "y")  # プロジェクト・目的・保存・結論・d003 の目的
+    applied = cli.pull(project, worksheet=ws, server="astana", ask=ask, out=lambda *a: None)
+    assert [(c.record.caseid, c.column) for c in applied] == [
+        ("d001", "目的"), ("d001", "保存"), ("d001", "結論"), ("d003", "目的"),
+    ]  # fmt: skip
+    assert len(ask.asked) == 5
+
+    text = note_file.read_text()
+    assert text.startswith("# 人のコメント\n[note]\n")
+    assert "[extra]\nx = 1\n" in text
+    n = tomllib.loads(text)["note"]
+    assert n["purpose"] == "新しい目的"
+    assert "project" not in n  # n と答えた
+    assert n["retention"] == "keep" and n["expires"] == "2027-03-31"
+    assert n["cited_in"] == ["DEC-600", "DEC-606"]
+    # メモの無かった d003 は新しく作る
+    n3 = tomllib.loads((project / "d003" / "data" / "param" / "run_note.toml").read_text())["note"]
+    assert n3 == {"purpose": "d003 の目的"}
+
+    # 戻したものはもう聞かない。n と答えたプロジェクトだけを次も聞く
+    ask2 = _answers("n")
+    assert cli.pull(project, worksheet=ws, server="astana", ask=ask2, out=lambda *a: None) == []
+    assert len(ask2.asked) == 1
+
+
+def test_pull_quit_and_dry_run_write_nothing(project):
+    ws = _pushed_sheet(project)
+    ws.cells[(2, ws.col("目的"))] = "a"
+    ws.cells[(4, ws.col("目的"))] = "b"
+    note_file = project / "d001" / "data" / "param" / "run_note.toml"
+    cli.pull(project, worksheet=ws, server="astana", dry_run=True, ask=_answers(), out=lambda *a: None)
+    assert not note_file.exists()
+    applied = cli.pull(project, worksheet=ws, server="astana", ask=_answers("q"), out=lambda *a: None)
+    assert applied == [] and not note_file.exists()
+
+
+def test_pull_skips_empty_unreadable_and_other_server(project):
+    (project / "d001" / "data" / "param" / "run_note.toml").write_text('[note]\npurpose = "残す"\n')
+    ws = _pushed_sheet(project)
+    ws.cells.pop((2, ws.col("目的")))  # 空のセルでは消さない
+    ws.cells[(2, ws.col("保存"))] = "そのうち消す"
+    ws.cells[(2, ws.col("結論"))] = "DEC-600, 論文"
+    ws.cells[(4, ws.col("目的"))] = "fugaku の行"
+    ws.cells[(4, ws.col("Server"))] = "fugaku"
+    lines = []
+    plan = sheet.plan_pull(ws.get_all_values(), cli._records(project, "astana", du=False), "astana")
+    assert plan.changes == []
+    assert [c for c, _ in plan.skipped] == ["d003"]
+    assert len(plan.warnings) == 2
+    forced = sheet.plan_pull(
+        ws.get_all_values(), cli._records(project, "astana", du=False), "astana", force=True
+    )
+    assert [(c.record.caseid, c.column) for c in forced.changes] == [("d003", "目的")]
+
+
+def test_pull_without_terminal_refuses(project, monkeypatch):
+    ws = _pushed_sheet(project)
+    monkeypatch.setattr(sys.stdin, "isatty", lambda: False)
+    with pytest.raises(SystemExit, match="端末"):
+        cli.pull(project, worksheet=ws, server="astana", out=lambda *a: None)
+
+
+def test_note_update_keeps_other_bytes(tmp_path):
+    from pyR2D2.ledger import note
+
+    run = tmp_path / "d001"
+    p = note.note_path(run)
+    p.parent.mkdir(parents=True)
+    p.write_text('[note]  # メモ\npurpose = "x" # 理由\ncited_in = ["DEC-1"]')
+    note.update(run, {"purpose": "y", "project": "p"})
+    assert p.read_text() == '[note]  # メモ\npurpose = "y"\ncited_in = ["DEC-1"]\nproject = "p"\n'

@@ -325,3 +325,83 @@ def apply_plan(worksheet, plan, chunk=500):
     data = [{"range": a1(r, c), "values": [[text]]} for r, c, text in plan.cells]
     for i in range(0, len(data), chunk):
         worksheet.batch_update(data[i : i + chunk])
+
+
+# ---------------------------------------------------------------------------
+# シートから手元へ (pull)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Change:
+    """シートで書き換えられた 1 セル。``fields`` はメモ (run_note.toml) に書く項目。"""
+
+    record: object  # collect.RunRecord
+    column: str
+    local: str  # 手元の値 (シートに送る形)
+    remote: str  # シートの値
+    fields: dict
+
+
+@dataclass
+class PullPlan:
+    changes: list = field(default_factory=list)
+    skipped: list = field(default_factory=list)  # (caseid, 理由)
+    warnings: list = field(default_factory=list)
+
+
+def plan_pull(values, records, server, force=False):
+    """シートの目的・プロジェクト・保存・結論 (:data:`note.PULL_COLUMNS`) のうち、手元のメモと違うものを集める。
+
+    * 行の決め方と送り手の確かめ方は :func:`plan_updates` と同じ (Server の違う行は ``force`` が無ければ飛ばす)。
+    * シートのセルが空なら戻さない (メモの項目を消すのは手元で行う)。
+    * 読めない値 (保存の表示が既知でない、結論が DEC-NNN でない) は警告して戻さない。
+    """
+    from . import note
+
+    plan = PullPlan()
+    header_row = list(values[0]) if values else []
+    positions = {}
+    for col, text in enumerate(header_row, start=1):
+        name = managed_name(text)
+        if name is not None and name not in positions:
+            positions[name] = col
+    if "Case ID" not in positions:
+        plan.warnings.append("シートに Case ID の列が無い")
+        return plan
+
+    for rec in records:
+        row = case_row(rec.caseid)
+        if row is None or row < 2 or row > len(values):
+            plan.skipped.append((rec.caseid, "シートに行が無い"))
+            continue
+        cur_case = _cell(values, row, positions["Case ID"]).strip()
+        if case_row(cur_case) != row:
+            plan.skipped.append((rec.caseid, f"{row} 行目の Case ID が {cur_case or '空'}"))
+            continue
+        cur_server = _cell(values, row, positions["Server"]).strip() if "Server" in positions else ""
+        sender = server or rec.values.get("Server")
+        if cur_server and cur_server != sender and not force:
+            plan.skipped.append(
+                (rec.caseid, f"Server が {cur_server} (手元は {sender}。--force で戻す)")
+            )
+            continue
+        for column in note.PULL_COLUMNS:
+            if column not in positions:
+                continue
+            remote = _cell(values, row, positions[column]).strip()
+            local = rec.values.get(column)
+            local = "" if local is None else str(local).strip()
+            if remote == local or not remote:
+                continue
+            try:
+                fields = note.parse_cell(column, remote)
+            except ValueError as e:
+                plan.warnings.append(f"{rec.caseid} の {column}: {e}")
+                continue
+            # 書き方だけ違う (結論の区切りが「、」など) ものは、読んだ値がメモと同じなら戻さない
+            current = note.read(rec.run_dir) or {}
+            if all(current.get(k) == v for k, v in fields.items()):
+                continue
+            plan.changes.append(Change(rec, column, local, remote, fields))
+    return plan

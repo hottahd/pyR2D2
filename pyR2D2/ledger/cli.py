@@ -6,6 +6,7 @@
     $ r2d2plus-ledger export  ~/work/proj/run -o ledger.csv
     $ r2d2plus-ledger push    ~/work/proj/run --dry-run  # 書き込むセルを表示するだけ
     $ r2d2plus-ledger push    ~/work/proj/run            # シートの管理列だけを更新
+    $ r2d2plus-ledger pull    ~/work/proj/run            # シートで書き換えた目的などを 1 つずつ確かめて手元へ
 
 シートはプロジェクトごとに 1 枚 (既定の名前はプロジェクトのディレクトリ名)。
 認証は従来の :py:func:`pyR2D2.write.google.init_gspread` と同じサービスアカウント
@@ -18,7 +19,7 @@ import glob
 import os
 import sys
 
-from . import collect, sheet
+from . import collect, note, sheet
 from .units import Quantity, render, choose_unit
 
 
@@ -170,6 +171,94 @@ def push_records(records, worksheet, server, label, dry_run=False, force=False, 
     return plan
 
 
+def pull(
+    path,
+    worksheet=None,
+    sheet_name=None,
+    sheet_id=None,
+    json_key=None,
+    server=None,
+    dry_run=False,
+    force=False,
+    only=None,
+    ask=None,
+    out=print,
+):
+    """シートで書き換えた目的・プロジェクト・保存・結論を、1 つずつ確かめて手元のメモ (run_note.toml) へ戻す。
+
+    ほかの列 (状態・時刻・格子など) は機械がランから読む値なので戻さない。シートのセルが空なら戻さない。
+
+    Parameters
+    ----------
+    ask : callable, optional
+        質問の文字列を受けて答えを返す (既定は ``input``)。``y`` で反映、``n`` で飛ばす、``q`` で終わる。
+
+    Returns
+    -------
+    applied : list of sheet.Change
+    """
+    records = _records(path, server, du=False, only=only)
+    label = sheet_id or sheet_name or collect.project_name(path)
+    if ask is None:
+        if not dry_run and not sys.stdin.isatty():
+            raise SystemExit("pull は 1 つずつ y/n で聞くので端末から実行する (--dry-run なら表示だけ)")
+        ask = input
+    if worksheet is None:
+        worksheet = open_worksheet(
+            sheet_name=None if sheet_id else label, sheet_id=sheet_id, json_key=json_key
+        )
+    plan = sheet.plan_pull(worksheet.get_all_values(), records, server, force=force)
+    for caseid, reason in plan.skipped:
+        out(f"警告: {caseid} を飛ばした: {reason}")
+    for w in plan.warnings:
+        out(f"警告: {w}")
+    if not plan.changes:
+        out(f"シート {label} に、手元と違う目的・プロジェクト・保存・結論は無い")
+        return []
+
+    applied = []
+    for i, c in enumerate(plan.changes, start=1):
+        out(f"[{i}/{len(plan.changes)}] {c.record.caseid} の {c.column}")
+        out(f"  手元  : {c.local or '(空)'}")
+        out(f"  シート: {c.remote}")
+        if c.column == "保存" and "expires" not in c.fields:
+            old = (note.read(c.record.run_dir) or {}).get("expires")
+            if old:
+                out(f"  (手元の「{old} まで残す」はシートに無いが、消さずに残る。消すなら手元で消す)")
+        if dry_run:
+            continue
+        while True:
+            ans = ask("  手元のメモに反映しますか [y/n/q]: ").strip().lower()
+            if ans in ("y", "n", "q"):
+                break
+        if ans == "q":
+            break
+        if ans == "y":
+            p = note.update(c.record.run_dir, c.fields)
+            applied.append(c)
+            out(f"  反映した: {p}")
+    if dry_run:
+        out(f"(dry-run) {len(plan.changes)} か所が手元と違う。手元は書き換えていない")
+    else:
+        out(f"{len(applied)} / {len(plan.changes)} か所を手元のメモに反映した")
+    return applied
+
+
+def cmd_pull(args, out=print):
+    only = [s.strip() for s in args.only.split(",")] if args.only else None
+    return pull(
+        args.path,
+        sheet_name=args.sheet,
+        sheet_id=args.sheet_id,
+        json_key=args.json_key,
+        server=args.server,
+        dry_run=args.dry_run,
+        force=args.force,
+        only=only,
+        out=out,
+    )
+
+
 def cmd_push(args, out=print):
     only = [s.strip() for s in args.only.split(",")] if args.only else None
     return push(
@@ -218,6 +307,19 @@ def build_parser():
     p.add_argument("--only", default=None, help="送るラン (例: d001,d005)")
     p.add_argument("--no-du", action="store_true", help="容量 (data/ の使用量) を測らない")
     p.set_defaults(func=cmd_push)
+
+    p = sub.add_parser(
+        "pull", help="シートで書き換えた目的・プロジェクト・保存・結論を、1 つずつ y/n で確かめて手元のメモへ戻す"
+    )
+    common(p)
+    g = p.add_mutually_exclusive_group()
+    g.add_argument("--sheet", default=None, help="シート名 (既定: プロジェクト名)")
+    g.add_argument("--sheet-id", default=None, help="シートの ID (URL の /d/ の後)")
+    p.add_argument("--json-key", default=None, help="サービスアカウントの JSON 鍵")
+    p.add_argument("--dry-run", action="store_true", help="違うところを表示するだけ")
+    p.add_argument("--force", action="store_true", help="Server の違う行も戻す")
+    p.add_argument("--only", default=None, help="戻すラン (例: d001,d005)")
+    p.set_defaults(func=cmd_pull)
     return ap
 
 

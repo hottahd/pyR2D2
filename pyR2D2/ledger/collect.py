@@ -32,16 +32,19 @@ from pathlib import Path
 import numpy as np
 
 from ..constant import constant
+from . import note as _note
 from .units import Quantity
 
 # 管理列 (この順でシートに無い列を足す)。見出しは単位を除いた名前で探す。
 # (名前, 別名, 量の列か)
 COLUMNS = [
     ("Case ID", (), False),
-    # 所属プロジェクト (run_note の project) と目的は Case ID のすぐ後 (2026-10-28、利用者の指示)。
+    # 所属プロジェクト (run_note の project)・目的・保存・容量は Case ID のすぐ後 (2026-10-28、利用者の指示)。
     # 既にあるシートは見出しの名前で探すので、列を動かしても送れる。
     ("プロジェクト", (), False),
     ("目的", (), False),
+    ("保存", (), False),
+    ("容量", (), True),
     ("Mstar", (), False),
     ("(ix,jx,kx)", (), False),
     ("xmin", (), True),
@@ -67,14 +70,12 @@ COLUMNS = [
     ("t_end", (), True),
     ("step", (), False),
     ("形式", (), False),
-    ("容量", (), True),
     ("加工", (), False),
     ("commit", (), False),
     ("backend", (), False),
     ("ranks", (), False),
     ("ms/step", (), False),
-    # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。目的は上
-    ("保存", (), False),
+    # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。目的・保存は上
     ("結論", (), False),
     # 2026-10-25 に足した列 (R2D2plus-project docs/run_data.md)。run/dNNN をリンクにして別のディスクに置いたときのデータの実体
     ("実体", (), False),
@@ -96,12 +97,8 @@ HASH_EXCLUDE = {"容量"}
 # 値があるときだけハッシュに入れる列 (2026-10-02 に足したメモの列。メモの無い既存のランを「未送信」にしないため)
 HASH_IF_SET = {"目的", "保存", "結論", "プロジェクト", "実体"}
 
-RETENTION_LABELS = {
-    "keep": "全部残す",
-    "thin": "間引いて残す",
-    "regen_only": "再生成の情報だけ",
-    "auto": "自動 (DEC-599)",
-}
+# 保存の表示は pull で読み戻すので note と共通
+RETENTION_LABELS = _note.RETENTION_LABELS
 
 STATUS_LABELS = {
     "running": "走行中",

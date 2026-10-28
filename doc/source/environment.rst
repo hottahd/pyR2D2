@@ -230,7 +230,7 @@ https://docs.google.com/spreadsheets/create
 
 ``pyR2D2.Data`` を読み込まずに、プロジェクトの全ラン (``<project>/run/dNNN``) の設定と
 状態をシートへ送るコマンド ``r2d2plus-ledger`` がある (pyR2D2 を入れると入る)。
-``push`` にだけ ``gspread`` と ``google-auth`` が要る (``pip install "pyR2D2[ledger]"``)。
+``push``・``pull`` にだけ ``gspread`` と ``google-auth`` が要る (``pip install "pyR2D2[ledger]"``)。
 計算ノードでは動かさず、ログインノードか手元で使う。
 
 .. code:: shell
@@ -240,14 +240,16 @@ https://docs.google.com/spreadsheets/create
     r2d2plus-ledger push   ~/work/proj/run --dry-run  # 書くセルを表示するだけ (Google に接続しない)
     r2d2plus-ledger push   ~/work/proj/run            # シート名 = プロジェクト名 (proj)
     r2d2plus-ledger push   ~/work/proj/run --sheet-id <ID> --only d001,d005
+    r2d2plus-ledger pull   ~/work/proj/run --dry-run  # シートと手元のメモの違いを表示するだけ
+    r2d2plus-ledger pull   ~/work/proj/run            # 違いを 1 つずつ y/n で確かめて手元のメモへ戻す
 
 - 読むのは ``data/param`` の ``params.dac``・``back.dac``・``run_summary.toml``・``origin.toml``・
   ``runs/<最新>/effective_config.txt``・``run.log`` の末尾と ``restart/*/meta.toml`` の ``[modifiers]``、
   および ``data/`` の使用量 (``--no-du`` で省略) だけ。Fortran 版のラン (``run_summary.toml`` が無い)
   も ``params.dac`` と ``cont_log.txt`` から従来どおりの列を埋める。
-- **コードが管理する列**は ``Case ID, Mstar, (ix,jx,kx), xmin … zmax, uni, dx, m ray, dtout, dtout_tau,
-  al, RSST, Om, Geometry, origin, update time, Server, 状態, 到達時刻, t_end, step, 形式, 容量, 加工,
-  commit, backend, ranks, ms/step``。列は見出しの**単位を除いた名前**で探す (``dtout [s]`` も
+- **コードが管理する列**は ``Case ID, プロジェクト, 目的, 保存, 容量, Mstar, (ix,jx,kx), xmin … zmax, uni, dx, m ray, dtout, dtout_tau,
+  al, RSST, Om, Geometry, origin, update time, Server, 状態, 到達時刻, t_end, step, 形式, 加工,
+  commit, backend, ranks, ms/step, 結論, 実体``。列は見出しの**単位を除いた名前**で探す (``dtout [s]`` も
   ``dtout [min]`` も ``dtout``。``Gemetry`` は ``Geometry`` の別名)。シートに無い管理列は見出しの右端に
   足す。**それ以外の列 (Note・Finish など) は人の列で、読みも書きもしない**。書くのは管理列のセル
   だけ (セル単位の ``batch_update``) で、行ごと書き戻さない。
@@ -266,6 +268,15 @@ https://docs.google.com/spreadsheets/create
 - 送ると各ランの ``data/param/ledger_sent.toml`` に管理列のハッシュを残す。``status`` はこれと
   比べて未送信の変更を示し、``pyR2D2.Data`` でそのランを開いたときにも
   「台帳へ未送信の変更があります: r2d2plus-ledger push …」と 1 行出る (R2D2plus のランだけ)。
+- ``pull`` はシートで書き換えた **目的・プロジェクト・保存・結論** だけを、手元のランのメモ
+  ``data/param/run_note.toml`` (R2D2plus DEC-600) へ戻す。ほかの列は機械がランから読む値なので戻さない。
+  違いを 1 つずつ「手元・シート」の並びで見せ、``y`` で反映、``n`` で飛ばす (次の ``pull`` でまた聞く)、
+  ``q`` で終わる。書き換えるのはメモの該当する行だけで、コメントや並びは保つ。シートのセルが空なら戻さない
+  (項目を消すのは手元で行う)。保存は ``全部残す``・``間引いて残す``・``再生成の情報だけ``・``自動 (DEC-599)``
+  (または ``keep`` などの名前) に「(YYYY-MM-DD まで残す)」を付けられ、結論は ``DEC-NNN`` を並べる。読めない値は
+  警告して戻さない。行と Server の確かめ方は ``push`` と同じで、ランの本体がある機械で実行する。
+- 管理列の並びは ``Case ID, プロジェクト, 目的, 保存, 容量`` から始まる (2026-10-28)。既にあるシートの列は
+  手で動かしてよい (見出しの名前で探す)。
 - 従来の ``pyR2D2.write.google.set_cells_gspread`` も同じ処理で書くようになった
   (以前は A〜T 列を位置で上書きし、``Server`` が落ちていた)。
 
