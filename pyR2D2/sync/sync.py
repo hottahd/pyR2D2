@@ -5,6 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
+from . import zarr_region
+
 try:  # Python 3.11+
     import tomllib
 except ImportError:  # pragma: no cover
@@ -70,8 +72,11 @@ class Sync:
         return pattern.format(**fields)
 
     @staticmethod
-    def _remote_data(project, caseid):
-        return Path("work") / project / "run" / caseid / "data"
+    def _remote_data(project, caseid, remote_root=None):
+        """リモートの ``data/``。``remote_root`` はランの並ぶ場所 (既定 ``work/<project>/run``)。"""
+        if remote_root is None:
+            remote_root = Path("work") / project / "run"
+        return Path(remote_root) / caseid / "data"
 
     @staticmethod
     def _remote_exists(server, path, ssh="ssh"):
@@ -96,7 +101,7 @@ class Sync:
 
     @staticmethod
     def setup(
-        server, caseid, ssh="ssh", project=None, dist="../run/"
+        server, caseid, ssh="ssh", project=None, dist="../run/", remote_root=None
     ):
         """
         Downloads setting data from remote server
@@ -113,10 +118,14 @@ class Sync:
             Name of project such as 'R2D2'
         dist :str
             Destination of data directory
+        remote_root : str
+            Remote directory that holds the runs (default ``work/<project>/run``),
+            e.g. ``/vol0600/data/hp200137/u10094/R2D2plus/run`` on Fugaku
         """
 
         if project is None:
             project = os.getcwd().split("/")[-2]
+        remote_run = Sync._remote_data(project, caseid, remote_root).parent
 
         args = [
             "--exclude=a.out",
@@ -138,7 +147,7 @@ class Sync:
             "--exclude=output.*",
             "-e",
             ssh,
-            server + ":work/" + project + "/run/" + caseid + "/",
+            server + ":" + str(remote_run) + "/",
             dist + caseid + "/",
         ]
 
@@ -533,6 +542,174 @@ class Sync:
             str(self.datadir / "slice") + "/",
         ]
         Sync.rsync_subprocess_wrapper(args)
+
+    # ---- zarr (.zarr.zip を含む) の一部をリモートで取り出して持ってくる ----
+
+    @staticmethod
+    def _steps(n):
+        return [int(n)] if np.ndim(n) == 0 else [int(m) for m in n]
+
+    def _index_range(self, axis, a0, a1, c0, c1):
+        """添字の範囲 [a0, a1) か、座標の範囲 [c0, c1] (両端を含む、最も近い格子点) を [始め, 終わり) にする。"""
+        if (a0 is not None or a1 is not None) and (c0 is not None or c1 is not None):
+            raise ValueError(f"give either the index or the coordinate range for {axis}, not both")
+        if c0 is not None or c1 is not None:
+            coord = np.asarray(getattr(self.data, axis))
+            a0 = None if c0 is None else int(np.argmin(np.abs(coord - c0)))
+            a1 = None if c1 is None else int(np.argmin(np.abs(coord - c1))) + 1
+        if a0 is None and a1 is None:
+            return None
+        return [0 if a0 is None else int(a0), 2**62 if a1 is None else int(a1)]
+
+    def _fetch_zarr(
+        self, server, rels, keys, region, ssh, project, remote_root, remote_python, block
+    ):
+        if project is None:
+            project = os.getcwd().split("/")[-2]
+        if isinstance(keys, str):
+            keys = [keys]
+        keys = None if keys is None else list(keys)
+        if region is not None and all(r is None for r in region):
+            region = None
+        remote_data = self._remote_data(project, self._caseid(), remote_root)
+
+        files = []
+        for rel in rels:
+            local = self.datadir / rel
+            status = zarr_region.local_status(local, keys, region)
+            if status == "full":
+                print(f"skip: the whole {local} is already here")
+            elif status == "done":
+                print(f"skip: the requested part of {local} is already here")
+            else:
+                files.append(
+                    {"remote": remote_data / rel, "local": local, "keys": keys, "region": region}
+                )
+        return zarr_region.fetch(
+            server, files, ssh=ssh, remote_python=remote_python, block=block
+        )
+
+    def remap_zarr(
+        self,
+        server,
+        n,
+        keys=None,
+        i0=None, i1=None, j0=None, j1=None, k0=None, k1=None,
+        x0=None, x1=None, y0=None, y1=None, z0=None, z1=None,
+        ssh="ssh",
+        project=None,
+        remote_root=None,
+        remote_python="python3",
+        block=1,
+    ):
+        """
+        Downloads part of the 3D remap data in zarr (``.zarr`` or ``.zarr.zip``) format
+
+        Only the requested range is read on the remote server (by Python started
+        through ssh) and streamed back; nothing is written on the remote side.
+        The local ``data/remap/qq/zarr/qq.NNNNNNNN.zarr`` has the same shape as the
+        original, with NaN where nothing was downloaded, so that
+        ``d.qx.read(xs, n, zarr_flag=True)`` and ``d.qr.read(n, keys, x0=..., ...)``
+        work as for the full data. Further calls add to the same local zarr, and a
+        range already downloaded is skipped.
+
+        Parameters
+        ----------
+        server : str
+            Name of remote server
+        n : int or list of int
+            Step(s) to be downloaded. All the steps go through one ssh connection
+        keys : str or list of str
+            Variables such as ``["ro", "vx"]``. None for all. x, y, z always come
+        i0, i1, j0, j1, k0, k1 : int
+            Index range ``[i0, i1)`` etc. None for the edge of the domain
+        x0, x1, y0, y1, z0, z1 : float
+            Coordinate range instead of the index range, as in ``d.qr.read``
+            (the nearest grid points, both ends included). ``x0 = x1 = xs`` gives one layer
+        ssh : str
+            Type of ssh command
+        project : str
+            Name of project such as 'R2D2'
+        remote_root : str
+            Remote directory that holds the runs (default ``work/<project>/run``),
+            e.g. ``/vol0600/data/hp200137/u10094/R2D2plus/run`` on Fugaku
+        remote_python : str
+            Python on the remote server with numpy and zarr 3, e.g. ``~/.venv/bin/python``
+        block : int
+            Number of chunks along x read at once on the remote server (memory there)
+
+        Returns
+        -------
+        list of Path
+            Local zarr directories written
+        """
+        region = [
+            self._index_range("x", i0, i1, x0, x1),
+            self._index_range("y", j0, j1, y0, y1),
+            self._index_range("z", k0, k1, z0, z1),
+        ]
+        rels = [f"remap/qq/zarr/qq.{m:08d}.zarr" for m in self._steps(n)]
+        return self._fetch_zarr(
+            server, rels, keys, region, ssh, project, remote_root, remote_python, block
+        )
+
+    def tau_zarr(
+        self,
+        server,
+        n,
+        keys=None,
+        j0=None, j1=None, k0=None, k1=None,
+        ssh="ssh",
+        project=None,
+        remote_root=None,
+        remote_python="python3",
+        block=1,
+    ):
+        """
+        Downloads part of the data at constant optical depth in zarr format
+        (``data/tau/zarr/qq.NNNNNNNN.zarr``). See :py:meth:`remap_zarr` for the parameters
+        """
+        region = [
+            self._index_range("y", j0, j1, None, None),
+            self._index_range("z", k0, k1, None, None),
+        ]
+        rels = [f"tau/zarr/qq.{m:08d}.zarr" for m in self._steps(n)]
+        return self._fetch_zarr(
+            server, rels, keys, region, ssh, project, remote_root, remote_python, block
+        )
+
+    def slice_zarr(
+        self,
+        server,
+        n,
+        direc,
+        keys=None,
+        n_slice=None,
+        i0=None, i1=None, j0=None, j1=None, k0=None, k1=None,
+        ssh="ssh",
+        project=None,
+        remote_root=None,
+        remote_python="python3",
+        block=1,
+    ):
+        """
+        Downloads part of the slice data in zarr format
+        (``data/slice/zarr/<direc>/qq.NNNNNNNN.zarr``)
+
+        ``keys`` such as ``"ro"`` also select ``ro_yin`` and ``ro_yan`` (YinYang).
+        ``n_slice`` selects one slice; the index along ``direc`` is the slice number.
+        See :py:meth:`remap_zarr` for the other parameters
+        """
+        if direc not in ("x", "y", "z"):
+            raise ValueError("direc must be 'x', 'y' or 'z'")
+        ranges = {"x": [i0, i1], "y": [j0, j1], "z": [k0, k1]}
+        if n_slice is not None:
+            ranges[direc] = [n_slice, n_slice + 1]
+        region = [self._index_range(a, *ranges[a], None, None) for a in "xyz"]
+        rels = [f"slice/zarr/{direc}/qq.{m:08d}.zarr" for m in self._steps(n)]
+        return self._fetch_zarr(
+            server, rels, keys, region, ssh, project, remote_root, remote_python, block
+        )
 
     def all(
         self, server, ssh="ssh", project=None, dist="../run/"

@@ -140,6 +140,27 @@ zip化の際は圧縮を行わない(``ZIP_STORED``)。zarr側ですでにBlosc/
 
     したがって、``zip()`` は無条件に実行するのではなく、**Gfarm(HPCI共用ストレージなど)のようにファイル数制限が厳しいシステムに保存する場合に限定して実行する**\ のが良い。ローカルディスクや通常のPOSIXファイルシステムに置く場合は、zarrストアをディレクトリのまま(zip化せず)残しておく方が、将来的な並列アクセスの余地を残せる。
 
+リモートの zarr から一部だけを持ってくる
+------------------------------------------------
+
+zip にすると rsync でランク・ステップごとに選んで持ってくることはできなくなる。代わりに :py:meth:`pyR2D2.Sync.remap_zarr` (と ``tau_zarr``, ``slice_zarr``) を使うと、リモートの ``.zarr.zip`` (または ``.zarr`` ディレクトリ)から、ステップ・変数・3 方向の範囲を選んで持ってこられる。
+
+.. code:: python
+
+    d = pyR2D2.Data('../run/d00012/data')   # 先に pyR2D2.Sync.setup(..., remote_root=...) で param を持ってくる
+    d.sync.remap_zarr(
+        'fg', range(81, 201, 10), keys=['ro', 'vx'], i0=100, i1=101,   # x0=x1=xs と座標でもよい
+        remote_root='/vol0600/data/hp200137/u10094/R2D2plus/run',
+        remote_python='~/.venv/bin/python',
+    )
+    d.qx.read(d.x[100], n=81, keys=['ro', 'vx'], zarr_flag=True)
+
+* リモートでは ssh で Python (numpy と zarr 3 があればよく、pyR2D2 は要らない)を動かし、要る範囲だけを読んで ssh の標準出力に流す。**リモートには一時ファイルを作らない。** 全ステップを 1 回の ssh で送る。
+* 手元には、元と同じ形・同じチャンクの ``qq.NNNNNNNN.zarr`` (ディレクトリ)ができる。持ってきていない所は NaN である。添字は元と同じなので、``d.qx``, ``d.qr``, ``d.qt``, ``d.qs`` は ``zarr_flag=True`` でそのまま読める(``d.qf.read`` は全体を NaN 込みで読むので大きい)。
+* 2 回目以降は同じ手元の zarr に足される。持ってきた範囲は属性 ``pyR2D2_partial`` に残り、すでにある範囲は持ってこない。手元に部分でない zarr (``.zarr.zip`` を含む)があれば何もしない。
+* リモートが読むのはチャンク単位なので、x に 1 層だけ欲しくてもリモートではその層を含むチャンク(既定で 12 層)を読んで展開する。送るのは要る範囲だけである。
+* HPCI 共用ストレージ(Gfarm)は、Gfarm がふつうのパスとして見える機械(hpciss05 の ``/gfarm/hp200137/hpci000196/hpci000196/...`` など)で読む。入るのは ``hpcissh`` で、``ssh`` 引数に渡す。踏み台を通すときは ``ssh='ssh boston hpcissh'``, ``server='hpci5'`` のように書く。このとき ``~`` は踏み台のシェルで展開されてしまうので、``remote_python`` と ``remote_root`` は絶対パス(``/home/hpci000196/.venv/bin/python``)で書く。
+
 time.zip: 時刻ファイルの圧縮
 ------------------------------------------------
 

@@ -133,6 +133,17 @@ def zip_zarr(
     return zip_path
 
 
+def _codec_f32(clevel: int = 5):
+    """pyR2D2 が単精度の配列に使う圧縮 (Blosc の zstd、bitshuffle)。"""
+    zarr = _require_zarr()
+    return zarr.codecs.BloscCodec(
+        cname="zstd",
+        clevel=clevel,
+        shuffle=zarr.codecs.BloscShuffle.bitshuffle,
+        typesize=4,
+    )
+
+
 def _check_chunks(chunks, shape_len):
     if chunks is None:
         return
@@ -194,12 +205,7 @@ def save(
     zarr = _require_zarr()
     root = zarr.open_group(path, mode=mode)
 
-    codec_f32 = zarr.codecs.BloscCodec(
-        cname="zstd",
-        clevel=clevel,
-        shuffle=zarr.codecs.BloscShuffle.bitshuffle,
-        typesize=4,
-    )
+    codec_f32 = _codec_f32(clevel)
 
     if params is not None:
         root.attrs["params"] = params
