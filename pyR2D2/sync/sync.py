@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -88,6 +89,40 @@ class Sync:
         return ssh_result.returncode == 0
 
     @staticmethod
+    def _remote_glob(server, path, ssh="ssh"):
+        """リモートのシェルでワイルドカードを展開したパスの list (無ければ空)。"""
+        result = subprocess.run(
+            shlex.split(ssh) + [server, "ls -1d " + str(path)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        if result.returncode != 0:
+            return []
+        return [line for line in result.stdout.splitlines() if line]
+
+    @staticmethod
+    def _zip_rel(kind, n=None, direc="*"):
+        """r2d2plus-pack がまとめた zip の ``data/`` からの相対パス (``n`` が None なら全ステップ)。"""
+        step = "*" if n is None else f"{n:08d}"
+        if kind == "remap":
+            return f"remap/qq/zarr/qq.{step}.zarr.zip"
+        if kind == "tau":
+            return f"tau/zarr/qq.{step}.zarr.zip"
+        return f"slice/zarr/{direc}/qq.{step}.zarr.zip"
+
+    def _fetch_zip(self, server, remote_data, rel, ssh):
+        """リモートに zip (``rel``、ワイルドカード可) があれば持ってくる。あれば True。"""
+        if not self._remote_exists(server, remote_data / rel, ssh):
+            return False
+        local_dir = self.datadir / Path(rel).parent
+        local_dir.mkdir(parents=True, exist_ok=True)
+        Sync.rsync_subprocess_wrapper(
+            ["-e", ssh, server + ":" + str(remote_data / rel), str(local_dir) + "/"]
+        )
+        return True
+
+    @staticmethod
     def rsync_subprocess_wrapper(args):
         command = ["rsync", "-avP"] + args
         result = subprocess.run(
@@ -138,6 +173,9 @@ class Sync:
             "--exclude=data/remap/vl/vl*",
             "--exclude=data/slice/qq*",
             "--exclude=data/tau/qq*",
+            # r2d2plus-pack がまとめた slice と tau の zip (3D は data/remap/qq に入っている)
+            "--exclude=data/slice/zarr",
+            "--exclude=data/tau/zarr",
             "--exclude=data/aftr",
             "--exclude=data/prev",
             # R2D2plus: restart と光球スラブ (DEC-641) は大きいので個別に持ってくる
@@ -153,7 +191,7 @@ class Sync:
 
         result = Sync.rsync_subprocess_wrapper(args)
 
-    def tau(self, server, n: int = None, ssh="ssh", project=None):
+    def tau(self, server, n: int = None, ssh="ssh", project=None, remote_root=None):
         """
         Downloads data at constant optical depth
 
@@ -173,7 +211,7 @@ class Sync:
             project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
-        remote_data = self._remote_data(project, caseid)
+        remote_data = self._remote_data(project, caseid, remote_root)
 
         if n is None:
             # data/ 以下から tau/ と time/ だけを持ってくる
@@ -194,6 +232,10 @@ class Sync:
                 filename = self._format_pattern("tau", nd_tau=n)
             else:
                 filename = f"tau/qq.dac.{n:08d}"
+            # 元のファイルを消して zip にまとめたステップ (r2d2plus-pack)
+            if not self._remote_exists(server, remote_data / filename, ssh):
+                if self._fetch_zip(server, remote_data, self._zip_rel("tau", n), ssh):
+                    return
             (self.datadir / filename).parent.mkdir(parents=True, exist_ok=True)
             args = [
                 "-e",
@@ -228,7 +270,7 @@ class Sync:
             ssh,
         )
 
-    def remap_qq(self, server, n, ssh="ssh", project=None):
+    def remap_qq(self, server, n, ssh="ssh", project=None, remote_root=None):
         """
         Downloads full 3D remap data
 
@@ -248,7 +290,11 @@ class Sync:
             project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
-        remote_data = self._remote_data(project, caseid)
+        remote_data = self._remote_data(project, caseid, remote_root)
+
+        # r2d2plus-pack がまとめたステップは zip 1 個を持ってくる
+        if self._fetch_zip(server, remote_data, self._zip_rel("remap", n), ssh):
+            return
 
         # remapを行ったMPIランクの洗い出し
         if self._remap_nested(server, remote_data, ssh):
@@ -268,7 +314,14 @@ class Sync:
             print("File does not exist in " + server)
 
     def xselect(
-        self, xs, server, n: int = None, ssh="ssh", project=None
+        self,
+        xs,
+        server,
+        n: int = None,
+        ssh="ssh",
+        project=None,
+        remote_root=None,
+        remote_python="python3",
     ):
         """
         Downloads data at certain height
@@ -285,6 +338,11 @@ class Sync:
                 Type of ssh command
             project : str
                 Name of project such as 'R2D2'
+            remote_root : str
+                Remote directory that holds the runs (default ``work/<project>/run``)
+            remote_python : str
+                Python on the remote server, used for steps packed into
+                ``.zarr.zip`` by r2d2plus-pack (only the layer is taken out, see :py:meth:`remap_zarr`)
         """
 
         if project is None:
@@ -295,7 +353,18 @@ class Sync:
 
         nps = np.char.zfill(self.np_ijr[ir0 - 1, :].astype(str), 8)
         caseid = self._caseid()
-        remote_data = self._remote_data(project, caseid)
+        remote_data = self._remote_data(project, caseid, remote_root)
+
+        # r2d2plus-pack がまとめたステップは、zip から層だけを取り出す
+        zips = self._remote_glob(server, remote_data / self._zip_rel("remap", n), ssh)
+        packed = [int(Path(z).name.split(".")[1]) for z in zips]
+        if packed:
+            self.remap_zarr(
+                server, packed, i0=int(i0), i1=int(i0) + 1, ssh=ssh, project=project,
+                remote_root=remote_root, remote_python=remote_python,
+            )
+            if n is not None:
+                return
 
         nested = self._remap_nested(server, remote_data, ssh)
 
@@ -345,7 +414,7 @@ class Sync:
         Sync.rsync_subprocess_wrapper(args)
 
     def check(
-        self, server, n, ssh="ssh", project=None, end_step=False
+        self, server, n, ssh="ssh", project=None, end_step=False, remote_root=None
     ):
         """
         Downloads checkpoint data
@@ -373,7 +442,7 @@ class Sync:
             project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
-        remote_data = self._remote_data(project, caseid)
+        remote_data = self._remote_data(project, caseid, remote_root)
 
         if self._remote_exists(server, remote_data / "restart", ssh):
             self._check_restart(server, n, ssh, remote_data, end_step)
@@ -488,6 +557,7 @@ class Sync:
         n_slice=None,
         ssh="ssh",
         project=None,
+        remote_root=None,
     ):
         """
         Downloads slice data
@@ -512,7 +582,7 @@ class Sync:
             project = os.getcwd().split("/")[-2]
 
         caseid = self._caseid()
-        remote_data = self._remote_data(project, caseid)
+        remote_data = self._remote_data(project, caseid, remote_root)
         (self.datadir / "slice").mkdir(parents=True, exist_ok=True)
 
         # 断面の位置 (slice.dac) と個数 (params.dac)
@@ -535,13 +605,18 @@ class Sync:
             n_slice_str = "*" if n_slice is None else str(n_slice).zfill(8)
             filename = "slice/qq" + direc + ".dac." + step + "." + n_slice_str
 
-        args = [
-            "-e",
-            ssh,
-            server + ":" + str(remote_data / filename),
-            str(self.datadir / "slice") + "/",
-        ]
-        Sync.rsync_subprocess_wrapper(args)
+        if self._remote_exists(server, remote_data / filename, ssh):
+            args = [
+                "-e",
+                ssh,
+                server + ":" + str(remote_data / filename),
+                str(self.datadir / "slice") + "/",
+            ]
+            Sync.rsync_subprocess_wrapper(args)
+
+        # r2d2plus-pack がまとめたステップ (zip には全部の断面が入っている)
+        for d in ("xyz" if direc == "*" else direc):
+            self._fetch_zip(server, remote_data, self._zip_rel("slice", n, d), ssh)
 
     # ---- zarr (.zarr.zip を含む) の一部をリモートで取り出して持ってくる ----
 

@@ -65,6 +65,9 @@ def remote(tmp_path, monkeypatch):
 
     monkeypatch.setattr(Sync, "rsync_subprocess_wrapper", staticmethod(fake_rsync))
     monkeypatch.setattr(Sync, "_remote_exists", staticmethod(fake_exists))
+    monkeypatch.setattr(
+        Sync, "_remote_glob", staticmethod(lambda server, path, ssh="ssh": sorted(glob.glob(str(home / path))))
+    )
     return home / "work" / PROJECT / "run" / CASEID
 
 
@@ -246,3 +249,58 @@ def test_legacy_paths_unchanged(tmp_path, remote):
         "tau/qq.dac.00000004",
         "time/tau/t.dac.00000004",
     ]
+
+
+def pack_remote(run):
+    """r2d2plus-pack で元を消した形にする: remap の n=1、tau の 5、slice x の 5 を zip だけにする。"""
+    data = run / "data"
+    for f in (data / "remap" / "qq").glob("*/*/qq.z.00000001.*"):
+        f.unlink()
+    touch(data / "remap" / "qq" / "zarr" / "qq.00000001.zarr.zip")
+    (data / "tau" / "qq.c.00000005").unlink()
+    touch(data / "tau" / "zarr" / "qq.00000005.zarr.zip")
+    for f in (data / "slice").glob("qqx.c.00000005.*"):
+        f.unlink()
+    touch(data / "slice" / "zarr" / "x" / "qq.00000005.zarr.zip")
+
+
+def test_packed_steps_come_as_zip(tmp_path, remote, monkeypatch):
+    make_compressed_remote(remote)
+    pack_remote(remote)
+    sync, datadir = make_sync(tmp_path, compressed=True)
+
+    sync.remap_qq(SERVER, 1, project=PROJECT)
+    assert local_files(datadir) == ["remap/qq/zarr/qq.00000001.zarr.zip"]
+    sync.remap_qq(SERVER, 2, project=PROJECT)
+    assert "remap/qq/00000/00000001/qq.z.00000002.00000001" in local_files(datadir)
+
+    sync.tau(SERVER, 5, project=PROJECT)
+    sync.tau(SERVER, 6, project=PROJECT)
+    assert [f for f in local_files(datadir) if f.startswith("tau/")] == [
+        "tau/qq.c.00000006",
+        "tau/zarr/qq.00000005.zarr.zip",
+    ]
+
+    sync.slice(SERVER, n=5, project=PROJECT)
+    got = [f for f in local_files(datadir) if f.startswith("slice/q") or f.startswith("slice/zarr")]
+    assert "slice/zarr/x/qq.00000005.zarr.zip" in got
+    assert "slice/qqy.c.00000005.00000001" in got
+    assert not any(f.startswith("slice/qqx") for f in got)
+
+    # xselect は zip から層だけを取り出す (remap_zarr)
+    calls = []
+    monkeypatch.setattr(Sync, "remap_zarr", lambda self, server, n, **kw: calls.append((n, kw["i0"], kw["i1"])))
+    sync.xselect(0.0, SERVER, n=1, project=PROJECT)
+    assert calls == [([1], 0, 1)]
+    sync.xselect(0.0, SERVER, project=PROJECT)
+    assert calls[-1] == ([1], 0, 1)
+    assert "remap/qq/00000/00000000/qq.z.00000002.00000000" in local_files(datadir)
+
+
+def test_setup_skips_packed_zips(tmp_path, remote):
+    make_compressed_remote(remote)
+    pack_remote(remote)
+    dist = tmp_path / "local" / PROJECT / "run"
+    dist.mkdir(parents=True)
+    Sync.setup(SERVER, CASEID, project=PROJECT, dist=str(dist) + "/")
+    assert not any("zarr" in f for f in local_files(dist / CASEID))

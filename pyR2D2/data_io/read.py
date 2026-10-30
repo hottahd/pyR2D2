@@ -58,6 +58,59 @@ class _BaseRemapReader(_BaseReader):
         for key in self.remap_keys + self.remap_keys_add:
             self.__dict__[key] = None
 
+    def _raw_missing(self, n, nps):
+        """ランク ``nps`` の 3D の元ファイルのどれかが無いか (zip にまとめて消したステップなど)。"""
+        return any(not self._get_filepath_remap_qq(n, np0).exists() for np0 in nps)
+
+    def _load_remap_zarr(self, n, keys, i0=None, i1=None, j0=None, j1=None, k0=None, k1=None, with_attrs=False):
+        """
+        3D の zarr (.zarr.zip を含む) から ``keys`` の範囲を読む。
+
+        新出力形式のランを zarr にしたもの (r2d2plus-pack) には ``pr``, ``te``, ``op`` が
+        入っていないので、元のファイルを読むときと同じく ``ro``, ``se`` から計算する。
+        """
+        zarr_filepath = self._get_filepath_remap_zarr(n)
+        if not _zarr_zarrzip_exists(zarr_filepath):
+            raise FileNotFoundError(
+                f"no output at n={n} (neither the binary files nor {zarr_filepath} exist)"
+            )
+        have = pyR2D2.zarr_util.list_vars(zarr_filepath)
+        if isinstance(keys, str) and keys == "all":
+            want = [k for k in self.remap_keys + self.remap_keys_add if k in have]
+            if self._is_compressed():
+                want += [k for k in _compressed.CompressedEOS.quantities if k not in have]
+        else:
+            want = [keys] if isinstance(keys, str) else list(keys)
+        derived = []
+        if self._is_compressed() and "ro" in have and "se" in have:
+            derived = [k for k in want if k not in have and k in _compressed.CompressedEOS.quantities]
+        stored = [k for k in want if k not in derived]
+        names = list(dict.fromkeys(stored + (["ro", "se"] if derived else [])))
+        names += [c for c in ["x", "y", "z"] if c in have]
+        out = pyR2D2.zarr_util.load(
+            zarr_filepath, names=names, with_attrs=with_attrs,
+            i0=i0, i1=i1, j0=j0, j1=j1, k0=k0, k1=k1,
+        )
+        qq, params = out if with_attrs else (out, None)
+        if derived:
+            eos = _compressed.compressed_eos(self.data.p)
+            ro, se = qq["ro"], qq["se"]
+            start = 0 if i0 is None else i0
+            iz = np.broadcast_to(np.arange(start, start + ro.shape[0]).reshape(-1, 1, 1), ro.shape)
+            for key in derived:
+                qq[key] = eos.remap(key, ro, se, iz)
+            for key in ["ro", "se"]:
+                if key not in want:
+                    del qq[key]
+        return (qq, params) if with_attrs else qq
+
+    def _read_zarr_region(self, n, i0, i1, j0, j1, k0, k1):
+        """3D の zarr から範囲を読み、属性にする (元ファイルが無いとき)。"""
+        qq = self._load_remap_zarr(n, "all", i0=i0, i1=i1, j0=j0, j1=j1, k0=k0, k1=k1)
+        for key, value in qq.items():
+            if key not in ["x", "y", "z"]:
+                self.__dict__[key] = value
+
         self._add_docstring()
 
     def _allocate_remap_qq(self, ijk: tuple, keys: list = None):
@@ -328,19 +381,7 @@ class XSelect(_BaseRemapReader):
             zarr_flag = True
 
         if zarr_flag:
-            if keys == "all":
-                names = keys
-            else:
-                if isinstance(keys, str):
-                    names = [keys, "x", "y", "z"]
-                else:
-                    names = list(keys) + ["x", "y", "z"]
-
-            # If zarr_flag is True, try to read from zarr file
-            zarr_path = self._get_filepath_remap_zarr(n)
-            if not _zarr_zarrzip_exists(zarr_path):
-                raise FileNotFoundError(f"Zarr file does not exist: {zarr_path}")
-            qq = pyR2D2.zarr_util.load(zarr_path, names=names, i0=i0, i1=i0 + 1)
+            qq = self._load_remap_zarr(n, keys, i0=i0, i1=i0 + 1)
             for key in qq.keys():
                 if key in ["x", "y", "z"]:
                     self.__dict__[key] = qq[key]
@@ -456,6 +497,15 @@ class ZSelect(_BaseRemapReader):
         """
         k0 = np.argmin(np.abs(self.z - zs))
 
+        if self._raw_missing(n, self.np_ijr.flatten()):
+            self._read_zarr_region(n, 0, self.ix, 0, self.jx, k0, k0 + 1)
+            for key in self.remap_keys + self.remap_keys_add:
+                if self.__dict__.get(key) is not None and self.__dict__[key].ndim == 3:
+                    self.__dict__[key] = self.__dict__[key][:, :, 0]
+            self.info = {}
+            self.info["zs"] = self.z[k0]
+            return
+
         if self._is_compressed():
             keys = self._compressed_keys(self.remap_keys + self.remap_keys_add, True)
             self._allocate_remap_qq(ijk=[self.ix, self.jx], keys=keys)
@@ -545,6 +595,12 @@ class MPIRegion(_BaseRemapReader):
         nps = np.where(self.ir - 1 == ixrt)[0]
         # correnponding i range
         self.i_ixrt = np.where(self.i2ir - 1 == ixrt)[0]
+
+        if self._raw_missing(n, [np0 for np0 in nps if self.iixl[np0] != 0]):
+            self._read_zarr_region(
+                n, self.i_ixrt[0], self.i_ixrt[-1] + 1, 0, self.jx, 0, self.kx
+            )
+            return
 
         if self._is_compressed():
             keys = self._compressed_keys(self.remap_keys + self.remap_keys_add, True)
@@ -664,21 +720,7 @@ class FullData(_BaseRemapReader):
             zarr_flag = True
 
         if zarr_flag:
-            if keys == "all":
-                names = keys
-            else:
-                if isinstance(keys, str):
-                    names = [keys, "x", "y", "z"]
-                else:
-                    names = list(keys) + ["x", "y", "z"]
-
-            zarr_filepath = self._get_filepath_remap_zarr(n)
-            if not _zarr_zarrzip_exists(zarr_filepath):
-                raise FileNotFoundError(f"no output at n={n} (neither the binary files nor {zarr_filepath} exist)")
-
-            qq, params = pyR2D2.zarr_util.load(
-                zarr_filepath, with_attrs=True, names=names
-            )
+            qq, params = self._load_remap_zarr(n, keys, with_attrs=True)
 
             for key in qq.keys():
                 self.__dict__[key] = qq[key]
@@ -833,25 +875,7 @@ class FullData(_BaseRemapReader):
         k_size = self.kx if k_size is None else k_size
 
         if chunks3d is None:
-            i_size_chunk = i_size
-            j_size_chunk = j_size
-            k_size_chunk = k_size
-
-            target_size = 2**24  # 64 MB for float32
-
-            i_count = 1
-            jk_count = 1
-            jk_priority = 3  # priority for j and k to be halved compared to i
-            while i_size_chunk * j_size_chunk * k_size_chunk > target_size:
-                if i_count <= jk_count * jk_priority:
-                    i_size_chunk = max(i_size_chunk // 2, 1)
-                    i_count += 1
-                else:
-                    j_size_chunk = max(j_size_chunk // 2, 1)
-                    k_size_chunk = max(k_size_chunk // 2, 1)
-                    jk_count += 1
-
-            chunks3d = (i_size_chunk, j_size_chunk, k_size_chunk)
+            chunks3d = self.default_chunks3d(i_size, j_size, k_size)
 
         params_dict = {
             "i_start": i_start,
@@ -899,6 +923,29 @@ class FullData(_BaseRemapReader):
             pyR2D2.zarr_util.save(
                 zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="a"
             )
+
+    @staticmethod
+    def default_chunks3d(i_size, j_size, k_size):
+        """3D の zarr の既定のチャンク (64 MB 以下、i を先に半分にする)。"""
+        i_size_chunk = i_size
+        j_size_chunk = j_size
+        k_size_chunk = k_size
+
+        target_size = 2**24  # 64 MB for float32
+
+        i_count = 1
+        jk_count = 1
+        jk_priority = 3  # priority for j and k to be halved compared to i
+        while i_size_chunk * j_size_chunk * k_size_chunk > target_size:
+            if i_count <= jk_count * jk_priority:
+                i_size_chunk = max(i_size_chunk // 2, 1)
+                i_count += 1
+            else:
+                j_size_chunk = max(j_size_chunk // 2, 1)
+                k_size_chunk = max(k_size_chunk // 2, 1)
+                jk_count += 1
+
+        return (i_size_chunk, j_size_chunk, k_size_chunk)
 
     @staticmethod
     def _check_core(qq1, qq2, key):
@@ -1156,28 +1203,8 @@ class RestrictedData(_BaseRemapReader):
             zarr_flag = True
 
         if zarr_flag:
-            if keys == "all":
-                names = keys
-            else:
-                if isinstance(keys, str):
-                    names = [keys, "x", "y", "z"]
-                else:
-                    names = list(keys) + ["x", "y", "z"]
-
-            zarr_filepath = self._get_filepath_remap_zarr(n)
-            if not _zarr_zarrzip_exists(zarr_filepath):
-                raise FileNotFoundError(f"no output at n={n} (neither the binary files nor {zarr_filepath} exist)")
-
-            qq, params = pyR2D2.zarr_util.load(
-                zarr_filepath,
-                with_attrs=True,
-                names=names,
-                i0=i0,
-                i1=i1 + 1,
-                j0=j0,
-                j1=j1 + 1,
-                k0=k0,
-                k1=k1 + 1,
+            qq, params = self._load_remap_zarr(
+                n, keys, i0=i0, i1=i1 + 1, j0=j0, j1=j1 + 1, k0=k0, k1=k1 + 1, with_attrs=True
             )
 
             for key in qq.keys():
@@ -1545,6 +1572,29 @@ class OpticalDepth(_BaseReader):
 
             for key in qq.keys():
                 self.__dict__[key] = qq[key]
+
+            # 新出力形式の tau を r2d2plus-pack でまとめたものは height を持つ。he は
+            # _read_compressed と同じく rstar + height を倍精度で作る
+            if self._is_compressed():
+                origin = 0.0
+                if self.format_info.get("tau_height_origin", "rstar") == "rstar":
+                    origin = float(self.format_info.get("rstar", self.rstar))
+                eos = None
+                for tau in ["", "01", "001"]:
+                    if "height" + tau in qq and "he" + tau not in qq:
+                        self.__dict__["he" + tau] = origin + qq["height" + tau].astype(
+                            np.float64
+                        )
+                    if "ro" + tau not in qq or "se" + tau not in qq:
+                        continue
+                    for key in ["pr", "te"]:
+                        if key + tau in qq:
+                            continue
+                        if eos is None:
+                            eos = _compressed.compressed_eos(self.data.p)
+                        self.__dict__[key + tau] = eos.total(
+                            key, qq["ro" + tau], qq["se" + tau]
+                        )
 
             self.info = {
                 "y": self.y[j0:j1],
@@ -2107,14 +2157,10 @@ class Slice(_BaseReader):
                 k0, k1 = n_slice, n_slice + 1
                 self.info["z"] = self.z_slice[n_slice]
 
-            names = []
-            for key in self.zarr_keys:
-                for postfix in postfixes:
-                    names.append(key + postfix)
-
+            # 入っている配列を全部読む (従来形式を r2d2plus-pack でまとめたものは ph, pr, te も持つ)
             qq = pyR2D2.zarr_util.load(
                 zarr_filepath,
-                names=names,
+                names="all",
                 i0=i0,
                 i1=i1,
                 j0=j0,
@@ -2124,6 +2170,25 @@ class Slice(_BaseReader):
             )
             for key, value in qq.items():
                 self.__dict__[key] = value.squeeze()
+
+            # 新出力形式の slice には pr, te が無い。元のファイルを読むとき (_read_compressed) と同じく計算する
+            if self._is_compressed():
+                eos = None
+                for postfix in postfixes:
+                    if "ro" + postfix not in qq or "se" + postfix not in qq:
+                        continue
+                    if direc == "x":
+                        iz = np.argmin(np.abs(self.x - self.x_slice[n_slice]))
+                    else:
+                        iz = np.arange(i0, i0 + qq["ro" + postfix].shape[0]).reshape(-1, 1)
+                    for key in ["pr", "te"]:
+                        if key + postfix in qq:
+                            continue
+                        if eos is None:
+                            eos = _compressed.compressed_eos(self.data.p)
+                        self.__dict__[key + postfix] = eos.slice(
+                            key, self.__dict__["ro" + postfix], self.__dict__["se" + postfix], iz
+                        )
         elif self._is_compressed():
             self._read_compressed(n_slice, direc, n)
         else:
@@ -2226,6 +2291,37 @@ class Slice(_BaseReader):
             print(f"Invalid slice direction: {direc}. Must be 'x', 'y', or 'z'.")
             return
 
+        vars_dict, params_dict, chunks3d = self.assemble(
+            n, direc, keys, i_start, i_size, j_start, j_size, k_start, k_size
+        )
+        pyR2D2.zarr_util.save(
+            zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
+        )
+
+    def assemble(
+        self,
+        n: int,
+        direc: str,
+        keys: list | None = None,
+        i_start: int = None,
+        i_size: int = None,
+        j_start: int = None,
+        j_size: int = None,
+        k_start: int = None,
+        k_size: int = None,
+    ):
+        """
+        Reads all the slices in ``direc`` at step ``n`` from the binary files into
+        the arrays that :py:meth:`compress` writes
+
+        Returns
+        -------
+        vars_dict, params_dict, chunks3d
+        """
+        if keys is None:
+            keys = self.zarr_keys
+        postfixes = self._get_postfixes()
+
         chunk_max = 4096
         if direc == "x":
             i_start, i_size = 0, 1
@@ -2300,9 +2396,7 @@ class Slice(_BaseReader):
                             key + postfix
                         ]
 
-        pyR2D2.zarr_util.save(
-            zarr_filepath, vars_dict, params_dict, chunks3d=chunks3d, mode="w"
-        )
+        return vars_dict, params_dict, chunks3d
 
     def check(
         self,

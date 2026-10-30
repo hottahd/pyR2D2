@@ -28,6 +28,10 @@ dependencies = [
 [project.scripts]
 # ランの一覧 (台帳) を Google スプレッドシートへ送る。push だけ gspread と google-auth が要る
 r2d2plus-ledger = "pyR2D2.ledger.cli:main"
+# ランの出力を 1 ステップ 1 個の .zarr.zip にまとめて照合する (zarr が要る)
+r2d2plus-pack = "pyR2D2.pack.cli:main"
+# HPCI に移すときに restart・time・残りをまとめる
+r2d2plus-archive = "pyR2D2.pack.cli:archive_main"
 
 [project.optional-dependencies]
 zarr = ["zarr>=3.0.8,<4"]
