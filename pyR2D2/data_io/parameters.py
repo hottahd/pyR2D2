@@ -393,6 +393,8 @@ class Parameters:
         """
         Read an EoS table (npz) and set the interpolation attributes
         (``log_ro_e``, ``se_e``, ``log_pr_e``, ..., ``dlogro_e``, ``dse_e``).
+        表に電子密度 ``ne`` [cm^-3] があれば ``log_ne_e`` も作る
+        (``pyR2D2.util.eos_table(d, ro, se, "ne")`` で引ける。R2D2plus DEC-671)。
 
         Parameters
         ----------
@@ -446,6 +448,12 @@ class Parameters:
         self.log_te_e = np.log(eos_d["te"] + 1.0e-200)
         self.log_op_e = np.log(eos_d["op"] + 1.0e-200)
         self.log_dprdro_e = np.log(eos_d["dprdro"] + 1.0e-200)
+        # 電子密度 ne [cm^-3] は任意の配列 (R2D2plus DEC-671、R2D2plus-input の
+        # stratification_eos/add_electron_density.py が足す)。無い表では属性を作らない
+        if "ne" in eos_d:
+            self.log_ne_e = np.log(eos_d["ne"] + 1.0e-200)
+        else:
+            self.__dict__.pop("log_ne_e", None)
 
         self.dlogro_e = self.log_ro_e[1] - self.log_ro_e[0]
         self.dse_e = self.se_e[1] - self.se_e[0]

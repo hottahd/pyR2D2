@@ -1762,6 +1762,14 @@ class OnTheFly(_BaseReader):
     ``d.vc.se_xz, d.vc.bx_xy`` (2D cuts). ``d.vc.read_et(n)`` adds ``d.vc.etm``
     (R2D2plus only). See Attributes for the full list.
 
+    R2D2plus の量の並び 2 (restart の ``vl_layout = 2``、DEC-671) のランは、
+    ``vl_xy`` に B と電流の相関・項目別の加熱率 (``qrk`` など) が、``vl_flux`` に
+    熱伝導の流束 ``fc`` が増える (名前は ``c.dac`` から読むので属性はそのまま出る)。
+    さらに高さごとの度数分布 ``hist_te``, ``hist_ro`` (:py:meth:`read_hist`) と、
+    視線ごとの emission measure ``em_x``, ``em_y``, ``em_z`` (:py:meth:`read_dem`) を
+    ``read`` が一緒に読む。ファイルの無いランでは ``None``。
+    EM から AIA・XRT の強度を作るのは :py:mod:`pyR2D2.synth.euv`。
+
 
     Important
     ---------
@@ -1784,6 +1792,12 @@ class OnTheFly(_BaseReader):
         # ⟨ρe⟩ (R2D2plus が追加した C++ 独自の vl_et.dac)。cl には載らない
         # 追加変数なので個別に初期化する。Fortran のランでは None のまま。
         self.etm = None
+        # 量の並び 2 の度数分布と EM (vl_hist.dac・vl_dem.dac)。これも cl には載らない
+        self.hist_te = None
+        self.hist_ro = None
+        self.em_x = None
+        self.em_y = None
+        self.em_z = None
 
         self._generate_docstring()
 
@@ -1827,6 +1841,10 @@ class OnTheFly(_BaseReader):
 
         # read mean internal energy density (R2D2plus only)
         self.read_et(n)
+
+        # 度数分布と EM (R2D2plus の量の並び 2 だけ)
+        self.read_hist(n)
+        self.read_dem(n)
 
         # read spectra
         #
@@ -1875,6 +1893,83 @@ class OnTheFly(_BaseReader):
             self.etm = np.fromfile(
                 f, self.endian + "f", self.ix * self.jx
             ).reshape((self.ix, self.jx), order="F")
+
+    # 量の並び 2 (R2D2plus DEC-671) の箱の境界。正本は R2D2plus docs/formats/legacy.md「量の並び 2」
+    #: ``hist_te`` の箱の境界 (log10 T、[3, 8) を 0.05 dex、100 箱)
+    hist_logte_edges = 3.0 + 0.05 * np.arange(101)
+    #: ``hist_ro`` の箱の境界 (log10(ρ/ρ0)、[-6, 2) を 0.1 dex、80 箱)
+    hist_logro_edges = -6.0 + 0.1 * np.arange(81)
+    #: ``em_x``, ``em_y``, ``em_z`` の箱の境界 (log10 T、[5, 8) を 0.05 dex、60 箱)
+    dem_logte_edges = 5.0 + 0.05 * np.arange(61)
+
+    def read_hist(self, n):
+        """
+        Reads height-dependent histograms of temperature and density (``vl_hist.dac``).
+
+        R2D2plus の量の並び 2 (restart の ``vl_layout = 2``、DEC-671) のランだけが書く。
+        各高さで面積の割合 (和 1)。範囲の外は端の箱に入る。T は ``vl_xy`` の ``te`` と
+        同じ合成 (表と線形、DEC-651)。球座標・YinYang は出力格子の点を sinθ で重み付けしている。
+
+        - ``self.hist_te`` : (ix, 100)。箱は :py:attr:`hist_logte_edges` (log10 T の [3, 8)、0.05 dex)
+        - ``self.hist_ro`` : (ix, 80)。箱は :py:attr:`hist_logro_edges` (log10(ρ/ρ0) の [-6, 2)、0.1 dex)
+
+        ファイルが無ければ両方 ``None`` にして黙って戻る。
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data (``nd_vl``)
+        """
+        path = self.datadir / "remap" / "vl" / f"vl_hist.dac.{n:08d}"
+        if not path.exists():
+            self.hist_te = self.hist_ro = None
+            return
+        nte = self.hist_logte_edges.size - 1
+        nro = self.hist_logro_edges.size - 1
+        hist = np.fromfile(path, self.endian + "f", self.ix * (nte + nro)).reshape(
+            (self.ix, nte + nro), order="F"
+        )
+        self.hist_te = hist[:, :nte]
+        self.hist_ro = hist[:, nte:]
+
+    def read_dem(self, n):
+        """
+        Reads emission measure per temperature bin along three lines of sight (``vl_dem.dac``).
+
+        R2D2plus の量の並び 2 のうち、Cartesian で熱伝導があり EOS 表に ``ne`` があるランだけが書く。
+        EM = Σ n_e² dl [cm^-5] を log10 T の箱 :py:attr:`dem_logte_edges` ([5, 8)、0.05 dex、60 箱)
+        に分けたもの (**箱あたり**の量。DEM(T) [cm^-5 K^-1] にするには箱の幅 ΔT で割る)。
+        n_e と T は表 (ρ, s) から引いている。
+
+        名前の最後の文字は**視線の向き** (pyR2D2 の軸、x が鉛直):
+
+        - ``self.em_z`` : (ix, jx, 60)。z 方向の視線 (R2D2plus の C++ では y 方向の視線、ファイルの 1 区画目)
+        - ``self.em_y`` : (ix, kx, 60)。y 方向の視線 (C++ では x 方向の視線、2 区画目)
+        - ``self.em_x`` : (jx, kx, 60)。鉛直の視線 (上から見た図、3 区画目)
+
+        ファイルが無ければ 3 つとも ``None`` にして黙って戻る。
+        強度にするのは :py:func:`pyR2D2.synth.euv.intensity`。
+
+        Parameters
+        ----------
+        n : int
+            A selected time step for data (``nd_vl``)
+        """
+        path = self.datadir / "remap" / "vl" / f"vl_dem.dac.{n:08d}"
+        if not path.exists():
+            self.em_x = self.em_y = self.em_z = None
+            return
+        nb = self.dem_logte_edges.size - 1
+        shapes = [(self.ix, self.jx, nb), (self.ix, self.kx, nb), (self.jx, self.kx, nb)]
+        sizes = [int(np.prod(sh)) for sh in shapes]
+        raw = np.fromfile(path, self.endian + "f")
+        if raw.size != sum(sizes):
+            raise ValueError(
+                f"{path}: {raw.size} values, expected {sum(sizes)} for (ix, jx, kx) = "
+                f"({self.ix}, {self.jx}, {self.kx}) and {nb} bins"
+            )
+        parts = np.split(raw, np.cumsum(sizes)[:-1])
+        self.em_z, self.em_y, self.em_x = (a.reshape(sh, order="F") for a, sh in zip(parts, shapes))
 
     def _update_json_template(
         self,

@@ -61,3 +61,14 @@ def test_setuptools_is_the_only_extension_build_path():
     """Do not reintroduce a second CMake/Makefile configuration."""
     assert not (PROJECT_ROOT / "pyR2D2" / "Makefile").exists()
     assert not (PROJECT_ROOT / "pyR2D2" / "cpp_util" / "CMakeLists.txt").exists()
+
+
+def test_euv_response_tables_are_declared_and_available():
+    """The bundled AIA/XRT response tables of pyR2D2.synth.euv are package data."""
+    configuration = load_pyproject()
+    declared = configuration["tool"]["setuptools"]["package-data"]["pyR2D2.synth"]
+    assert declared == ["data/*.txt"]
+
+    synth = importlib.resources.files("pyR2D2.synth")
+    assert synth.joinpath("data", "aia_response.txt").is_file()
+    assert synth.joinpath("data", "xrt_response.txt").is_file()

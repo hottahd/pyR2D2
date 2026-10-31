@@ -43,6 +43,8 @@ plot = ["matplotlib>=3.7"]
 compressed = ["numcodecs>=0.13", "xxhash>=3"]
 # 3D スナップショットからのスペクトル合成 (pyR2D2.synth、R2D2plus DEC-589)。不透明度表 (.h5) を読む
 synth = ["h5py>=3.8"]
+# EUV・軟 X 線の応答関数の表を SSW の .genx から作り直すとき (python -m pyR2D2.synth.euv aia)。強度を作るだけなら要らない
+euv = ["sunpy>=5"]
 # r2d2plus-ledger push (Google スプレッドシート)
 ledger = ["gspread>=5", "google-auth>=2"]
 all = [
@@ -65,6 +67,8 @@ include = ["pyR2D2", "pyR2D2.*"]
 
 [tool.setuptools.package-data]
 "pyR2D2.data_io" = ["*.json"]
+# EUV・軟 X 線の応答関数の表 (pyR2D2.synth.euv、SSW の公開ファイルから作ったもの)
+"pyR2D2.synth" = ["data/*.txt"]
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
