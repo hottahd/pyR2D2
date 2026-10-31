@@ -6,7 +6,8 @@
 * ``data/restart/<slot>.tar``: restart の slot ごと (中のファイルの名前・大きさ・種類が元と一致することを確かめる)
 * ``data/time.zip``: ``data/time`` (全メンバーの CRC と、名前・大きさが元と一致することを確かめる)
 * ``rest.tar``: 残り全部 (``data/param/source`` と ``bin`` も入れる。ランの記録なので)
-* ``archive_report.toml``: 上の照合の結果と、``rest.tar`` に入れずにランから直接送る zip の一覧
+* ``archive_report.toml``: 上の照合の結果 (restart は slot ごとの中身の一覧と tar の SHA-256。
+  ``r2d2plus-restore`` が戻すときに使う) と、``rest.tar`` に入れずにランから直接送る zip の一覧
 
 rest.tar に入れないのは、restart・time と、3D・slice・tau の元のファイルと zip
 (``remap/qq``、``slice/qq*``・``slice/zarr``、``tau/qq*``・``tau/zarr``)。zip はステップごとに
@@ -15,6 +16,7 @@ rest.tar に入れないのは、restart・time と、3D・slice・tau の元の
 """
 
 import datetime
+import hashlib
 import os
 import socket
 import subprocess
@@ -86,6 +88,14 @@ def _walk(root, skip=None):
     return rels
 
 
+def sha256(path, bufsize=1 << 24):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(bufsize):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def _make_tar(tar_path, root, rels):
     """``root`` の下の ``rels`` だけを (下を辿らずに) tar にし、中身の名前・種類・大きさを元と比べる。"""
     listing = tar_path.with_name(tar_path.name + ".list")
@@ -105,7 +115,7 @@ def _make_tar(tar_path, root, rels):
         extra = sorted(got - expected)[:5]
         raise RuntimeError(f"{tar_path}: tar differs from the source (missing {missing}, extra {extra})")
     os.replace(work, tar_path)
-    return len(expected)
+    return sorted(expected)
 
 
 class Archiver:
@@ -168,13 +178,16 @@ class Archiver:
             t0 = time.time()
             rels = [slot.name] + [f"{slot.name}/{r}" for r in _walk(slot)]
             tar_path = dest / f"{slot.name}.tar"
-            n = _make_tar(tar_path, src, rels)
+            members = _make_tar(tar_path, src, rels)
             self._record(
                 part="restart", slot=slot.name, tar=tar_path.relative_to(self.out).as_posix(),
-                entries=n, bytes=tar_path.stat().st_size, seconds=round(time.time() - t0, 1),
+                entries=len(members), bytes=tar_path.stat().st_size, sha256=sha256(tar_path),
+                seconds=round(time.time() - t0, 1),
                 check="tar members (name, type, size) == source",
+                # r2d2plus-restore が展開した後に照合する (名前, 種類 f/d/l, 大きさ)
+                members=[list(m) for m in members],
             )
-            self.log(f"restart {slot.name}: {n} entries, {tar_path.stat().st_size / 1e9:.3f} GB")
+            self.log(f"restart {slot.name}: {len(members)} entries, {tar_path.stat().st_size / 1e9:.3f} GB")
 
     def time_zip(self):
         src = self.datadir / "time"
@@ -210,7 +223,7 @@ class Archiver:
         rels = _walk(self.run, skip)
         tar_path = self.out / "rest.tar"
         self.out.mkdir(parents=True, exist_ok=True)
-        n = _make_tar(tar_path, self.run, rels)
+        n = len(_make_tar(tar_path, self.run, rels))
         self._record(
             part="rest", tar="rest.tar", entries=n, bytes=tar_path.stat().st_size,
             seconds=round(time.time() - t0, 1),

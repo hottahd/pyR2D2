@@ -32,6 +32,8 @@ r2d2plus-ledger = "pyR2D2.ledger.cli:main"
 r2d2plus-pack = "pyR2D2.pack.cli:main"
 # HPCI に移すときに restart・time・残りをまとめる
 r2d2plus-archive = "pyR2D2.pack.cli:archive_main"
+# HPCI に移したランの restart の slot を富岳へ戻す (csgw2 で)
+r2d2plus-restore = "pyR2D2.pack.cli:restore_main"
 
 [project.optional-dependencies]
 zarr = ["zarr>=3.0.8,<4"]

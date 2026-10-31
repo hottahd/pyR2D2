@@ -226,14 +226,35 @@ def test_verify_existing_then_delete(runs, capsys):
     assert [e["deleted_files"] for e in second] == [1, 1]
 
 
-def test_no_delete_while_running_or_mismatch(runs):
+def test_running_run_packs_finished_steps(runs):
+    """走っているランは、後の時刻のファイルがあるステップ (書き終わったもの) だけをまとめて元を消す。"""
     fmt, orig, packed = runs
     set_status(packed, "running")
-    assert Packer(packed).run(kinds=["qf"], delete_original=True)
-    assert all(e["deleted_files"] == 0 for e in report(packed))
-    assert all(e["kept_because"] == "run status 'running'" for e in report(packed))
+    assert Packer(packed).run(kinds=["qf", "qt"], delete_original=True)
+    done = {(e["kind"], e["n"]) for e in report(packed)}
+    assert done == {("qf", 0), ("qf", 1), ("qt", 0), ("qt", 1)}
+    assert all(e["deleted_files"] == e["raw_files"] for e in report(packed))
+    # いちばん新しいステップ (後の時刻が無い) はまとめず、元を残す
+    assert not (packed / "remap" / "qq" / "zarr" / "qq.00000002.zarr.zip").exists()
+    assert list((packed / "remap" / "qq").glob("*/*/qq.*.00000002.*"))
+    # restart と time には触らない
+    assert list((packed / "time" / "mhd").glob("t.dac.*")) and list((packed / "restart").iterdir())
 
-    set_status(packed, "normal_end")
+    # 時刻が time.zip にしかなくても見分ける。次の出力が出れば n=2 も書き終わった扱いになる
+    import shutil, zipfile
+    with zipfile.ZipFile(packed / "time.zip", "w") as zf:
+        for f in sorted((packed / "time").rglob("*")):
+            if f.is_file():
+                zf.write(f, f.relative_to(packed))
+        zf.writestr("time/mhd/t.dac.00000003", b"\0" * 8)
+    shutil.rmtree(packed / "time")
+    assert Packer(packed).run(kinds=["qf"], delete_original=True)
+    assert (packed / "remap" / "qq" / "zarr" / "qq.00000002.zarr.zip").exists()
+
+
+def test_mismatch_keeps_originals(runs):
+    fmt, orig, packed = runs
+    assert Packer(packed).run(kinds=["qf"])
     # zip を別のステップのものにすり替えると、照合に失敗して元は消さない
     z = packed / "remap" / "qq" / "zarr"
     (z / "qq.00000000.zarr.zip").write_bytes((z / "qq.00000001.zarr.zip").read_bytes())
@@ -250,3 +271,68 @@ def test_incomplete_step_is_skipped(runs):
     Packer(packed).run(kinds=["qs"], delete_original=True)
     assert not (packed / "slice" / "zarr" / "x" / "qq.00000001.zarr.zip").exists()
     assert list((packed / "slice").glob("qqx*.00000001.00000002"))
+
+
+def test_restore(runs, tmp_path):
+    """archive の restart の tar を戻し、archive_report.toml の一覧と照合して展開する。"""
+    import filecmp, shutil
+    from pyR2D2.pack.cli import restore_main
+
+    fmt, orig, packed = runs
+    assert Packer(packed).run(delete_original=True)
+    out = tmp_path / "archive"
+    assert archive_main([str(packed.parent), str(out), "--parts", "restart"]) == 0
+    slot = sorted(p.name for p in (packed / "restart").iterdir())[0]
+    original = tmp_path / "slot_copy"
+    shutil.copytree(packed / "restart" / slot, original, symlinks=True)
+
+    # すでにあれば戻さない
+    assert restore_main([str(packed.parent), "--slot", slot, "--from", str(out)]) == 1
+    shutil.rmtree(packed / "restart" / slot)
+    assert restore_main([str(packed.parent), "--slot", slot, "--from", str(out), "--dry-run"]) == 0
+    assert not (packed / "restart" / slot).exists()
+    assert restore_main([str(packed.parent), "--slot", slot, "--from", str(out)]) == 0
+    cmp = filecmp.dircmp(original, packed / "restart" / slot)
+    assert not cmp.diff_files and not cmp.left_only and not cmp.right_only
+    assert not list((packed / "restart").glob(".restore-*"))
+    with open(packed / "param" / "restore_report.toml", "rb") as f:
+        assert tomllib.load(f)["restore"][0]["slot"] == slot
+    assert restore_main([str(packed.parent), "--slot", "nosuch", "--from", str(out)]) == 1
+
+    # 壊れた tar (SHA-256 が違う) は展開しない
+    shutil.rmtree(packed / "restart" / slot)
+    tar = out / "data" / "restart" / f"{slot}.tar"
+    data = bytearray(tar.read_bytes())
+    data[-1] ^= 1
+    tar.write_bytes(bytes(data))
+    assert restore_main([str(packed.parent), "--slot", slot, "--from", str(out)]) == 1
+    assert not (packed / "restart" / slot).exists()
+
+
+def test_restore_from_gfarm_uses_gfpcopy(runs, tmp_path):
+    """gfarm: の場所からは gfpcopy で持ってくる (ここでは手元のパスに読み替える偽物)。"""
+    import shutil
+    from pyR2D2.pack.restore import Restorer
+
+    fmt, orig, packed = runs
+    assert Packer(packed).run(delete_original=True)
+    out = tmp_path / "archive"
+    assert archive_main([str(packed.parent), str(out), "--parts", "restart"]) == 0
+    slot = sorted(p.name for p in (packed / "restart").iterdir())[-1]
+    shutil.rmtree(packed / "restart" / slot)
+    fake = tmp_path / "gfpcopy"
+    fake.write_text(f'#!/bin/sh\nshift\nsrc=$(echo "$1" | sed "s|^gfarm:///place|{out}|")\ncp "$src" "$2"/\n')
+    fake.chmod(0o755)
+    r = Restorer(packed.parent, source="gfarm:///place", gfpcopy=str(fake), log=lambda *m: None)
+    assert r.run_slot(slot) == packed / "restart" / slot
+
+
+def test_restore_default_source():
+    from pyR2D2.pack.restore import default_source
+
+    assert default_source("/vol0600/data/hp200137/u10094/R2D2plus/run/d00012") == (
+        "gfarm:///home/hp200137/hpci000196/fugaku/R2D2plus/run/d00012"
+    )
+    assert default_source("/x/run/d001", project="lowmass") == "gfarm:///home/hp200137/hpci000196/fugaku/lowmass/run/d001"
+    with pytest.raises(ValueError):
+        default_source("/x/somewhere/d001")

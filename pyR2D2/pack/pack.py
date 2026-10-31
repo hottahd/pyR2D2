@@ -20,13 +20,19 @@
 比べる (元を消すときの照合)。作業中の zarr と zip は ``.packing`` の付いた名前で作り、
 照合が通ってから本来の名前にするので、読み手が途中のものを読むことはない。
 
+走っているラン (``data/param/run_summary.toml`` の status が ``normal_end`` でも ``wall_limit`` でも
+ないもの。無いもの (Fortran 版) も含む) では、書き終わったステップだけを扱う。書き終わった印は、
+そのステップより後の時刻のファイル (3D は ``data/time/mhd/t.dac.N``、slice・tau は ``data/time/tau/t.dac.N``)
+があること。R2D2plus はステップの出力を書き終えてからその時刻のファイルを書き、次の出力はその後の
+時間ステップ (ランク間の通信を含む) の後なので、後の番号の時刻があれば前のステップは全ランクが書き終えている。
+
 元のファイルを消すのは ``delete_original=True`` のときだけで、さらに
 
-* この呼び出しで照合が通ったステップ
-* ランが走っていない (``data/param/run_summary.toml`` の status が ``normal_end`` か ``wall_limit``)
+* この呼び出しで照合が通ったステップ (走っているランでは、書き終わったものだけ)
 * ``wall_limit`` で止まったランでは、その種類の最後のステップではない (延長の前提なので残す)
 
-のすべてを満たすものに限る。結果 (消したものを含む) は ``data/param/pack_report.toml`` に足していく。
+を満たすものに限る (利用者 2026-10-31: 照合が通れば走っている間でも消してよい)。restart と
+``data/time`` には触らない。結果 (消したものを含む) は ``data/param/pack_report.toml`` に足していく。
 
 ``out`` を与えると、zip と記録はランではなく ``out/data/`` の下に作る (ランには何も書かない)。
 このときは元のファイルを消さない。試しや、ランの外にまとめるとき用。
@@ -95,6 +101,25 @@ def run_status(datadir):
         return None
     with open(path, "rb") as f:
         return tomllib.load(f).get("status", {}).get("status")
+
+
+def time_steps(datadir, family):
+    """``data/time/<family>/t.dac.NNNNNNNN`` の番号の集合 (``data/time.zip`` の中も見る)。"""
+    datadir = Path(datadir)
+    found = set()
+    for f in (datadir / "time" / family).glob("t.dac.*"):
+        suffix = f.name.rsplit(".", 1)[-1]
+        if suffix.isdigit():
+            found.add(int(suffix))
+    zpath = datadir / "time.zip"
+    if zpath.is_file():
+        pattern = re.compile(rf"(^|/){family}/t\.dac\.(\d+)$")
+        with zipfile.ZipFile(zpath) as zf:
+            for name in zf.namelist():
+                m = pattern.search(name)
+                if m:
+                    found.add(int(m.group(2)))
+    return found
 
 
 def parse_steps(text):
@@ -424,14 +449,16 @@ class Packer:
         if delete_original and self.outdir is not None:
             raise ValueError("delete_original cannot be used with out (the zips are not in the run)")
         status = run_status(self.datadir)
-        may_delete = delete_original and status in STOPPED
-        # 走り終えたランは最後のステップも消してよい。wall_limit は延長の前提なので最後を残す
-        keep_last = status != "normal_end"
-        if delete_original and not may_delete:
-            self.log(
-                f"run status is {status!r} (param/run_summary.toml); "
-                f"original files are not deleted unless it is one of {STOPPED}"
-            )
+        # 走っているランでは、後の時刻のファイルがあるステップ (書き終わったもの) だけを扱う
+        running = status not in STOPPED
+        later = {}
+        if running:
+            later = {
+                family: max(time_steps(self.datadir, family), default=-1) for family in ("mhd", "tau")
+            }
+            self.log(f"run status is {status!r}: only steps followed by a later time file are handled")
+        # wall_limit は延長の前提なので、種類ごとの最後のステップの元を残す
+        keep_last = status == "wall_limit"
 
         ok = True
         for unit, is_last in self.units(kinds, steps):
@@ -447,10 +474,13 @@ class Packer:
             if unit.final.is_dir():
                 self.log(f"{unit.label()}: {unit.final} (zarr directory) exists; skipped")
                 continue
-            delete = may_delete and not (keep_last and is_last)
+            if running and later["mhd" if unit.kind == "qf" else "tau"] <= unit.n:
+                self.log(f"{unit.label()}: may still be being written (no later time file); skipped")
+                continue
+            delete = delete_original and not (keep_last and is_last)
             action = "verify" if has_zip else "pack"
             if dry_run:
-                note = "delete originals" if delete else ("keep (last step)" if may_delete else "keep")
+                note = "delete originals" if delete else ("keep (last step)" if delete_original else "keep")
                 self.log(f"{unit.label()}: {action}, {len(present)} files, {note}")
                 continue
 
@@ -489,7 +519,7 @@ class Packer:
             if entry["result"] != "failed" and not deleted:
                 why = "not requested"
                 if delete_original:
-                    why = f"run status {status!r}" if status not in STOPPED else "last step of a wall_limit run"
+                    why = "last step of a wall_limit run"
                 entry["kept_because"] = why
             entry["seconds"] = round(time.time() - t0, 1)
             entry["date"] = datetime.datetime.now().astimezone().isoformat(timespec="seconds")

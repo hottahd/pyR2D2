@@ -154,7 +154,9 @@ r2d2plus-pack: ランをまとめて照合し、元を消す
 * **入れる変数:** 元のファイルに書かれているものだけを入れる。新出力形式では ``format.toml`` の ``variables`` / ``slice_variables`` / ``tau_quantities`` で、``pr``, ``te``, ``op`` と tau の ``he`` は入れない。これらは読むときに、元のファイルを読むときと同じ式で計算する。従来形式では、ファイルにある変数を全部入れる。
 * **照合:** 元のファイルは 1 回だけ読む。読んだ配列を zarr に書いて読み戻し、**ビット単位**で比べる。zip にした後は、全メンバーの CRC (``testzip``)、名前と大きさが zarr と同じこと、配列の名前・shape・dtype・属性を見る。前からある zip を元を消すために照合するときは、元と zip をビット単位で比べる。
 * **途中で止まっても安全:** 作業中のものは ``.packing`` の付いた名前で作る。照合が通ってから本来の名前にするので、読み手が途中のものを読むことはない。
-* **元を消す条件:** ``--delete-original`` を付けたときだけ消す。消すのは、その呼び出しで照合が通ったステップの元のファイルだけである。ランが走っているとき(``param/run_summary.toml`` の status が ``normal_end`` か ``wall_limit`` でないとき)は何も消さない。``wall_limit`` で止まったランでは、延長の前提なので種類ごとの最後のステップを残す。元のファイルが一部しかないステップ(書き込み中など)はまとめない。
+* **元を消す条件:** ``--delete-original`` を付けたときだけ消す。消すのは、その呼び出しで照合が通ったステップの元のファイルだけである。``wall_limit`` で止まったランでは、延長の前提なので種類ごとの最後のステップを残す。restart と ``data/time`` には触らない。
+* **走っているラン:** ``param/run_summary.toml`` の status が ``normal_end`` でも ``wall_limit`` でもないラン(status の無い Fortran 版も含む)では、**書き終わったステップだけ**をまとめ、``--delete-original`` なら元を消す。書き終わった印は、そのステップより後の時刻のファイルがあること(3D は ``data/time/mhd/t.dac.N``、slice・tau は ``data/time/tau/t.dac.N``。``data/time.zip`` の中も見る)。R2D2plus はステップを書き終えてから時刻のファイルを書き、次の出力はその後なので、後の時刻があれば前のステップは全ランクが書き終えている。書いている途中のいちばん新しいステップは飛ばす。異常終了で status が ``running`` のまま残ったランでも、最後のステップだけが残る。
+* 元のファイルが一部しかないステップはまとめない。
 * **出力先を変える:** ``--out DIR`` を付けると、zip と記録をランではなく ``DIR/data/`` の下に作り、ランには何も書かない(試しや、ランの外にまとめるとき用。``--delete-original`` とは併用できない)。
 * **記録:** 結果は ``data/param/pack_report.toml`` に ``[[pack]]`` として足していく。照合の方法、入れた変数、zip と元の大きさ、消したファイルの数(と例)、消さなかった理由が入る。
 * **延長したラン:** 延長で出た新しいステップは、もう一度同じコマンドを流せばそれだけがまとまる(zip のあるステップは、元が残っていれば照合だけ、無ければ何もしない)。
@@ -173,8 +175,23 @@ HPCI(Gfarm)に移すときに、``r2d2plus-pack`` でまとめた残りを出力
 * ``data/restart/<slot>.tar``: restart を slot ごとに tar にする。中のファイルの名前・種類・大きさが元と一致することを確かめる。
 * ``data/time.zip``: ``data/time`` を zip にする。全メンバーの CRC (``testzip``) と、名前・大きさが元と一致することを確かめる。
 * ``rest.tar``: 残り全部を tar にする。``data/param/source`` と ``bin`` も入れる(ランの記録なので)。入れないのは restart・time と、3D・slice・tau の元のファイルと zip である。
-* ``archive_report.toml``: 照合の結果と、ランから直接送る zip の一覧を書く。zip はステップごとに取り出せるよう、そのままの形で送る。
+* ``archive_report.toml``: 照合の結果と、ランから直接送る zip の一覧を書く。restart は slot ごとに、中身の一覧(名前・種類・大きさ)と tar の SHA-256 も書く(``r2d2plus-restore`` が使う)。zip はステップごとに取り出せるよう、そのままの形で送る。
 * 走っているラン(status が ``running``)と、zip の無いステップの元のファイルが残っているランは止める(rest.tar から漏れるので、先に ``r2d2plus-pack`` を流す)。
+
+r2d2plus-restore: HPCI から restart を戻す
+------------------------------------------------
+
+HPCI に移したランを延長することになったときに、restart の slot を 1 つ富岳のランへ戻す。``gfpcopy`` と ``/vol0600`` の両方がある **csgw2** で動かす(csgw2 には ``u10094`` の ``~/.venv`` がある)。
+
+.. code:: bash
+
+    r2d2plus-restore /vol0600/data/hp200137/u10094/R2D2plus/run/d00012 --slot o --dry-run
+    r2d2plus-restore /vol0600/data/hp200137/u10094/R2D2plus/run/d00012 --slot o
+
+* 取ってくる場所は ``--from`` で指定する(``gfarm:`` の URL か、手元のパス)。既定は ``gfarm:///home/hp200137/hpci000196/fugaku/<プロジェクト>/run/<ランの名前>`` で(``Sync`` の ``work/<プロジェクト>/run/<ランの名前>`` と同じ形)、そこに ``r2d2plus-archive`` の出力(``archive_report.toml`` と ``data/restart/<slot>.tar``)がある前提である。プロジェクトはランのパス ``…/<プロジェクト>/run/<ランの名前>`` から取る(富岳の ``…/u10094/R2D2plus/run/d00012`` なら ``R2D2plus``)。違うときは ``--project`` で与える。
+* tar の SHA-256 が ``archive_report.toml`` と同じことを確かめてから、``data/restart/.restore-<slot>/`` に展開する。名前・種類・大きさが ``archive_report.toml`` の一覧と同じであれば、``data/restart/<slot>`` にする。``data/restart/<slot>`` がすでにあれば何もしない。結果は ``data/param/restore_report.toml`` に残る。
+* astana から動かすときは、boston を踏み台にする。``hpcissh`` に渡すコマンドは改行がつぶれるので、スクリプトにして ``/vol0600`` に置き、``ssh boston hpcissh csgw2.fugaku.r-ccs.riken.jp "bash <スクリプト>"`` で走らせる。スクリプトの中では ``~/.venv/bin/r2d2plus-restore …`` と書く。
+* 延長には restart の他に、富岳に残した設定・``param``・``data/time`` を使う(``data/time`` は富岳から消さない)。
 
 リモートの zarr から一部だけを持ってくる
 ------------------------------------------------
