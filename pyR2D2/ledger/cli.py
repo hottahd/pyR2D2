@@ -231,10 +231,13 @@ def pull(
         out(f"[{i}/{len(plan.changes)}] {c.record.caseid} の {c.column}")
         out(f"  手元  : {c.local or '(空)'}")
         out(f"  シート: {c.remote}")
-        if c.column == "保存" and "expires" not in c.fields:
-            old = (note.read(c.record.run_dir) or {}).get("expires")
-            if old:
-                out(f"  (手元の「{old} まで残す」はシートに無いが、消さずに残る。消すなら手元で消す)")
+        if c.column == "保存":
+            cur = note.read(c.record.run_dir) or {}
+            if "expires" not in c.fields and cur.get("expires"):
+                out(f"  (手元の「{cur['expires']} まで残す」はシートに無いが、消さずに残る。消すなら手元で消す)")
+            if "keep_parts" not in c.fields and cur.get("keep_parts"):
+                parts = note.KEEP_PARTS_JOIN.join(cur["keep_parts"])
+                out(f"  (手元の「{note.KEEP_PARTS_SEP}{parts}」はシートに無いが、消さずに残る。消すなら手元で消す)")
         if dry_run:
             continue
         while True:

@@ -11,12 +11,13 @@
     project   = "..."            # プロジェクト
     retention = "keep"           # 保存 (keep | regen_only | auto。thin は古いメモだけ。R2D2plus DEC-666)
     expires   = "2026-12-31"     # 保存の「(… まで残す)」
+    keep_parts = ["remap/vl", "slice"]  # 保存の「＋remap/vl・slice」(消したあとに data/ に残すもの。2026-10-31)
     cited_in  = ["DEC-533"]      # 結論
 """
 
 import re
 import tomllib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 NOTE_FILE = "run_note.toml"
 
@@ -38,6 +39,10 @@ OLD_RETENTION_LABELS = {
 # シートから戻してよい列 (列名 → メモの項目)。ほかの列は機械が書く値なので戻さない。
 PULL_COLUMNS = ("プロジェクト", "目的", "保存", "結論")
 
+# 保存の表示で、retention の後ろに keep_parts を付ける形「再生成の情報だけ＋remap/vl・slice」
+KEEP_PARTS_SEP = "＋"
+KEEP_PARTS_JOIN = "・"
+
 _EXPIRES_RE = re.compile(r"^(.*?)\s*\((\d{4}-\d{2}-\d{2})\s*まで残す\)\s*$")
 _DEC_RE = re.compile(r"^DEC-\d+$")
 
@@ -51,6 +56,51 @@ def read(run_dir):
     if not p.exists():
         return None
     return tomllib.loads(p.read_text(encoding="utf-8")).get("note", {})
+
+
+def retention_label(note):
+    """メモの retention・keep_parts・expires を、シートの「保存」の表示にする (何も無ければ None)。"""
+    retention = note.get("retention")
+    parts = note.get("keep_parts") or []
+    expires = note.get("expires")
+    if not (retention or parts or expires):
+        return None
+    label = RETENTION_LABELS.get(retention or "auto", retention)
+    if parts:
+        label += KEEP_PARTS_SEP + KEEP_PARTS_JOIN.join(str(s) for s in parts)
+    if expires:
+        label += f" ({expires} まで残す)"
+    return label
+
+
+def keep_parts_value(items):
+    """keep_parts の並びを検査して直す。R2D2plus ``tools/run_note.py`` の ``keep_parts_value`` (DEC-668) と同じ決まり:
+    data/ からの相対パス、末尾の ``/``・先頭の ``./`` は落とし、重複は除く。絶対パス・``..``・先頭の ``data/``・``.`` は不可。
+    """
+    parts = []
+    for raw in items:
+        item = raw.strip()
+        if not item:
+            raise ValueError("keep_parts に空の項目がある")
+        if item.startswith("/") or "\\" in item:
+            raise ValueError(f"keep_parts の {item!r} は data/ からの相対パスで書く (絶対パス・バックスラッシュは不可)")
+        path = PurePosixPath(item)
+        if ".." in path.parts:
+            raise ValueError(f"keep_parts の {item!r} に .. は使えない")
+        if path.parts and path.parts[0] == "data":
+            raise ValueError(f"keep_parts の {item!r} は data/ からの相対パスで書く (先頭の data/ は付けない)")
+        norm = str(path)
+        if norm == ".":
+            raise ValueError(f"keep_parts の {item!r} は data/ 全体になる (全部残すなら 残す)")
+        if norm not in parts:
+            parts.append(norm)
+    return parts
+
+
+def _parse_keep_parts(text):
+    if not text.strip():
+        raise ValueError(f"「{KEEP_PARTS_SEP}」の後は data/ からの相対パスを「{KEEP_PARTS_JOIN}」で並べる")
+    return keep_parts_value(re.split(r"[・、,]", text))
 
 
 def parse_cell(column, text):
@@ -75,6 +125,12 @@ def parse_cell(column, text):
         m = _EXPIRES_RE.match(text)
         if m:
             text, expires = m.group(1).strip(), m.group(2)
+        parts = None
+        for sep in (KEEP_PARTS_SEP, "+"):
+            if sep in text:
+                text, rest = (t.strip() for t in text.split(sep, 1))
+                parts = _parse_keep_parts(rest)
+                break
         keys = {label: key for key, label in RETENTION_LABELS.items()}
         keys.update(OLD_RETENTION_LABELS)
         keys.update({key: key for key in RETENTION_LABELS})
@@ -82,9 +138,11 @@ def parse_cell(column, text):
             raise ValueError(
                 f"保存の値 {text!r} が読めない ("
                 + "・".join(RETENTION_LABELS.values())
-                + " のどれか、後ろに「(YYYY-MM-DD まで残す)」を付けられる)"
+                + f" のどれか。後ろに「{KEEP_PARTS_SEP}remap/vl{KEEP_PARTS_JOIN}slice」と「(YYYY-MM-DD まで残す)」を付けられる)"
             )
         fields = {"retention": keys[text]}
+        if parts:
+            fields["keep_parts"] = parts
         if expires:
             fields["expires"] = expires
         return fields
@@ -105,6 +163,56 @@ def _toml_value(value):
     if isinstance(value, list):
         return "[" + ", ".join(_quote(c) for c in value) + "]"
     return _quote(value)
+
+
+# R2D2plus tools/run_note.py の _value_end と同じ (複数行の並び・値の後ろのコメントを保つ)
+def _value_end(lines, i):
+    """`lines[i]` の `key = 値` の値が終わる行と、その行の値の後ろ（コメント・改行）を返す。
+
+    並びは複数の行にまたがってよい（人が `keep_parts = [\n  "slice",\n]` と書くことがある）。文字列の中の `[`・`]`・`#` は数えない。
+    三重引用符の文字列は読まない（ValueError）。
+    """
+    line = lines[i]
+    pos = line.index("=") + 1
+    depth, started = 0, False
+    j = i
+    while True:
+        text = lines[j]
+        k = pos if j == i else 0
+        while k < len(text):
+            ch = text[k]
+            if ch in "\"'":
+                if text.startswith(ch * 3, k):
+                    raise ValueError("三重引用符の値は書き換えない")
+                k += 1
+                while k < len(text) and text[k] != ch:
+                    k += 2 if (ch == '"' and text[k] == "\\") else 1
+                if k >= len(text):
+                    raise ValueError("閉じていない文字列")
+                started = True
+            elif ch == "#":
+                if depth == 0 and started:
+                    return j, text[k:]
+                k = len(text)  # 並びの中のコメントは行末まで飛ばす
+                continue
+            elif ch == "[":
+                depth += 1; started = True
+            elif ch == "]":
+                depth -= 1
+                if depth == 0:
+                    rest = text[k + 1:]
+                    return j, rest
+            elif ch in " \t\r\n":
+                if started and depth == 0:
+                    return j, text[k:]
+            else:
+                started = True
+            k += 1
+        if depth == 0 and started:
+            return j, ""
+        j += 1
+        if j >= len(lines):
+            raise ValueError("閉じていない並び")
 
 
 def update(run_dir, fields):
@@ -138,9 +246,16 @@ def update(run_dir, fields):
         header = len(lines) - 1
     if note_end is None:
         note_end = header
-    for key, i in found.items():
-        eol = "\n" if lines[i].endswith("\n") else ""
-        lines[i] = f"{key} = {_toml_value(fields[key])}" + eol
+    for key, i in sorted(found.items(), key=lambda kv: -kv[1]):  # 後ろから (複数行の値で番号がずれないように)
+        end, rest = _value_end(lines, i)
+        head = re.match(r"\s*", lines[i]).group(0)
+        if not rest.strip():  # 値の後ろにコメントが無ければ、改行の有無だけを保つ
+            rest = "\n" if lines[end].endswith("\n") else ""
+        elif not rest.startswith((" ", "\t")):
+            rest = " " + rest
+        lines[i:end + 1] = [f"{head}{key} = {_toml_value(fields[key])}" + rest]
+        if note_end >= i:
+            note_end -= min(end, note_end) - i
     extra = [f"{k} = {_toml_value(v)}\n" for k, v in fields.items() if k not in found]
     if extra:
         if not lines[note_end].endswith("\n"):

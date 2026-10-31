@@ -603,9 +603,7 @@ def collect_run(run_dir, server=None, du=True, now=None):
     note = ((_read_toml(param_dir / "run_note.toml") or {}).get("note")) or {}
     v["目的"] = note.get("purpose") or None
     v["プロジェクト"] = note.get("project") or None
-    if note.get("retention") or note.get("expires"):
-        label = RETENTION_LABELS.get(note.get("retention", "auto"), note.get("retention"))
-        v["保存"] = label + (f" ({note['expires']} まで残す)" if note.get("expires") else "")
+    v["保存"] = _note.retention_label(note)
     cited = note.get("cited_in") or []
     v["結論"] = ", ".join(str(c) for c in cited) if cited else None
 

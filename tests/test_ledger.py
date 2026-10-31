@@ -828,6 +828,39 @@ def test_retention_labels_dec666():
     assert note.parse_cell("保存", "全部残す (2027-03-31 まで残す)") == {"retention": "keep", "expires": "2027-03-31"}
 
 
+def test_keep_parts_in_retention_column(tmp_path):
+    """keep_parts (消したあとに data/ に残すもの。2026-10-31) は保存の列に「＋」で付き、シートから読み戻せる。"""
+    from pyR2D2.ledger import note
+
+    run = make_run(tmp_path, "d001")
+    (run / "data" / "param" / "run_note.toml").write_text(
+        '[note]\nretention = "regen_only"\nkeep_parts = ["remap/vl", "slice"]\nexpires = "2026-12-31"\n'
+    )
+    v = collect.collect_run(run, server="astana", du=False).values
+    assert v["保存"] == "再生成の情報だけ＋remap/vl・slice (2026-12-31 まで残す)"
+    assert note.parse_cell("保存", v["保存"]) == {
+        "retention": "regen_only", "keep_parts": ["remap/vl", "slice"], "expires": "2026-12-31",
+    }
+    assert note.parse_cell("保存", "regen_only + tau, slice/") == {"retention": "regen_only", "keep_parts": ["tau", "slice"]}
+    assert note.retention_label({"keep_parts": ["slice"]}) == "未定 (消さない)＋slice"
+    with pytest.raises(ValueError):
+        note.parse_cell("保存", "再生成の情報だけ＋../x")
+    with pytest.raises(ValueError):
+        note.parse_cell("保存", "再生成の情報だけ＋")
+    # R2D2plus tools/run_note.py の keep_parts_value (DEC-668) と同じ決まり
+    assert note.parse_cell("保存", "再生成の情報だけ＋./slice/・slice・remap/vl")["keep_parts"] == ["slice", "remap/vl"]
+    for bad in ("/abs", "data/slice", ".", "slice・"):
+        with pytest.raises(ValueError):
+            note.parse_cell("保存", "再生成の情報だけ＋" + bad)
+    note.update(run, {"keep_parts": ["tau"]})
+    assert note.read(run)["keep_parts"] == ["tau"] and note.read(run)["retention"] == "regen_only"
+    # 人が複数の行に書いた並びと、値の後ろのコメントを保って書き換える
+    p = run / "data" / "param" / "run_note.toml"
+    p.write_text('[note]\nretention = "regen_only"  # 再生成\nkeep_parts = [\n  "slice",  # 2D\n  "tau",\n]  # 後で見る\n\n[x]\na = 1\n')
+    note.update(run, {"keep_parts": ["remap/vl"], "retention": "keep"})
+    assert p.read_text() == '[note]\nretention = "keep"  # 再生成\nkeep_parts = ["remap/vl"]  # 後で見る\n\n[x]\na = 1\n'
+
+
 def test_note_columns_absent_do_not_change_hash(tmp_path):
     """メモの無いランは、メモの列を足す前と同じハッシュになる (既存のランを「未送信」にしない)。"""
     run = make_run(tmp_path, "d001")
@@ -977,7 +1010,7 @@ def test_note_update_keeps_other_bytes(tmp_path):
     p.parent.mkdir(parents=True)
     p.write_text('[note]  # メモ\npurpose = "x" # 理由\ncited_in = ["DEC-1"]')
     note.update(run, {"purpose": "y", "project": "p"})
-    assert p.read_text() == '[note]  # メモ\npurpose = "y"\ncited_in = ["DEC-1"]\nproject = "p"\n'
+    assert p.read_text() == '[note]  # メモ\npurpose = "y" # 理由\ncited_in = ["DEC-1"]\nproject = "p"\n'
 
 
 def test_push_reorders_managed_columns_only(project):
