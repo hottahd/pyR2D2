@@ -793,7 +793,7 @@ def test_run_note_columns(tmp_path):
     )
     v = collect.collect_run(run, server="astana", du=False).values
     assert v["目的"] == "粘性を 10 倍にした感度"
-    assert v["保存"] == "間引いて残す (2026-12-31 まで残す)"
+    assert v["保存"] == "間引き済み (残す) (2026-12-31 まで残す)"
     assert v["結論"] == "DEC-533, DEC-600"
     assert v["プロジェクト"] is None
 
@@ -814,6 +814,18 @@ def test_project_and_actual_location_columns(tmp_path):
 
     plain = make_run(tmp_path, "d001")
     assert collect.collect_run(plain, server="astana", du=False).values["実体"] is None
+
+
+def test_retention_labels_dec666():
+    """保存の表示は R2D2plus DEC-666 の意味 (2026-10-31)。前の表示もシートから読める。"""
+    from pyR2D2.ledger import note
+
+    assert note.RETENTION_LABELS["auto"] == "未定 (消さない)"
+    assert note.RETENTION_LABELS["keep"] == "残す"
+    assert note.parse_cell("保存", "未定 (消さない)") == {"retention": "auto"}
+    assert note.parse_cell("保存", "間引き済み (残す)") == {"retention": "thin"}
+    assert note.parse_cell("保存", "自動 (DEC-599)") == {"retention": "auto"}
+    assert note.parse_cell("保存", "全部残す (2027-03-31 まで残す)") == {"retention": "keep", "expires": "2027-03-31"}
 
 
 def test_note_columns_absent_do_not_change_hash(tmp_path):

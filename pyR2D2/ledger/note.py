@@ -9,7 +9,7 @@
     [note]
     purpose   = "..."            # 目的
     project   = "..."            # プロジェクト
-    retention = "thin"           # 保存 (keep | thin | regen_only | auto)
+    retention = "keep"           # 保存 (keep | regen_only | auto。thin は古いメモだけ。R2D2plus DEC-666)
     expires   = "2026-12-31"     # 保存の「(… まで残す)」
     cited_in  = ["DEC-533"]      # 結論
 """
@@ -20,12 +20,19 @@ from pathlib import Path
 
 NOTE_FILE = "run_note.toml"
 
-# シートの「保存」の表示 (collect.RETENTION_LABELS と同じ)
+# シートの「保存」の表示 (collect.RETENTION_LABELS と同じ)。R2D2plus DEC-666 (2026-10-31) で意味を改めた:
+# auto は未定で消さない、thin は新しく使わず keep と同じに扱う
 RETENTION_LABELS = {
-    "keep": "全部残す",
-    "thin": "間引いて残す",
+    "keep": "残す",
+    "thin": "間引き済み (残す)",
     "regen_only": "再生成の情報だけ",
-    "auto": "自動 (DEC-599)",
+    "auto": "未定 (消さない)",
+}
+# 2026-10-31 までの表示。シートに残っていても pull で読めるようにする
+OLD_RETENTION_LABELS = {
+    "全部残す": "keep",
+    "間引いて残す": "thin",
+    "自動 (DEC-599)": "auto",
 }
 
 # シートから戻してよい列 (列名 → メモの項目)。ほかの列は機械が書く値なので戻さない。
@@ -69,6 +76,7 @@ def parse_cell(column, text):
         if m:
             text, expires = m.group(1).strip(), m.group(2)
         keys = {label: key for key, label in RETENTION_LABELS.items()}
+        keys.update(OLD_RETENTION_LABELS)
         keys.update({key: key for key in RETENTION_LABELS})
         if text not in keys:
             raise ValueError(
