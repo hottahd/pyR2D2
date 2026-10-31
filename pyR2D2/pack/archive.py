@@ -4,7 +4,8 @@
 このコマンドは元のランには触らず、出力先に次のものを作る:
 
 * ``data/restart/<slot>.tar``: restart の slot ごと (中のファイルの名前・大きさ・種類が元と一致することを確かめる)
-* ``data/time.zip``: ``data/time`` (全メンバーの CRC と、名前・大きさが元と一致することを確かめる)
+* ``data/time.zip``: ``data/time`` (``time/mhd``・``time/vl``・``time/tau``・``time/slice`` など下を全部。
+  中の名前は ``time/<族>/t.dac.N``。全メンバーの CRC と、名前・大きさが元と一致することを確かめる)
 * ``rest.tar``: 残り全部 (``data/param/source`` と ``bin`` も入れる。ランの記録なので)
 * ``archive_report.toml``: 上の照合の結果 (restart は slot ごとの中身の一覧と tar の SHA-256。
   ``r2d2plus-restore`` が戻すときに使う) と、``rest.tar`` に入れずにランから直接送る zip の一覧
@@ -198,12 +199,13 @@ class Archiver:
         dest.parent.mkdir(parents=True, exist_ok=True)
         work = dest.with_name("time.packing.zip")
         files = {r: (src / r).stat().st_size for r in _walk(src) if (src / r).is_file()}
+        # Data.zip_time・Data.time_read と同じく time/<族>/t.dac.N の名前で入れる (2026-10-31 までは <族>/… だった)
         with zipfile.ZipFile(work, "w", zipfile.ZIP_STORED, allowZip64=True) as zf:
             for rel in files:
-                zf.write(src / rel, rel)
+                zf.write(src / rel, f"time/{rel}")
         with zipfile.ZipFile(work) as zf:
             bad = zf.testzip()
-            members = {i.filename: i.file_size for i in zf.infolist()}
+            members = {i.filename.removeprefix("time/"): i.file_size for i in zf.infolist()}
         if bad is not None or members != files:
             raise RuntimeError(f"{work}: CRC error {bad} or members differ from data/time")
         os.replace(work, dest)

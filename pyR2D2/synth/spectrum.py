@@ -94,11 +94,15 @@ def main():
         print(f"  {len(n_fil)} 枚 (n = {n_fil[0]}..{n_fil[-1]}), "
               f"高さ {len(x_fil)} 点, {fil.attrs.get('note', '')}")
 
-    n = int(p.nd) if args.n < 0 else args.n
-    print(f"スナップショット: n={n} (t={n*p.dtout/60:.0f} min)")
+    # 3D は three_d_every ごとにしか無いことがある。時刻は time/ から取る (dtout は途中で変わりうる)
+    qq_steps = d.qq_steps() if fil is None else sorted(int(m) for m in n_fil)
+    n = qq_steps[-1] if args.n < 0 else args.n
+    print(f"スナップショット: n={n} (t={d.time_read(n, verbose=False)/60:.0f} min)")
 
     snaps = [n - k * args.snap_step for k in range(args.nsnap)]
-    snaps = [m for m in snaps if m >= 0][::-1]
+    snaps = [m for m in snaps if m >= 0 and m in set(qq_steps)][::-1]
+    if not snaps and fil is None:
+        raise SystemExit(f"3D の出力が無い番号ばかり (n={n}, --snap-step {args.snap_step})")
     if fil is not None:
         # フィルタ済みファイルに入っている出力番号だけに限る
         snaps = [m for m in snaps if m in set(n_fil.tolist())]
@@ -106,8 +110,8 @@ def main():
             raise SystemExit(f"指定した出力番号がフィルタ済みデータに無い "
                              f"(入っているのは {n_fil[0]}..{n_fil[-1]})")
     print(f"平均するスナップショット: {len(snaps)} 枚 "
-          f"(n = {snaps[0]}..{snaps[-1]}, 間隔 {args.snap_step*p.dtout:.0f} s, "
-          f"合計 {(snaps[-1]-snaps[0])*p.dtout/60:.0f} 分)")
+          f"(n = {snaps[0]}..{snaps[-1]}, "
+          f"合計 {(d.time_read(snaps[-1], verbose=False) - d.time_read(snaps[0], verbose=False))/60:.0f} 分)")
     x = np.array(p.x) if fil is None else x_fil
 
     # 上端が先頭になるよう反転し、深いところは切る (tau >> 1 で寄与しない)

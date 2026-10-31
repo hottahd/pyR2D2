@@ -20,7 +20,10 @@ os.makedirs(pngdir,exist_ok=True)
 n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd_tau')
 
 print("Maximum time step= ",d.nd_tau," time ="\
-          ,d.dtout_tau*float(d.nd_tau)/3600./24.," [day]")
+          ,d.time_read(d.nd_tau,verbose=False,tau=True)/3600./24.," [day]")
+
+# slice は tau と間隔が違いうる (R2D2plus output_cadence = 2) ので、時刻のいちばん近い番号を読む
+slice_steps, slice_times = d.times("slice")
 
 plt.close('all')
 
@@ -51,6 +54,7 @@ t0 = d.time_read(0,verbose=False)
 for n in tqdm(range(n0,d.nd_tau + 1)):
     # read data
     t = d.time_read(n,verbose=False,tau=True)
+    ns = int(slice_steps[np.argmin(abs(slice_times - t))])  # 時刻のいちばん近い slice の番号
     
     ##############################
     
@@ -61,7 +65,7 @@ for n in tqdm(range(n0,d.nd_tau + 1)):
     
     if d.geometry == 'Cartesian':
         d.qt.read(n)
-        d.qs.read(np.argmin(abs(d.y_slice - 0.5*d.ymax)),'y',n)
+        d.qs.read(np.argmin(abs(d.y_slice - 0.5*d.ymax)),'y',ns)
         tu_height = d.qt.he[np.argmax(d.y > d.y_slice[np.argmin(abs(d.y_slice - 0.5*d.ymax))]),:]
                 
         rtm = d.qt.rt.mean() # mean intensity
@@ -93,7 +97,7 @@ for n in tqdm(range(n0,d.nd_tau + 1)):
 
         mov_util.mov_cartesian_photo_2x2(d,t-t0,vls,tu_height,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     else: # Spherical geometry including Yin-Yang
-        d.qs.read(np.argmin(abs(d.x_slice - d.xmax)), 'x', n) # xmaxに一番近いところ
+        d.qs.read(np.argmin(abs(d.x_slice - d.xmax)), 'x', ns) # xmaxに一番近いところ
         vxrms = np.sqrt((d.qs.vx_yin**2).mean())
         bxrms = max(np.sqrt((d.qs.bx_yin**2).mean()),1e-2)
     

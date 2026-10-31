@@ -575,7 +575,7 @@ def test_no_slices_and_unknown_version(tmp_path):
     d.qf.read(1, keys=["ro"])
     with pytest.raises(ValueError, match="did not write slices"):
         d.qs.read(0, "x", 1)
-    (comp / "param" / "format.toml").write_text(FORMAT_TOML.replace("version = 1", "version = 3"))
+    (comp / "param" / "format.toml").write_text(FORMAT_TOML.replace("version = 1", "version = 4"))
     with pytest.raises(ValueError, match="unsupported format.toml version"):
         pyR2D2.Data(comp)
 

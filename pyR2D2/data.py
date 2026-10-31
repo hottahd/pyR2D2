@@ -37,11 +37,13 @@ class Data:
         (``rt`` at tau=1, ``rt01`` at 0.1, ``rt001`` at 0.01; multigroup ``rt1, rt2, ...``)
     vc : pyR2D2.OnTheFly
         On-the-fly means, RMS, correlations and xy/xz cuts (``remap/vl``).
-        ``d.vc.read(n)`` -> ``d.vc.rom, sem, serms, se_xz, bx_xy, ...``;
+        ``d.vc.read(n)`` -> ``d.vc.rom, sem, serms, se_xz, bx_xy, ...``
+        (``n`` は ``nd_vl`` の番号。出力の間隔が 4 つでないランでは ``nd`` と同じ);
         ``d.vc.read_et(n)`` -> ``d.vc.etm`` (R2D2plus only)
     qs : pyR2D2.Slice
         2D slice output (``slice/``).
         ``d.qs.read(n_slice, direc, n)`` -> ``d.qs.ro, vx, ..., pr, te``
+        (``n`` は ``nd_slice`` の番号。出力の間隔が 4 つでないランでは ``nd_tau`` と同じ)
     q2 : pyR2D2.TwoDimension
         Full data of a 2D run (dict access).
         ``d.q2.read(n)`` -> ``d.q2['ro'], d.q2['tu'], ...``
@@ -192,7 +194,22 @@ class Data:
         for p in pending_removal:
             os.remove(p)
 
-    def time_read(self, n, tau=False, verbose=True, use_zip=False):
+    # 時刻のディレクトリ (data/time/<族>)。出力の間隔が 4 つでないラン (output_cadence = 1) では
+    # vl は 3D と、slice は tau と同じ時刻を使う
+    TIME_FAMILIES = ("mhd", "vl", "tau", "slice")
+
+    def _time_family(self, kind, tau=False):
+        if kind is None:
+            kind = "tau" if tau else "mhd"
+        if kind == "qq":
+            kind = "mhd"
+        if kind not in self.TIME_FAMILIES:
+            raise ValueError(f"kind must be one of {self.TIME_FAMILIES} (or 'qq'), not {kind!r}")
+        if getattr(self.p, "output_cadence", 1) < 2:
+            kind = {"vl": "mhd", "slice": "tau"}.get(kind, kind)
+        return kind
+
+    def time_read(self, n, tau=False, verbose=True, use_zip=False, kind=None):
         """
         Reads time at a selected time step
         The data is stored in self.t
@@ -202,12 +219,17 @@ class Data:
         n : int
             selected time step for data
         tau : bool
-            if True time for optical depth (high cadence)
+            if True time for optical depth (high cadence). Same as ``kind="tau"``
         verbose: bool
             if True, print a message indicating that the time variable has been stored in self.time
         use_zip: bool
             if True, read time from time.zip instead of the original files
             if False, read from the original file if it exists; otherwise, fall back to time.zip.
+        kind : str, optional
+            ``"mhd"`` (or ``"qq"``, 3D, number ``nd``), ``"vl"`` (``nd_vl``), ``"tau"`` (``nd_tau``)
+            or ``"slice"`` (``nd_slice``). Runs with one output interval per family (R2D2plus
+            ``output_cadence = 2``) keep the time of each in ``time/<kind>``; older runs use
+            ``time/mhd`` for vl and ``time/tau`` for slice.
 
         Returns
         -------
@@ -215,16 +237,20 @@ class Data:
             time at a selected time step
         """
 
-        subdir = "tau" if tau else "mhd"
+        subdir = self._time_family(kind, tau)
         filename = f"t.dac.{n:08d}"
 
         filepath = self.datadir / "time" / subdir / filename
 
         if not filepath.exists() or use_zip:
             zippath = self.datadir / "time.zip"
-            arcname = f"time/{subdir}/{filename}"
 
             with zipfile.ZipFile(zippath, "r") as zf:
+                # zip_time は time/<族>/…、r2d2plus-archive (2026-10-31 まで) は <族>/… で入れた
+                names = set(zf.namelist())
+                arcname = f"time/{subdir}/{filename}"
+                if arcname not in names and f"{subdir}/{filename}" in names:
+                    arcname = f"{subdir}/{filename}"
                 data = zf.read(arcname)
                 self.time = np.frombuffer(
                     data,
@@ -239,6 +265,158 @@ class Data:
             print("### time is stored in self.time ###")
 
         return self.time
+
+    def time_steps(self, kind="mhd"):
+        """
+        Numbers with a time file for ``kind`` (``time/<kind>`` and ``time.zip``), sorted
+
+        Parameters
+        ----------
+        kind : str
+            ``"mhd"`` (or ``"qq"``), ``"vl"``, ``"tau"`` or ``"slice"`` (see :meth:`time_read`)
+
+        Returns
+        -------
+        steps : list of int
+        """
+        from .pack.pack import time_steps
+
+        return sorted(time_steps(self.datadir, self._time_family(kind)))
+
+    def times(self, kind="mhd", steps=None):
+        """
+        Times of ``steps`` (default: all numbers with a time file) for ``kind``
+
+        Use this instead of ``dtout * n``: the output interval can change within a run, and
+        each family has its own interval in runs with R2D2plus ``output_cadence = 2``.
+
+        Returns
+        -------
+        steps : numpy.ndarray, int
+        t : numpy.ndarray, float
+            time [s]
+        """
+        if steps is None:
+            steps = self.time_steps(kind)
+        steps = np.asarray(list(steps), dtype=int)
+        t = np.array([self.time_read(int(n), verbose=False, kind=kind) for n in steps], dtype=float)
+        return steps, t
+
+    def three_d_every_values(self):
+        """``three_d_every`` of each segment (``param/runs/*/run.toml``, in order). Empty for runs without them."""
+        import tomllib
+
+        values = []
+        runs = self.datadir / "param" / "runs"
+        if not runs.is_dir():
+            return values
+        for seg in sorted(runs.iterdir()):
+            path = seg / "run.toml"
+            if not path.is_file():
+                continue
+            try:
+                with open(path, "rb") as f:
+                    out = tomllib.load(f).get("output", {})
+            except (OSError, tomllib.TOMLDecodeError):
+                continue
+            values.append(int(out.get("three_d_every", 1)))
+        return values
+
+    def qq_steps(self):
+        """
+        Numbers ``nd`` at which 3D data (``remap/qq``) was written, sorted
+
+        R2D2plus runs counted the old way (``output_cadence = 1``) may write 3D only every
+        ``three_d_every`` outputs (``[output] three_d_every`` in ``param/runs/*/run.toml``)
+        while ``time/mhd`` and ``remap/vl`` are written at every ``nd``. The numbers are taken from
+        the run records: ``nd % three_d_every == 0`` within each segment (a segment starts at the
+        first ``nd`` after its ``resume_time`` in ``provenance.toml``). Numbers whose 3D files
+        (binary, compressed or ``.zarr``/``.zarr.zip``) are present are added. In other runs every
+        ``nd`` has 3D data.
+
+        Returns
+        -------
+        steps : list of int
+        """
+        every = self._three_d_every_segments()
+        if not every:
+            steps = set(range(0, self.p.nd + 1))
+        else:
+            steps = set()
+            starts = self._segment_start_nd([t for _, t in every])
+            for i, (k, _) in enumerate(every):
+                start = starts[i]
+                end = starts[i + 1] - 1 if i + 1 < len(every) else self.p.nd
+                steps.update(n for n in range(start, end + 1) if n % k == 0)
+            steps.update(self._qq_steps_on_disk())
+        return sorted(n for n in steps if 0 <= n <= self.p.nd)
+
+    def _three_d_every_segments(self):
+        """[(three_d_every, resume_time)] of the segments in order, or [] if every segment writes 3D every time."""
+        import tomllib
+
+        runs = self.datadir / "param" / "runs"
+        if not runs.is_dir():
+            return []
+        out = []
+        for seg in sorted(runs.iterdir()):
+            try:
+                with open(seg / "run.toml", "rb") as f:
+                    k = int(tomllib.load(f).get("output", {}).get("three_d_every", 1))
+            except (OSError, tomllib.TOMLDecodeError):
+                continue
+            resume = None
+            try:
+                with open(seg / "provenance.toml", "rb") as f:
+                    resume = tomllib.load(f).get("segment", {}).get("resume_time")
+            except (OSError, tomllib.TOMLDecodeError):
+                pass
+            out.append((k, float(resume) if resume not in (None, "") else None))
+        if all(k == 1 for k, _ in out):
+            return []
+        return out
+
+    def _segment_start_nd(self, resume_times):
+        """First ``nd`` of each segment: 0 for a fresh start, otherwise the first ``nd`` after its resume time."""
+        starts = []
+        if any(rt is not None for rt in resume_times[1:]):
+            steps, t = self.times("mhd")
+        for i, rt in enumerate(resume_times):
+            if i == 0 or rt is None:
+                starts.append(0 if i == 0 else starts[-1])
+                continue
+            # restart は出力を書いた直後に書くので、その時刻ちょうどの nd は前の区間のもの
+            # (R2D2plus time_loop.cpp、manager が確かめた。2026-10-31)。文字列と倍精度の丸めの差は同じ時刻とみなす
+            later = steps[t > rt + 1e-9 * max(abs(rt), 1.0)]
+            starts.append(int(later[0]) if len(later) else self.p.nd + 1)
+        return starts
+
+    def _qq_steps_on_disk(self):
+        found = set()
+        qq = self.datadir / "remap" / "qq"
+        patterns = [
+            (qq, r"qq\.dac\.(\d{8})\.\d{8}$"),
+            (qq / "zarr", r"(\d{8})"),
+        ]
+        import re
+
+        for root, pat in patterns:
+            if not root.is_dir():
+                continue
+            rx = re.compile(pat)
+            for name in os.listdir(root):
+                m = rx.search(name)
+                if m:
+                    found.add(int(m.group(1)))
+        # ランクの小ディレクトリの下 (remap/qq/00000/00000000/qq.{dac,z}.<nd>.00000000)
+        first = qq / "00000" / "00000000"
+        if first.is_dir():
+            rx = re.compile(r"qq\.(?:dac|z)\.(\d{8})\.\d{8}$")
+            for name in os.listdir(first):
+                m = rx.search(name)
+                if m:
+                    found.add(int(m.group(1)))
+        return found
 
     def qc_read(self, n, end_step=False):
         """

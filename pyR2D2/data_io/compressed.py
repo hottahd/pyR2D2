@@ -40,8 +40,9 @@ except ImportError:  # pragma: no cover
 
 R2D2PLUS_Z_MAGIC = b"R2D2PLUS-Z 1\n"
 
-# 読める format.toml の版 (R2D2plus DEC-576 の 1、DEC-657 の 2)
-_SUPPORTED_FORMAT_VERSIONS = {1, 2}
+# 読める format.toml の版 (R2D2plus DEC-576 の 1、DEC-657 の 2、出力の間隔が 4 つで vl・slice の間隔が
+# 従来と違うランの 3。2026-10-31)
+_SUPPORTED_FORMAT_VERSIONS = {1, 2, 3}
 
 # format.toml が無い項目の既定値 (R2D2plus DEC-576 の version 1)
 _FORMAT_DEFAULTS = {
@@ -823,6 +824,12 @@ def format_path(datadir, info, kind, **fields):
     """``format.toml`` のパスの雛形 ``info[kind]`` を埋めて ``datadir`` からのパスにする。"""
     if "rank" in fields:
         fields.setdefault("group", fields["rank"] // RANK_GROUP_SIZE)
+    # slice の番号はいつも nd_slice。雛形は版 1・2 が {nd_tau}、版 3 が {nd_slice} (2026-10-31)。vl も同じ
+    for a, b in (("nd_tau", "nd_slice"), ("nd", "nd_vl")):
+        if a in fields:
+            fields.setdefault(b, fields[a])
+        elif b in fields:
+            fields.setdefault(a, fields[b])
     return Path(datadir) / info[kind].format(**fields)
 
 

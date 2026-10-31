@@ -326,7 +326,10 @@ def _fortran_time(data_dir, p):
         zpath = data_dir / "time.zip"
         if zpath.exists():
             with zipfile.ZipFile(zpath) as zf:
-                buf = zf.read(f"time/mhd/{name}")
+                # time/mhd/… (Data.zip_time) と mhd/… (2026-10-31 までの r2d2plus-archive・hpci_pack.py)
+                names = set(zf.namelist())
+                arc = f"time/mhd/{name}" if f"time/mhd/{name}" in names else f"mhd/{name}"
+                buf = zf.read(arc)
             return float(np.frombuffer(buf, endian + "d", 1)[0])
     except (OSError, ValueError, IndexError, KeyError):
         pass

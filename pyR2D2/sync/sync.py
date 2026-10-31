@@ -67,6 +67,12 @@ class Sync:
         pattern = self.format_info[kind]
         if "rank" in fields and fields["rank"] is not None:
             fields.setdefault("group", fields["rank"] // 1000)
+        # slice の雛形は版 1・2 が {nd_tau}、版 3 が {nd_slice} (番号はいつも nd_slice。2026-10-31)。vl も同じ
+        for a, b in (("nd_tau", "nd_slice"), ("nd", "nd_vl")):
+            if a in fields:
+                fields.setdefault(b, fields[a])
+            elif b in fields:
+                fields.setdefault(a, fields[b])
         for key in [k for k, v in fields.items() if v is None]:
             pattern = re.sub(r"\{" + key + r"(:[^}]*)?\}", "*", pattern)
             del fields[key]
@@ -567,7 +573,8 @@ class Sync:
         server : str
             Name of remote server
         n : int
-            Step to be downloaded
+            Step to be downloaded (``nd_slice``; the same as ``nd_tau`` in runs without
+            R2D2plus ``output_cadence = 2``)
         direc : str
             Direction of slice data, 'x', 'y', 'z' or '*'
         n_slice : int

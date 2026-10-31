@@ -190,9 +190,16 @@ def test_archive(runs, tmp_path):
         assert any(m.name.endswith("meta.toml") for m in tf)
     with zipfile.ZipFile(out / "data" / "time.zip") as zf:
         assert zf.testzip() is None
+        # 中の名前は Data.zip_time と同じ time/<族>/t.dac.N
         assert sorted(zf.namelist()) == sorted(
-            str(p.relative_to(packed / "time")) for p in (packed / "time").rglob("*") if p.is_file()
+            str(p.relative_to(packed)) for p in (packed / "time").rglob("*") if p.is_file()
         )
+    import shutil
+    d = pyR2D2.Data(str(packed), verbose=False)
+    t1 = d.time_read(1, verbose=False)
+    shutil.copy(out / "data" / "time.zip", packed / "time.zip")  # Data.time_read が読める
+    assert d.time_read(1, verbose=False, use_zip=True) == t1
+    (packed / "time.zip").unlink()
     with tarfile.open(out / "rest.tar") as tf:
         names = {m.name for m in tf}
     assert f"{fmt}/data/param/source/src.tar.zst" not in names  # run の相対で入る
@@ -250,6 +257,20 @@ def test_running_run_packs_finished_steps(runs):
     shutil.rmtree(packed / "time")
     assert Packer(packed).run(kinds=["qf"], delete_original=True)
     assert (packed / "remap" / "qq" / "zarr" / "qq.00000002.zarr.zip").exists()
+
+
+def test_running_run_slice_uses_time_slice(runs):
+    """出力の間隔が 4 つのラン (R2D2plus output_cadence = 2) の slice は time/slice で書き終わりを見る。"""
+    fmt, orig, packed = runs
+    set_status(packed, "running")
+    with open(packed / "param" / "params.dac", "a") as f:
+        f.write("         2 output_cadence i\n")
+    (packed / "time" / "slice").mkdir()
+    for n in range(2):  # slice は n=1 までしか後の時刻が無い (tau は n=2 まである)
+        (packed / "time" / "slice" / f"t.dac.{n:08d}").write_bytes(b"\0" * 8)
+    assert Packer(packed).run(kinds=["qs"], delete_original=True)
+    assert {e["n"] for e in report(packed)} == {0}
+    assert list((packed / "slice").glob("qqx*.00000001.00000001"))
 
 
 def test_mismatch_keeps_originals(runs):

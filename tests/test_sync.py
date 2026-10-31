@@ -197,6 +197,17 @@ def test_compressed_slice(tmp_path, remote):
     assert len([f for f in local_files(datadir) if ".c." in f]) == 6
 
 
+def test_compressed_slice_version3_template(tmp_path, remote):
+    """format.toml の版 3 (R2D2plus output_cadence = 2) の slice の雛形は {nd_slice}。番号はどちらも同じに埋める。"""
+    make_compressed_remote(remote)
+    sync, datadir = make_sync(tmp_path, compressed=True)
+    sync.format_info["slice"] = "slice/{name}.c.{nd_slice:08d}.{n:08d}"
+    sync.slice(SERVER, n=5, direc="y", n_slice=2, project=PROJECT)
+    assert "slice/qqy.c.00000005.00000002" in local_files(datadir)
+    sync.slice(SERVER, project=PROJECT)
+    assert len([f for f in local_files(datadir) if ".c." in f]) == 6
+
+
 def test_restart_end_step_takes_newer_slot_and_current_generation(tmp_path, remote):
     make_compressed_remote(remote)
     sync, datadir = make_sync(tmp_path, compressed=True)

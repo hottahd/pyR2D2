@@ -22,8 +22,9 @@
 
 走っているラン (``data/param/run_summary.toml`` の status が ``normal_end`` でも ``wall_limit`` でも
 ないもの。無いもの (Fortran 版) も含む) では、書き終わったステップだけを扱う。書き終わった印は、
-そのステップより後の時刻のファイル (3D は ``data/time/mhd/t.dac.N``、slice・tau は ``data/time/tau/t.dac.N``)
-があること。R2D2plus はステップの出力を書き終えてからその時刻のファイルを書き、次の出力はその後の
+そのステップより後の時刻のファイル (3D は ``data/time/mhd/t.dac.N``、tau は ``data/time/tau/t.dac.N``、
+slice は ``data/time/slice/t.dac.N``。出力の間隔が 4 つでないラン (R2D2plus ``output_cadence = 1``) の slice は
+``data/time/tau/t.dac.N``) があること。R2D2plus はステップの出力を書き終えてからその時刻のファイルを書き、次の出力はその後の
 時間ステップ (ランク間の通信を含む) の後なので、後の番号の時刻があれば前のステップは全ランクが書き終えている。
 
 元のファイルを消すのは ``delete_original=True`` のときだけで、さらに
@@ -199,6 +200,14 @@ class Packer:
 
     def log(self, *msg):
         self._log(f"[{time.time() - self._t0:8.1f}s]", *msg)
+
+    def _time_family(self, kind):
+        """``kind`` の書き終わりを見る時刻のディレクトリ (``data/time/<族>``)。"""
+        if kind == "qf":
+            return "mhd"
+        if kind == "qs" and getattr(self.d.p, "output_cadence", 1) >= 2:
+            return "slice"
+        return "tau"
 
     def _compressed(self):
         return getattr(self.d.p, "output_format", "legacy") == "compressed"
@@ -454,7 +463,8 @@ class Packer:
         later = {}
         if running:
             later = {
-                family: max(time_steps(self.datadir, family), default=-1) for family in ("mhd", "tau")
+                family: max(time_steps(self.datadir, family), default=-1)
+                for family in {self._time_family(kind) for kind in KINDS}
             }
             self.log(f"run status is {status!r}: only steps followed by a later time file are handled")
         # wall_limit は延長の前提なので、種類ごとの最後のステップの元を残す
@@ -474,7 +484,7 @@ class Packer:
             if unit.final.is_dir():
                 self.log(f"{unit.label()}: {unit.final} (zarr directory) exists; skipped")
                 continue
-            if running and later["mhd" if unit.kind == "qf" else "tau"] <= unit.n:
+            if running and later[self._time_family(unit.kind)] <= unit.n:
                 self.log(f"{unit.label()}: may still be being written (no later time file); skipped")
                 continue
             delete = delete_original and not (keep_last and is_last)

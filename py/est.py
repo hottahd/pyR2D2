@@ -13,14 +13,15 @@ datadir = "../run/"+caseid+"/data/"
 d = pyR2D2.Data(datadir)
 
 pyR2D2.util.locals_define(d,locals())
-n0 = pyR2D2.util.define_n0(d,locals())
+# 平均量 (remap/vl) の番号は nd_vl (出力の間隔が 4 つでないランでは nd と同じ)
+n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd_vl')
 
 # 生成された画像の出力先の設定・作成
 pngdir="../figs/"+caseid+"/est/"
 os.makedirs(pngdir,exist_ok=True)
 
-print("Maximum time step= ",d.nd," time ="\
-      ,d.dtout*float(d.nd)/3600./24.," [day]")
+print("Maximum time step= ",d.nd_vl," time ="\
+      ,d.time_read(d.nd_vl,verbose=False,kind="vl")/3600./24.," [day]")
 
 plt.close('all')
 
@@ -47,17 +48,17 @@ vls = ['vxrmst', 'vyrmst', 'vzrmst',
         'romt', 'semt', 'prmt', 'temt'
         ]
 for vl in vls:
-    md[vl] = np.zeros((d.ix, d.nd-n0+1))
+    md[vl] = np.zeros((d.ix, d.nd_vl-n0+1))
 
 ## mean magnetic field (2D)
 vls = ['vxmt', 'vymt', 'vzmt', 'bxmt', 'bymt', 'bzmt']
 for vl in vls:
-    md[vl] =  np.zeros((d.ix, d.jx, d.nd-n0+1))
+    md[vl] =  np.zeros((d.ix, d.jx, d.nd_vl-n0+1))
 
 ## energy fluxes (1D but ix + 1)
 vls = ['fet','fmt','fdt','fkt','frt','ftt','fft']
 for vl in vls:
-    md[vl] = np.zeros((d.ix+1, d.nd-n0+1))
+    md[vl] = np.zeros((d.ix+1, d.nd_vl-n0+1))
 
 ###############################################################################
 ###############################################################################
@@ -127,10 +128,10 @@ def est_plot(d, md, fig, ax1, ax2, ax3, ax4):
 ###############################################################################
 ###############################################################################
 
-for n in tqdm(range(n0,nd+1)):
+for n in tqdm(range(n0,d.nd_vl+1)):
     print(f"\r n = {n} ", end='', flush=True)
     ##############################
-    t = d.time_read(n, verbose=False)
+    t = d.time_read(n, verbose=False, kind="vl")
     d.vc.read(n)
 
     ##############################    
@@ -190,7 +191,7 @@ for n in tqdm(range(n0,nd+1)):
     plt.pause(0.1)
     fig.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
 
-    if n != d.nd:
+    if n != d.nd_vl:
         plt.clf() # clear figure
     
     # loop end

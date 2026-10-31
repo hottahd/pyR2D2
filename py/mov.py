@@ -16,10 +16,14 @@ pyR2D2.util.locals_define(d,locals())
 pngdir="../figs/"+caseid+"/mov/"
 os.makedirs(pngdir,exist_ok=True)
 
-n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd')
+# 平均量 (remap/vl) の番号 nd_vl で回す (出力の間隔が 4 つでないランでは nd と同じ)
+n0 = pyR2D2.util.define_n0(d,locals(),nd_type='nd_vl')
 
-print("Maximum time step= ",d.nd," time ="\
-          ,d.dtout*float(d.nd)/3600./24.," [day]")
+print("Maximum time step= ",d.nd_vl," time ="\
+          ,d.time_read(d.nd_vl,verbose=False,kind="vl")/3600./24.," [day]")
+
+# tau は vl と間隔が違いうるので、時刻のいちばん近い番号を読む (nd_tau = nd*ifac とは限らない)
+tau_steps, tau_times = d.times("tau")
 
 plt.close('all')
 
@@ -49,9 +53,9 @@ if not d.geometry == 'Cartesian':
 # read initial time
 t0 = d.time_read(0,verbose=False)
 
-for n in tqdm(range(n0,d.nd + 1)):
+for n in tqdm(range(n0,d.nd_vl + 1)):
     # read data
-    t = d.time_read(n,verbose=False)
+    t = d.time_read(n,verbose=False,kind="vl")
     d.vc.read(n)
     
     ##############################
@@ -62,7 +66,7 @@ for n in tqdm(range(n0,d.nd + 1)):
         tight_layout_flag = False
     
     if d.geometry == 'Cartesian':
-        d.qt.read(n*int(d.ifac))
+        d.qt.read(int(tau_steps[np.argmin(abs(tau_times - t))]))
         tu_height = d.qt.he[d.jc, :]
         
         rtm = d.qt.rt.mean() # mean intensity
@@ -132,7 +136,7 @@ for n in tqdm(range(n0,d.nd + 1)):
         mov_util.mov_spherical_2x2(d,t,vls,vmaxs,vmins,titles,tight_layout_flag=tight_layout_flag)
     plt.pause(0.1)
     plt.savefig(pngdir+"py"+'{0:08d}'.format(n)+".png")
-    if(n != d.nd):
+    if(n != d.nd_vl):
         plt.clf()
         
 

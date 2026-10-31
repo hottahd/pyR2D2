@@ -6,6 +6,21 @@ import numpy as np
 import pyR2D2
 
 
+def _cadence_info(format_info):
+    """``format.toml`` の ``output_cadence`` と 4 つの間隔 (無ければ空の dict)。
+
+    R2D2plus は最上位に書く。節の中に書かれていても見つける。
+    """
+    if not format_info:
+        return {}
+    if "output_cadence" in format_info:
+        return format_info
+    for value in format_info.values():
+        if isinstance(value, dict) and "output_cadence" in value:
+            return value
+    return {}
+
+
 def _read_r2d2plus_table(path):
     """r2d2plus-table 1 (形式の正本は R2D2plus docs/formats/r2d2plus-table.md) を {name: array} で返す。
 
@@ -55,10 +70,13 @@ class Parameters:
         self.datadir = data.datadir
 
         # Time control parameters
+        # nd.dac は「nd nd_tau」、出力の間隔が 4 つのラン (R2D2plus output_cadence = 2) は
+        # 「nd nd_tau nd_vl nd_slice」(2026-10-31)
         with open(self.datadir / "param" / "nd.dac", "r") as f:
             nn = f.read().split()
             self.nd = int(nn[0])  # current maximum time step
             self.nd_tau = int(nn[1])  # current maximum time step for tau
+            self._nd_extra = [int(v) for v in nn[2:4]]
 
         # data/time/tau のファイルの数を数え、nd_tauと比較して大きい方をnd_tauとする
         if os.path.isdir(self.datadir / "time" / "tau"):
@@ -326,6 +344,8 @@ class Parameters:
                 if table.is_file():
                     self.read_eos_table(table)
 
+        self._set_output_cadence()
+
         # read original data
         if os.path.exists(self.datadir / "cont_log.txt"):
             with open(self.datadir / "cont_log.txt") as f:
@@ -334,6 +354,40 @@ class Parameters:
             self.origin = "N/A"
 
         self._generate_docstring()
+
+    def _set_output_cadence(self):
+        """出力の間隔と番号を 4 つの族 (qq・vl・tau・slice) について揃える。
+
+        R2D2plus の ``output_cadence = 2`` (``param/params.dac``・``param/format.toml``、2026-10-31) のランは、3D (remap/qq)・
+        水平平均など (remap/vl)・tau・slice が別々の間隔 ``dtout``・``dtout_vl``・``dtout_tau``・``dtout_slice``
+        と番号 ``nd``・``nd_vl``・``nd_tau``・``nd_slice`` を持ち、時刻は ``time/mhd``・``time/vl``・
+        ``time/tau``・``time/slice`` にある。それより前のラン (``output_cadence = 1``) では vl は 3D と、
+        slice は tau と同じ番号・時刻なので、``nd_vl = nd``・``nd_slice = nd_tau`` などとする。
+        """
+        # 数え方 2 のランは params.dac に output_cadence・dtout_vl・dtout_slice を足し (format = "legacy"
+        # のランには format.toml が無い)、compressed のランは format.toml の最上位にも書く
+        cadence = _cadence_info(self.format_info)
+        self.output_cadence = int(cadence.get("output_cadence", getattr(self, "output_cadence", 1)))
+        if self.output_cadence >= 2:
+            for key in ("dtout", "dtout_vl", "dtout_tau", "dtout_slice"):
+                if key in cadence:
+                    self.__dict__[key] = float(cadence[key])
+            self.dtout_vl = getattr(self, "dtout_vl", self.dtout)
+            self.dtout_slice = getattr(self, "dtout_slice", self.dtout_tau)
+            extra = self._nd_extra + [None, None]
+            self.nd_vl = extra[0] if extra[0] is not None else self.nd
+            self.nd_slice = extra[1] if extra[1] is not None else self.nd_tau
+            # nd.dac は「最後に書いた番号」(まだ書いていなければ -1)。time/<族> の番号の方が大きければそちら
+            for family, attr in (("vl", "nd_vl"), ("slice", "nd_slice")):
+                d = self.datadir / "time" / family
+                if d.is_dir():
+                    numbers = [int(f.rsplit(".", 1)[-1]) for f in os.listdir(d) if f.rsplit(".", 1)[-1].isdigit()]
+                    self.__dict__[attr] = max(numbers + [self.__dict__[attr]])
+        else:
+            self.dtout_vl = getattr(self, "dtout", None)
+            self.dtout_slice = getattr(self, "dtout_tau", None)
+            self.nd_vl = self.nd
+            self.nd_slice = self.nd_tau
 
     def read_eos_table(self, path=None):
         """
@@ -509,8 +563,22 @@ class Parameters:
 
         print("")
         print(RED + "### calculation time ###" + END)
-        print("time step (nd) =", self.nd)
-        print("time step (nd_tau) =", self.nd_tau)
+        if self.output_cadence >= 2:
+            # 4 つの族が別々の間隔と番号を持つ (R2D2plus output_cadence = 2)
+            for family, nd, dt in (
+                ("qq", "nd", "dtout"),
+                ("vl", "nd_vl", "dtout_vl"),
+                ("tau", "nd_tau", "dtout_tau"),
+                ("slice", "nd_slice", "dtout_slice"),
+            ):
+                print(f"{family:5s} {nd} = {getattr(self, nd)}  {dt} = {getattr(self, dt):g} s")
+        else:
+            print("time step (nd) =", self.nd)
+            print("time step (nd_tau) =", self.nd_tau)
+            every = self.data.three_d_every_values() if hasattr(self.data, "three_d_every_values") else []
+            if any(k != 1 for k in every):
+                steps = self.data.qq_steps()
+                print(f"3D (qq) steps = {len(steps)} (three_d_every = {', '.join(str(k) for k in every)})")
         t = self.data.time_read(self.nd, verbose=False)
         print("time =", "{:.2f}".format(t / 3600), " [hour]")
 
