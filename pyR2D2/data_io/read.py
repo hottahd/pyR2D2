@@ -327,6 +327,14 @@ class XSelect(_BaseRemapReader):
     ``d.qx.read(xs, n)`` reads the plane at the grid nearest to ``x = xs`` at step ``n``.
     Then use ``d.qx.ro, d.qx.vx, ...`` (see Attributes).
 
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[i] + d.qx.te``, where ``i = np.argmin(np.abs(d.p.x - xs))``
+    is the x index of the plane.
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qx`
@@ -476,6 +484,13 @@ class ZSelect(_BaseRemapReader):
     ``d.qz.read(zs, n)`` reads the plane at the grid nearest to ``z = zs`` at step ``n``.
     Then use ``d.qz.ro, d.qz.vx, ...`` (see Attributes).
 
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[:, None] + d.qz.te`` (x is the first axis).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qz`
@@ -569,6 +584,14 @@ class MPIRegion(_BaseRemapReader):
     ``d.qm.read(ixrt, n)`` reads the ``ixrt``-th remap region (x direction) at step ``n``.
     Then use ``d.qm.ro, d.qm.vx, ...`` (see Attributes).
 
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[d.qm.i_ixrt, None, None] + d.qm.te`` (``d.qm.i_ixrt`` are the
+    x indices of the region read; x is the first axis).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qm`
@@ -648,6 +671,13 @@ class FullData(_BaseRemapReader):
     -----
     ``d.qf.read(n)`` reads the whole 3D box at step ``n``.
     Then use ``d.qf.ro, d.qf.vx, ...`` (see Attributes).
+
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[:, None, None] + d.qf.te`` (x is the first axis).
 
     Important
     ---------
@@ -1121,6 +1151,14 @@ class RestrictedData(_BaseRemapReader):
     -----
     ``d.qr.read(n, keys, x0=..., x1=..., y0=..., y1=..., z0=..., z1=...)`` reads only the
     sub-volume at step ``n``. Then use ``d.qr.ro, ...`` (see Attributes).
+
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[i0:i1 + 1, None, None] + d.qr.te``, where
+    ``i0 = np.argmin(np.abs(d.p.x - x0))`` and ``i1 = np.argmin(np.abs(d.p.x - x1))`` (x is the first axis).
 
     Important
     ---------
@@ -2042,6 +2080,15 @@ class Slice(_BaseReader):
     ``d.qs.read(n_slice, direc, n)`` reads slice number ``n_slice`` in direction ``direc``
     (``'x'``, ``'y'`` or ``'z'``) at step ``n``. Then use ``d.qs.ro, d.qs.vx, ...`` (see Attributes).
 
+    Note
+    ----
+    In R2D2plus runs, ``ro``, ``se``, ``pr`` and ``te`` are perturbations from the background
+    ``d.p.ro0``, ``d.p.se0``, ``d.p.pr0``, ``d.p.te0`` (1D in x, margins excluded), as R2D2plus
+    writes them; for the compressed format, pyR2D2 computes ``pr`` and ``te`` the same way.
+    The total temperature is ``d.p.te0[i] + d.qs.te`` for an x slice (``direc='x'``), where
+    ``i = np.argmin(np.abs(d.p.x - d.p.x_slice[n_slice]))`` is the x index of the slice,
+    and ``d.p.te0[:, None] + d.qs.te`` for y and z slices (x is the first axis).
+
     Important
     ---------
     pyR2D2.Data class can access this class as :code:`pyR2D2.Data.qs`
@@ -2067,9 +2114,9 @@ class Slice(_BaseReader):
     ph : numpy.ndarray, float
         div B cleaning variable
     pr : numpy.ndarray, float
-        pressure
+        pressure perturbation (see Note)
     te : numpy.ndarray, float
-        temperature
+        temperature perturbation (see Note)
 
     """
 
