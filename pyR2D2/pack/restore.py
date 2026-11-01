@@ -28,6 +28,7 @@ except ImportError:  # pragma: no cover
     tomllib = None
 
 import pyR2D2
+from pyR2D2 import _term as term
 
 from .archive import _entries, _walk, sha256
 from .pack import _toml_value
@@ -80,7 +81,7 @@ class Restorer:
         self._t0 = time.time()
 
     def log(self, *msg):
-        self._log(f"[{time.time() - self._t0:8.1f}s]", *msg)
+        self._log(term.dim(f"[{time.time() - self._t0:8.1f}s]"), *msg)
 
     def _is_gfarm(self):
         return self.source.startswith("gfarm:")
@@ -161,7 +162,7 @@ class Restorer:
                 slot=slot, source=f"{self.source}/{entry['tar']}", entries=len(got),
                 bytes=entry["bytes"], check=check, seconds=round(time.time() - t0, 1),
             )
-            self.log(f"restored {dest} ({len(got)} entries)")
+            self.log(f"{term.green('restored')} {dest} ({len(got)} entries)")
             return dest
         finally:
             if work.exists():

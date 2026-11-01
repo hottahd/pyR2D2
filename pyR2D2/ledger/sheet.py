@@ -171,8 +171,8 @@ def decide_quantity_group(columns):
         warnings = []
         if unparsed and split_header(header)[1] != header_unit:
             warnings.append(
-                f"列 {name}: 単位を {header_unit} → {split_header(header)[1]} に変えたが、"
-                f"数として読めないセルが {len(unparsed)} 個あり、そのままにした"
+                f"column {name}: changed the unit from {header_unit} to {split_header(header)[1]}, "
+                f"but left {len(unparsed)} cells that are not numbers as they are"
             )
         out[name] = (header, new_texts, rewrites, warnings)
     return out
@@ -249,28 +249,28 @@ def plan_updates(values, records, server, force=False):
     for rec in records:
         row = case_row(rec.caseid)
         if row is None:
-            plan.skipped.append((rec.caseid, "Case ID が dNNN の形でない"))
+            plan.skipped.append((rec.caseid, "Case ID is not of the form dNNN"))
             continue
         if row < 2:
             # d000 は「番号 + 1 行目」の規則だと見出しの行(1 行目)に重なる。見出しを壊さない。
-            plan.skipped.append((rec.caseid, "1 行目は見出しなので送らない(d000)"))
+            plan.skipped.append((rec.caseid, "row 1 is the header, so d000 is not sent"))
             continue
         if row in rows:
             # d012 と d00012 のように桁の違う名前が同じ番号を指す (同じ行を上書きし合う)
-            plan.skipped.append((rec.caseid, f"{rows[row].caseid} と同じ {row} 行目になる"))
+            plan.skipped.append((rec.caseid, f"falls on row {row}, the same row as {rows[row].caseid}"))
             continue
         cur_case = _cell(values, row, positions["Case ID"]).strip()
         cur_server = _cell(values, row, positions["Server"]).strip()
         # 同じ番号で桁だけ違う名前 (d001 → d00001、2026-10-25 の 5 桁化) は同じランとして上書きしてよい
         if cur_case and case_row(cur_case) != row and not force:
             plan.skipped.append(
-                (rec.caseid, f"{row} 行目の Case ID が {cur_case} (--force で上書き)")
+                (rec.caseid, f"row {row} has Case ID {cur_case} (overwrite with --force)")
             )
             continue
         sender = server or rec.values.get("Server")
         if cur_server and cur_server != sender and not force:
             plan.skipped.append(
-                (rec.caseid, f"Server が {cur_server} (送り手は {sender}。--force で上書き)")
+                (rec.caseid, f"Server is {cur_server}, not {sender} (overwrite with --force)")
             )
             continue
         rows[row] = rec
@@ -432,23 +432,23 @@ def plan_pull(values, records, server, force=False):
         if name is not None and name not in positions:
             positions[name] = col
     if "Case ID" not in positions:
-        plan.warnings.append("シートに Case ID の列が無い")
+        plan.warnings.append("the sheet has no Case ID column")
         return plan
 
     for rec in records:
         row = case_row(rec.caseid)
         if row is None or row < 2 or row > len(values):
-            plan.skipped.append((rec.caseid, "シートに行が無い"))
+            plan.skipped.append((rec.caseid, "no row in the sheet"))
             continue
         cur_case = _cell(values, row, positions["Case ID"]).strip()
         if case_row(cur_case) != row:
-            plan.skipped.append((rec.caseid, f"{row} 行目の Case ID が {cur_case or '空'}"))
+            plan.skipped.append((rec.caseid, f"row {row} has Case ID {cur_case or '(empty)'}"))
             continue
         cur_server = _cell(values, row, positions["Server"]).strip() if "Server" in positions else ""
         sender = server or rec.values.get("Server")
         if cur_server and cur_server != sender and not force:
             plan.skipped.append(
-                (rec.caseid, f"Server が {cur_server} (手元は {sender}。--force で戻す)")
+                (rec.caseid, f"Server is {cur_server}, not {sender} (bring back with --force)")
             )
             continue
         for column in note.PULL_COLUMNS:
@@ -462,7 +462,7 @@ def plan_pull(values, records, server, force=False):
             try:
                 fields = note.parse_cell(column, remote)
             except ValueError as e:
-                plan.warnings.append(f"{rec.caseid} の {column}: {e}")
+                plan.warnings.append(f"{rec.caseid} {note.PULL_KEYS.get(column, column)}: {e}")
                 continue
             # 書き方だけ違う (結論の区切りが「、」など) ものは、読んだ値がメモと同じなら戻さない
             current = note.read(rec.run_dir) or {}

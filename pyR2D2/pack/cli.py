@@ -11,6 +11,7 @@ import argparse
 import subprocess
 import sys
 
+from .. import _term as term
 from .archive import Archiver
 from .pack import KINDS, Packer, parse_steps
 from .restore import GFARM_ROOT, Restorer
@@ -49,7 +50,7 @@ def main(argv=None):
     kinds = [k for k in args.kinds.split(",") if k]
     unknown = [k for k in kinds if k not in KINDS]
     if unknown:
-        raise SystemExit(f"unknown kinds {unknown}; choose from {KINDS}")
+        raise SystemExit(term.error("r2d2plus-pack", f"unknown kinds {unknown}; choose from {KINDS}"))
     packer = Packer(args.run, workers=args.workers, log=lambda *m: print(*m, flush=True), out=args.out)
     ok = packer.run(
         kinds=kinds,
@@ -57,6 +58,9 @@ def main(argv=None):
         delete_original=args.delete_original,
         dry_run=args.dry_run,
     )
+    if not ok:
+        print(term.error("r2d2plus-pack", "some steps FAILED; their originals were kept "
+                         "(see data/param/pack_report.toml)"), file=sys.stderr)
     return 0 if ok else 1
 
 
@@ -81,12 +85,12 @@ def archive_main(argv=None):
     parts = [p for p in args.parts.split(",") if p]
     unknown = [p for p in parts if p not in ("restart", "time", "rest")]
     if unknown:
-        raise SystemExit(f"unknown parts {unknown}")
+        raise SystemExit(term.error("r2d2plus-archive", f"unknown parts {unknown}; choose from restart, time, rest"))
     archiver = Archiver(args.run, args.out, log=lambda *m: print(*m, flush=True))
     try:
         archiver.run_all(parts=parts, dry_run=args.dry_run)
     except RuntimeError as exc:
-        print(f"r2d2plus-archive: {exc}", file=sys.stderr)
+        print(term.error("r2d2plus-archive", exc), file=sys.stderr)
         return 1
     return 0
 
@@ -124,7 +128,7 @@ def restore_main(argv=None):
         )
         restorer.run_slot(args.slot, dry_run=args.dry_run)
     except (RuntimeError, ValueError, FileNotFoundError, subprocess.CalledProcessError) as exc:
-        print(f"r2d2plus-restore: {exc}", file=sys.stderr)
+        print(term.error("r2d2plus-restore", exc), file=sys.stderr)
         return 1
     return 0
 

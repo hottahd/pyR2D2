@@ -35,6 +35,6 @@ def unsent_hint(datadir):
         if sent_sha == sha:
             return None
         run_parent = Path(os.path.abspath(os.fspath(datadir))).parent.parent
-        return f"台帳へ未送信の変更があります: r2d2plus-ledger push {run_parent}"
+        return f"the ledger has unsent changes: r2d2plus-ledger push {run_parent}"
     except Exception:
         return None

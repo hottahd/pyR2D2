@@ -5,6 +5,7 @@ Google には一切接続しない。シートは gspread.Worksheet の最小限
 """
 
 import datetime
+import io
 import os
 import re
 import shutil
@@ -426,7 +427,7 @@ def test_server_defaults_to_last_push(project, monkeypatch):
 
     ws.updated.clear()
     plan = cli.push(project, worksheet=ws, du=False, out=lambda *a: None)
-    assert plan.skipped == [] or all("dNNN" in why or "見出し" in why for _, why in plan.skipped)
+    assert plan.skipped == [] or all("dNNN" in why or "header" in why for _, why in plan.skipped)
     assert ws.updated == []
 
     # 送ったことのないランはホスト名が既定
@@ -499,7 +500,7 @@ def test_dry_run_does_not_touch_google_or_disk(project, monkeypatch):
     out = []
     plan = cli.push(project, dry_run=True, server="astana", out=out.append)
     assert plan.cells
-    assert any("接続していない" in line for line in out)
+    assert any("not connected" in line for line in out)
     assert any(line.startswith("A2\td001") for line in out)
     assert not (project / "d001" / "data" / "param" / "ledger_sent.toml").exists()
 
@@ -552,7 +553,7 @@ def test_set_cells_gspread_uses_header_names(project, monkeypatch):
 def test_unsent_hint(project, tmp_path):
     datadir = project / "d001" / "data"
     msg = unsent_hint(datadir)
-    assert msg == f"台帳へ未送信の変更があります: r2d2plus-ledger push {os.path.abspath(project)}"
+    assert msg == f"the ledger has unsent changes: r2d2plus-ledger push {os.path.abspath(project)}"
     rec = collect.collect_run(project / "d001", server="astana", du=False)
     collect.write_sent(rec, "sunspot")
     assert unsent_hint(datadir) is None
@@ -572,7 +573,7 @@ def test_data_prints_hint_only_for_r2d2plus(capsys):
     import pyR2D2
 
     pyR2D2.Data(Path(__file__).parent / "data")
-    assert "台帳" not in capsys.readouterr().out
+    assert "ledger" not in capsys.readouterr().out
 
 
 # ---------------------------------------------------------------------------
@@ -998,7 +999,7 @@ def test_pull_skips_empty_unreadable_and_other_server(project):
 def test_pull_without_terminal_refuses(project, monkeypatch):
     ws = _pushed_sheet(project)
     monkeypatch.setattr(sys.stdin, "isatty", lambda: False)
-    with pytest.raises(SystemExit, match="端末"):
+    with pytest.raises(SystemExit, match="terminal"):
         cli.pull(project, worksheet=ws, server="astana", out=lambda *a: None)
 
 
@@ -1045,3 +1046,37 @@ def test_column_moves_keep_human_positions():
         assert c > t
         ids.insert(t, ids.pop(c))
     assert ids == final
+
+
+class _Tty:
+    """isatty が True を返す出し先 (色を付ける場合を試す)。"""
+
+    def isatty(self):
+        return True
+
+
+def test_color_only_on_a_terminal_without_no_color(monkeypatch):
+    from pyR2D2 import _term as term
+
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert term.green("ok", _Tty()) == "\033[32mok\033[0m"
+    assert term.green("ok", io.StringIO()) == "ok"  # パイプ・ファイル
+    monkeypatch.setenv("NO_COLOR", "1")
+    assert term.green("ok", _Tty()) == "ok"
+
+
+def test_status_columns_line_up_with_color(project, monkeypatch):
+    """色の制御文字を幅に数えない (幅を揃えてから色を付ける)。"""
+    import re
+
+    from pyR2D2 import _term as term
+
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setattr(term, "enabled", lambda stream=None: True)
+    lines = []
+    cli.cmd_status(type("A", (), {"path": project, "server": "astana"})(), out=lines.append)
+    assert any("\033[" in line for line in lines)
+    plain = [re.sub(r"\033\[[0-9;]*m", "", line) for line in lines]
+    assert plain[0].split()[:2] == ["CASE", "ID"]
+    col = plain[0].index("STATUS")
+    assert all(line[col - 2 : col] == "  " and line[col] != " " for line in plain[1:])

@@ -19,8 +19,18 @@ import glob
 import os
 import sys
 
+from .. import _term as term
 from . import collect, note, sheet
 from .units import Quantity, render, choose_unit
+
+PROG = "r2d2plus-ledger"
+
+# 画面に出す名前 (シートの列名・値は日本語のまま。R2D2plus DEC-666)
+# status の「状態」の値 → R2D2plus の状態名と色
+STATUS_NAMES = {label: key for key, label in collect.STATUS_LABELS.items()}
+STATUS_NAMES[collect.STALE_LABEL] = "unknown"
+STATUS_STYLES = {"running": "green", "normal_end": "green", "wall_limit": "yellow",
+                 "error": "red", "unknown": "yellow"}
 
 
 def _records(path, server, du, only=None):
@@ -30,7 +40,7 @@ def _records(path, server, du, only=None):
         runs = [r for r in runs if r.name in wanted]
         missing = wanted - {r.name for r in runs}
         if missing:
-            print("見つからないラン: " + ", ".join(sorted(missing)), file=sys.stderr)
+            print(term.warning("runs not found: " + ", ".join(sorted(missing)), sys.stderr), file=sys.stderr)
     return [collect.collect_run(r, server=server, du=du) for r in runs]
 
 
@@ -44,23 +54,27 @@ def _fmt_time(q):
 def cmd_status(args, out=print):
     """各ランの要約と、台帳へ未送信の変更があるかを表示する。シートには触らない。"""
     records = _records(args.path, args.server, du=False)
-    rows = [("Case ID", "状態", "到達時刻", "step", "未送信")]
+    header = ("CASE ID", "STATUS", "TIME", "STEP", "UNSENT")
+    rows, styles = [], []
     for r in records:
         unsent = r.unsent()
-        mark = "初回" if unsent == "never" else ("あり" if unsent else "-")
-        rows.append(
-            (
-                r.caseid,
-                r.values.get("状態") or "",
-                _fmt_time(r.values.get("到達時刻")),
-                r.values.get("step") or "",
-                mark,
-            )
-        )
-    widths = [max(_width(row[i]) for row in rows) for i in range(len(rows[0]))]
-    for row in rows:
-        out("  ".join(_pad(c, w) for c, w in zip(row, widths)).rstrip())
+        mark = "never sent" if unsent == "never" else ("yes" if unsent else "-")
+        label = r.values.get("状態") or ""
+        status = STATUS_NAMES.get(label, label)
+        rows.append((r.caseid, status, _fmt_time(r.values.get("到達時刻")), r.values.get("step") or "", mark))
+        styles.append((None, STATUS_STYLES.get(status), None, None, "dim" if mark == "-" else "yellow"))
+    widths = [max(_width(row[i]) for row in [header] + rows) for i in range(len(header))]
+    # 色の制御文字は幅に数えないよう、幅を揃えてから色を付ける
+    widths[-1] = 0  # 最後の列は揃えない (行末に空白を残さない)
+    out(term.bold("  ".join(_pad(c, w) for c, w in zip(header, widths)).rstrip()))
+    for row, style in zip(rows, styles):
+        cells = [term.paint(_pad(c, w), s) for c, w, s in zip(row, widths, style)]
+        out("  ".join(cells).rstrip())
     return records
+
+
+def _n(count, noun):
+    return f"{count} {noun}" + ("" if count == 1 else "s")
 
 
 def _width(s):
@@ -69,7 +83,7 @@ def _width(s):
 
 
 def _pad(s, w):
-    return str(s) + " " * (w - _width(s))
+    return str(s) + " " * max(0, w - _width(s))
 
 
 def cmd_export(args, out=print):
@@ -80,7 +94,7 @@ def cmd_export(args, out=print):
         w = csv.writer(f)
         w.writerow(headers)
         w.writerows(rows)
-    out(f"{len(records)} 本のランを {args.output} に書いた")
+    out(term.green(f"wrote {_n(len(records), 'run')} to {args.output}"))
     return headers, rows
 
 
@@ -91,15 +105,15 @@ def open_worksheet(sheet_name=None, sheet_id=None, json_key=None):
         from google.oauth2.service_account import Credentials  # noqa: F401
     except ImportError as e:
         raise SystemExit(
-            "r2d2plus-ledger push には gspread と google-auth が要る "
-            f"(pip install gspread google-auth): {e}"
+            term.error(PROG, "push and pull need gspread and google-auth "
+                       f"(pip install gspread google-auth): {e}")
         )
     from ..write.google.google import init_gspread
 
     if json_key is None:
         keys = sorted(glob.glob(os.path.join(os.environ["HOME"], "json", "*")))
         if not keys:
-            raise SystemExit("~/json/ にサービスアカウントの JSON 鍵が無い (--json-key で指定)")
+            raise SystemExit(term.error(PROG, "no service account JSON key in ~/json/ (give one with --json-key)"))
         json_key = keys[0]
     gc = init_gspread(json_key, sheet_name)
     book = gc.open_by_key(sheet_id) if sheet_id else gc.open(sheet_name)
@@ -154,30 +168,27 @@ def push_records(
     values = worksheet.get_all_values() if worksheet is not None else []
     plan = sheet.plan_updates(values, records, server, force=force)
 
-    for caseid, reason in plan.skipped:
-        out(f"警告: {caseid} を飛ばした: {reason}")
-    for w in plan.warnings:
-        out(f"警告: {w}")
+    _warn(plan, out)
     # 管理列を COLUMNS の順に並べ替える (人の列は動かさない)。書いた後の見出しで決める
     moves, final = sheet.column_moves(plan.header_after) if reorder else ([], [])
 
     if dry_run:
         if moves:
-            out("列を並べ替える: " + ", ".join(h for h in final if h))
+            out("would reorder columns: " + ", ".join(h for h in final if h))
         if worksheet is None:
-            out(f"(dry-run: シート {label} には接続していない。空のシートに対する計画)")
+            out(term.dim(f"(dry-run: not connected to sheet {label}; plan against an empty sheet)"))
         for r, c, text in sorted(plan.cells):
-            out(f"{sheet.a1(r, c)}\t{text}")
-        out(f"(dry-run) {len(plan.cells)} セルを書く予定、{len(plan.written)} 本のラン")
+            out(f"{term.dim(sheet.a1(r, c))}\t{text}")
+        out(f"(dry-run) would write {_n(len(plan.cells), 'cell')} for {_n(len(plan.written), 'run')}")
         return plan
 
     sheet.apply_plan(worksheet, plan)
     if moves:
         sheet.apply_column_moves(worksheet, moves)
-        out(f"管理列を決まった順に並べ替えた ({len(moves)} 回の移動)")
+        out(f"reordered the managed columns ({_n(len(moves), 'move')})")
     for rec in plan.written:
         collect.write_sent(rec, label)
-    out(f"{len(plan.written)} 本のランをシート {label} に送った ({len(plan.cells)} セル)")
+    out(term.green(f"sent {_n(len(plan.written), 'run')} to sheet {label} ({_n(len(plan.cells), 'cell')})"))
     return plan
 
 
@@ -211,37 +222,37 @@ def pull(
     label = sheet_id or sheet_name or collect.project_name(path)
     if ask is None:
         if not dry_run and not sys.stdin.isatty():
-            raise SystemExit("pull は 1 つずつ y/n で聞くので端末から実行する (--dry-run なら表示だけ)")
+            raise SystemExit(term.error(PROG, "pull asks y/n for each change; run it from a terminal "
+                                        "(or use --dry-run to only show the changes)"))
         ask = input
     if worksheet is None:
         worksheet = open_worksheet(
             sheet_name=None if sheet_id else label, sheet_id=sheet_id, json_key=json_key
         )
     plan = sheet.plan_pull(worksheet.get_all_values(), records, server, force=force)
-    for caseid, reason in plan.skipped:
-        out(f"警告: {caseid} を飛ばした: {reason}")
-    for w in plan.warnings:
-        out(f"警告: {w}")
+    _warn(plan, out)
     if not plan.changes:
-        out(f"シート {label} に、手元と違う目的・プロジェクト・保存・結論は無い")
+        out(term.green(f"sheet {label} has no purpose, project, retention or cited_in that differs from the local notes"))
         return []
 
     applied = []
     for i, c in enumerate(plan.changes, start=1):
-        out(f"[{i}/{len(plan.changes)}] {c.record.caseid} の {c.column}")
-        out(f"  手元  : {c.local or '(空)'}")
-        out(f"  シート: {c.remote}")
+        out(term.bold(f"[{i}/{len(plan.changes)}] {c.record.caseid} {note.PULL_KEYS.get(c.column, c.column)}"))
+        out(f"  local: {c.local or term.dim('(empty)')}")
+        out(f"  sheet: {c.remote}")
         if c.column == "保存":
             cur = note.read(c.record.run_dir) or {}
             if "expires" not in c.fields and cur.get("expires"):
-                out(f"  (手元の「{cur['expires']} まで残す」はシートに無いが、消さずに残る。消すなら手元で消す)")
+                out(term.dim(f"  (local expires = {cur['expires']} is not in the sheet; it is kept. "
+                             "Remove it in the local note to drop it)"))
             if "keep_parts" not in c.fields and cur.get("keep_parts"):
-                parts = note.KEEP_PARTS_JOIN.join(cur["keep_parts"])
-                out(f"  (手元の「{note.KEEP_PARTS_SEP}{parts}」はシートに無いが、消さずに残る。消すなら手元で消す)")
+                parts = ", ".join(cur["keep_parts"])
+                out(term.dim(f"  (local keep_parts = [{parts}] is not in the sheet; it is kept. "
+                             "Remove it in the local note to drop it)"))
         if dry_run:
             continue
         while True:
-            ans = ask("  手元のメモに反映しますか [y/n/q]: ").strip().lower()
+            ans = ask("  apply to the local note? [y/n/q]: ").strip().lower()
             if ans in ("y", "n", "q"):
                 break
         if ans == "q":
@@ -249,12 +260,19 @@ def pull(
         if ans == "y":
             p = note.update(c.record.run_dir, c.fields)
             applied.append(c)
-            out(f"  反映した: {p}")
+            out(term.green(f"  applied: {p}"))
     if dry_run:
-        out(f"(dry-run) {len(plan.changes)} か所が手元と違う。手元は書き換えていない")
+        out(f"(dry-run) {_n(len(plan.changes), 'change')} from the local notes; nothing was written")
     else:
-        out(f"{len(applied)} / {len(plan.changes)} か所を手元のメモに反映した")
+        out(term.green(f"applied {len(applied)} of {len(plan.changes)} changes to the local notes"))
     return applied
+
+
+def _warn(plan, out):
+    for caseid, reason in plan.skipped:
+        out(term.warning(f"skipped {caseid}: {reason}"))
+    for w in plan.warnings:
+        out(term.warning(w))
 
 
 def cmd_pull(args, out=print):
@@ -292,52 +310,52 @@ def cmd_push(args, out=print):
 def build_parser():
     ap = argparse.ArgumentParser(
         prog="r2d2plus-ledger",
-        description="ランの一覧 (台帳) を Google スプレッドシートへ送る",
+        description="Send the list of runs (the ledger) to a Google spreadsheet",
     )
     sub = ap.add_subparsers(dest="command", required=True)
 
     def common(p):
-        p.add_argument("path", help="<project>/run (またはラン 1 本のディレクトリ)")
-        p.add_argument("--server", default=None, help="サーバ名 (既定: 前回送ったときの名前、無ければホスト名)")
+        p.add_argument("path", help="<project>/run (or the directory of one run)")
+        p.add_argument("--server", default=None, help="server name (default: the name used last time, else the host name)")
 
-    p = sub.add_parser("status", help="各ランの要約と未送信の有無 (送らない)")
+    p = sub.add_parser("status", help="show each run and whether it has unsent changes (sends nothing)")
     common(p)
     p.set_defaults(func=cmd_status)
 
-    p = sub.add_parser("export", help="管理列を CSV に書く")
+    p = sub.add_parser("export", help="write the managed columns to a CSV file")
     common(p)
     p.add_argument("-o", "--output", required=True)
-    p.add_argument("--no-du", action="store_true", help="容量 (data/ の使用量) を測らない")
+    p.add_argument("--no-du", action="store_true", help="do not measure the size (disk usage of data/)")
     p.set_defaults(func=cmd_export)
 
-    p = sub.add_parser("push", help="シートの管理列を更新する")
+    p = sub.add_parser("push", help="update the managed columns of the sheet")
     common(p)
     g = p.add_mutually_exclusive_group()
-    g.add_argument("--sheet", default=None, help="シート名 (既定: プロジェクト名)")
-    g.add_argument("--sheet-id", default=None, help="シートの ID (URL の /d/ の後)")
-    p.add_argument("--json-key", default=None, help="サービスアカウントの JSON 鍵")
-    p.add_argument("--dry-run", action="store_true", help="書くセルを表示するだけ")
-    p.add_argument("--force", action="store_true", help="Server の違う行も上書きする")
-    p.add_argument("--only", default=None, help="送るラン (例: d001,d005)")
-    p.add_argument("--no-du", action="store_true", help="容量 (data/ の使用量) を測らない")
+    g.add_argument("--sheet", default=None, help="sheet name (default: the project name)")
+    g.add_argument("--sheet-id", default=None, help="sheet ID (the part after /d/ in the URL)")
+    p.add_argument("--json-key", default=None, help="JSON key of the service account")
+    p.add_argument("--dry-run", action="store_true", help="only show the cells that would be written")
+    p.add_argument("--force", action="store_true", help="also overwrite rows whose Server differs")
+    p.add_argument("--only", default=None, help="runs to send (e.g. d001,d005)")
+    p.add_argument("--no-du", action="store_true", help="do not measure the size (disk usage of data/)")
     p.add_argument(
         "--keep-column-order",
         action="store_true",
-        help="管理列を決まった順 (Case ID, プロジェクト, 目的, 保存, 容量, …) に並べ替えない",
+        help="do not reorder the managed columns into the fixed order (Case ID, project, purpose, retention, size, ...)",
     )
     p.set_defaults(func=cmd_push)
 
     p = sub.add_parser(
-        "pull", help="シートで書き換えた目的・プロジェクト・保存・結論を、1 つずつ y/n で確かめて手元のメモへ戻す"
+        "pull", help="bring purpose, project, retention and cited_in edited in the sheet back to the local notes, asking y/n for each"
     )
     common(p)
     g = p.add_mutually_exclusive_group()
-    g.add_argument("--sheet", default=None, help="シート名 (既定: プロジェクト名)")
-    g.add_argument("--sheet-id", default=None, help="シートの ID (URL の /d/ の後)")
-    p.add_argument("--json-key", default=None, help="サービスアカウントの JSON 鍵")
-    p.add_argument("--dry-run", action="store_true", help="違うところを表示するだけ")
-    p.add_argument("--force", action="store_true", help="Server の違う行も戻す")
-    p.add_argument("--only", default=None, help="戻すラン (例: d001,d005)")
+    g.add_argument("--sheet", default=None, help="sheet name (default: the project name)")
+    g.add_argument("--sheet-id", default=None, help="sheet ID (the part after /d/ in the URL)")
+    p.add_argument("--json-key", default=None, help="JSON key of the service account")
+    p.add_argument("--dry-run", action="store_true", help="only show the differences")
+    p.add_argument("--force", action="store_true", help="also bring back rows whose Server differs")
+    p.add_argument("--only", default=None, help="runs to bring back (e.g. d001,d005)")
     p.set_defaults(func=cmd_pull)
     return ap
 

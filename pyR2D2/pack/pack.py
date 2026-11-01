@@ -57,6 +57,7 @@ except ImportError:  # pragma: no cover
     tomllib = None
 
 import pyR2D2
+from pyR2D2 import _term as term
 from pyR2D2.data_io import zarr_util
 
 KINDS = ("qf", "qs", "qt")
@@ -199,7 +200,7 @@ class Packer:
         return self.outdir / Path(path).relative_to(self.datadir)
 
     def log(self, *msg):
-        self._log(f"[{time.time() - self._t0:8.1f}s]", *msg)
+        self._log(term.dim(f"[{time.time() - self._t0:8.1f}s]"), *msg)
 
     def _time_family(self, kind):
         """``kind`` の書き終わりを見る時刻のディレクトリ (``data/time/<族>``)。"""
@@ -466,7 +467,7 @@ class Packer:
                 family: max(time_steps(self.datadir, family), default=-1)
                 for family in {self._time_family(kind) for kind in KINDS}
             }
-            self.log(f"run status is {status!r}: only steps followed by a later time file are handled")
+            self.log(term.yellow(f"run status is {status!r}: only steps followed by a later time file are handled"))
         # wall_limit は延長の前提なので、種類ごとの最後のステップの元を残す
         keep_last = status == "wall_limit"
 
@@ -476,16 +477,16 @@ class Packer:
             has_zip = unit.zip.exists()
             if not present:
                 if not has_zip:
-                    self.log(f"{unit.label()}: no files")
+                    self.log(term.dim(f"{unit.label()}: no files"))
                 continue
             if len(present) != len(unit.raw):
-                self.log(f"{unit.label()}: only {len(present)}/{len(unit.raw)} binary files; skipped")
+                self.log(f"{unit.label()}: only {len(present)}/{len(unit.raw)} binary files; {term.yellow('skipped')}")
                 continue
             if unit.final.is_dir():
-                self.log(f"{unit.label()}: {unit.final} (zarr directory) exists; skipped")
+                self.log(f"{unit.label()}: {unit.final} (zarr directory) exists; {term.yellow('skipped')}")
                 continue
             if running and later[self._time_family(unit.kind)] <= unit.n:
-                self.log(f"{unit.label()}: may still be being written (no later time file); skipped")
+                self.log(f"{unit.label()}: may still be being written (no later time file); {term.yellow('skipped')}")
                 continue
             delete = delete_original and not (keep_last and is_last)
             action = "verify" if has_zip else "pack"
@@ -512,7 +513,7 @@ class Packer:
             except Exception as exc:  # 記録して次へ。元のファイルは消さない
                 ok = False
                 entry.update(result="failed", message=f"{type(exc).__name__}: {exc}")
-                self.log(f"{unit.label()}: FAILED {exc}")
+                self.log(f"{unit.label()}: {term.red('FAILED')} {exc}")
                 delete = False
 
             deleted = []
@@ -538,7 +539,7 @@ class Packer:
             self.record(entry)
             if entry["result"] != "failed":
                 self.log(
-                    f"{unit.label()}: {entry['result']} {entry['zip_bytes'] / 1e9:.3f} GB"
+                    f"{unit.label()}: {term.green(entry['result'])} {entry['zip_bytes'] / 1e9:.3f} GB"
                     f" ({raw_bytes / 1e9:.3f} GB raw), deleted {len(deleted)} files"
                 )
         return ok

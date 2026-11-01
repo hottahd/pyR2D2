@@ -27,6 +27,7 @@ import zipfile
 from pathlib import Path
 
 import pyR2D2
+from pyR2D2 import _term as term
 
 from .pack import KINDS, Packer, _toml_value, run_status
 
@@ -145,7 +146,7 @@ class Archiver:
         self.report = []
 
     def log(self, *msg):
-        self._log(f"[{time.time() - self._t0:8.1f}s]", *msg)
+        self._log(term.dim(f"[{time.time() - self._t0:8.1f}s]"), *msg)
 
     def _record(self, **entry):
         entry["date"] = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
@@ -271,4 +272,4 @@ class Archiver:
         if "rest" in parts:
             self.rest()
         self.write_report(zips)
-        self.log(f"done; {len(zips)} zips are to be sent from the run itself (see archive_report.toml)")
+        self.log(f"{term.green('done')}; {len(zips)} zips are to be sent from the run itself (see archive_report.toml)")

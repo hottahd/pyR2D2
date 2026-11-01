@@ -38,6 +38,8 @@ OLD_RETENTION_LABELS = {
 
 # シートから戻してよい列 (列名 → メモの項目)。ほかの列は機械が書く値なので戻さない。
 PULL_COLUMNS = ("プロジェクト", "目的", "保存", "結論")
+# 画面に出すときの名前 (メモの項目名)
+PULL_KEYS = {"プロジェクト": "project", "目的": "purpose", "保存": "retention", "結論": "cited_in"}
 
 # 保存の表示で、retention の後ろに keep_parts を付ける形「再生成の情報だけ＋remap/vl・slice」
 KEEP_PARTS_SEP = "＋"
@@ -81,17 +83,17 @@ def keep_parts_value(items):
     for raw in items:
         item = raw.strip()
         if not item:
-            raise ValueError("keep_parts に空の項目がある")
+            raise ValueError("keep_parts has an empty item")
         if item.startswith("/") or "\\" in item:
-            raise ValueError(f"keep_parts の {item!r} は data/ からの相対パスで書く (絶対パス・バックスラッシュは不可)")
+            raise ValueError(f"keep_parts item {item!r} must be a path relative to data/ (no absolute path, no backslash)")
         path = PurePosixPath(item)
         if ".." in path.parts:
-            raise ValueError(f"keep_parts の {item!r} に .. は使えない")
+            raise ValueError(f"keep_parts item {item!r} must not contain ..")
         if path.parts and path.parts[0] == "data":
-            raise ValueError(f"keep_parts の {item!r} は data/ からの相対パスで書く (先頭の data/ は付けない)")
+            raise ValueError(f"keep_parts item {item!r} must be a path relative to data/ (without a leading data/)")
         norm = str(path)
         if norm == ".":
-            raise ValueError(f"keep_parts の {item!r} は data/ 全体になる (全部残すなら 残す)")
+            raise ValueError(f"keep_parts item {item!r} is the whole of data/ (to keep everything, use retention keep)")
         if norm not in parts:
             parts.append(norm)
     return parts
@@ -99,7 +101,7 @@ def keep_parts_value(items):
 
 def _parse_keep_parts(text):
     if not text.strip():
-        raise ValueError(f"「{KEEP_PARTS_SEP}」の後は data/ からの相対パスを「{KEEP_PARTS_JOIN}」で並べる")
+        raise ValueError(f"after {KEEP_PARTS_SEP!r}, list paths relative to data/ separated by {KEEP_PARTS_JOIN!r}")
     return keep_parts_value(re.split(r"[・、,]", text))
 
 
@@ -136,9 +138,10 @@ def parse_cell(column, text):
         keys.update({key: key for key in RETENTION_LABELS})
         if text not in keys:
             raise ValueError(
-                f"保存の値 {text!r} が読めない ("
-                + "・".join(RETENTION_LABELS.values())
-                + f" のどれか。後ろに「{KEEP_PARTS_SEP}remap/vl{KEEP_PARTS_JOIN}slice」と「(YYYY-MM-DD まで残す)」を付けられる)"
+                f"cannot read retention {text!r}: use one of "
+                + ", ".join(repr(v) for v in RETENTION_LABELS.values())
+                + f", optionally followed by {KEEP_PARTS_SEP + 'remap/vl' + KEEP_PARTS_JOIN + 'slice'!r}"
+                + " and ' (YYYY-MM-DD まで残す)'"
             )
         fields = {"retention": keys[text]}
         if parts:
@@ -150,7 +153,7 @@ def parse_cell(column, text):
         decs = [s for s in re.split(r"[,、\s]+", text) if s]
         bad = [s for s in decs if not _DEC_RE.match(s)]
         if bad:
-            raise ValueError(f"結論は DEC-NNN を並べる ({', '.join(bad)} が読めない)")
+            raise ValueError(f"cited_in must be a list of DEC-NNN (cannot read {', '.join(bad)})")
         return {"cited_in": decs}
     raise KeyError(column)
 
@@ -183,12 +186,12 @@ def _value_end(lines, i):
             ch = text[k]
             if ch in "\"'":
                 if text.startswith(ch * 3, k):
-                    raise ValueError("三重引用符の値は書き換えない")
+                    raise ValueError("values in triple quotes are not rewritten")
                 k += 1
                 while k < len(text) and text[k] != ch:
                     k += 2 if (ch == '"' and text[k] == "\\") else 1
                 if k >= len(text):
-                    raise ValueError("閉じていない文字列")
+                    raise ValueError("unterminated string")
                 started = True
             elif ch == "#":
                 if depth == 0 and started:
@@ -212,7 +215,7 @@ def _value_end(lines, i):
             return j, ""
         j += 1
         if j >= len(lines):
-            raise ValueError("閉じていない並び")
+            raise ValueError("unterminated array")
 
 
 def update(run_dir, fields):
@@ -265,7 +268,7 @@ def update(run_dir, fields):
     new_note = tomllib.loads(new_text).get("note", {})
     for key, value in fields.items():
         if new_note.get(key) != value:
-            raise RuntimeError(f"{p}: {key} を書けなかった")
+            raise RuntimeError(f"{p}: could not write {key}")
     p.parent.mkdir(parents=True, exist_ok=True)
     tmp = p.with_suffix(".toml.tmp")
     tmp.write_text(new_text, encoding="utf-8")
