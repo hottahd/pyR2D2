@@ -3,28 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-R2D2 Document
+pyR2D2
 ================================
 
-このページは太陽と恒星のための輻射磁気流体コードR2D2 (RSST and Radiation for Deep Dynamics)のマニュアルである。 
+pyR2D2 は、太陽と恒星のための輻射磁気流体コード R2D2 (RSST and Radiation for Deep Dynamics) と、
+その C++ 版 R2D2plus の計算結果を読み、解析するための Python モジュールである。
 
-R2D2では、輻射磁気流体力学の方程式を中央差分と非線形の人工粘性を用いて高精度かつ安定に解く。R2D2では、太陽表面付近では現実的に輻射輸送を解き、太陽深部では微小擾乱を正確に解く手法を取ることで、太陽内部から表面までを一貫して解くことができる。
+https://github.com/hottahd/pyR2D2
 
+R2D2 そのもの (方程式・数値スキーム・境界条件・計算の始め方) の説明は
+`R2D2 マニュアル <https://hottahd.github.io/R2D2-manual/>`_ にある。
+R2D2plus は公開していない。
 
 .. toctree::
    :maxdepth: 2
 
-   quick_start
-   environment
-   typical_case
    pyr2d2
+   environment
    data_compression
+   paraview
    api_reference
-   sphinx.rst
-   paraview.rst
-   geometry.rst
-	     
-ライセンス
+
+R2D2 のライセンス
 ----------------------------------
 
 R2D2は公開ソフトウェアではなく、再配布も禁じている。
@@ -36,7 +36,7 @@ R2D2は公開ソフトウェアではなく、再配布も禁じている。
 * R2D2を用いた論文を出版するときは `Hotta et al., 2019 <https://ui.adsabs.harvard.edu/abs/2019SciA....5.2307H/abstract>`_, `Hotta and Iijima, 2020 <https://ui.adsabs.harvard.edu/abs/2020MNRAS.494.2523H/abstract>`_ を引用すること。  
 * R2D2を用いた研究を発表するときは、`R2D2のロゴ <https://hottahd.github.io/R2D2-manual/_images/R2D2_logo_red.png>`_ の使用が推奨される(強制ではない)。
 
-出版論文
+R2D2 を用いた出版論文
 ----------------------------------
 R2D2を用いた研究で出版された論文は以下です。
 

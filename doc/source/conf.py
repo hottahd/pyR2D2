@@ -30,8 +30,8 @@ import pyR2D2
 
 # -- Project information -----------------------------------------------------
 
-project = 'R2D2 Document'
-copyright = '2020-2024, Hideyuki Hotta'
+project = 'pyR2D2'
+copyright = '2020-2026, Hideyuki Hotta'
 author = 'Hideyuki Hotta'
 
 # The full version, including alpha/beta/rc tags
@@ -50,7 +50,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
 ]
 
 if not IS_PREVIEW:

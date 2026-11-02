@@ -1,64 +1,10 @@
-R2D2を使うための環境設定
+pyR2D2 を使うための環境設定
 ===============================
 
-R2D2コードを使って計算するだけならば任意のfortranコンパイラ, FFTW, MPIのみがあれば良い。
-Pythonコードを使って解析する場合は、いくつかのモジュールが必要なので、そのインストールの方法もここで説明する。
-
-Fortranコードの環境設定
-----------------------------------------
-Mac
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Homebrewを用いて、必要なコンパイラ・ライブラリをインストールすることを推奨している。
-コンパイラとFFTWのインクルードファイルとライブラリの位置だけ指定すれば良いので、
-任意の方法でインストールして構わない。Homebrew以外を用いる場合は、便宜make/Makefileを編集すること。
-
-Homebrewのインストール
-
-.. code::
-
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-gfortranのインストール
-
-.. code::
-
-    brew install gcc
-
-OpenMPIのインストール
-
-.. code::
-
-    brew install openmpi
-
-
-FFTWのインストール
-
-.. code:: 
-
-    brew install fftw
-
-Linux (Ubuntu 22.04)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-ここでは、Ubuntu 22.04の場合のみを説明する。
-
-gfortranのインストール
-
-.. code::
-
-    sudo apt-get install gfortran
-
-OpenMPIのインストール
-
-.. code::
-
-    sudo apt-get install openmpi-doc openmpi-bin libopenmpi-dev
-
-FFTWのインストール
-
-.. code:: 
-    
-     sudo apt-get install libfftw3-dev
+pyR2D2 を使うための Python の環境と、計算の一覧を Google スプレッドシートに送るための設定を説明する。
+pyR2D2 そのもののインストールは :doc:`pyr2d2` にある。
+R2D2 (Fortran) を計算するためのコンパイラ・MPI・FFTW の準備は
+`R2D2 マニュアル <https://hottahd.github.io/R2D2-manual/>`_ にある。
 
 Pythonコードの環境設定
 ----------------------------------------
@@ -79,7 +25,7 @@ MacとLinuxで共通する部分が多いのでまとめて説明を記す。
 
         wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
-    インストールするディレクトリは :code:`/home_directory/miniforge3` とする(デフォルト)。  インストール後、シェルの初期化ファイルに以下の行を追加して、miniforgeのbinディレクトリにPATHを通す。 :code:`/ホームディレクトリ/anaconda3` にPATHを通す。conda環境は重いので、必要なときにのみPATHを通すことを推奨する。
+    インストールするディレクトリは :code:`/home_directory/miniforge3` とする(デフォルト)。  インストール後、シェルの初期化ファイルに以下の行を追加して、miniforgeのbinディレクトリにPATHを通す。conda環境は重いので、必要なときにのみPATHを通すことを推奨する。
     スパコンのログインノードなどでもインストール方法は共通である。
 
 ipythonの初期設定
@@ -228,65 +174,24 @@ https://docs.google.com/spreadsheets/create
 台帳の送信 (r2d2plus-ledger)
 ||||||||||||||||||||||||||||||
 
-``pyR2D2.Data`` を読み込まずに、プロジェクトの全ラン (``<project>/run/dNNN``) の設定と
-状態をシートへ送るコマンド ``r2d2plus-ledger`` がある (pyR2D2 を入れると入る)。
-``push``・``pull`` にだけ ``gspread`` と ``google-auth`` が要る (``pip install "pyR2D2[ledger]"``)。
-計算ノードでは動かさず、ログインノードか手元で使う。
+pyR2D2 を入れると、プロジェクトの全ラン (``<project>/run/dNNN``) の設定と状態を、データを読み込まずに
+シートへ送るコマンド ``r2d2plus-ledger`` が入る。``push``・``pull`` にだけ ``gspread`` と ``google-auth`` が要る
+(``pip install "pyR2D2[ledger]"``)。計算ノードでは動かさず、ログインノードか手元で使う。
 
 .. code:: shell
 
-    r2d2plus-ledger status ~/work/proj/run            # 各ランの状態と「未送信の変更」の有無 (送らない)
+    r2d2plus-ledger status ~/work/proj/run            # 各ランの状態と未送信 (UNSENT) の有無 (送らない)
     r2d2plus-ledger export ~/work/proj/run -o ledger.csv
     r2d2plus-ledger push   ~/work/proj/run --dry-run  # 書くセルを表示するだけ (Google に接続しない)
     r2d2plus-ledger push   ~/work/proj/run            # シート名 = プロジェクト名 (proj)
-    r2d2plus-ledger push   ~/work/proj/run --sheet-id <ID> --only d001,d005
-    r2d2plus-ledger pull   ~/work/proj/run --dry-run  # シートと手元のメモの違いを表示するだけ
-    r2d2plus-ledger pull   ~/work/proj/run            # 違いを 1 つずつ y/n で確かめて手元のメモへ戻す
+    r2d2plus-ledger pull   ~/work/proj/run            # シートで書き換えた目的などを 1 つずつ y/n で手元へ戻す
+    r2d2plus-ledger --help                            # 使い方 (サブコマンドごとにも --help がある)
 
-- 読むのは ``data/param`` の ``params.dac``・``back.dac``・``run_summary.toml``・``origin.toml``・
-  ``runs/<最新>/effective_config.txt``・``run.log`` の末尾と ``restart/*/meta.toml`` の ``[modifiers]``、
-  および ``data/`` の使用量 (``--no-du`` で省略) だけ。Fortran 版のラン (``run_summary.toml`` が無い)
-  も ``params.dac`` と ``cont_log.txt`` から従来どおりの列を埋める。
-- **コードが管理する列**は ``Case ID, プロジェクト, 目的, 保存, 容量, Mstar, (ix,jx,kx), xmin … zmax, uni, dx, m ray, dtout, dtout_tau,
-  al, RSST, Om, Geometry, origin, update time, Server, 状態, 到達時刻, t_end, step, 形式, 加工,
-  commit, backend, ranks, ms/step, 結論, 実体``。列は見出しの**単位を除いた名前**で探す (``dtout [s]`` も
-  ``dtout [min]`` も ``dtout``。``Gemetry`` は ``Geometry`` の別名)。シートに無い管理列は見出しの右端に
-  足す。**それ以外の列 (Note・Finish など) は人の列で、読みも書きもしない**。書くのは管理列のセル
-  だけ (セル単位の ``batch_update``) で、行ごと書き戻さない。
-- 行は Case ID の番号で決まる (d001 は 2 行目)。欠番の空行や人のメモだけの行はそのまま残る。
-  その行の ``Server`` が送り手 (``--server`` で指定。省くと前回送ったときの名前 (``ledger_sent.toml``)、
-  一度も送っていなければホスト名。富岳のようにログインノードが何台もある機械では、初回に
-  ``--server fugaku`` のように付ける) と違えば、警告して飛ばす
-  (``--force`` で上書き)。
-- 単位は列ごとに値に合わせて自動で選び、見出しに書く (時刻 s/min/h/d/yr、長さ km/Mm、容量 MB/GB/TB、
-  球・YinYang の動径は R_star、角度は deg)。表示値が 1〜1000 に入る単位のうち、慣用の繰り上がり
-  (1000 s 未満は s、48 h 未満は h など) で 1 つに決める。今の見出しの単位で 0.1〜1e4 に収まる間は
-  単位を変えない。対になる列 (xmin/xmax・ymin/ymax・zmin/zmax・到達時刻/t_end) は値を合わせて同じ単位にし、
-  変えるときも組で一緒に変える (dtout と dtout_tau は独立)。単位が変わると、手元に無いランの行のセルも見出しの旧単位で読んで換算し書き直す
-  (表示の 2 桁の丸めの分だけ誤差が入る)。1 列に長さと角度が混ざるときは、見出しを単位なしにして
-  各セルに ``6.14 [Mm]`` の形で単位を書く。直交座標の xmin/xmax は従来どおり rstar からの距離。
-- 送ると各ランの ``data/param/ledger_sent.toml`` に管理列のハッシュを残す。``status`` はこれと
-  比べて未送信の変更を示し、``pyR2D2.Data`` でそのランを開いたときにも
-  「台帳へ未送信の変更があります: r2d2plus-ledger push …」と 1 行出る (R2D2plus のランだけ)。
-- ``pull`` はシートで書き換えた **目的・プロジェクト・保存・結論** だけを、手元のランのメモ
-  ``data/param/run_note.toml`` (R2D2plus DEC-600) へ戻す。ほかの列は機械がランから読む値なので戻さない。
-  違いを 1 つずつ「手元・シート」の並びで見せ、``y`` で反映、``n`` で飛ばす (次の ``pull`` でまた聞く)、
-  ``q`` で終わる。書き換えるのはメモの該当する行だけで、コメントや並びは保つ。シートのセルが空なら戻さない
-  (項目を消すのは手元で行う)。保存は ``残す``・``再生成の情報だけ``・``未定 (消さない)``・``間引き済み (残す)``
-  (または ``keep``・``regen_only``・``auto``・``thin``。2026-10-31 までの表示 ``全部残す``・``間引いて残す``・
-  ``自動 (DEC-599)`` も読める。意味は R2D2plus DEC-666) に、メモの ``keep_parts`` (消したあとに ``data/`` に残すもの。
-  2026-10-31) を「＋」の後に「・」で並べて付け (``再生成の情報だけ＋remap/vl・slice``)、「(YYYY-MM-DD まで残す)」を
-  付けられる。シートに「＋…」や「(… まで残す)」が無くても、手元のその項目は消さずに残す。結論は ``DEC-NNN`` を並べる。読めない値は
-  警告して戻さない。行と Server の確かめ方は ``push`` と同じで、ランの本体がある機械で実行する。
-- 管理列の並びは ``Case ID, プロジェクト, 目的, 保存, 容量`` から始まる (2026-10-28)。``push`` は既にあるシートでも
-  管理列をこの順に並べ替える (Sheets API の moveDimension、中身・書式・幅ごと移る)。人の列は動かさず、管理列が
-  占めている位置だけに詰める。並べ替えないときは ``--keep-column-order``。
-- 従来の ``pyR2D2.write.google.set_cells_gspread`` も同じ処理で書くようになった
-  (以前は A〜T 列を位置で上書きし、``Server`` が落ちていた)。
-
-IDLコードの環境設定
-----------------------------------------
-
-システムにIDLをインストールすれば、それのみで使える。ここでは説明しない。
+- 表示・警告・エラーは英語で出る。端末に出すときだけ色を付け (緑 = 正常、黄 = 注意、赤 = 失敗)、
+  環境変数 ``NO_COLOR`` があれば付けない。シートの見出しと値 (``状態``・``保存`` など) は日本語のままである。
+- 書くのはコードが管理する列のセルだけで、それ以外の列 (Note など) は人の列として読みも書きもしない。
+- 送ると各ランの ``data/param/ledger_sent.toml`` に記録が残る。``pyR2D2.Data`` でそのランを開いたとき、
+  未送信の変更があれば ``the ledger has unsent changes: r2d2plus-ledger push …`` と 1 行出る (R2D2plus のランだけ)。
+- 列・単位・``pull`` で戻す項目などの決まりは R2D2plus の文書 (``docs/manual/run_ledger.rst``、非公開) にある。
 
 最終更新日：|today|
