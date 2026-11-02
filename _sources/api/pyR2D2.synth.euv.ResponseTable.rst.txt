@@ -1,0 +1,31 @@
+ResponseTable
+=============
+
+.. currentmodule:: pyR2D2.synth.euv
+
+.. autoclass:: ResponseTable
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ResponseTable.channels
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ResponseTable.bin_mean
+      ~ResponseTable.load
+      ~ResponseTable.save
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: channels
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: bin_mean
+   .. automethod:: load
+   .. automethod:: save

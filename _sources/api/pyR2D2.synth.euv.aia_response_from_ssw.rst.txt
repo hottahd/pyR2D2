@@ -1,0 +1,6 @@
+aia_response_from_ssw
+=====================
+
+.. currentmodule:: pyR2D2.synth.euv
+
+.. autofunction:: aia_response_from_ssw

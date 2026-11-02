@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OnTheFly &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>OnTheFly &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,9 +15,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +34,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,14 +46,14 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#classes">Classes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
@@ -66,9 +66,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
 </ul>
 
         </div>
@@ -77,7 +74,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">R2D2 Document</a>
+          <a href="../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -101,17 +98,69 @@
 <h1>OnTheFly<a class="headerlink" href="#onthefly" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyR2D2.OnTheFly">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">OnTheFly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#OnTheFly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.OnTheFly" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">OnTheFly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#OnTheFly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.OnTheFly" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseReader</span></code></p>
 <p>Class for on-the-fly analysis data
 Mean, RMS, and correlation are done in longitudinal or z directions.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">d.vc.read(n)</span></code> reads all on-the-fly diagnostics at step <code class="docutils literal notranslate"><span class="pre">n</span></code>.
+Then use e.g. <code class="docutils literal notranslate"><span class="pre">d.vc.rom,</span> <span class="pre">d.vc.sem,</span> <span class="pre">d.vc.serms</span></code> (means/RMS vs height) and
+<code class="docutils literal notranslate"><span class="pre">d.vc.se_xz,</span> <span class="pre">d.vc.bx_xy</span></code> (2D cuts). <code class="docutils literal notranslate"><span class="pre">d.vc.read_et(n)</span></code> adds <code class="docutils literal notranslate"><span class="pre">d.vc.etm</span></code>
+(R2D2plus only). See Attributes for the full list.</p>
+<p>R2D2plus の量の並び 2 (restart の <code class="docutils literal notranslate"><span class="pre">vl_layout</span> <span class="pre">=</span> <span class="pre">2</span></code>、DEC-671) のランは、
+<code class="docutils literal notranslate"><span class="pre">vl_xy</span></code> に B と電流の相関・項目別の加熱率 (<code class="docutils literal notranslate"><span class="pre">qrk</span></code> など) が、<code class="docutils literal notranslate"><span class="pre">vl_flux</span></code> に
+熱伝導の流束 <code class="docutils literal notranslate"><span class="pre">fc</span></code> が増える (名前は <code class="docutils literal notranslate"><span class="pre">c.dac</span></code> から読むので属性はそのまま出る)。
+さらに高さごとの度数分布 <code class="docutils literal notranslate"><span class="pre">hist_te</span></code>, <code class="docutils literal notranslate"><span class="pre">hist_ro</span></code> (<code class="xref py py-meth docutils literal notranslate"><span class="pre">read_hist()</span></code>) と、
+視線ごとの emission measure <code class="docutils literal notranslate"><span class="pre">em_x</span></code>, <code class="docutils literal notranslate"><span class="pre">em_y</span></code>, <code class="docutils literal notranslate"><span class="pre">em_z</span></code> (<code class="xref py py-meth docutils literal notranslate"><span class="pre">read_dem()</span></code>) を
+<code class="docutils literal notranslate"><span class="pre">read</span></code> が一緒に読む。ファイルの無いランでは <code class="docutils literal notranslate"><span class="pre">None</span></code>。
+EM から AIA・XRT の強度を作るのは <a class="reference internal" href="../pyR2D2.module.html#module-pyR2D2.synth.euv" title="pyR2D2.synth.euv"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyR2D2.synth.euv</span></code></a>。</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>pyR2D2.Data class can access this class as <code class="code docutils literal notranslate"><span class="pre">pyR2D2.Data.vc</span></code></p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – pyR2D2.Data instance</p>
+<dt class="field-odd">ivar data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pyR2D2.Data instance</p>
+</dd>
+<dt class="field-even">vartype data<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar etm<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mean internal energy density &lt;rho*e&gt; (R2D2plus only, vl_et.dac; None for Fortran runs)</p>
+</dd>
+<dt class="field-even">vartype etm<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar hist_te<span class="colon">:</span></dt>
+<dd class="field-odd"><p>area fraction per log10 T bin at each height, (ix, 100), bins hist_logte_edges (R2D2plus vl_layout 2 only, DEC-671)</p>
+</dd>
+<dt class="field-even">vartype hist_te<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar hist_ro<span class="colon">:</span></dt>
+<dd class="field-odd"><p>area fraction per log10(rho/rho0) bin at each height, (ix, 80), bins hist_logro_edges (R2D2plus vl_layout 2 only, DEC-671)</p>
+</dd>
+<dt class="field-even">vartype hist_ro<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar em_x<span class="colon">:</span></dt>
+<dd class="field-odd"><p>emission measure per log10 T bin [cm^-5] along vertical lines of sight, (jx, kx, 60), bins dem_logte_edges (R2D2plus vl_layout 2 only, DEC-671)</p>
+</dd>
+<dt class="field-even">vartype em_x<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar em_y<span class="colon">:</span></dt>
+<dd class="field-odd"><p>emission measure per log10 T bin [cm^-5] along y lines of sight, (ix, kx, 60) (R2D2plus vl_layout 2 only, DEC-671)</p>
+</dd>
+<dt class="field-even">vartype em_y<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
+</dd>
+<dt class="field-odd">ivar em_z<span class="colon">:</span></dt>
+<dd class="field-odd"><p>emission measure per log10 T bin [cm^-5] along z lines of sight, (ix, jx, 60) (R2D2plus vl_layout 2 only, DEC-671)</p>
+</dd>
+<dt class="field-even">vartype em_z<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray, float</p>
 </dd>
 </dl>
 <p class="rubric">Methods Summary</p>
@@ -130,7 +179,7 @@ Mean, RMS, and correlation are done in longitudinal or z directions.</p>
 The data is stored in self.vc dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – A selected time step for data</p>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – A selected time step for data</p>
 </dd>
 </dl>
 </dd></dl>
@@ -140,6 +189,7 @@ The data is stored in self.vc dictionary</p>
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#OnTheFly.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.OnTheFly.__init__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -155,7 +205,7 @@ The data is stored in self.vc dictionary</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.util.stream_function &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2.util.stream_function &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -14,9 +14,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -43,15 +43,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -60,7 +56,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">R2D2 Document</a>
+          <a href="../../../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -82,7 +78,7 @@
 <div class="viewcode-block" id="stream_function">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.stream_function.html#pyR2D2.util.stream_function">[docs]</a>
 <span></span><span class="k">def</span><span class="w"> </span><span class="nf">stream_function</span><span class="p">(</span><span class="n">vrr</span><span class="p">,</span><span class="n">vth</span><span class="p">,</span><span class="n">rr</span><span class="p">,</span><span class="n">th</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">'''</span>
 <span class="sd">    Calculate stream function from vector field in 2D pherical geometry.</span>
 <span class="sd">    The vector field must satisfy div v = 0 condition.</span>
 <span class="sd">    </span>
@@ -105,7 +101,7 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    rr and th must be uniform grids.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    '''</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
     <span class="n">drr</span> <span class="o">=</span> <span class="n">rr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">dth</span> <span class="o">=</span> <span class="n">th</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">th</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -136,7 +132,7 @@
     <span class="n">thg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">thg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">thg</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">thg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">thg</span><span class="p">[</span><span class="n">jxg</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">thg</span><span class="p">[</span><span class="n">jxg</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">thg</span><span class="p">[</span><span class="n">jxg</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">thg</span><span class="p">[</span><span class="n">jxg</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
 
-    <span class="n">RRg</span><span class="p">,</span> <span class="n">THg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">rrg</span><span class="p">,</span><span class="n">thg</span><span class="p">,</span><span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">)</span>
+    <span class="n">RRg</span><span class="p">,</span> <span class="n">THg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">rrg</span><span class="p">,</span><span class="n">thg</span><span class="p">,</span><span class="n">indexing</span><span class="o">=</span><span class="s1">'ij'</span><span class="p">)</span>
 
     <span class="c1"># boundary condition (will be modified)</span>
     <span class="c1">## Radial boundary condition</span>
@@ -221,7 +217,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

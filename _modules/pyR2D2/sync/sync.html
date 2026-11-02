@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.sync.sync &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2.sync.sync &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -14,9 +14,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -43,15 +43,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -60,7 +56,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">R2D2 Document</a>
+          <a href="../../../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -80,30 +76,53 @@
              
   <h1>Source code for pyR2D2.sync.sync</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">zarr_region</span>
+
+<span class="k">try</span><span class="p">:</span>  <span class="c1"># Python 3.11+</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">tomllib</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># R2D2plus がランの記録として data/param/ に写すソース一式と実行ファイル (DEC-638)。</span>
+<span class="c1"># 解析には使わないので、どのメソッドでも持ってこない。</span>
+<span class="n">_PROVENANCE_EXCLUDES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"--exclude=data/param/source"</span><span class="p">,</span>
+    <span class="s2">"--exclude=data/param/bin"</span><span class="p">,</span>
+<span class="p">]</span>
+
 
 <div class="viewcode-block" id="Sync">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Sync</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class for downloading data from remote server</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    Both the legacy output (Fortran R2D2 and R2D2plus ``format = "legacy"``) and</span>
+<span class="sd">    the R2D2plus compressed output (``data/param/format.toml``, DEC-576) are</span>
+<span class="sd">    supported. For the compressed output, the file names are taken from the</span>
+<span class="sd">    local ``param/format.toml``, which :py:meth:`setup` downloads.</span>
+<span class="sd">    The copies of the source and the executable that R2D2plus keeps in</span>
+<span class="sd">    ``data/param/source`` and ``data/param/bin`` are never downloaded.</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Sync.__init__">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize pyR2D2.Sync</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        read : pyR2D2.Read</span>
 <span class="sd">            Instance of pyR2D2.read</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span></div>
 
 
@@ -115,14 +134,87 @@
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">' object has no attribute '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_compressed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""R2D2plus の新出力形式 (``param/format.toml`` が ``format = "compressed"``) か。"""</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="s2">"output_format"</span><span class="p">,</span> <span class="s2">"legacy"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"compressed"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        ``format.toml`` のパスの雛形 ``kind`` を埋めて ``data/`` からの相対パスにする。</span>
+<span class="sd">        値が ``None`` の欄は rsync (リモートのシェル) のワイルドカード ``*`` にする。</span>
+<span class="sd">        """</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_info</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"rank"</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">and</span> <span class="n">fields</span><span class="p">[</span><span class="s2">"rank"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"group"</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="s2">"rank"</span><span class="p">]</span> <span class="o">//</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="c1"># slice の雛形は版 1・2 が {nd_tau}、版 3 が {nd_slice} (番号はいつも nd_slice。2026-10-31)。vl も同じ</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"nd_tau"</span><span class="p">,</span> <span class="s2">"nd_slice"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"nd"</span><span class="p">,</span> <span class="s2">"nd_vl"</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">fields</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="n">a</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">fields</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\{"</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">"(:[^}]*)?\}"</span><span class="p">,</span> <span class="s2">"*"</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">fields</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""リモートの ``data/``。``remote_root`` はランの並ぶ場所 (既定 ``work/&lt;project&gt;/run``)。"""</span>
+        <span class="k">if</span> <span class="n">remote_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">remote_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"work"</span><span class="p">)</span> <span class="o">/</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">"run"</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">remote_root</span><span class="p">)</span> <span class="o">/</span> <span class="n">caseid</span> <span class="o">/</span> <span class="s2">"data"</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">):</span>
+        <span class="n">ssh_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ssh</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="s2">"ls "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)],</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ssh_result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remote_glob</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""リモートのシェルでワイルドカードを展開したパスの list (無ければ空)。"""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ssh</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">server</span><span class="p">,</span> <span class="s2">"ls -1d "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)],</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">line</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zip_rel</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direc</span><span class="o">=</span><span class="s2">"*"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""r2d2plus-pack がまとめた zip の ``data/`` からの相対パス (``n`` が None なら全ステップ)。"""</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"remap"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"remap/qq/zarr/qq.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">.zarr.zip"</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"tau"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">"tau/zarr/qq.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">.zarr.zip"</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"slice/zarr/</span><span class="si">{</span><span class="n">direc</span><span class="si">}</span><span class="s2">/qq.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">.zarr.zip"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">rel</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""リモートに zip (``rel``、ワイルドカード可) があれば持ってくる。あれば True。"""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="n">rel</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">local_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">"-e"</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="n">rel</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">local_dir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Sync.rsync_subprocess_wrapper">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.rsync_subprocess_wrapper">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rsync&quot;</span><span class="p">,</span> <span class="s2">&quot;-avP&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"rsync"</span><span class="p">,</span> <span class="s2">"-avP"</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
             <span class="n">command</span><span class="p">,</span>
             <span class="c1"># stdout=subprocess.PIPE, stderr=subprocess.PIPE,</span>
@@ -137,9 +229,9 @@
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.setup">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span>
-        <span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
+        <span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">"../run/"</span><span class="p">,</span> <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads setting data from remote server</span>
 
 <span class="sd">        Parameters</span>
@@ -147,36 +239,47 @@
 <span class="sd">        server : str</span>
 <span class="sd">            Name of remote server</span>
 <span class="sd">        caseid : str</span>
-<span class="sd">            caseid format of &#39;d001&#39;</span>
+<span class="sd">            caseid format of 'd001'</span>
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
 <span class="sd">        dist :str</span>
 <span class="sd">            Destination of data directory</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        remote_root : str</span>
+<span class="sd">            Remote directory that holds the runs (default ``work/&lt;project&gt;/run``),</span>
+<span class="sd">            e.g. ``/vol0600/data/hp200137/u10094/R2D2plus/run`` on Fugaku</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">remote_run</span> <span class="o">=</span> <span class="n">Sync</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--exclude=a.out&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=.git&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=make/*.o&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=make/*.lst&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=make/*.mod&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/qq&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/remap/qq&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/remap/vl/vl*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/slice/qq*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/tau/qq*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/aftr&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=data/prev&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=output.*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+            <span class="s2">"--exclude=a.out"</span><span class="p">,</span>
+            <span class="s2">"--exclude=.git"</span><span class="p">,</span>
+            <span class="s2">"--exclude=make/*.o"</span><span class="p">,</span>
+            <span class="s2">"--exclude=make/*.lst"</span><span class="p">,</span>
+            <span class="s2">"--exclude=make/*.mod"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/qq"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/remap/qq"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/remap/vl/vl*"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/slice/qq*"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/tau/qq*"</span><span class="p">,</span>
+            <span class="c1"># r2d2plus-pack がまとめた slice と tau の zip (3D は data/remap/qq に入っている)</span>
+            <span class="s2">"--exclude=data/slice/zarr"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/tau/zarr"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/aftr"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/prev"</span><span class="p">,</span>
+            <span class="c1"># R2D2plus: restart と光球スラブ (DEC-641) は大きいので個別に持ってくる</span>
+            <span class="s2">"--exclude=data/restart"</span><span class="p">,</span>
+            <span class="s2">"--exclude=data/photosphere"</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">_PROVENANCE_EXCLUDES</span><span class="p">,</span>
+            <span class="s2">"--exclude=output.*"</span><span class="p">,</span>
+            <span class="s2">"-e"</span><span class="p">,</span>
             <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-            <span class="n">dist</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_run</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="n">dist</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
@@ -184,50 +287,90 @@
 
 <div class="viewcode-block" id="Sync.tau">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.tau">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads data at constant optical depth</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        server : str</span>
 <span class="sd">            Name of remote server</span>
+<span class="sd">        n : int</span>
+<span class="sd">            Step to be downloaded. If None, all the steps (and data/time/) are downloaded</span>
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;tau/qq.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--exclude=param&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=qq&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=remap&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=slice&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;--exclude=time/mhd&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-            <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span>
-            <span class="o">+</span> <span class="s2">&quot;:&quot;</span>
-            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;work&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">project</span> <span class="o">/</span> <span class="s2">&quot;run&quot;</span> <span class="o">/</span> <span class="n">caseid</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="n">filename</span><span class="p">),</span>
-            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">),</span>
-        <span class="p">]</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># data/ 以下から tau/ と time/ だけを持ってくる</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">"--include=/tau/"</span><span class="p">,</span>
+                <span class="s2">"--include=/tau/**"</span><span class="p">,</span>
+                <span class="s2">"--exclude=/time/mhd"</span><span class="p">,</span>
+                <span class="s2">"--include=/time/"</span><span class="p">,</span>
+                <span class="s2">"--include=/time/**"</span><span class="p">,</span>
+                <span class="s2">"--exclude=*"</span><span class="p">,</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
+                <span class="n">ssh</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_compressed</span><span class="p">():</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_pattern</span><span class="p">(</span><span class="s2">"tau"</span><span class="p">,</span> <span class="n">nd_tau</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"tau/qq.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+            <span class="c1"># 元のファイルを消して zip にまとめたステップ (r2d2plus-pack)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zip</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_rel</span><span class="p">(</span><span class="s2">"tau"</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">ssh</span><span class="p">):</span>
+                    <span class="k">return</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
+                <span class="n">ssh</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="n">filename</span><span class="p">),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">),</span>
+            <span class="p">]</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remap_rank_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""ランク ``ns`` の 3D remap のファイル (リモートのパス) とローカルの置き場所。"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_compressed</span><span class="p">():</span>
+            <span class="n">rel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_pattern</span><span class="p">(</span><span class="s2">"remap_qq"</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">),</span> <span class="n">nd</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="n">rel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="n">par_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">chi_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">nd</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">remote_file</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"remap"</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"qq.dac.</span><span class="si">{</span><span class="n">nd</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ns</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">remote_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"remap"</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remap_nested</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""従来形式の remap/qq がランクごとの小ディレクトリに入っているか。新形式は常に入れ子。"""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_compressed</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span>
+            <span class="n">server</span><span class="p">,</span>
+            <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"remap/qq/00000/00000000/qq.dac.00000000.00000000"</span><span class="p">,</span>
+            <span class="n">ssh</span><span class="p">,</span>
+        <span class="p">)</span>
+
 <div class="viewcode-block" id="Sync.remap_qq">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.remap_qq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">remap_qq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_qq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads full 3D remap data</span>
 
 <span class="sd">        Parameters</span>
@@ -237,70 +380,52 @@
 <span class="sd">        server : str</span>
 <span class="sd">            Name of remote server</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span>
 
-        <span class="c1"># check if file exists</span>
-        <span class="n">ssh_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">ssh</span><span class="p">,</span>
-                <span class="n">server</span><span class="p">,</span>
-                <span class="s2">&quot;ls work/&quot;</span>
-                <span class="o">+</span> <span class="n">project</span>
-                <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span>
-                <span class="o">+</span> <span class="n">caseid</span>
-                <span class="o">+</span> <span class="s2">&quot;/data/remap/qq/00000/00000000/qq.dac.00000000.00000000&quot;</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># r2d2plus-pack がまとめたステップは zip 1 個を持ってくる</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zip</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_rel</span><span class="p">(</span><span class="s2">"remap"</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">ssh</span><span class="p">):</span>
+            <span class="k">return</span>
 
         <span class="c1"># remapを行ったMPIランクの洗い出し</span>
-        <span class="k">if</span> <span class="n">ssh_result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_nested</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
             <span class="n">nps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">np_ijr</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="mi">8</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">nps</span><span class="p">:</span>
-                <span class="n">par_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">chi_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
-
-                <span class="n">remote_base</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;work&quot;</span><span class="p">)</span>
-                    <span class="o">/</span> <span class="n">project</span>
-                    <span class="o">/</span> <span class="s2">&quot;run&quot;</span>
-                    <span class="o">/</span> <span class="n">caseid</span>
-                    <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
-                    <span class="o">/</span> <span class="s2">&quot;remap&quot;</span>
-                    <span class="o">/</span> <span class="s2">&quot;qq&quot;</span>
-                    <span class="o">/</span> <span class="n">par_dir</span>
-                    <span class="o">/</span> <span class="n">chi_dir</span>
-                <span class="p">)</span>
-                <span class="n">remote_file</span> <span class="o">=</span> <span class="n">remote_base</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;qq.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ns</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;remap&quot;</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span>
+                <span class="n">remote_file</span><span class="p">,</span> <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_rank_file</span><span class="p">(</span><span class="n">remote_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
                 <span class="n">local_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+                    <span class="s2">"-e"</span><span class="p">,</span>
                     <span class="n">ssh</span><span class="p">,</span>
-                    <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
+                    <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">local_dir</span><span class="p">),</span>
                 <span class="p">]</span>
                 <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File does not exist in &quot;</span> <span class="o">+</span> <span class="n">server</span><span class="p">)</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"File does not exist in "</span> <span class="o">+</span> <span class="n">server</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sync.xselect">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.xselect">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">xselect</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">xs</span><span class="p">,</span>
+        <span class="n">server</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span>
+        <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_python</span><span class="o">=</span><span class="s2">"python3"</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads data at certain height</span>
 
 <span class="sd">        Parameters</span>
@@ -309,78 +434,64 @@
 <span class="sd">                Height to be downloaded</span>
 <span class="sd">            server : str</span>
 <span class="sd">                Name of remote server</span>
+<span class="sd">            n : int</span>
+<span class="sd">                Step to be downloaded. If None, all the steps are downloaded</span>
 <span class="sd">            ssh : str</span>
 <span class="sd">                Type of ssh command</span>
 <span class="sd">            project : str</span>
-<span class="sd">                Name of project such as &#39;R2D2&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                Name of project such as 'R2D2'</span>
+<span class="sd">            remote_root : str</span>
+<span class="sd">                Remote directory that holds the runs (default ``work/&lt;project&gt;/run``)</span>
+<span class="sd">            remote_python : str</span>
+<span class="sd">                Python on the remote server, used for steps packed into</span>
+<span class="sd">                ``.zarr.zip`` by r2d2plus-pack (only the layer is taken out, see :py:meth:`remap_zarr`)</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">i0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">xs</span><span class="p">))</span>
         <span class="n">ir0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2ir</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span>
 
         <span class="n">nps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">np_ijr</span><span class="p">[</span><span class="n">ir0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="mi">8</span><span class="p">)</span>
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">filename_part</span> <span class="o">=</span> <span class="s2">&quot;qq.dac.*.&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">filename_part</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;qq.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="c1"># r2d2plus-pack がまとめたステップは、zip から層だけを取り出す</span>
+        <span class="n">zips</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_glob</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_rel</span><span class="p">(</span><span class="s2">"remap"</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">ssh</span><span class="p">)</span>
+        <span class="n">packed</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zips</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">packed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remap_zarr</span><span class="p">(</span>
+                <span class="n">server</span><span class="p">,</span> <span class="n">packed</span><span class="p">,</span> <span class="n">i0</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">i0</span><span class="p">),</span> <span class="n">i1</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">i0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                <span class="n">remote_root</span><span class="o">=</span><span class="n">remote_root</span><span class="p">,</span> <span class="n">remote_python</span><span class="o">=</span><span class="n">remote_python</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span>
 
-        <span class="c1"># check if file exists</span>
-        <span class="n">ssh_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">ssh</span><span class="p">,</span>
-                <span class="n">server</span><span class="p">,</span>
-                <span class="s2">&quot;ls work/&quot;</span>
-                <span class="o">+</span> <span class="n">project</span>
-                <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span>
-                <span class="o">+</span> <span class="n">caseid</span>
-                <span class="o">+</span> <span class="s2">&quot;/data/remap/qq/00000/00000000/qq.dac.00000000.00000000&quot;</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">nested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_nested</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">ssh</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">nps</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ssh_result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">par_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">chi_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">nested</span><span class="p">:</span>
+                <span class="n">remote_file</span><span class="p">,</span> <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_rank_file</span><span class="p">(</span><span class="n">remote_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">par_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-                <span class="n">chi_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">nd</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">remote_file</span> <span class="o">=</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"remap"</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"qq.dac.</span><span class="si">{</span><span class="n">nd</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ns</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"remap"</span> <span class="o">/</span> <span class="s2">"qq"</span>
 
-            <span class="n">remote_base</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;work&quot;</span><span class="p">)</span>
-                <span class="o">/</span> <span class="n">project</span>
-                <span class="o">/</span> <span class="s2">&quot;run&quot;</span>
-                <span class="o">/</span> <span class="n">caseid</span>
-                <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
-                <span class="o">/</span> <span class="s2">&quot;remap&quot;</span>
-                <span class="o">/</span> <span class="s2">&quot;qq&quot;</span>
-                <span class="o">/</span> <span class="n">par_dir</span>
-                <span class="o">/</span> <span class="n">chi_dir</span>
-            <span class="p">)</span>
-            <span class="n">remote_file</span> <span class="o">=</span> <span class="n">remote_base</span> <span class="o">/</span> <span class="p">(</span><span class="n">filename_part</span> <span class="o">+</span> <span class="n">ns</span><span class="p">)</span>
-
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;remap&quot;</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span>
-                <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
+            <span class="n">local_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
                 <span class="n">ssh</span><span class="p">,</span>
-                <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
-                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;remap&quot;</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span><span class="p">),</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">local_dir</span><span class="p">),</span>
             <span class="p">]</span>
             <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sync.vc">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.vc">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">vc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads pre analyzed data</span>
 
 <span class="sd">        Parameters</span>
@@ -390,20 +501,20 @@
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
         <span class="n">Sync</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;--exclude=time/mhd&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+            <span class="s2">"--exclude=time/mhd"</span><span class="p">,</span>
+            <span class="s2">"-e"</span><span class="p">,</span>
             <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/data/remap/vl&quot;</span><span class="p">,</span>
-            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;remap&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":work/"</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">"/run/"</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">"/data/remap/vl"</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"remap"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
@@ -411,10 +522,15 @@
 <div class="viewcode-block" id="Sync.check">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.check">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads checkpoint data</span>
+
+<span class="sd">        For R2D2plus runs (``data/restart/`` exists on the remote server), the</span>
+<span class="sd">        restart slot ``data/restart/&lt;n:08d&gt;/`` is downloaded (only the generation</span>
+<span class="sd">        that ``meta.toml`` points to). With ``end_step=True``, the newer one of</span>
+<span class="sd">        the alternating slots ``e`` and ``o`` is downloaded.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -425,79 +541,122 @@
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
 <span class="sd">        end_step : bool</span>
 <span class="sd">            If true, checkpoint of end step is read</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"restart"</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_restart</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">end_step</span><span class="p">)</span>
+            <span class="k">return</span>
 
         <span class="n">step</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;e&quot;</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s2">"e"</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;o&quot;</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s2">"o"</span>
 
-        <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
-        <span class="n">ssh_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">ssh</span><span class="p">,</span>
-                <span class="n">server</span><span class="p">,</span>
-                <span class="s2">&quot;ls work/&quot;</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/data/qq/00000&quot;</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">ssh_result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">io_type</span> <span class="o">=</span> <span class="s2">&quot;posixio&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="s2">"00000"</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+            <span class="n">io_type</span> <span class="o">=</span> <span class="s2">"posixio"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">io_type</span> <span class="o">=</span> <span class="s2">&quot;mpiio&quot;</span>
+            <span class="n">io_type</span> <span class="o">=</span> <span class="s2">"mpiio"</span>
 
-        <span class="k">if</span> <span class="n">io_type</span> <span class="o">==</span> <span class="s2">&quot;posixio&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">io_type</span> <span class="o">==</span> <span class="s2">"posixio"</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npe</span><span class="p">):</span>
-                <span class="n">par_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">chi_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">par_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">1000</span><span class="si">:</span><span class="s2">05d</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">chi_dir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
 
-                <span class="n">remote_base</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;work&quot;</span><span class="p">)</span>
-                    <span class="o">/</span> <span class="n">project</span>
-                    <span class="o">/</span> <span class="s2">&quot;run&quot;</span>
-                    <span class="o">/</span> <span class="n">caseid</span>
-                    <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
-                    <span class="o">/</span> <span class="s2">&quot;qq&quot;</span>
-                    <span class="o">/</span> <span class="n">par_dir</span>
-                    <span class="o">/</span> <span class="n">chi_dir</span>
-                <span class="p">)</span>
-                <span class="n">remote_file</span> <span class="o">=</span> <span class="n">remote_base</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;qq.dac.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ns</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span>
+                <span class="n">remote_base</span> <span class="o">=</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span>
+                <span class="n">remote_file</span> <span class="o">=</span> <span class="n">remote_base</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"qq.dac.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ns</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span>
 
                 <span class="n">local_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+                    <span class="s2">"-e"</span><span class="p">,</span>
                     <span class="n">ssh</span><span class="p">,</span>
-                    <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
-                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span><span class="p">),</span>
+                    <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_file</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="n">par_dir</span> <span class="o">/</span> <span class="n">chi_dir</span><span class="p">),</span>
                 <span class="p">]</span>
                 <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">io_type</span> <span class="o">==</span> <span class="s2">&quot;mpiio&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">io_type</span> <span class="o">==</span> <span class="s2">"mpiio"</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
                 <span class="n">ssh</span><span class="p">,</span>
-                <span class="n">server</span>
-                <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span>
-                <span class="o">+</span> <span class="n">project</span>
-                <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span>
-                <span class="o">+</span> <span class="n">caseid</span>
-                <span class="o">+</span> <span class="s2">&quot;/data/qq/qq.dac.&quot;</span>
-                <span class="o">+</span> <span class="n">step</span><span class="p">,</span>
-                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="p">(</span><span class="s2">"qq.dac."</span> <span class="o">+</span> <span class="n">step</span><span class="p">)),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"qq"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
             <span class="p">]</span>
             <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_restart_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""リモートの ``restart/&lt;slot&gt;/meta.toml`` をローカルへ写して読む。無ければ ``None``。"""</span>
+        <span class="n">local_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"restart"</span> <span class="o">/</span> <span class="n">slot</span>
+        <span class="n">local_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">"-e"</span><span class="p">,</span>
+            <span class="n">ssh</span><span class="p">,</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"restart"</span> <span class="o">/</span> <span class="n">slot</span> <span class="o">/</span> <span class="s2">"meta.toml"</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">local_dir</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">local_dir</span> <span class="o">/</span> <span class="s2">"meta.toml"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">meta</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">tomllib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">"downloading R2D2plus restart needs Python &gt;= 3.11 (tomllib)"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="n">end_step</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""R2D2plus の restart (``data/restart/&lt;slot&gt;/``, DEC-076) を持ってくる。"""</span>
+        <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
+            <span class="c1"># e と o は交代で書かれるので、step の大きい方が最新</span>
+            <span class="n">metas</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"e"</span><span class="p">,</span> <span class="s2">"o"</span><span class="p">]:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_restart_meta</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">metas</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metas</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"Restart (e/o) does not exist in "</span> <span class="o">+</span> <span class="n">server</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">slot</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">metas</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">metas</span><span class="p">[</span><span class="n">s</span><span class="p">][</span><span class="s2">"restart"</span><span class="p">][</span><span class="s2">"step"</span><span class="p">]))</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">metas</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slot</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_restart_meta</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Restart </span><span class="si">{</span><span class="n">slot</span><span class="si">}</span><span class="s2"> does not exist in "</span> <span class="o">+</span> <span class="n">server</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="n">remote_slot</span> <span class="o">=</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"restart"</span> <span class="o">/</span> <span class="n">slot</span>
+        <span class="n">local_slot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"restart"</span> <span class="o">/</span> <span class="n">slot</span>
+        <span class="n">generation</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">"restart"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"generation"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">generation</span><span class="p">:</span>
+            <span class="c1"># v2: meta.toml が指す世代のディレクトリだけ (古い世代は持ってこない)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
+                <span class="n">ssh</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_slot</span> <span class="o">/</span> <span class="n">generation</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">local_slot</span> <span class="o">/</span> <span class="n">generation</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># v1: slot の直下の state.&lt;rank&gt;.bin</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">"--exclude=.generation-*"</span><span class="p">,</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
+                <span class="n">ssh</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_slot</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">local_slot</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Sync.slice">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.slice">[docs]</a>
@@ -505,12 +664,13 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">server</span><span class="p">,</span>
         <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">direc</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="n">direc</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span>
         <span class="n">n_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span>
+        <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span>
         <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Downloads slice data</span>
 
 <span class="sd">        Parameters</span>
@@ -518,64 +678,237 @@
 <span class="sd">        server : str</span>
 <span class="sd">            Name of remote server</span>
 <span class="sd">        n : int</span>
-<span class="sd">            Step to be downloaded</span>
+<span class="sd">            Step to be downloaded (``nd_slice``; the same as ``nd_tau`` in runs without</span>
+<span class="sd">            R2D2plus ``output_cadence = 2``)</span>
 <span class="sd">        direc : str</span>
-<span class="sd">            Direction of slice data, &#39;x&#39;, &#39;y&#39;, &#39;z&#39; or &#39;*&#39;</span>
+<span class="sd">            Direction of slice data, 'x', 'y', 'z' or '*'</span>
 <span class="sd">        n_slice : int</span>
 <span class="sd">            Slice number</span>
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project : str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">n_slice</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">n_slice_str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">n_slice_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_slice</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">)</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"slice"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># 断面の位置 (slice.dac) と個数 (params.dac)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+            <span class="s2">"-e"</span><span class="p">,</span>
             <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/data/slice/slice.dac&quot;</span><span class="p">,</span>
-            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;slice&quot;</span><span class="p">),</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"slice"</span> <span class="o">/</span> <span class="s2">"slice.dac"</span><span class="p">),</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="s2">"slice"</span> <span class="o">/</span> <span class="s2">"params.dac"</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"slice"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
-            <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span>
-            <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span>
-            <span class="o">+</span> <span class="n">project</span>
-            <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span>
-            <span class="o">+</span> <span class="n">caseid</span>
-            <span class="o">+</span> <span class="s2">&quot;/data/slice/qq&quot;</span>
-            <span class="o">+</span> <span class="n">direc</span>
-            <span class="o">+</span> <span class="s2">&quot;.dac.&quot;</span>
-            <span class="o">+</span> <span class="n">step</span>
-            <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
-            <span class="o">+</span> <span class="n">n_slice_str</span><span class="p">,</span>
-            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;slice&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-        <span class="p">]</span>
-        <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_compressed</span><span class="p">():</span>
+            <span class="c1"># YinYang の _yin/_yan も拾うよう、方向の後ろにも * を付ける</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_pattern</span><span class="p">(</span>
+                <span class="s2">"slice"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"qq"</span> <span class="o">+</span> <span class="n">direc</span> <span class="o">+</span> <span class="s2">"*"</span><span class="p">,</span> <span class="n">nd_tau</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n_slice</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">n_slice_str</span> <span class="o">=</span> <span class="s2">"*"</span> <span class="k">if</span> <span class="n">n_slice</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_slice</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="s2">"slice/qq"</span> <span class="o">+</span> <span class="n">direc</span> <span class="o">+</span> <span class="s2">".dac."</span> <span class="o">+</span> <span class="n">step</span> <span class="o">+</span> <span class="s2">"."</span> <span class="o">+</span> <span class="n">n_slice_str</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_exists</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">"-e"</span><span class="p">,</span>
+                <span class="n">ssh</span><span class="p">,</span>
+                <span class="n">server</span> <span class="o">+</span> <span class="s2">":"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">remote_data</span> <span class="o">/</span> <span class="n">filename</span><span class="p">),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"slice"</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="c1"># r2d2plus-pack がまとめたステップ (zip には全部の断面が入っている)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"xyz"</span> <span class="k">if</span> <span class="n">direc</span> <span class="o">==</span> <span class="s2">"*"</span> <span class="k">else</span> <span class="n">direc</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zip</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">remote_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_rel</span><span class="p">(</span><span class="s2">"slice"</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span> <span class="n">ssh</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ---- zarr (.zarr.zip を含む) の一部をリモートで取り出して持ってくる ----</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_steps</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">n</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_index_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""添字の範囲 [a0, a1) か、座標の範囲 [c0, c1] (両端を含む、最も近い格子点) を [始め, 終わり) にする。"""</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">a1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">c0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"give either the index or the coordinate range for </span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">, not both"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="p">))</span>
+            <span class="n">a0</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">c0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coord</span> <span class="o">-</span> <span class="n">c0</span><span class="p">)))</span>
+            <span class="n">a1</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">c1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">coord</span> <span class="o">-</span> <span class="n">c1</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">a0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">a1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">a0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">a0</span><span class="p">),</span> <span class="mi">2</span><span class="o">**</span><span class="mi">62</span> <span class="k">if</span> <span class="n">a1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">a1</span><span class="p">)]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_zarr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">rels</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">,</span> <span class="n">remote_python</span><span class="p">,</span> <span class="n">block</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys</span><span class="p">]</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">region</span><span class="p">):</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">remote_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_data</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">(),</span> <span class="n">remote_root</span><span class="p">)</span>
+
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">rels</span><span class="p">:</span>
+            <span class="n">local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="n">rel</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">zarr_region</span><span class="o">.</span><span class="n">local_status</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"skip: the whole </span><span class="si">{</span><span class="n">local</span><span class="si">}</span><span class="s2"> is already here"</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">"done"</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"skip: the requested part of </span><span class="si">{</span><span class="n">local</span><span class="si">}</span><span class="s2"> is already here"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">"remote"</span><span class="p">:</span> <span class="n">remote_data</span> <span class="o">/</span> <span class="n">rel</span><span class="p">,</span> <span class="s2">"local"</span><span class="p">:</span> <span class="n">local</span><span class="p">,</span> <span class="s2">"keys"</span><span class="p">:</span> <span class="n">keys</span><span class="p">,</span> <span class="s2">"region"</span><span class="p">:</span> <span class="n">region</span><span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">zarr_region</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+            <span class="n">server</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="n">ssh</span><span class="p">,</span> <span class="n">remote_python</span><span class="o">=</span><span class="n">remote_python</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_zarr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">server</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">,</span>
+        <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">i0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span>
+        <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_python</span><span class="o">=</span><span class="s2">"python3"</span><span class="p">,</span>
+        <span class="n">block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Downloads part of the 3D remap data in zarr (``.zarr`` or ``.zarr.zip``) format</span>
+
+<span class="sd">        Only the requested range is read on the remote server (by Python started</span>
+<span class="sd">        through ssh) and streamed back; nothing is written on the remote side.</span>
+<span class="sd">        The local ``data/remap/qq/zarr/qq.NNNNNNNN.zarr`` has the same shape as the</span>
+<span class="sd">        original, with NaN where nothing was downloaded, so that</span>
+<span class="sd">        ``d.qx.read(xs, n, zarr_flag=True)`` and ``d.qr.read(n, keys, x0=..., ...)``</span>
+<span class="sd">        work as for the full data. Further calls add to the same local zarr, and a</span>
+<span class="sd">        range already downloaded is skipped.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        server : str</span>
+<span class="sd">            Name of remote server</span>
+<span class="sd">        n : int or list of int</span>
+<span class="sd">            Step(s) to be downloaded. All the steps go through one ssh connection</span>
+<span class="sd">        keys : str or list of str</span>
+<span class="sd">            Variables such as ``["ro", "vx"]``. None for all. x, y, z always come</span>
+<span class="sd">        i0, i1, j0, j1, k0, k1 : int</span>
+<span class="sd">            Index range ``[i0, i1)`` etc. None for the edge of the domain</span>
+<span class="sd">        x0, x1, y0, y1, z0, z1 : float</span>
+<span class="sd">            Coordinate range instead of the index range, as in ``d.qr.read``</span>
+<span class="sd">            (the nearest grid points, both ends included). ``x0 = x1 = xs`` gives one layer</span>
+<span class="sd">        ssh : str</span>
+<span class="sd">            Type of ssh command</span>
+<span class="sd">        project : str</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
+<span class="sd">        remote_root : str</span>
+<span class="sd">            Remote directory that holds the runs (default ``work/&lt;project&gt;/run``),</span>
+<span class="sd">            e.g. ``/vol0600/data/hp200137/u10094/R2D2plus/run`` on Fugaku</span>
+<span class="sd">        remote_python : str</span>
+<span class="sd">            Python on the remote server with numpy and zarr 3, e.g. ``~/.venv/bin/python``</span>
+<span class="sd">        block : int</span>
+<span class="sd">            Number of chunks along x read at once on the remote server (memory there)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of Path</span>
+<span class="sd">            Local zarr directories written</span>
+<span class="sd">        """</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">j0</span><span class="p">,</span> <span class="n">j1</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">z1</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">rels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"remap/qq/zarr/qq.</span><span class="si">{</span><span class="n">m</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">.zarr"</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zarr</span><span class="p">(</span>
+            <span class="n">server</span><span class="p">,</span> <span class="n">rels</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">,</span> <span class="n">remote_python</span><span class="p">,</span> <span class="n">block</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">tau_zarr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">server</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">,</span>
+        <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">j0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span>
+        <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_python</span><span class="o">=</span><span class="s2">"python3"</span><span class="p">,</span>
+        <span class="n">block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Downloads part of the data at constant optical depth in zarr format</span>
+<span class="sd">        (``data/tau/zarr/qq.NNNNNNNN.zarr``). See :py:meth:`remap_zarr` for the parameters</span>
+<span class="sd">        """</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">j0</span><span class="p">,</span> <span class="n">j1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="s2">"z"</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">rels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"tau/zarr/qq.</span><span class="si">{</span><span class="n">m</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">.zarr"</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zarr</span><span class="p">(</span>
+            <span class="n">server</span><span class="p">,</span> <span class="n">rels</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">,</span> <span class="n">remote_python</span><span class="p">,</span> <span class="n">block</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice_zarr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">server</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">,</span>
+        <span class="n">direc</span><span class="p">,</span>
+        <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">n_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">i0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">j1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span>
+        <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remote_python</span><span class="o">=</span><span class="s2">"python3"</span><span class="p">,</span>
+        <span class="n">block</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Downloads part of the slice data in zarr format</span>
+<span class="sd">        (``data/slice/zarr/&lt;direc&gt;/qq.NNNNNNNN.zarr``)</span>
+
+<span class="sd">        ``keys`` such as ``"ro"`` also select ``ro_yin`` and ``ro_yan`` (YinYang).</span>
+<span class="sd">        ``n_slice`` selects one slice; the index along ``direc`` is the slice number.</span>
+<span class="sd">        See :py:meth:`remap_zarr` for the other parameters</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">direc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"direc must be 'x', 'y' or 'z'"</span><span class="p">)</span>
+        <span class="n">ranges</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="p">[</span><span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">],</span> <span class="s2">"y"</span><span class="p">:</span> <span class="p">[</span><span class="n">j0</span><span class="p">,</span> <span class="n">j1</span><span class="p">],</span> <span class="s2">"z"</span><span class="p">:</span> <span class="p">[</span><span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="n">n_slice</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ranges</span><span class="p">[</span><span class="n">direc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_slice</span><span class="p">,</span> <span class="n">n_slice</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index_range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">*</span><span class="n">ranges</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="s2">"xyz"</span><span class="p">]</span>
+        <span class="n">rels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"slice/zarr/</span><span class="si">{</span><span class="n">direc</span><span class="si">}</span><span class="s2">/qq.</span><span class="si">{</span><span class="n">m</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">.zarr"</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_zarr</span><span class="p">(</span>
+            <span class="n">server</span><span class="p">,</span> <span class="n">rels</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">ssh</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">remote_root</span><span class="p">,</span> <span class="n">remote_python</span><span class="p">,</span> <span class="n">block</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Sync.all">
 <a class="viewcode-back" href="../../../api/pyR2D2.Sync.html#pyR2D2.Sync.all">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">all</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">&quot;../run/&quot;</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">ssh</span><span class="o">=</span><span class="s2">"ssh"</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="s2">"../run/"</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        This method downloads all the data</span>
+
+<span class="sd">        The copies of the source and the executable that R2D2plus keeps in</span>
+<span class="sd">        ``data/param/source`` and ``data/param/bin`` are not downloaded.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -584,19 +917,20 @@
 <span class="sd">        ssh : str</span>
 <span class="sd">            Type of ssh command</span>
 <span class="sd">        project :str</span>
-<span class="sd">            Name of project such as &#39;R2D2&#39;</span>
+<span class="sd">            Name of project such as 'R2D2'</span>
 <span class="sd">        dist :str</span>
 <span class="sd">            Destination of data directory</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">project</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="n">caseid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caseid</span><span class="p">()</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">_PROVENANCE_EXCLUDES</span><span class="p">,</span>
+            <span class="s2">"-e"</span><span class="p">,</span>
             <span class="n">ssh</span><span class="p">,</span>
-            <span class="n">server</span> <span class="o">+</span> <span class="s2">&quot;:work/&quot;</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">&quot;/run/&quot;</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+            <span class="n">server</span> <span class="o">+</span> <span class="s2">":work/"</span> <span class="o">+</span> <span class="n">project</span> <span class="o">+</span> <span class="s2">"/run/"</span> <span class="o">+</span> <span class="n">caseid</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span>
             <span class="n">dist</span> <span class="o">+</span> <span class="n">caseid</span><span class="p">,</span>
         <span class="p">]</span>
         <span class="n">Sync</span><span class="o">.</span><span class="n">rsync_subprocess_wrapper</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
@@ -611,7 +945,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

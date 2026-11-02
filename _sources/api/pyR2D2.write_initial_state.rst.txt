@@ -1,0 +1,6 @@
+write_initial_state
+===================
+
+.. currentmodule:: pyR2D2
+
+.. autofunction:: write_initial_state

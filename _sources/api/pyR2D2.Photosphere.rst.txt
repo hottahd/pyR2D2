@@ -1,0 +1,19 @@
+Photosphere
+===========
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: Photosphere
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Photosphere.read
+      ~Photosphere.snapshots
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: read
+   .. automethod:: snapshots

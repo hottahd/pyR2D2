@@ -1,0 +1,6 @@
+eos_table
+=========
+
+.. currentmodule:: pyR2D2.util
+
+.. autofunction:: eos_table

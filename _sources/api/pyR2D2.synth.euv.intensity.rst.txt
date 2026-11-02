@@ -1,0 +1,6 @@
+intensity
+=========
+
+.. currentmodule:: pyR2D2.synth.euv
+
+.. autofunction:: intensity

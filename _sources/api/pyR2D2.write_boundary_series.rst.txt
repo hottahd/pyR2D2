@@ -1,0 +1,6 @@
+write_boundary_series
+=====================
+
+.. currentmodule:: pyR2D2
+
+.. autofunction:: write_boundary_series

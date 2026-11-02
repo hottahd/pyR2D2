@@ -1,0 +1,223 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eos_switch &mdash; pyR2D2 0.4.1.dev48 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="eos_table" href="pyR2D2.util.eos_table.html" />
+    <link rel="prev" title="eos" href="pyR2D2.util.eos.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyR2D2
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#id1">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id3">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyR2D2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
+      <li class="breadcrumb-item active">eos_switch</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyR2D2.util.eos_switch.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="eos-switch">
+<h1>eos_switch<a class="headerlink" href="#eos-switch" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyR2D2.util.eos_switch">
+<span class="sig-prename descclassname"><span class="pre">pyR2D2.util.</span></span><span class="sig-name descname"><span class="pre">eos_switch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ro1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.003</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/util/util.html#eos_switch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.util.eos_switch" title="Link to this definition"></a></dt>
+<dd><p>Returns the equation of state <strong>as R2D2 itself evaluates it</strong>, i.e. with
+the switch between the table EOS and the linearized EOS.</p>
+<section id="why-this-exists">
+<h2>Why this exists<a class="headerlink" href="#why-this-exists" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="pyR2D2.util.eos.html#pyR2D2.util.eos" title="pyR2D2.util.eos"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos()</span></code></a>, <a class="reference internal" href="pyR2D2.util.eos_table.html#pyR2D2.util.eos_table" title="pyR2D2.util.eos_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos_table()</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">pyR2D2.Data.eos.eval</span></code> all read the table unconditionally.  R2D2 does
+not.  Wherever the code needs pressure, temperature or internal energy it
+computes the relative amplitude</p>
+<div class="math notranslate nohighlight">
+\[c_t = \max(|\rho_1|/\rho_0, |s_1|/s_0)\]</div>
+<p>and uses the <strong>linearized</strong> EOS when <span class="math notranslate nohighlight">\(c_t \le c_{t0}\)</span>
+(<code class="docutils literal notranslate"><span class="pre">ct0</span> <span class="pre">=</span> <span class="pre">3e-3</span></code>, <code class="docutils literal notranslate"><span class="pre">eos_def.F90</span></code>), falling back to the table only above
+it.  The switch is hard, not smooth:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">feos</span> <span class="o">=</span> <span class="n">sign</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ct</span> <span class="o">-</span> <span class="n">ct0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+<p>and appears identically in <code class="docutils literal notranslate"><span class="pre">runge_kutta_cartesian.F90</span></code> /
+<code class="docutils literal notranslate"><span class="pre">runge_kutta_spherical.F90</span></code> (pressure), <code class="docutils literal notranslate"><span class="pre">artdif_cartesian.F90</span></code> /
+<code class="docutils literal notranslate"><span class="pre">artdif_spherical.F90</span></code> (temperature and enthalpy), <code class="docutils literal notranslate"><span class="pre">cfl.F90</span></code>
+(<code class="docutils literal notranslate"><span class="pre">dprdro</span></code>, hence the sound speed) and <code class="docutils literal notranslate"><span class="pre">remap_calc.F90</span></code> (the pr/te/en
+written into <code class="docutils literal notranslate"><span class="pre">remap/vl</span></code>).</p>
+<p>In a deep-convection run <span class="math notranslate nohighlight">\(c_t\)</span> never reaches <span class="math notranslate nohighlight">\(c_{t0}\)</span>, so the
+code runs entirely on the linearized EOS while a plain table lookup
+returns something else.  That is the discrepancy this function removes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">param data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Instance of pyR2D2.Data or pyR2D2.Read classes</p>
+</dd>
+<dt class="field-even">type data<span class="colon">:</span></dt>
+<dd class="field-even"><p>pyR2D2.Data, or, pyR2D2.Read</p>
+</dd>
+<dt class="field-odd">param ro1<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Density <strong>perturbation</strong>, i.e. <code class="docutils literal notranslate"><span class="pre">d.qq['ro']</span></code> as stored in the output.
+The first axis must be the vertical one (size <code class="docutils literal notranslate"><span class="pre">ix</span></code>).</p>
+</dd>
+<dt class="field-even">type ro1<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-odd">param se1<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Entropy <strong>perturbation</strong>, same shape as <code class="docutils literal notranslate"><span class="pre">ro1</span></code></p>
+</dd>
+<dt class="field-even">type se1<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-odd">param var<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Variable name; pr, te, en, op, or dprdro</p>
+</dd>
+<dt class="field-even">type var<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param ct0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Switching threshold, <code class="docutils literal notranslate"><span class="pre">eos_def.F90</span></code>’s <code class="docutils literal notranslate"><span class="pre">ct0</span></code>.  Change it only to
+experiment; the code itself compiles it in as 3e-3.</p>
+</dd>
+<dt class="field-even">type ct0<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>qq</strong> – For <code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code> and <code class="docutils literal notranslate"><span class="pre">en</span></code>: the <strong>perturbation</strong>, matching what
+<code class="docutils literal notranslate"><span class="pre">remap_calc.F90</span></code> writes into the output files (add <code class="docutils literal notranslate"><span class="pre">d.p.pr0</span></code> etc.
+for the total).  For <code class="docutils literal notranslate"><span class="pre">op</span></code> and <code class="docutils literal notranslate"><span class="pre">dprdro</span></code>: the value itself, since
+neither has a linearized perturbation form.  <code class="docutils literal notranslate"><span class="pre">op</span></code> is never switched
+(the table is the only source); <code class="docutils literal notranslate"><span class="pre">dprdro</span></code> switches to the background
+profile <code class="docutils literal notranslate"><span class="pre">d.p.dprdro</span></code>.</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyR2D2.util.eos.html" class="btn btn-neutral float-left" title="eos" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyR2D2.util.eos_table.html" class="btn btn-neutral float-right" title="eos_table" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

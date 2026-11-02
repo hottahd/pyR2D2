@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TwoDimension &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>TwoDimension &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,9 +15,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -34,7 +34,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,14 +46,14 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#classes">Classes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
@@ -66,9 +66,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
 </ul>
 
         </div>
@@ -77,7 +74,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">R2D2 Document</a>
+          <a href="../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -101,9 +98,14 @@
 <h1>TwoDimension<a class="headerlink" href="#twodimension" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyR2D2.TwoDimension">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">TwoDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#TwoDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.TwoDimension" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">TwoDimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#TwoDimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.TwoDimension" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseReader</span></code></p>
 <p>Class for 2D data</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">d.q2.read(n)</span></code> reads the full data of a 2D run at step <code class="docutils literal notranslate"><span class="pre">n</span></code>.
+Access by key: <code class="docutils literal notranslate"><span class="pre">d.q2['ro'],</span> <span class="pre">d.q2['se'],</span> <span class="pre">d.q2['tu'],</span> <span class="pre">...</span></code>
+(<code class="docutils literal notranslate"><span class="pre">ro,</span> <span class="pre">vx,</span> <span class="pre">vy,</span> <span class="pre">vz,</span> <span class="pre">bx,</span> <span class="pre">by,</span> <span class="pre">bz,</span> <span class="pre">se,</span> <span class="pre">pr,</span> <span class="pre">te,</span> <span class="pre">op,</span> <span class="pre">tu</span></code> …).</p>
 <p class="rubric">Methods Summary</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -120,7 +122,7 @@
 The data is stored in self.q2 dictionary</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – A selected time step for data</p>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a>) – A selected time step for data</p>
 </dd>
 </dl>
 </dd></dl>
@@ -130,6 +132,7 @@ The data is stored in self.q2 dictionary</p>
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/read.html#TwoDimension.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.TwoDimension.__init__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -145,7 +148,7 @@ The data is stored in self.q2 dictionary</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

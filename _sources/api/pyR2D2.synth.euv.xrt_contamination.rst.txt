@@ -1,0 +1,6 @@
+xrt_contamination
+=================
+
+.. currentmodule:: pyR2D2.synth.euv
+
+.. autofunction:: xrt_contamination

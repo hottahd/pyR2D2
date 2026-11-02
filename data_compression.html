@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>データ圧縮 &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>データ圧縮 &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -15,14 +15,14 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=750e77fb"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="pyR2D2 API Reference" href="api_reference.html" />
-    <link rel="prev" title="pyR2D2" href="pyr2d2.html" /> 
+    <link rel="next" title="Paraviewを用いた3Dデータ表示" href="paraview.html" />
+    <link rel="prev" title="pyR2D2 を使うための環境設定" href="environment.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +34,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,23 +46,28 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">データ圧縮</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id2">概要</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#compress-zarr">compress(): バイナリファイルをzarrにまとめる</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#check-delete">check() と delete(): 元データの安全な削除</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zip">zip(): ファイル数制限への対策</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r2d2plus-pack">r2d2plus-pack: ランをまとめて照合し、元を消す</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r2d2plus-archive-hpci">r2d2plus-archive: HPCI に移す形にまとめる</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r2d2plus-restore-hpci-restart">r2d2plus-restore: HPCI から restart を戻す</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">リモートの zarr から一部だけを持ってくる</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#time-zip">time.zip: 時刻ファイルの圧縮</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">典型的なワークフロー</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">典型的なワークフロー</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r2d2plus-format-compressed">R2D2plus の新出力形式 (<code class="docutils literal notranslate"><span class="pre">format</span> <span class="pre">=</span> <span class="pre">&quot;compressed&quot;</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#r2d2plus">前の出力を R2D2plus の初期条件にする</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">境界値の時系列を R2D2plus の境界条件に与える</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -71,7 +76,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">R2D2 Document</a>
+          <a href="index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -121,7 +126,7 @@
 <h2>compress(): バイナリファイルをzarrにまとめる<a class="headerlink" href="#compress-zarr" title="Link to this heading"></a></h2>
 <p><a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> インスタンスを作成した後、3次元フルデータであれば <code class="docutils literal notranslate"><span class="pre">d.qf.compress()</span></code> を呼ぶ。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d001/data'</span><span class="p">)</span>
 
 <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
@@ -131,8 +136,12 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>デフォルトで保存される変数は <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">vy</span></code>, <code class="docutils literal notranslate"><span class="pre">vz</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code>, <code class="docutils literal notranslate"><span class="pre">by</span></code>, <code class="docutils literal notranslate"><span class="pre">bz</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> の8つ(<code class="docutils literal notranslate"><span class="pre">zarr_keys</span></code>)である。<code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> はこれらから <a class="reference internal" href="api/pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS" title="pyR2D2.cpp_util.EOS"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.cpp_util.EOS</span></code></a> を使って後から計算できるため、デフォルトでは含まれない。これらが必要な場合は <code class="docutils literal notranslate"><span class="pre">keys</span></code> 引数で明示的に指定する。</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ro&quot;</span><span class="p">,</span> <span class="s2">&quot;se&quot;</span><span class="p">,</span> <span class="s2">&quot;pr&quot;</span><span class="p">,</span> <span class="s2">&quot;te&quot;</span><span class="p">,</span> <span class="s2">&quot;op&quot;</span><span class="p">])</span>
+<p>デフォルトで保存される変数は <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">vy</span></code>, <code class="docutils literal notranslate"><span class="pre">vz</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code>, <code class="docutils literal notranslate"><span class="pre">by</span></code>, <code class="docutils literal notranslate"><span class="pre">bz</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> の8つ(<code class="docutils literal notranslate"><span class="pre">zarr_keys</span></code>)である。<code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> はデフォルトでは含まれない。これらが必要な場合は <code class="docutils literal notranslate"><span class="pre">keys</span></code> 引数で明示的に指定する。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> を後から <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> と <a class="reference internal" href="api/pyR2D2.cpp_util.EOS.html#pyR2D2.cpp_util.EOS" title="pyR2D2.cpp_util.EOS"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.cpp_util.EOS</span></code></a> (あるいは <a class="reference internal" href="api/pyR2D2.util.eos_table.html#pyR2D2.util.eos_table" title="pyR2D2.util.eos_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos_table()</span></code></a>) で計算しても、出力ファイルの値とは一致しない。これらは常に表を引くが、R2D2 本体は相対振幅 <code class="docutils literal notranslate"><span class="pre">ct</span> <span class="pre">=</span> <span class="pre">max(|ro1|/ro0,</span> <span class="pre">|se1|/se0)</span></code> が <code class="docutils literal notranslate"><span class="pre">3e-3</span></code> を下回る点では線形化した EOS を使っている(硬い切り替え)。深部の計算ではほぼ全域が線形側である。本体と同じ値が要るなら <a class="reference internal" href="api/pyR2D2.util.eos_switch.html#pyR2D2.util.eos_switch" title="pyR2D2.util.eos_switch"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos_switch()</span></code></a> を使うこと(単精度の丸めの位置まで同じではないので最終桁は違いうる)。解析で <code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> を使うなら <code class="docutils literal notranslate"><span class="pre">keys</span></code> に入れて保存しておくのが確実である。</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">"ro"</span><span class="p">,</span> <span class="s2">"se"</span><span class="p">,</span> <span class="s2">"pr"</span><span class="p">,</span> <span class="s2">"te"</span><span class="p">,</span> <span class="s2">"op"</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>計算領域全体ではなく一部分だけを圧縮したい場合は、<code class="docutils literal notranslate"><span class="pre">i_start</span></code> / <code class="docutils literal notranslate"><span class="pre">i_size</span></code> / <code class="docutils literal notranslate"><span class="pre">j_start</span></code> / <code class="docutils literal notranslate"><span class="pre">j_size</span></code> / <code class="docutils literal notranslate"><span class="pre">k_start</span></code> / <code class="docutils literal notranslate"><span class="pre">k_size</span></code> で範囲を指定できる。</p>
@@ -145,7 +154,7 @@
 </div>
 <p>光学的厚さ一定面のデータ(<code class="docutils literal notranslate"><span class="pre">d.qt</span></code>)やスライスデータ(<code class="docutils literal notranslate"><span class="pre">d.qs</span></code>)でも同様に使える。スライスデータは方向(<code class="docutils literal notranslate"><span class="pre">'x'</span></code>, <code class="docutils literal notranslate"><span class="pre">'y'</span></code>, <code class="docutils literal notranslate"><span class="pre">'z'</span></code>)の指定が必要である。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qt</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="n">d</span><span class="o">.</span><span class="n">qs</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">direc</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qs</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">direc</span><span class="o">=</span><span class="s1">'x'</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -153,7 +162,7 @@
 <h2>check() と delete(): 元データの安全な削除<a class="headerlink" href="#check-delete" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">compress()</span></code> でzarrストアを作成しても、元のバイナリファイルは自動的には消えない。作成したzarrストアが元のバイナリファイルと一致するかを確認するのが <code class="docutils literal notranslate"><span class="pre">check()</span></code> である。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="c1"># -&gt; &quot;Check passed at n=10&quot; のように表示され、True が返る</span>
+<span class="c1"># -&gt; "Check passed at n=10" のように表示され、True が返る</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">check()</span></code> は、zarrファイルの存在確認・変数の存在確認をした上で、実際にzarr経由とバイナリ経由の両方でデータを読み込み、数値が一致するかどうかを比較する。一致しない場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返す。</p>
@@ -184,7 +193,7 @@
 </div>
 <p>低レベルAPIとして、任意の <code class="docutils literal notranslate"><span class="pre">.zarr</span></code> ディレクトリに対して直接 <code class="docutils literal notranslate"><span class="pre">pyR2D2.zarr_util.zip_zarr</span></code> を呼ぶこともできる。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
-<span class="n">pyR2D2</span><span class="o">.</span><span class="n">zarr_util</span><span class="o">.</span><span class="n">zip_zarr</span><span class="p">(</span><span class="s1">&#39;path/to/data.zarr&#39;</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">zarr_util</span><span class="o">.</span><span class="n">zip_zarr</span><span class="p">(</span><span class="s1">'path/to/data.zarr'</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition important">
@@ -193,6 +202,75 @@
 <p>zarrストアはディレクトリのまま(zip化しない)であれば、複数プロセスからの並列アクセスが可能である(ただしpyR2D2側でこれを積極的に活用する実装は現時点では用意されていない)。一方、<code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> にまとめると、そうした並列アクセスの余地は失われる。</p>
 <p>したがって、<code class="docutils literal notranslate"><span class="pre">zip()</span></code> は無条件に実行するのではなく、<strong>Gfarm(HPCI共用ストレージなど)のようにファイル数制限が厳しいシステムに保存する場合に限定して実行する</strong>のが良い。ローカルディスクや通常のPOSIXファイルシステムに置く場合は、zarrストアをディレクトリのまま(zip化せず)残しておく方が、将来的な並列アクセスの余地を残せる。</p>
 </div>
+</section>
+<section id="r2d2plus-pack">
+<h2>r2d2plus-pack: ランをまとめて照合し、元を消す<a class="headerlink" href="#r2d2plus-pack" title="Link to this heading"></a></h2>
+<p>計算が終わったランの 3D (<code class="docutils literal notranslate"><span class="pre">qf</span></code>)・slice (<code class="docutils literal notranslate"><span class="pre">qs</span></code>)・tau (<code class="docutils literal notranslate"><span class="pre">qt</span></code>) を、1 ステップ 1 個の <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> にまとめるコマンドである(<code class="docutils literal notranslate"><span class="pre">pyR2D2[zarr]</span></code> で入る)。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r2d2plus-pack<span class="w"> </span>/vol0600/data/hp200137/u10094/R2D2plus/run/d00012<span class="w"> </span>--dry-run
+r2d2plus-pack<span class="w"> </span>/vol0600/data/hp200137/u10094/R2D2plus/run/d00012<span class="w"> </span>--kinds<span class="w"> </span>qf,qs,qt<span class="w"> </span>--workers<span class="w"> </span><span class="m">32</span>
+r2d2plus-pack<span class="w"> </span>...<span class="w"> </span>--steps<span class="w"> </span><span class="m">81</span>,100-200<span class="w"> </span>--delete-original
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>入れる変数:</strong> 元のファイルに書かれているものだけを入れる。新出力形式では <code class="docutils literal notranslate"><span class="pre">format.toml</span></code> の <code class="docutils literal notranslate"><span class="pre">variables</span></code> / <code class="docutils literal notranslate"><span class="pre">slice_variables</span></code> / <code class="docutils literal notranslate"><span class="pre">tau_quantities</span></code> で、<code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> と tau の <code class="docutils literal notranslate"><span class="pre">he</span></code> は入れない。これらは読むときに、元のファイルを読むときと同じ式で計算する。従来形式では、ファイルにある変数を全部入れる。</p></li>
+<li><p><strong>照合:</strong> 元のファイルは 1 回だけ読む。読んだ配列を zarr に書いて読み戻し、<a href="#id3"><span class="problematic" id="id4">**</span></a>ビット単位**で比べる。zip にした後は、全メンバーの CRC (<code class="docutils literal notranslate"><span class="pre">testzip</span></code>)、名前と大きさが zarr と同じこと、配列の名前・shape・dtype・属性を見る。前からある zip を元を消すために照合するときは、元と zip をビット単位で比べる。</p></li>
+<li><p><strong>途中で止まっても安全:</strong> 作業中のものは <code class="docutils literal notranslate"><span class="pre">.packing</span></code> の付いた名前で作る。照合が通ってから本来の名前にするので、読み手が途中のものを読むことはない。</p></li>
+<li><p><strong>元を消す条件:</strong> <code class="docutils literal notranslate"><span class="pre">--delete-original</span></code> を付けたときだけ消す。消すのは、その呼び出しで照合が通ったステップの元のファイルだけである。<code class="docutils literal notranslate"><span class="pre">wall_limit</span></code> で止まったランでは、延長の前提なので種類ごとの最後のステップを残す。restart と <code class="docutils literal notranslate"><span class="pre">data/time</span></code> には触らない。</p></li>
+<li><p><strong>走っているラン:</strong> <code class="docutils literal notranslate"><span class="pre">param/run_summary.toml</span></code> の status が <code class="docutils literal notranslate"><span class="pre">normal_end</span></code> でも <code class="docutils literal notranslate"><span class="pre">wall_limit</span></code> でもないラン(status の無い Fortran 版も含む)では、<a href="#id5"><span class="problematic" id="id6">**</span></a>書き終わったステップだけ**をまとめ、<code class="docutils literal notranslate"><span class="pre">--delete-original</span></code> なら元を消す。書き終わった印は、そのステップより後の時刻のファイルがあること(3D は <code class="docutils literal notranslate"><span class="pre">data/time/mhd/t.dac.N</span></code>、slice・tau は <code class="docutils literal notranslate"><span class="pre">data/time/tau/t.dac.N</span></code>。<code class="docutils literal notranslate"><span class="pre">data/time.zip</span></code> の中も見る)。R2D2plus はステップを書き終えてから時刻のファイルを書き、次の出力はその後なので、後の時刻があれば前のステップは全ランクが書き終えている。書いている途中のいちばん新しいステップは飛ばす。異常終了で status が <code class="docutils literal notranslate"><span class="pre">running</span></code> のまま残ったランでも、最後のステップだけが残る。</p></li>
+<li><p>元のファイルが一部しかないステップはまとめない。</p></li>
+<li><p><strong>出力先を変える:</strong> <code class="docutils literal notranslate"><span class="pre">--out</span> <span class="pre">DIR</span></code> を付けると、zip と記録をランではなく <code class="docutils literal notranslate"><span class="pre">DIR/data/</span></code> の下に作り、ランには何も書かない(試しや、ランの外にまとめるとき用。<code class="docutils literal notranslate"><span class="pre">--delete-original</span></code> とは併用できない)。</p></li>
+<li><p><strong>記録:</strong> 結果は <code class="docutils literal notranslate"><span class="pre">data/param/pack_report.toml</span></code> に <code class="docutils literal notranslate"><span class="pre">[[pack]]</span></code> として足していく。照合の方法、入れた変数、zip と元の大きさ、消したファイルの数(と例)、消さなかった理由が入る。</p></li>
+<li><p><strong>延長したラン:</strong> 延長で出た新しいステップは、もう一度同じコマンドを流せばそれだけがまとまる(zip のあるステップは、元が残っていれば照合だけ、無ければ何もしない)。</p></li>
+</ul>
+<p>zip のステップと元のファイルのステップが混ざったランも、そのまま読める。<code class="docutils literal notranslate"><span class="pre">d.qf</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qx</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qz</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qm</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qr</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qs</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qt</span></code> は、元のファイルが無いステップを zip から読む。<code class="docutils literal notranslate"><span class="pre">Sync</span></code> の <code class="docutils literal notranslate"><span class="pre">remap_qq</span></code>, <code class="docutils literal notranslate"><span class="pre">tau</span></code>, <code class="docutils literal notranslate"><span class="pre">slice</span></code> は、まとめたステップでは zip を持ってくる。<code class="docutils literal notranslate"><span class="pre">xselect</span></code> は zip からその層だけを取り出す(<code class="docutils literal notranslate"><span class="pre">remap_zarr</span></code>、<code class="docutils literal notranslate"><span class="pre">remote_python</span></code> が要る)。<code class="docutils literal notranslate"><span class="pre">Sync.setup</span></code> は <code class="docutils literal notranslate"><span class="pre">slice/zarr</span></code> と <code class="docutils literal notranslate"><span class="pre">tau/zarr</span></code> を持ってこない。</p>
+</section>
+<section id="r2d2plus-archive-hpci">
+<h2>r2d2plus-archive: HPCI に移す形にまとめる<a class="headerlink" href="#r2d2plus-archive-hpci" title="Link to this heading"></a></h2>
+<p>HPCI(Gfarm)に移すときに、<code class="docutils literal notranslate"><span class="pre">r2d2plus-pack</span></code> でまとめた残りを出力先にまとめる。元のランには触らない。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r2d2plus-archive<span class="w"> </span>/vol0600/data/hp200137/u10094/R2D2plus/run/d00012<span class="w"> </span>/vol0600/.../archive/d00012
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data/restart/&lt;slot&gt;.tar</span></code>: restart を slot ごとに tar にする。中のファイルの名前・種類・大きさが元と一致することを確かめる。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/time.zip</span></code>: <code class="docutils literal notranslate"><span class="pre">data/time</span></code> を zip にする。全メンバーの CRC (<code class="docutils literal notranslate"><span class="pre">testzip</span></code>) と、名前・大きさが元と一致することを確かめる。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rest.tar</span></code>: 残り全部を tar にする。<code class="docutils literal notranslate"><span class="pre">data/param/source</span></code> と <code class="docutils literal notranslate"><span class="pre">bin</span></code> も入れる(ランの記録なので)。入れないのは restart・time と、3D・slice・tau の元のファイルと zip である。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">archive_report.toml</span></code>: 照合の結果と、ランから直接送る zip の一覧を書く。restart は slot ごとに、中身の一覧(名前・種類・大きさ)と tar の SHA-256 も書く(<code class="docutils literal notranslate"><span class="pre">r2d2plus-restore</span></code> が使う)。zip はステップごとに取り出せるよう、そのままの形で送る。</p></li>
+<li><p>走っているラン(status が <code class="docutils literal notranslate"><span class="pre">running</span></code>)と、zip の無いステップの元のファイルが残っているランは止める(rest.tar から漏れるので、先に <code class="docutils literal notranslate"><span class="pre">r2d2plus-pack</span></code> を流す)。</p></li>
+</ul>
+</section>
+<section id="r2d2plus-restore-hpci-restart">
+<h2>r2d2plus-restore: HPCI から restart を戻す<a class="headerlink" href="#r2d2plus-restore-hpci-restart" title="Link to this heading"></a></h2>
+<p>HPCI に移したランを延長することになったときに、restart の slot を 1 つ富岳のランへ戻す。<code class="docutils literal notranslate"><span class="pre">gfpcopy</span></code> と <code class="docutils literal notranslate"><span class="pre">/vol0600</span></code> の両方がある <strong>csgw2</strong> で動かす(csgw2 には <code class="docutils literal notranslate"><span class="pre">u10094</span></code> の <code class="docutils literal notranslate"><span class="pre">~/.venv</span></code> がある)。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>r2d2plus-restore<span class="w"> </span>/vol0600/data/hp200137/u10094/R2D2plus/run/d00012<span class="w"> </span>--slot<span class="w"> </span>o<span class="w"> </span>--dry-run
+r2d2plus-restore<span class="w"> </span>/vol0600/data/hp200137/u10094/R2D2plus/run/d00012<span class="w"> </span>--slot<span class="w"> </span>o
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>取ってくる場所は <code class="docutils literal notranslate"><span class="pre">--from</span></code> で指定する(<code class="docutils literal notranslate"><span class="pre">gfarm:</span></code> の URL か、手元のパス)。既定は <code class="docutils literal notranslate"><span class="pre">gfarm:///home/hp200137/hpci000196/fugaku/&lt;プロジェクト&gt;/run/&lt;ランの名前&gt;</span></code> で(<code class="docutils literal notranslate"><span class="pre">Sync</span></code> の <code class="docutils literal notranslate"><span class="pre">work/&lt;プロジェクト&gt;/run/&lt;ランの名前&gt;</span></code> と同じ形)、そこに <code class="docutils literal notranslate"><span class="pre">r2d2plus-archive</span></code> の出力(<code class="docutils literal notranslate"><span class="pre">archive_report.toml</span></code> と <code class="docutils literal notranslate"><span class="pre">data/restart/&lt;slot&gt;.tar</span></code>)がある前提である。プロジェクトはランのパス <code class="docutils literal notranslate"><span class="pre">…/&lt;プロジェクト&gt;/run/&lt;ランの名前&gt;</span></code> から取る(富岳の <code class="docutils literal notranslate"><span class="pre">…/u10094/R2D2plus/run/d00012</span></code> なら <code class="docutils literal notranslate"><span class="pre">R2D2plus</span></code>)。違うときは <code class="docutils literal notranslate"><span class="pre">--project</span></code> で与える。</p></li>
+<li><p>tar の SHA-256 が <code class="docutils literal notranslate"><span class="pre">archive_report.toml</span></code> と同じことを確かめてから、<code class="docutils literal notranslate"><span class="pre">data/restart/.restore-&lt;slot&gt;/</span></code> に展開する。名前・種類・大きさが <code class="docutils literal notranslate"><span class="pre">archive_report.toml</span></code> の一覧と同じであれば、<code class="docutils literal notranslate"><span class="pre">data/restart/&lt;slot&gt;</span></code> にする。<code class="docutils literal notranslate"><span class="pre">data/restart/&lt;slot&gt;</span></code> がすでにあれば何もしない。結果は <code class="docutils literal notranslate"><span class="pre">data/param/restore_report.toml</span></code> に残る。</p></li>
+<li><p>astana から動かすときは、boston を踏み台にする。<code class="docutils literal notranslate"><span class="pre">hpcissh</span></code> に渡すコマンドは改行がつぶれるので、スクリプトにして <code class="docutils literal notranslate"><span class="pre">/vol0600</span></code> に置き、<code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">boston</span> <span class="pre">hpcissh</span> <span class="pre">csgw2.fugaku.r-ccs.riken.jp</span> <span class="pre">&quot;bash</span> <span class="pre">&lt;スクリプト&gt;&quot;</span></code> で走らせる。スクリプトの中では <code class="docutils literal notranslate"><span class="pre">~/.venv/bin/r2d2plus-restore</span> <span class="pre">…</span></code> と書く。</p></li>
+<li><p>延長には restart の他に、富岳に残した設定・<code class="docutils literal notranslate"><span class="pre">param</span></code>・<code class="docutils literal notranslate"><span class="pre">data/time</span></code> を使う(<code class="docutils literal notranslate"><span class="pre">data/time</span></code> は富岳から消さない)。</p></li>
+</ul>
+</section>
+<section id="id7">
+<h2>リモートの zarr から一部だけを持ってくる<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<p>zip にすると rsync でランク・ステップごとに選んで持ってくることはできなくなる。代わりに <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.Sync.remap_zarr()</span></code> (と <code class="docutils literal notranslate"><span class="pre">tau_zarr</span></code>, <code class="docutils literal notranslate"><span class="pre">slice_zarr</span></code>) を使うと、リモートの <code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> (または <code class="docutils literal notranslate"><span class="pre">.zarr</span></code> ディレクトリ)から、ステップ・変数・3 方向の範囲を選んで持ってこられる。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d00012/data'</span><span class="p">)</span>   <span class="c1"># 先に pyR2D2.Sync.setup(..., remote_root=...) で param を持ってくる</span>
+<span class="n">d</span><span class="o">.</span><span class="n">sync</span><span class="o">.</span><span class="n">remap_zarr</span><span class="p">(</span>
+    <span class="s1">'fg'</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">81</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">'ro'</span><span class="p">,</span> <span class="s1">'vx'</span><span class="p">],</span> <span class="n">i0</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">i1</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span>   <span class="c1"># x0=x1=xs と座標でもよい</span>
+    <span class="n">remote_root</span><span class="o">=</span><span class="s1">'/vol0600/data/hp200137/u10094/R2D2plus/run'</span><span class="p">,</span>
+    <span class="n">remote_python</span><span class="o">=</span><span class="s1">'~/.venv/bin/python'</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">81</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">'ro'</span><span class="p">,</span> <span class="s1">'vx'</span><span class="p">],</span> <span class="n">zarr_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>リモートでは ssh で Python (numpy と zarr 3 があればよく、pyR2D2 は要らない)を動かし、要る範囲だけを読んで ssh の標準出力に流す。<strong>リモートには一時ファイルを作らない。</strong> 全ステップを 1 回の ssh で送る。</p></li>
+<li><p>手元には、元と同じ形・同じチャンクの <code class="docutils literal notranslate"><span class="pre">qq.NNNNNNNN.zarr</span></code> (ディレクトリ)ができる。持ってきていない所は NaN である。添字は元と同じなので、<code class="docutils literal notranslate"><span class="pre">d.qx</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qr</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qt</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qs</span></code> は <code class="docutils literal notranslate"><span class="pre">zarr_flag=True</span></code> でそのまま読める(<code class="docutils literal notranslate"><span class="pre">d.qf.read</span></code> は全体を NaN 込みで読むので大きい)。</p></li>
+<li><p>2 回目以降は同じ手元の zarr に足される。持ってきた範囲は属性 <code class="docutils literal notranslate"><span class="pre">pyR2D2_partial</span></code> に残り、すでにある範囲は持ってこない。手元に部分でない zarr (<code class="docutils literal notranslate"><span class="pre">.zarr.zip</span></code> を含む)があれば何もしない。</p></li>
+<li><p>リモートが読むのはチャンク単位なので、x に 1 層だけ欲しくてもリモートではその層を含むチャンク(既定で 12 層)を読んで展開する。送るのは要る範囲だけである。</p></li>
+<li><p>HPCI 共用ストレージ(Gfarm)は、Gfarm がふつうのパスとして見える機械(hpciss05 の <code class="docutils literal notranslate"><span class="pre">/gfarm/hp200137/hpci000196/hpci000196/...</span></code> など)で読む。入るのは <code class="docutils literal notranslate"><span class="pre">hpcissh</span></code> で、<code class="docutils literal notranslate"><span class="pre">ssh</span></code> 引数に渡す。踏み台を通すときは <code class="docutils literal notranslate"><span class="pre">ssh='ssh</span> <span class="pre">boston</span> <span class="pre">hpcissh'</span></code>, <code class="docutils literal notranslate"><span class="pre">server='hpci5'</span></code> のように書く。このとき <code class="docutils literal notranslate"><span class="pre">~</span></code> は踏み台のシェルで展開されてしまうので、<code class="docutils literal notranslate"><span class="pre">remote_python</span></code> と <code class="docutils literal notranslate"><span class="pre">remote_root</span></code> は絶対パス(<code class="docutils literal notranslate"><span class="pre">/home/hpci000196/.venv/bin/python</span></code>)で書く。</p></li>
+</ul>
 </section>
 <section id="time-zip">
 <h2>time.zip: 時刻ファイルの圧縮<a class="headerlink" href="#time-zip" title="Link to this heading"></a></h2>
@@ -209,26 +287,26 @@
 </pre></div>
 </div>
 </section>
-<section id="id3">
-<h2>典型的なワークフロー<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="id8">
+<h2>典型的なワークフロー<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
 <p>計算が完了したタイムステップについて、まとめて圧縮・確認・削除を行う例を示す。ここでは、通常のディスクに保存する場合(<code class="docutils literal notranslate"><span class="pre">zip()</span></code> は行わない)と、Gfarmのようなファイル数制限の厳しいストレージに保存する場合(<code class="docutils literal notranslate"><span class="pre">zip()</span></code> まで行う)の2通りを示す。</p>
 <p><strong>通常のディスクに保存する場合</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d001/data'</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Gfarmなど、ファイル数制限の厳しいストレージに保存する場合</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">&#39;../run/d001/data&#39;</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d001/data'</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
     <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
@@ -236,7 +314,7 @@
         <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">: check failed, keeping original binary files"</span><span class="p">)</span>
 
 <span class="n">d</span><span class="o">.</span><span class="n">zip_time</span><span class="p">(</span><span class="n">remove_original</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -245,7 +323,71 @@
 <p class="admonition-title">Note</p>
 <p>計算がまだ進行中のディレクトリに対してこの処理を行う場合、計算プロセスが書き込み中のファイルを誤って対象にしないよう注意すること。基本的には、計算が完全に終了した(あるいは十分に古い)タイムステップに対してのみ実行するのが安全である。</p>
 </div>
-<p>最終更新日：Jul 27, 2026</p>
+</section>
+<section id="r2d2plus-format-compressed">
+<h2>R2D2plus の新出力形式 (<code class="docutils literal notranslate"><span class="pre">format</span> <span class="pre">=</span> <span class="pre">&quot;compressed&quot;</span></code>)<a class="headerlink" href="#r2d2plus-format-compressed" title="Link to this heading"></a></h2>
+<p>R2D2plus (C++版) は <code class="docutils literal notranslate"><span class="pre">[output]</span> <span class="pre">format</span> <span class="pre">=</span> <span class="pre">&quot;compressed&quot;</span></code> で、計算の時点で圧縮した出力を書ける(R2D2plus DEC-576)。上の <code class="docutils literal notranslate"><span class="pre">compress()</span></code> とは別物で、pyR2D2 側の操作は要らない。<code class="docutils literal notranslate"><span class="pre">param/format.toml</span></code> があり <code class="docutils literal notranslate"><span class="pre">format</span> <span class="pre">=</span> <span class="pre">&quot;compressed&quot;</span></code> と書かれていれば <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> が自動で見分け、<code class="docutils literal notranslate"><span class="pre">d.qf.read(n)</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qx</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qz</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qm</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qr</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qt</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qs</span></code>, <code class="docutils literal notranslate"><span class="pre">d.q2</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qp</span></code>/<code class="docutils literal notranslate"><span class="pre">d.qa</span></code> をこれまでと同じ引数・同じ属性名・同じ配列の形で使える(<code class="docutils literal notranslate"><span class="pre">d.vc</span></code> は従来形式と同じファイル)。従来形式(Fortran R2D2 と R2D2plus の <code class="docutils literal notranslate"><span class="pre">format</span> <span class="pre">=</span> <span class="pre">&quot;legacy&quot;</span></code>)の読み方は変わらない。</p>
+<ul class="simple">
+<li><p>3D の <code class="docutils literal notranslate"><span class="pre">remap/qq</span></code> は 1 ランク 1 ファイルの <code class="docutils literal notranslate"><span class="pre">r2d2plus-z</span></code> コンテナ(変数ごとに byte shuffle + zstd)。中身は従来形式とビット単位で同一。読むには zstd の復号器が要る(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numcodecs</span></code>。<code class="docutils literal notranslate"><span class="pre">pyR2D2[zarr]</span></code> を入れていれば入っている)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> は書かれない。pyR2D2 は要求されたとき(<code class="docutils literal notranslate"><span class="pre">keys=&quot;all&quot;</span></code> の既定も含む)に、出力に同梱された <code class="docutils literal notranslate"><span class="pre">param/eos_table.tbl</span></code> を使って <code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> から計算する。式は R2D2plus の従来形式の書き出しと同じで、単精度の丸めの位置まで写してあるので、3D の <code class="docutils literal notranslate"><span class="pre">remap/qq</span></code> と tau の <code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code>, <code class="docutils literal notranslate"><span class="pre">op</span></code> は従来形式のファイルとビット単位で一致する(対照ランで確認)。slice と 2D の <code class="docutils literal notranslate"><span class="pre">pr</span></code>, <code class="docutils literal notranslate"><span class="pre">te</span></code> は R2D2plus が倍精度の状態から作っていたので、単精度の出力から計算するこちらとは最終桁が違いうる(対照ランの slice で背景量に対し 2e-8 以内)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ph</span></code> (発散クリーニングの変数) は既定では書かれない。<code class="docutils literal notranslate"><span class="pre">keys=&quot;all&quot;</span></code> では属性が <code class="docutils literal notranslate"><span class="pre">None</span></code> になり、明示的に要求すると例外になる。</p></li>
+<li><p>tau の高さは <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">-</span> <span class="pre">rstar</span></code> [cm] で書かれる。<code class="docutils literal notranslate"><span class="pre">d.qt.height</span></code> (と <code class="docutils literal notranslate"><span class="pre">height01</span></code>, <code class="docutils literal notranslate"><span class="pre">height001</span></code>) でそのまま読める。従来の <code class="docutils literal notranslate"><span class="pre">d.qt.he</span></code> (中心からの半径) は <code class="docutils literal notranslate"><span class="pre">rstar</span> <span class="pre">+</span> <span class="pre">height</span></code> を倍精度で返す(従来の単精度の半径は約 82 m 刻みだった)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d.qp</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qa</span></code> の配列は単精度(従来形式は倍精度)。値は同じ。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">r2d2plus-z</span></code> のファイル 1 個や、R2D2plus のリスタートを直接読む関数もある(リスタートは実験的)。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyR2D2.data_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">compressed</span>
+
+<span class="n">header</span><span class="p">,</span> <span class="n">qq</span> <span class="o">=</span> <span class="n">compressed</span><span class="o">.</span><span class="n">read_r2d2plus_z</span><span class="p">(</span>
+    <span class="s2">"data/remap/qq/00000/00000000/qq.z.00000001.00000000"</span><span class="p">)</span>
+<span class="n">state</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">compressed</span><span class="o">.</span><span class="n">read_restart_state</span><span class="p">(</span><span class="s2">"data/restart/e"</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="r2d2plus">
+<h3>前の出力を R2D2plus の初期条件にする<a class="headerlink" href="#r2d2plus" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="api/pyR2D2.write_initial_state.html#pyR2D2.write_initial_state" title="pyR2D2.write_initial_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.write_initial_state()</span></code></a> は R2D2plus の初期状態ファイル(<code class="docutils literal notranslate"><span class="pre">r2d2plus-z</span></code>、<code class="docutils literal notranslate"><span class="pre">kind</span> <span class="pre">=</span> <span class="pre">&quot;initial_state&quot;</span></code>)を書く。R2D2plus 側では <code class="docutils literal notranslate"><span class="pre">[initial_condition]</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&quot;file&quot;</span></code>、<code class="docutils literal notranslate"><span class="pre">[initial_condition.params]</span> <span class="pre">path</span> <span class="pre">=</span> <span class="pre">&quot;...&quot;</span></code> で読む。変数名と軸は pyR2D2 の 3D 配列と同じ(<code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code> が鉛直成分、形は <code class="docutils literal notranslate"><span class="pre">(ix,</span> <span class="pre">jx,</span> <span class="pre">kx)</span></code>、領域全体の物理セルのみ)なので、<code class="docutils literal notranslate"><span class="pre">d.qf.read(n)</span></code> で読んだ配列をそのまま渡せばよい(従来形式・新形式のどちらのランでも同じ)。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">ro</span></code> と <code class="docutils literal notranslate"><span class="pre">se</span></code> は <strong>背景からの摂動</strong> (<code class="docutils literal notranslate"><span class="pre">d.qf.ro</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qf.se</span></code> と同じ量) を渡す。全量 (<code class="docutils literal notranslate"><span class="pre">ro0</span> <span class="pre">+</span> <span class="pre">ro</span></code>) を渡してはならない。</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d001/data'</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ro"</span><span class="p">,</span> <span class="s2">"vx"</span><span class="p">,</span> <span class="s2">"vy"</span><span class="p">,</span> <span class="s2">"vz"</span><span class="p">,</span> <span class="s2">"bx"</span><span class="p">,</span> <span class="s2">"by"</span><span class="p">,</span> <span class="s2">"bz"</span><span class="p">,</span> <span class="s2">"se"</span><span class="p">]</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">)</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write_initial_state</span><span class="p">(</span>
+    <span class="s2">"initial_state.z"</span><span class="p">,</span>
+    <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">},</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">datadir</span><span class="p">),</span> <span class="s2">"nd"</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">"time"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>書き出しには <code class="docutils literal notranslate"><span class="pre">xxhash</span></code> が要る(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xxhash</span></code>、または <code class="docutils literal notranslate"><span class="pre">pyR2D2[compressed]</span></code>)。R2D2plus は変数ごとの XXH3-64 を照合して読むので、チェックサムを省略できない。</p>
+</section>
+<section id="id9">
+<h3>境界値の時系列を R2D2plus の境界条件に与える<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="api/pyR2D2.write_boundary_series.html#pyR2D2.write_boundary_series" title="pyR2D2.write_boundary_series"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.write_boundary_series()</span></code></a> は R2D2plus の汎用境界条件の規則 <code class="docutils literal notranslate"><span class="pre">&quot;file&quot;</span></code> が読む時系列(<code class="docutils literal notranslate"><span class="pre">kind</span> <span class="pre">=</span> <span class="pre">&quot;boundary_series&quot;</span></code>)を書く。<code class="docutils literal notranslate"><span class="pre">values</span></code> の形は <code class="docutils literal notranslate"><span class="pre">(n1,</span> <span class="pre">n2,</span> <span class="pre">nt)</span></code> (<code class="docutils literal notranslate"><span class="pre">n1</span></code> = 第1水平 <code class="docutils literal notranslate"><span class="pre">jx</span></code>、<code class="docutils literal notranslate"><span class="pre">n2</span></code> = 第2水平 <code class="docutils literal notranslate"><span class="pre">kx</span></code>、<strong>時刻が最後の軸</strong>)、<code class="docutils literal notranslate"><span class="pre">times</span></code> は狭義単調増加。値はその壁の ghost 層すべてに使われ、ステップ開始時刻で線形内挿される(範囲外は端の値)。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">[boundary.params]</span></code> の変数名は <strong>C++ の成分名</strong> (<code class="docutils literal notranslate"><span class="pre">ro,</span> <span class="pre">vx,</span> <span class="pre">vy,</span> <span class="pre">vz,</span> <span class="pre">bx,</span> <span class="pre">by,</span> <span class="pre">bz,</span> <span class="pre">se,</span> <span class="pre">ps</span></code>、C++ では <strong>z が鉛直</strong>) である。pyR2D2 (Fortran の名前) の <code class="docutils literal notranslate"><span class="pre">vx</span></code> (鉛直) は <code class="docutils literal notranslate"><span class="pre">vz</span></code>、<code class="docutils literal notranslate"><span class="pre">vy</span></code> は <code class="docutils literal notranslate"><span class="pre">vx</span></code>、<code class="docutils literal notranslate"><span class="pre">vz</span></code> は <code class="docutils literal notranslate"><span class="pre">vy</span></code> になる(磁場も同様、<code class="docutils literal notranslate"><span class="pre">ph</span></code> は <code class="docutils literal notranslate"><span class="pre">ps</span></code>)。<code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> は背景からの摂動を与える。</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s1">'../run/d001/data'</span><span class="p">)</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">121</span><span class="p">)</span>
+<span class="n">planes</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">"vx"</span><span class="p">])</span>
+    <span class="n">planes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">vx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>   <span class="c1"># 下端の面の鉛直速度 (jx, kx)</span>
+    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write_boundary_series</span><span class="p">(</span><span class="s2">"bottom_vz.z"</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">planes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+<span class="c1"># R2D2plus 側: [boundary.params] bottom.vz = "file", bottom.vz_file = "bottom_vz.z"</span>
+</pre></div>
+</div>
+<p>最終更新日：Nov 02, 2026</p>
+</section>
 </section>
 </section>
 
@@ -253,14 +395,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyr2d2.html" class="btn btn-neutral float-left" title="pyR2D2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api_reference.html" class="btn btn-neutral float-right" title="pyR2D2 API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="environment.html" class="btn btn-neutral float-left" title="pyR2D2 を使うための環境設定" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="paraview.html" class="btn btn-neutral float-right" title="Paraviewを用いた3Dデータ表示" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

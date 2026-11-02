@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.color.color Module &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2.color.color Module &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -15,13 +15,13 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=750e77fb"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Sphinx使用の覚書" href="sphinx.html" />
+    <link rel="next" title="aia_response_from_ssw" href="api/pyR2D2.synth.euv.aia_response_from_ssw.html" />
     <link rel="prev" title="write_optical_surface" href="api/pyR2D2.write.vtk.write_optical_surface.html" /> 
 </head>
 
@@ -34,7 +34,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,23 +46,25 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#packages">Packages</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="api_reference.html#modules">Modules</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyR2D2.color.color Module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pyR2D2.constant.constant">pyR2D2.constant.constant Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pyR2D2.synth.euv">pyR2D2.synth.euv Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
-<li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -71,7 +73,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">R2D2 Document</a>
+          <a href="index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -183,19 +185,95 @@ Set can be use for plotting.</p>
 </pre></div>
 </div>
 </section>
+<section id="module-pyR2D2.synth.euv">
+<span id="pyr2d2-synth-euv-module"></span><h1>pyR2D2.synth.euv Module<a class="headerlink" href="#module-pyR2D2.synth.euv" title="Link to this heading"></a></h1>
+<p>EUV・軟 X 線の強度を emission measure (EM) と応答関数から作る (R2D2plus DEC-671)。</p>
+<p>R2D2plus の量の並び 2 のランは <code class="docutils literal notranslate"><span class="pre">remap/vl/vl_dem.dac</span></code> に、視線ごとの EM = Σ n_e² dl [cm^-5] を
+log10 T の箱 ([5, 8)、0.05 dex、60 箱) に分けて書く (<code class="xref py py-meth docutils literal notranslate"><span class="pre">pyR2D2.OnTheFly.read_dem()</span></code>)。
+強度は EM に装置の温度応答 R(T) [DN cm^5 s^-1 pix^-1] を掛けて足したもの:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>I = Σ_箱 EM_箱 × (箱の中の R の平均)   [DN s^-1 pix^-1]
+</pre></div>
+</div>
+<p>使い方:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>                                   <span class="c1"># em_x (鉛直の視線), em_y, em_z</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">synth</span><span class="o">.</span><span class="n">euv</span><span class="o">.</span><span class="n">intensity</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">em_x</span><span class="p">,</span> <span class="s2">"aia"</span><span class="p">)</span>     <span class="c1"># {"A94": (jx, kx), ...}</span>
+<span class="n">xrt</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">synth</span><span class="o">.</span><span class="n">euv</span><span class="o">.</span><span class="n">intensity</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">em_x</span><span class="p">,</span> <span class="s2">"xrt"</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Al-poly"</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>応答関数は <a class="reference internal" href="api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable" title="pyR2D2.synth.euv.ResponseTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResponseTable</span></code></a> で、表を差し替えられる (<code class="docutils literal notranslate"><span class="pre">intensity(em,</span> <span class="pre">&quot;my_table.txt&quot;)</span></code> や
+<code class="docutils literal notranslate"><span class="pre">ResponseTable</span></code> を直接渡す)。同梱の表 (<code class="docutils literal notranslate"><span class="pre">pyR2D2/synth/data/</span></code>) は SSW の公開ファイルから
+<a class="reference internal" href="api/pyR2D2.synth.euv.aia_response_from_ssw.html#pyR2D2.synth.euv.aia_response_from_ssw" title="pyR2D2.synth.euv.aia_response_from_ssw"><code class="xref py py-func docutils literal notranslate"><span class="pre">aia_response_from_ssw()</span></code></a> と <a class="reference internal" href="api/pyR2D2.synth.euv.xrt_response_from_ssw.html#pyR2D2.synth.euv.xrt_response_from_ssw" title="pyR2D2.synth.euv.xrt_response_from_ssw"><code class="xref py py-func docutils literal notranslate"><span class="pre">xrt_response_from_ssw()</span></code></a> で作ったもの:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">aia</span></code>: <code class="docutils literal notranslate"><span class="pre">aia_get_response(/temp,</span> <span class="pre">/dn,</span> <span class="pre">/evenorm,</span> <span class="pre">/chiantifix)</span></code> (V10、時間変化の補正なし) と同じ手順。
+94・131・171・193・211・335 Å。304 Å は光学的に厚いので入れない。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xrt</span></code>: <code class="docutils literal notranslate"><span class="pre">make_xrt_temp_resp(make_xrt_wave_resp(contam_time=...),</span> <span class="pre">/chianti_default)</span></code> と同じ手順。
+CCD と焦点面フィルターの汚染 (DEHP) の厚さは表の作った日付のもの (表の頭の <code class="docutils literal notranslate"><span class="pre">meta</span></code> に記録)。
+観測と比べるときは、その日付で作り直す (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pyR2D2.synth.euv</span> <span class="pre">xrt</span> <span class="pre">--date</span> <span class="pre">...</span></code>)。</p></li>
+</ul>
+<p>EM が無いラン (古いラン、球座標など) は <a class="reference internal" href="api/pyR2D2.synth.euv.em_from_state.html#pyR2D2.synth.euv.em_from_state" title="pyR2D2.synth.euv.em_from_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">em_from_state()</span></code></a> で 3D 出力から作り直せる
+(EOS 表に <code class="docutils literal notranslate"><span class="pre">ne</span></code> が要る。R2D2plus-input の <code class="docutils literal notranslate"><span class="pre">stratification_eos/add_electron_density.py</span></code>)。</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.aia_response_from_ssw.html#pyR2D2.synth.euv.aia_response_from_ssw" title="pyR2D2.synth.euv.aia_response_from_ssw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aia_response_from_ssw</span></code></a>(ssw_dir[, channels, ...])</p></td>
+<td><p>AIA の温度応答を SSW の公開ファイルから作る (<code class="docutils literal notranslate"><span class="pre">aia_get_response(/temp,</span> <span class="pre">/dn,</span> <span class="pre">...)</span></code> と同じ手順)。</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.em_from_state.html#pyR2D2.synth.euv.em_from_state" title="pyR2D2.synth.euv.em_from_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">em_from_state</span></code></a>(data, n[, los, logte_edges])</p></td>
+<td><p>3D 出力 (<code class="docutils literal notranslate"><span class="pre">remap/qq</span></code>) から箱ごとの EM を作り直す (R2D2plus の vl_dem.dac と同じ定義)。</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.intensity.html#pyR2D2.synth.euv.intensity" title="pyR2D2.synth.euv.intensity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intensity</span></code></a>(em[, response, channels, ...])</p></td>
+<td><p>箱ごとの EM から強度を作る。</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.load_response.html#pyR2D2.synth.euv.load_response" title="pyR2D2.synth.euv.load_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_response</span></code></a>([response])</p></td>
+<td><p>応答の表を返す。<code class="docutils literal notranslate"><span class="pre">&quot;aia&quot;</span></code>・<code class="docutils literal notranslate"><span class="pre">&quot;xrt&quot;</span></code> は同梱の表、文字列や Path はファイル、 <a class="reference internal" href="api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable" title="pyR2D2.synth.euv.ResponseTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResponseTable</span></code></a> はそのまま。</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.main.html#pyR2D2.synth.euv.main" title="pyR2D2.synth.euv.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>([argv])</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pyR2D2.synth.euv</span> <span class="pre">aia|xrt</span> <span class="pre">--ssw</span> <span class="pre">DIR</span> <span class="pre">--out</span> <span class="pre">FILE</span> <span class="pre">...</span></code> で応答の表を作る。</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.xrt_contamination.html#pyR2D2.synth.euv.xrt_contamination" title="pyR2D2.synth.euv.xrt_contamination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xrt_contamination</span></code></a>(ssw_dir, channel, date)</p></td>
+<td><p>XRT の汚染 (DEHP) の厚さ [Å] (CCD、焦点面フィルター) を SSW xrt_time2contam と同じく作る。</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.xrt_response_from_ssw.html#pyR2D2.synth.euv.xrt_response_from_ssw" title="pyR2D2.synth.euv.xrt_response_from_ssw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xrt_response_from_ssw</span></code></a>(ssw_dir[, channels, ...])</p></td>
+<td><p>XRT の温度応答を SSW の公開ファイルから作る (<code class="docutils literal notranslate"><span class="pre">make_xrt_temp_resp(make_xrt_wave_resp(contam_time=date),</span> <span class="pre">/chianti_default)</span></code> と同じ手順)。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Path</span></code>(*args, **kwargs)</p></td>
+<td><p>PurePath subclass that can make system calls.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable" title="pyR2D2.synth.euv.ResponseTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResponseTable</span></code></a>(logt, responses[, units, meta])</p></td>
+<td><p>温度応答の表 R(log10 T) をチャンネルごとに持つ。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Link to this heading"></a></h2>
+<div class="graphviz"><img src="_images/inheritance-7c7d5348b4545254c52ea21b318130db1aa9f732.png" alt="Inheritance diagram of pyR2D2.synth.euv.ResponseTable" usemap="#inheritancedf0a6311a9" class="inheritance graphviz" /></div>
+<map id="inheritancedf0a6311a9" name="inheritancedf0a6311a9">
+<area shape="rect" id="node1" href="api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable" target="_top" title="温度応答の表 R(log10 T) をチャンネルごとに持つ。" alt="" coords="5,5,124,31"/>
+</map></section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="api/pyR2D2.write.vtk.write_optical_surface.html" class="btn btn-neutral float-left" title="write_optical_surface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="sphinx.html" class="btn btn-neutral float-right" title="Sphinx使用の覚書" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api/pyR2D2.synth.euv.aia_response_from_ssw.html" class="btn btn-neutral float-right" title="aia_response_from_ssw" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

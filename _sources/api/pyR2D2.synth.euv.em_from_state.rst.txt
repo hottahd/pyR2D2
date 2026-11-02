@@ -1,0 +1,6 @@
+em_from_state
+=============
+
+.. currentmodule:: pyR2D2.synth.euv
+
+.. autofunction:: em_from_state

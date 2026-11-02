@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>write_initial_state &mdash; pyR2D2 0.4.1.dev48 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="write_boundary_series" href="pyR2D2.write_boundary_series.html" />
+    <link rel="prev" title="pyR2D2 Package" href="../pyR2D2.package.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyR2D2
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyR2D2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
+      <li class="breadcrumb-item active">write_initial_state</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyR2D2.write_initial_state.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="write-initial-state">
+<h1>write_initial_state<a class="headerlink" href="#write-initial-state" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyR2D2.write_initial_state">
+<span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">write_initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/compressed.html#write_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.write_initial_state" title="Link to this definition"></a></dt>
+<dd><p>R2D2plus の初期状態ファイル (<code class="docutils literal notranslate"><span class="pre">r2d2plus-z</span></code>、<code class="docutils literal notranslate"><span class="pre">kind</span> <span class="pre">=</span> <span class="pre">&quot;initial_state&quot;</span></code>) を書く。</p>
+<p>R2D2plus では次のように指定して読む:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">initial_condition</span><span class="p">]</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="s2">"file"</span>
+<span class="p">[</span><span class="n">initial_condition</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">"/path/to/initial_state.z"</span>
+</pre></div>
+</div>
+<p><strong>ro と se は背景からの摂動である。</strong> 従来形式の <code class="docutils literal notranslate"><span class="pre">d.qf.ro</span></code> / <code class="docutils literal notranslate"><span class="pre">d.qf.se</span></code>
+(<code class="docutils literal notranslate"><span class="pre">remap/qq</span></code>) が返すものと同じ量で、全量 (<code class="docutils literal notranslate"><span class="pre">ro0</span> <span class="pre">+</span> <span class="pre">ro</span></code>) を渡してはならない。
+速度・磁場・<code class="docutils literal notranslate"><span class="pre">ph</span></code> はそのままの値。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – 書き出し先</p></li>
+<li><p><strong>fields</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a><em> of </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a>) – <code class="docutils literal notranslate"><span class="pre">{name:</span> <span class="pre">array}</span></code>。名前は <code class="docutils literal notranslate"><span class="pre">ro,</span> <span class="pre">vx,</span> <span class="pre">vy,</span> <span class="pre">vz,</span> <span class="pre">bx,</span> <span class="pre">by,</span> <span class="pre">bz,</span> <span class="pre">se,</span> <span class="pre">ph</span></code> から。
+<strong>名前と軸は pyR2D2 の 3D 配列 (Fortran の並び) と同じ</strong>: <code class="docutils literal notranslate"><span class="pre">vx</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code> が
+鉛直成分、配列の形は <code class="docutils literal notranslate"><span class="pre">(ix,</span> <span class="pre">jx,</span> <span class="pre">kx)</span></code> = (鉛直, 第1水平, 第2水平)、
+領域全体の物理セルのみ (margin 無し)。<code class="docutils literal notranslate"><span class="pre">d.qf.read(n)</span></code> で読んだ配列を
+そのまま渡せばよい。すべて同じ形であること。</p></li>
+<li><p><strong>attributes</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">[attributes]</span></code> に書くスカラー (文字列・整数・実数・真偽)。例:
+<code class="docutils literal notranslate"><span class="pre">{&quot;source&quot;:</span> <span class="pre">&quot;d001&quot;,</span> <span class="pre">&quot;nd&quot;:</span> <span class="pre">120,</span> <span class="pre">&quot;time&quot;:</span> <span class="pre">3600.0}</span></code></p></li>
+<li><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – zstd の圧縮レベル (既定 3)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>path</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)">pathlib.Path</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>各変数は float64、<code class="docutils literal notranslate"><span class="pre">order</span> <span class="pre">=</span> <span class="pre">&quot;F&quot;</span></code> (鉛直が最速)、<code class="docutils literal notranslate"><span class="pre">shape</span> <span class="pre">=</span> <span class="pre">list(array.shape)</span></code>
+で書く。XXH3-64 のチェックサムを R2D2plus が照合するので <code class="docutils literal notranslate"><span class="pre">xxhash</span></code> が必要
+(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">xxhash</span></code>)。zstd には numcodecs (または zstandard) を使う。</p>
+<p class="rubric">Examples</p>
+<p>前の出力を初期条件にする (従来形式・新形式どちらのランでも同じ):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">"../run/d001/data"</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">"ro"</span><span class="p">,</span> <span class="s2">"vx"</span><span class="p">,</span> <span class="s2">"vy"</span><span class="p">,</span> <span class="s2">"vz"</span><span class="p">,</span> <span class="s2">"bx"</span><span class="p">,</span> <span class="s2">"by"</span><span class="p">,</span> <span class="s2">"bz"</span><span class="p">,</span> <span class="s2">"se"</span><span class="p">])</span>
+<span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
+          <span class="p">[</span><span class="s2">"ro"</span><span class="p">,</span> <span class="s2">"vx"</span><span class="p">,</span> <span class="s2">"vy"</span><span class="p">,</span> <span class="s2">"vz"</span><span class="p">,</span> <span class="s2">"bx"</span><span class="p">,</span> <span class="s2">"by"</span><span class="p">,</span> <span class="s2">"bz"</span><span class="p">,</span> <span class="s2">"se"</span><span class="p">]}</span>
+<span class="n">pyR2D2</span><span class="o">.</span><span class="n">write_initial_state</span><span class="p">(</span>
+    <span class="s2">"initial_state.z"</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">datadir</span><span class="p">),</span> <span class="s2">"nd"</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">"time"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../pyR2D2.package.html" class="btn btn-neutral float-left" title="pyR2D2 Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyR2D2.write_boundary_series.html" class="btn btn-neutral float-right" title="write_boundary_series" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+PhotosphereSnapshot
+===================
+
+.. currentmodule:: pyR2D2
+
+.. autoclass:: PhotosphereSnapshot
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~PhotosphereSnapshot.fields
+      ~PhotosphereSnapshot.index
+      ~PhotosphereSnapshot.path
+      ~PhotosphereSnapshot.step
+      ~PhotosphereSnapshot.time
+      ~PhotosphereSnapshot.units
+      ~PhotosphereSnapshot.x
+      ~PhotosphereSnapshot.y
+      ~PhotosphereSnapshot.z
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: fields
+   .. autoattribute:: index
+   .. autoattribute:: path
+   .. autoattribute:: step
+   .. autoattribute:: time
+   .. autoattribute:: units
+   .. autoattribute:: x
+   .. autoattribute:: y
+   .. autoattribute:: z

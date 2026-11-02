@@ -1,0 +1,6 @@
+read_photosphere
+================
+
+.. currentmodule:: pyR2D2
+
+.. autofunction:: read_photosphere

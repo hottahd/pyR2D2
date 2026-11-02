@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.data &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2.data &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -14,9 +14,9 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -43,15 +43,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../data_compression.html">データ圧縮</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -60,7 +56,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">R2D2 Document</a>
+          <a href="../../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -91,55 +87,76 @@
 <div class="viewcode-block" id="Data">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Data</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class for managing R2D2 data</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    p : pyR2D2.Parameters</span>
-<span class="sd">        Instance of pyR2D2.Parameters</span>
-<span class="sd">    qx : pyR2D2.XSelect</span>
-<span class="sd">        Instance of pyR2D2.XSelect</span>
-<span class="sd">    qz : pyR2D2.ZSelect</span>
-<span class="sd">        Instance of pyR2D2.ZSelect</span>
-<span class="sd">    qm : pyR2D2.MPIRegion</span>
-<span class="sd">        Instance of pyR2D2.MPIRegion</span>
+<span class="sd">        Run parameters and grids (``x, y, z, nx, ...``); also reachable directly as</span>
+<span class="sd">        ``d.x``, ``d.nx``, ... (attribute lookup falls through to ``d.p``).</span>
 <span class="sd">    qf : pyR2D2.FullData</span>
-<span class="sd">        Instance of pyR2D2.FullData</span>
+<span class="sd">        Full 3D data (``remap/qq``).</span>
+<span class="sd">        ``d.qf.read(n)`` -&gt; ``d.qf.ro, vx, vy, vz, bx, by, bz, se, pr, te, op``</span>
+<span class="sd">    qx : pyR2D2.XSelect</span>
+<span class="sd">        2D plane at a given x.</span>
+<span class="sd">        ``d.qx.read(xs, n)`` -&gt; ``d.qx.ro, vx, vy, vz, bx, by, bz, se, ...``</span>
+<span class="sd">    qz : pyR2D2.ZSelect</span>
+<span class="sd">        2D plane at a given z.</span>
+<span class="sd">        ``d.qz.read(zs, n)`` -&gt; ``d.qz.ro, vx, ...``</span>
+<span class="sd">    qm : pyR2D2.MPIRegion</span>
+<span class="sd">        3D data of one remap MPI region.</span>
+<span class="sd">        ``d.qm.read(ixrt, n)`` -&gt; ``d.qm.ro, ...``</span>
 <span class="sd">    qr : pyR2D2.RestrictedData</span>
-<span class="sd">        Instance of pyR2D2.RestrictedData</span>
+<span class="sd">        3D data inside a sub-volume.</span>
+<span class="sd">        ``d.qr.read(n, keys, x0=..., x1=..., ...)`` -&gt; ``d.qr.ro, ...``</span>
 <span class="sd">    qt : pyR2D2.OpticalDepth</span>
-<span class="sd">        Instance of pyR2D2.OpticalDepth</span>
+<span class="sd">        2D data on optical-depth surfaces (tau = 1, 0.1, 0.01).</span>
+<span class="sd">        ``d.qt.read(n)`` -&gt; ``d.qt.rt, he, fr, ro, se, vx, ...``</span>
+<span class="sd">        (``rt`` at tau=1, ``rt01`` at 0.1, ``rt001`` at 0.01; multigroup ``rt1, rt2, ...``)</span>
 <span class="sd">    vc : pyR2D2.OnTheFly</span>
-<span class="sd">        Instance of pyR2D2.OnTheFly</span>
+<span class="sd">        On-the-fly means, RMS, correlations and xy/xz cuts (``remap/vl``).</span>
+<span class="sd">        ``d.vc.read(n)`` -&gt; ``d.vc.rom, sem, serms, se_xz, bx_xy, ...``</span>
+<span class="sd">        (``n`` は ``nd_vl`` の番号。出力の間隔が 4 つでないランでは ``nd`` と同じ);</span>
+<span class="sd">        ``d.vc.read_et(n)`` -&gt; ``d.vc.etm`` (R2D2plus only)</span>
 <span class="sd">    qs : pyR2D2.Slice</span>
-<span class="sd">        Instance of pyR2D2.Slice</span>
+<span class="sd">        2D slice output (``slice/``).</span>
+<span class="sd">        ``d.qs.read(n_slice, direc, n)`` -&gt; ``d.qs.ro, vx, ..., pr, te``</span>
+<span class="sd">        (``n`` は ``nd_slice`` の番号。出力の間隔が 4 つでないランでは ``nd_tau`` と同じ)</span>
+<span class="sd">    q2 : pyR2D2.TwoDimension</span>
+<span class="sd">        Full data of a 2D run (dict access).</span>
+<span class="sd">        ``d.q2.read(n)`` -&gt; ``d.q2['ro'], d.q2['tu'], ...``</span>
 <span class="sd">    ms : pyR2D2.ModelS</span>
-<span class="sd">        Instance of pyR2D2.ModelS</span>
+<span class="sd">        Model S based stratification.  ``d.ms.read()``</span>
+<span class="sd">    qp, qa : pyR2D2.Previous, pyR2D2.After</span>
+<span class="sd">        Checkpoint before / after step n.</span>
+<span class="sd">        ``d.qp.read(n, n_prev)``, ``d.qa.read(n, n_aftr)``</span>
 <span class="sd">    time : float</span>
-<span class="sd">        Time at a selected time step. See :meth:`pyR2D2.Data.time_read`</span>
+<span class="sd">        Time at a selected step. See :meth:`pyR2D2.Data.time_read`</span>
 <span class="sd">    qc : numpy.ndarray, float</span>
-<span class="sd">        3D full data for checkpoint. See :meth:`pyR2D2.Data.qc_read`</span>
-<span class="sd">    qp : pyR2D2.Previous</span>
-<span class="sd">        Instance of pyR2D2.Previous</span>
-<span class="sd">    qa : pyR2D2.After</span>
-<span class="sd">        Instance of pyR2D2.After</span>
-
+<span class="sd">        3D checkpoint data. See :meth:`pyR2D2.Data.qc_read`</span>
 <span class="sd">    sync : pyR2D2.Sync</span>
-<span class="sd">        Instance of pyR2D2.Sync</span>
 <span class="sd">    eos : pyR2D2.cpp_util.EOS</span>
-<span class="sd">        Instance of pyR2D2.cpp_util.EOS</span>
-<span class="sd">    yinyang: pyR2D2.cpp_util.YinYang</span>
-<span class="sd">        Instance of pyR2D2.cpp_util.YinYang</span>
+<span class="sd">    yinyang : pyR2D2.cpp_util.YinYang</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    ``help(d.qt)`` (or ``d.qt?`` in IPython) shows how to read and which variables appear.</span>
+
+<span class="sd">    Output format</span>
+<span class="sd">    -------------</span>
+<span class="sd">    The format is detected automatically: when ``&lt;datadir&gt;/param/format.toml`` says</span>
+<span class="sd">    ``format = "compressed"`` (R2D2plus DEC-576) the readers above read the new files</span>
+<span class="sd">    with the same arguments, attribute names and array shapes, and compute ``pr``,</span>
+<span class="sd">    ``te``, ``op`` from ``ro``, ``se`` with ``param/eos_table.tbl`` (not stored in that</span>
+<span class="sd">    format). ``d.p.output_format`` is ``"legacy"`` or ``"compressed"``.</span>
+<span class="sd">    See :py:mod:`pyR2D2.data_io.compressed`.</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Data.__init__">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">self_old</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize pyR2D2.Data</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qx</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">XSelect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -161,8 +178,23 @@
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 
-        <span class="n">eosdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;input_data&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">eosdir</span> <span class="o">/</span> <span class="s2">&quot;eos_table_sero.npz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="c1"># 台帳 (r2d2plus-ledger) へ未送信の変更があれば 1 行だけ知らせる。</span>
+        <span class="c1"># R2D2plus のラン (run_summary.toml がある) だけ。失敗しても黙る。</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.ledger</span><span class="w"> </span><span class="kn">import</span> <span class="n">unsent_hint</span>
+
+            <span class="n">hint</span> <span class="o">=</span> <span class="n">unsent_hint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hint</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">hint</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">eosdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"input_data"</span>
+        <span class="c1"># 新出力形式 (R2D2plus DEC-576) は param/eos_table.tbl を Parameters が読んでいる</span>
+        <span class="n">compressed_with_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">output_format</span> <span class="o">==</span> <span class="s2">"compressed"</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="s2">"log_ro_e"</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eosdir</span> <span class="o">/</span> <span class="s2">"eos_table_sero.npz"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">compressed_with_table</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eos</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">cpp_util</span><span class="o">.</span><span class="n">EOS</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_ro_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">se_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
@@ -172,7 +204,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">log_op_e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;YinYang&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">"YinYang"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">yinyang</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">cpp_util</span><span class="o">.</span><span class="n">YinYang</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">yg_yy</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">zg_yy</span><span class="p">,</span>
@@ -182,21 +214,21 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        When an attribute is not found in pyR2D2.Data, it is searched in pyR2D2.Data.p</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">attr</span>
 
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">' object has no attribute '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">'"</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Data.zip_time">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.zip_time">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">zip_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remove_original</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Archive datadir/time into datadir/time.zip.</span>
 
 <span class="sd">        Existing entries in time.zip are skipped.</span>
@@ -206,12 +238,12 @@
 <span class="sd">        ----------</span>
 <span class="sd">        remove_original : bool, optional</span>
 <span class="sd">            If True, remove the original files after archiving. Default is False.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span>
-        <span class="n">dst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time.zip&quot;</span>
+<span class="sd">        """</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"time"</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"time.zip"</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s2"> does not exist"</span><span class="p">)</span>
 
         <span class="c1"># Files are only deleted after the zip archive below is fully closed</span>
         <span class="c1"># (its central directory flushed to disk), so a crash or kill</span>
@@ -222,12 +254,12 @@
         <span class="c1"># zipfile.ZIP_STORED is used to avoid compression, which can be slow for many small files.</span>
         <span class="c1"># allowZip64=True is used to support large zip files.</span>
         <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span>
-            <span class="n">dst</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_STORED</span><span class="p">,</span> <span class="n">allowZip64</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">dst</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_STORED</span><span class="p">,</span> <span class="n">allowZip64</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
             <span class="c1"># set is used to avoid duplicate entries in the zip file</span>
             <span class="n">existing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span>
 
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
                 <span class="c1"># Skip directories and non-files</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                     <span class="k">continue</span>
@@ -247,10 +279,25 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
 
 
+    <span class="c1"># 時刻のディレクトリ (data/time/&lt;族&gt;)。出力の間隔が 4 つでないラン (output_cadence = 1) では</span>
+    <span class="c1"># vl は 3D と、slice は tau と同じ時刻を使う</span>
+    <span class="n">TIME_FAMILIES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"mhd"</span><span class="p">,</span> <span class="s2">"vl"</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">,</span> <span class="s2">"slice"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_time_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="s2">"tau"</span> <span class="k">if</span> <span class="n">tau</span> <span class="k">else</span> <span class="s2">"mhd"</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"qq"</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="s2">"mhd"</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIME_FAMILIES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"kind must be one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">TIME_FAMILIES</span><span class="si">}</span><span class="s2"> (or 'qq'), not </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="s2">"output_cadence"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"vl"</span><span class="p">:</span> <span class="s2">"mhd"</span><span class="p">,</span> <span class="s2">"slice"</span><span class="p">:</span> <span class="s2">"tau"</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kind</span>
+
 <div class="viewcode-block" id="Data.time_read">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.time_read">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">time_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_zip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_zip</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Reads time at a selected time step</span>
 <span class="sd">        The data is stored in self.t</span>
 
@@ -259,49 +306,210 @@
 <span class="sd">        n : int</span>
 <span class="sd">            selected time step for data</span>
 <span class="sd">        tau : bool</span>
-<span class="sd">            if True time for optical depth (high cadence)</span>
+<span class="sd">            if True time for optical depth (high cadence). Same as ``kind="tau"``</span>
 <span class="sd">        verbose: bool</span>
 <span class="sd">            if True, print a message indicating that the time variable has been stored in self.time</span>
 <span class="sd">        use_zip: bool</span>
 <span class="sd">            if True, read time from time.zip instead of the original files</span>
 <span class="sd">            if False, read from the original file if it exists; otherwise, fall back to time.zip.</span>
+<span class="sd">        kind : str, optional</span>
+<span class="sd">            ``"mhd"`` (or ``"qq"``, 3D, number ``nd``), ``"vl"`` (``nd_vl``), ``"tau"`` (``nd_tau``)</span>
+<span class="sd">            or ``"slice"`` (``nd_slice``). Runs with one output interval per family (R2D2plus</span>
+<span class="sd">            ``output_cadence = 2``) keep the time of each in ``time/&lt;kind&gt;``; older runs use</span>
+<span class="sd">            ``time/mhd`` for vl and ``time/tau`` for slice.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time : float</span>
 <span class="sd">            time at a selected time step</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="n">subdir</span> <span class="o">=</span> <span class="s2">&quot;tau&quot;</span> <span class="k">if</span> <span class="n">tau</span> <span class="k">else</span> <span class="s2">&quot;mhd&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">subdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_family</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"t.dac.</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
 
-        <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time&quot;</span> <span class="o">/</span> <span class="n">subdir</span> <span class="o">/</span> <span class="n">filename</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"time"</span> <span class="o">/</span> <span class="n">subdir</span> <span class="o">/</span> <span class="n">filename</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filepath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">use_zip</span><span class="p">:</span>
-            <span class="n">zippath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;time.zip&quot;</span>
-            <span class="n">arcname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;time/</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">zippath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"time.zip"</span>
 
-            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zippath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zippath</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+                <span class="c1"># zip_time は time/&lt;族&gt;/…、r2d2plus-archive (2026-10-31 まで) は &lt;族&gt;/… で入れた</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">())</span>
+                <span class="n">arcname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"time/</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>
+                <span class="k">if</span> <span class="n">arcname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span> <span class="ow">and</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                    <span class="n">arcname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">arcname</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
                     <span class="n">data</span><span class="p">,</span>
-                    <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">"d"</span><span class="p">,</span>
                     <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">"d"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;### time is stored in self.time ###&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"### time is stored in self.time ###"</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">time_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"mhd"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Numbers with a time file for ``kind`` (``time/&lt;kind&gt;`` and ``time.zip``), sorted</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kind : str</span>
+<span class="sd">            ``"mhd"`` (or ``"qq"``), ``"vl"``, ``"tau"`` or ``"slice"`` (see :meth:`time_read`)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        steps : list of int</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.pack.pack</span><span class="w"> </span><span class="kn">import</span> <span class="n">time_steps</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">time_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_family</span><span class="p">(</span><span class="n">kind</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"mhd"</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Times of ``steps`` (default: all numbers with a time file) for ``kind``</span>
+
+<span class="sd">        Use this instead of ``dtout * n``: the output interval can change within a run, and</span>
+<span class="sd">        each family has its own interval in runs with R2D2plus ``output_cadence = 2``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        steps : numpy.ndarray, int</span>
+<span class="sd">        t : numpy.ndarray, float</span>
+<span class="sd">            time [s]</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_steps</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">steps</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">steps</span><span class="p">,</span> <span class="n">t</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">three_d_every_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""``three_d_every`` of each segment (``param/runs/*/run.toml``, in order). Empty for runs without them."""</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">runs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"runs"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">runs</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">values</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">runs</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">seg</span> <span class="o">/</span> <span class="s2">"run.toml"</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output"</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"three_d_every"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">qq_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Numbers ``nd`` at which 3D data (``remap/qq``) was written, sorted</span>
+
+<span class="sd">        R2D2plus runs counted the old way (``output_cadence = 1``) may write 3D only every</span>
+<span class="sd">        ``three_d_every`` outputs (``[output] three_d_every`` in ``param/runs/*/run.toml``)</span>
+<span class="sd">        while ``time/mhd`` and ``remap/vl`` are written at every ``nd``. The numbers are taken from</span>
+<span class="sd">        the run records: ``nd % three_d_every == 0`` within each segment (a segment starts at the</span>
+<span class="sd">        first ``nd`` after its ``resume_time`` in ``provenance.toml``). Numbers whose 3D files</span>
+<span class="sd">        (binary, compressed or ``.zarr``/``.zarr.zip``) are present are added. In other runs every</span>
+<span class="sd">        ``nd`` has 3D data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        steps : list of int</span>
+<span class="sd">        """</span>
+        <span class="n">every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_three_d_every_segments</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">every</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segment_start_nd</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">every</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">every</span><span class="p">):</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">starts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">starts</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">every</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span>
+                <span class="n">steps</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">steps</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_qq_steps_on_disk</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">steps</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_three_d_every_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""[(three_d_every, resume_time)] of the segments in order, or [] if every segment writes 3D every time."""</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+
+        <span class="n">runs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"param"</span> <span class="o">/</span> <span class="s2">"runs"</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">runs</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">runs</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">seg</span> <span class="o">/</span> <span class="s2">"run.toml"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"three_d_every"</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">resume</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">seg</span> <span class="o">/</span> <span class="s2">"provenance.toml"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">resume</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"resume_time"</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">resume</span><span class="p">)</span> <span class="k">if</span> <span class="n">resume</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">out</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_segment_start_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resume_times</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""First ``nd`` of each segment: 0 for a fresh start, otherwise the first ``nd`` after its resume time."""</span>
+        <span class="n">starts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">rt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">rt</span> <span class="ow">in</span> <span class="n">resume_times</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">steps</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="s2">"mhd"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resume_times</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">starts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">continue</span>
+            <span class="c1"># restart は出力を書いた直後に書くので、その時刻ちょうどの nd は前の区間のもの</span>
+            <span class="c1"># (R2D2plus time_loop.cpp、manager が確かめた。2026-10-31)。文字列と倍精度の丸めの差は同じ時刻とみなす</span>
+            <span class="n">later</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">rt</span> <span class="o">+</span> <span class="mf">1e-9</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rt</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)]</span>
+            <span class="n">starts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">later</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">later</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">starts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qq_steps_on_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">qq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"remap"</span> <span class="o">/</span> <span class="s2">"qq"</span>
+        <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">qq</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"qq\.dac\.(\d</span><span class="si">{8}</span><span class="s2">)\.\d</span><span class="si">{8}</span><span class="s2">$"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">qq</span> <span class="o">/</span> <span class="s2">"zarr"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"(\d</span><span class="si">{8}</span><span class="s2">)"</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">pat</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">root</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="n">rx</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pat</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">found</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="c1"># ランクの小ディレクトリの下 (remap/qq/00000/00000000/qq.{dac,z}.&lt;nd&gt;.00000000)</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">qq</span> <span class="o">/</span> <span class="s2">"00000"</span> <span class="o">/</span> <span class="s2">"00000000"</span>
+        <span class="k">if</span> <span class="n">first</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">rx</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"qq\.(?:dac|z)\.(\d</span><span class="si">{8}</span><span class="s2">)\.\d</span><span class="si">{8}</span><span class="s2">$"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">first</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">rx</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">found</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">found</span>
+
 <div class="viewcode-block" id="Data.qc_read">
 <a class="viewcode-back" href="../../api/pyR2D2.Data.html#pyR2D2.Data.qc_read">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">qc_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">end_step</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Reads 3D full data for checkpoint</span>
 <span class="sd">        The data is stored in self.qc dictionary</span>
 
@@ -311,19 +519,19 @@
 <span class="sd">            A selected time step for data</span>
 <span class="sd">        end_step : bool</span>
 <span class="sd">            If true, checkpoint of end step is read.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="n">step</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">if</span> <span class="n">end_step</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;e&quot;</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s2">"e"</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">step</span> <span class="o">=</span> <span class="s2">&quot;o&quot;</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="s2">"o"</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;qq&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;qq.dac.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">"qq"</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"qq.dac.</span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">qc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span>
-                <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ixg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span></div>
+                <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endian</span> <span class="o">+</span> <span class="s2">"d"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ixg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ixg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">jxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kxg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
@@ -335,7 +543,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

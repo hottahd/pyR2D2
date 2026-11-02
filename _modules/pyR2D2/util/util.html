@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2.util.util &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2.util.util &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
@@ -14,9 +14,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -43,15 +43,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -60,7 +56,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">R2D2 Document</a>
+          <a href="../../../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,13 +82,13 @@
 <a class="viewcode-back" href="../../../api/pyR2D2.util.init.html#pyR2D2.util.init">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
     <span class="n">main_locals</span><span class="p">,</span>
-    <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span>
+    <span class="n">instance_name</span><span class="o">=</span><span class="s2">"d"</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">google</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">copy_to_local</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Initialize pyR2D2.Data instance in main program.</span>
 
 <span class="sd">    Parameters</span>
@@ -120,28 +116,28 @@
 <span class="sd">        import pyR2D2</span>
 <span class="sd">        pyR2D2.util.init(locals())</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
 
     <span class="k">if</span> <span class="n">datadir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># if google is True, force to read caseid from user input.</span>
-        <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;caseid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span> <span class="n">force_read</span><span class="o">=</span><span class="n">google</span><span class="p">)</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="s2">&quot;../run/&quot;</span> <span class="o">+</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;caseid&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/data/&quot;</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s2">"caseid"</span><span class="p">]</span> <span class="o">=</span> <span class="n">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span> <span class="n">force_read</span><span class="o">=</span><span class="n">google</span><span class="p">)</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="s2">"../run/"</span> <span class="o">+</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">"caseid"</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/data/"</span>
 
     <span class="n">initialize_instance</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span> <span class="n">instance_name</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">&quot;### An instance of pyR2D2.Data class is initialized as &quot;</span>
+        <span class="s2">"### An instance of pyR2D2.Data class is initialized as "</span>
         <span class="o">+</span> <span class="n">instance_name</span>
-        <span class="o">+</span> <span class="s2">&quot; ###&quot;</span>
+        <span class="o">+</span> <span class="s2">" ###"</span>
     <span class="p">)</span>
     <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">copy_to_local</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;### Copying pyR2D2.Data.p to locals() ###&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"### Copying pyR2D2.Data.p to locals() ###"</span><span class="p">)</span>
         <span class="n">locals_define</span><span class="p">(</span><span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">],</span> <span class="n">main_locals</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">google</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2.write.google</span>
 
@@ -156,7 +152,7 @@
 <div class="viewcode-block" id="initialize_instance">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.initialize_instance.html#pyR2D2.util.initialize_instance">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">initialize_instance</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span> <span class="n">instance_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Initializes arbitrary instance of pyR2D2.Data object in main program.</span>
 
 <span class="sd">    Parameters</span>
@@ -165,7 +161,7 @@
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    instance_name : str</span>
 <span class="sd">        name of instance of pyR2D2.Data object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">instance_name</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
         <span class="n">main_locals</span><span class="p">[</span><span class="n">instance_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
@@ -174,7 +170,7 @@
 <div class="viewcode-block" id="caseid_select">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.caseid_select.html#pyR2D2.util.caseid_select">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">caseid_select</span><span class="p">(</span><span class="n">main_locals</span><span class="p">,</span> <span class="n">force_read</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Choose caseid from input or from user input.</span>
 
 <span class="sd">    Parameters</span>
@@ -189,15 +185,16 @@
 <span class="sd">    -------</span>
 <span class="sd">    caseid : str</span>
 <span class="sd">        caseid</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">RED</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[31m&quot;</span>
-    <span class="n">END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[31m"</span>
+    <span class="n">END</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\033</span><span class="s2">[0m"</span>
 
-    <span class="k">if</span> <span class="n">force_read</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s2">&quot;caseid&quot;</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
-        <span class="n">caseid</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">&quot;input caseid id (3 digit): &quot;</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">force_read</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s2">"caseid"</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
+        <span class="c1"># Fortran R2D2 は 3 桁 (012)、R2D2plus のプロダクトランは 5 桁 (00012、2026-10-25)。打った桁はそのまま使う</span>
+        <span class="n">caseid</span> <span class="o">=</span> <span class="s2">"d"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="n">RED</span> <span class="o">+</span> <span class="s2">"input caseid id (e.g. 012, 00012): "</span> <span class="o">+</span> <span class="n">END</span><span class="p">))</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;caseid&quot;</span><span class="p">]</span>
+        <span class="n">caseid</span> <span class="o">=</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">"caseid"</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">caseid</span></div>
 
@@ -206,7 +203,7 @@
 <div class="viewcode-block" id="locals_define">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.locals_define.html#pyR2D2.util.locals_define">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">locals_define</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">main_locals</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Substitute selp.p to main_locals in main program.</span>
 
 <span class="sd">    Parameters</span>
@@ -215,7 +212,7 @@
 <span class="sd">        Instance of pyR2D2.Data or pyR2D2.Read classes</span>
 <span class="sd">    main_locals : dict</span>
 <span class="sd">        locals() in main program, which include local variables</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">main_locals</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">return</span></div>
@@ -224,8 +221,8 @@
 
 <div class="viewcode-block" id="define_n0">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.define_n0.html#pyR2D2.util.define_n0">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">define_n0</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">main_locals</span><span class="p">,</span> <span class="n">nd_type</span><span class="o">=</span><span class="s2">&quot;nd&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">define_n0</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">main_locals</span><span class="p">,</span> <span class="n">nd_type</span><span class="o">=</span><span class="s2">"nd"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Define n0 in main_locals if not exists.</span>
 
 <span class="sd">    Parameters</span>
@@ -235,21 +232,21 @@
 <span class="sd">    main_locals : dict</span>
 <span class="sd">        locals() in main program, which include local variables</span>
 <span class="sd">    nd_type : str</span>
-<span class="sd">        type of nd. &#39;nd&#39; for MHD output, &#39;nd_tau&#39; for high cadence output.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;n0&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
-        <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;n0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;n0&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]:</span>
-        <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;n0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]</span>
+<span class="sd">        type of nd. 'nd' for MHD output, 'nd_tau' for high cadence output.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="s2">"n0"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">main_locals</span><span class="p">:</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s2">"n0"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">"n0"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]:</span>
+        <span class="n">main_locals</span><span class="p">[</span><span class="s2">"n0"</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">nd_type</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">&quot;n0&quot;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">main_locals</span><span class="p">[</span><span class="s2">"n0"</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="get_best_unit">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.get_best_unit.html#pyR2D2.util.get_best_unit">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_best_unit</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">unit_multipliers</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the best unit for displaying the size.</span>
 
 <span class="sd">    Parameters</span>
@@ -258,40 +255,40 @@
 <span class="sd">        size of the file</span>
 <span class="sd">    unit_multipliers : dict</span>
 <span class="sd">        dictionary of unit multipliers</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">([</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;kB&quot;</span><span class="p">,</span> <span class="s2">&quot;MB&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;TB&quot;</span><span class="p">,</span> <span class="s2">&quot;PB&quot;</span><span class="p">]):</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">([</span><span class="s2">"B"</span><span class="p">,</span> <span class="s2">"kB"</span><span class="p">,</span> <span class="s2">"MB"</span><span class="p">,</span> <span class="s2">"GB"</span><span class="p">,</span> <span class="s2">"TB"</span><span class="p">,</span> <span class="s2">"PB"</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;=</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">unit</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">unit</span>
-    <span class="k">return</span> <span class="s2">&quot;B&quot;</span></div>
+    <span class="k">return</span> <span class="s2">"B"</span></div>
 
 
 
 <div class="viewcode-block" id="get_total_file_size">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.get_total_file_size.html#pyR2D2.util.get_total_file_size">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_total_file_size</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Evaluate total size of files in directory.</span>
 
 <span class="sd">    Parameters:</span>
 <span class="sd">       directory (str): directory path</span>
-<span class="sd">       unit (str): unit of file size. Choose from &#39;B&#39;, &#39;kB&#39;, &#39;MB&#39;, &#39;GB&#39;, &#39;TB&#39;, &#39;PB&#39;.</span>
+<span class="sd">       unit (str): unit of file size. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">       total_size (int): total size of files in directory in bytes</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
     <span class="n">unit_multipliers</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;kB&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="s2">&quot;MB&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;GB&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
-        <span class="s2">&quot;TB&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span>
-        <span class="s2">&quot;PB&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
+        <span class="s2">"B"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"kB"</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="s2">"MB"</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"GB"</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"TB"</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span>
+        <span class="s2">"PB"</span><span class="p">:</span> <span class="mi">1024</span><span class="o">**</span><span class="mi">5</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unit_multipliers</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Invalid unit: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">. Choose from &#39;B&#39;, &#39;kB&#39;, &#39;MB&#39;, &#39;GB&#39;, &#39;TB&#39;, &#39;PB&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"Invalid unit: </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">. Choose from 'B', 'kB', 'MB', 'GB', 'TB', 'PB'."</span>
         <span class="p">)</span>
 
     <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
@@ -307,11 +304,11 @@
                     <span class="n">display_unit</span> <span class="o">=</span> <span class="n">unit</span>
                 <span class="n">converted_size</span> <span class="o">=</span> <span class="n">total_size</span> <span class="o">/</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">display_unit</span><span class="p">]</span>
                 <span class="nb">print</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\r</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="se">\r</span><span class="s2">Current total size: </span><span class="si">{</span><span class="n">converted_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">display_unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="se">\r</span><span class="si">{</span><span class="s1">' '</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="se">\r</span><span class="s2">Current total size: </span><span class="si">{</span><span class="n">converted_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">display_unit</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span>
                     <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="c1"># print(f&quot;\rCurrent total size: {converted_size:.2f} {display_unit} &quot;, end=&#39;&#39;, flush=True)</span>
+                <span class="c1"># print(f"\rCurrent total size: {converted_size:.2f} {display_unit} ", end='', flush=True)</span>
             <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
                 <span class="c1"># ファイルが見つからない場合は無視</span>
                 <span class="k">continue</span>
@@ -320,7 +317,7 @@
         <span class="n">unit</span> <span class="o">=</span> <span class="n">get_best_unit</span><span class="p">(</span><span class="n">total_size</span><span class="p">,</span> <span class="n">unit_multipliers</span><span class="p">)</span>
 
     <span class="n">final_size</span> <span class="o">=</span> <span class="n">total_size</span> <span class="o">/</span> <span class="n">unit_multipliers</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Final total size: </span><span class="si">{</span><span class="n">final_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Final total size: </span><span class="si">{</span><span class="n">final_size</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">final_size</span><span class="p">,</span> <span class="n">unit</span></div>
 
@@ -329,7 +326,7 @@
 <div class="viewcode-block" id="update_results_file">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.update_results_file.html#pyR2D2.util.update_results_file">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">update_results_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">total_size</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">caseid</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Updates the results file with the size of a directory.</span>
 
 <span class="sd">    Parameters</span>
@@ -345,12 +342,12 @@
 <span class="sd">    dir_path : str</span>
 <span class="sd">        The directory path</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
     <span class="c1"># 現在の日時を取得</span>
-    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S"</span><span class="p">)</span>
 
     <span class="c1"># シンボリックリンクの場合の実体パスを取得</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
@@ -360,7 +357,7 @@
 
     <span class="c1"># 既存のデータを読み込む</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">existing_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">existing_data</span> <span class="o">=</span> <span class="p">[]</span>
@@ -374,25 +371,25 @@
             <span class="n">size</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-            <span class="n">existing_dict</span><span class="p">[</span><span class="n">existing_caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">existing_dict</span><span class="p">[</span><span class="n">existing_caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="c1"># ディレクトリサイズの情報を更新</span>
-    <span class="n">directory_size_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">total_size</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">directory_size_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">real_path</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">directory_size_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">total_size</span><span class="si">:</span><span class="s2">6.2f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">directory_size_str</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">now</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">real_path</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="c1"># 更新されたデータを書き込む</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">caseid</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">existing_dict</span><span class="p">):</span>
             <span class="n">size_timestamp_realpath</span> <span class="o">=</span> <span class="n">existing_dict</span><span class="p">[</span><span class="n">caseid</span><span class="p">]</span>
             <span class="c1"># フォーマット: ディレクトリ名、右揃えで6桁、小数点2桁、単位</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caseid</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">size_timestamp_realpath</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">caseid</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">size_timestamp_realpath</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="eos">
 <a class="viewcode-back" href="../../../api/pyR2D2.util.eos.html#pyR2D2.util.eos">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">eos</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns the Table equation of state.</span>
 
 <span class="sd">    Parameters</span>
@@ -414,7 +411,18 @@
 <span class="sd">    Warning</span>
 <span class="sd">    -------</span>
 <span class="sd">    This method is very slow for large numpy array. Please consider using fortraun code.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    It also only accepts scalars; use :func:`pyR2D2.util.eos_table` for arrays.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    **This reads the table unconditionally, which is not what R2D2 does.**</span>
+<span class="sd">    The code switches to the linearized EOS whenever the relative amplitude</span>
+<span class="sd">    ``ct = max(|ro1|/ro0, |se1|/se0)`` stays below ``ct0 = 3e-3``, and in a</span>
+<span class="sd">    deep-convection run that is everywhere.  Comparing a plain table lookup</span>
+<span class="sd">    against the ``pr``/``te`` in the output files can be off by four orders of</span>
+<span class="sd">    magnitude *of the signal amplitude*, not four decimal places.  Use</span>
+<span class="sd">    :func:`pyR2D2.util.eos_switch` to reproduce what the code actually did.</span>
+<span class="sd">    """</span>
 
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -426,21 +434,189 @@
 
     <span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
         <span class="p">(</span>
-            <span class="o">+</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;log_&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;_e&quot;</span><span class="p">][</span><span class="n">iro</span><span class="p">,</span> <span class="n">ise</span><span class="p">]</span>
+            <span class="o">+</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"log_"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"_e"</span><span class="p">][</span><span class="n">iro</span><span class="p">,</span> <span class="n">ise</span><span class="p">]</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dlogro_e</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dse_e</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;log_&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;_e&quot;</span><span class="p">][</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"log_"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"_e"</span><span class="p">][</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span><span class="p">]</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">dlogro</span><span class="p">)</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dse_e</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;log_&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;_e&quot;</span><span class="p">][</span><span class="n">iro</span><span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"log_"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"_e"</span><span class="p">][</span><span class="n">iro</span><span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dlogro_e</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span>
             <span class="o">*</span> <span class="p">(</span><span class="n">dse</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;log_&quot;</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">&quot;_e&quot;</span><span class="p">][</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dse</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"log_"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"_e"</span><span class="p">][</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dse</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">dlogro_e</span>
         <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">dse_e</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">qq</span></div>
+
+
+
+<div class="viewcode-block" id="eos_table">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.eos_table.html#pyR2D2.util.eos_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eos_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Returns the table equation of state, vectorized over numpy arrays.</span>
+
+<span class="sd">    This is the array-capable counterpart of :func:`pyR2D2.util.eos`, which</span>
+<span class="sd">    only accepts scalars (it calls ``int()`` on the index).  The interpolation</span>
+<span class="sd">    itself is identical: bilinear in ``(log rho, s)`` on the logarithm of the</span>
+<span class="sd">    tabulated quantity, exponentiated afterwards.  Everything is done in</span>
+<span class="sd">    float64, whereas ``pyR2D2.Data.eos.eval`` (the C++ helper) works in</span>
+<span class="sd">    float32.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pyR2D2.Data, or, pyR2D2.Read</span>
+<span class="sd">        Instance of pyR2D2.Data or pyR2D2.Read classes</span>
+<span class="sd">    ro : float or numpy.ndarray</span>
+<span class="sd">        Total density (background + perturbation)</span>
+<span class="sd">    se : float or numpy.ndarray</span>
+<span class="sd">        Total entropy (background + perturbation)</span>
+<span class="sd">    var : str</span>
+<span class="sd">        Variable name; pr, te, en, op, or dprdro</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qq : numpy.ndarray</span>
+<span class="sd">        Corresponding variable, same shape as ``ro``</span>
+<span class="sd">    """</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">log_table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">"log_"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"_e"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">log_ro_e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">log_ro_e</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">se_e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">se_e</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">dlogro_e</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dlogro_e</span><span class="p">)</span>
+    <span class="n">dse_e</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dse_e</span><span class="p">)</span>
+
+    <span class="n">log_ro</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ro</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="c1"># R2D2 (eos_proc.F95 の eos_calc_init) と同じく、両端で 2x2 ステンシルが</span>
+    <span class="c1"># 表からはみ出さないところまでクランプする。範囲外は外挿になる。</span>
+    <span class="n">iro</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(((</span><span class="n">log_ro</span> <span class="o">-</span> <span class="n">log_ro_e</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">dlogro_e</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">log_ro_e</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(((</span><span class="n">se</span> <span class="o">-</span> <span class="n">se_e</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">dse_e</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">se_e</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">dlogro</span> <span class="o">=</span> <span class="n">log_ro</span> <span class="o">-</span> <span class="n">log_ro_e</span><span class="p">[</span><span class="n">iro</span><span class="p">]</span>
+    <span class="n">dse</span> <span class="o">=</span> <span class="n">se</span> <span class="o">-</span> <span class="n">se_e</span><span class="p">[</span><span class="n">ise</span><span class="p">]</span>
+
+    <span class="c1"># fmt: off</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="o">+</span> <span class="n">log_table</span><span class="p">[</span><span class="n">iro</span>    <span class="p">,</span> <span class="n">ise</span>    <span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">dlogro_e</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dse_e</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">log_table</span><span class="p">[</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span>    <span class="p">]</span> <span class="o">*</span> <span class="p">(</span>           <span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dse_e</span> <span class="o">-</span> <span class="n">dse</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">log_table</span><span class="p">[</span><span class="n">iro</span>    <span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">dlogro_e</span> <span class="o">-</span> <span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>          <span class="n">dse</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">log_table</span><span class="p">[</span><span class="n">iro</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ise</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>           <span class="n">dlogro</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>          <span class="n">dse</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">/</span> <span class="n">dlogro_e</span>
+        <span class="o">/</span> <span class="n">dse_e</span>
+    <span class="p">)</span></div>
+
+    <span class="c1"># fmt: on</span>
+
+
+<div class="viewcode-block" id="eos_switch">
+<a class="viewcode-back" href="../../../api/pyR2D2.util.eos_switch.html#pyR2D2.util.eos_switch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eos_switch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro1</span><span class="p">,</span> <span class="n">se1</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">ct0</span><span class="o">=</span><span class="mf">3.0e-3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Returns the equation of state **as R2D2 itself evaluates it**, i.e. with</span>
+<span class="sd">    the switch between the table EOS and the linearized EOS.</span>
+
+<span class="sd">    Why this exists</span>
+<span class="sd">    ---------------</span>
+<span class="sd">    :func:`pyR2D2.util.eos`, :func:`pyR2D2.util.eos_table` and</span>
+<span class="sd">    ``pyR2D2.Data.eos.eval`` all read the table unconditionally.  R2D2 does</span>
+<span class="sd">    not.  Wherever the code needs pressure, temperature or internal energy it</span>
+<span class="sd">    computes the relative amplitude</span>
+
+<span class="sd">    .. math:: c_t = \\max(|\\rho_1|/\\rho_0, |s_1|/s_0)</span>
+
+<span class="sd">    and uses the **linearized** EOS when :math:`c_t \\le c_{t0}`</span>
+<span class="sd">    (``ct0 = 3e-3``, ``eos_def.F90``), falling back to the table only above</span>
+<span class="sd">    it.  The switch is hard, not smooth::</span>
+
+<span class="sd">        feos = sign(0.5, ct - ct0) + 0.5</span>
+
+<span class="sd">    and appears identically in ``runge_kutta_cartesian.F90`` /</span>
+<span class="sd">    ``runge_kutta_spherical.F90`` (pressure), ``artdif_cartesian.F90`` /</span>
+<span class="sd">    ``artdif_spherical.F90`` (temperature and enthalpy), ``cfl.F90``</span>
+<span class="sd">    (``dprdro``, hence the sound speed) and ``remap_calc.F90`` (the pr/te/en</span>
+<span class="sd">    written into ``remap/vl``).</span>
+
+<span class="sd">    In a deep-convection run :math:`c_t` never reaches :math:`c_{t0}`, so the</span>
+<span class="sd">    code runs entirely on the linearized EOS while a plain table lookup</span>
+<span class="sd">    returns something else.  That is the discrepancy this function removes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pyR2D2.Data, or, pyR2D2.Read</span>
+<span class="sd">        Instance of pyR2D2.Data or pyR2D2.Read classes</span>
+<span class="sd">    ro1 : numpy.ndarray</span>
+<span class="sd">        Density **perturbation**, i.e. ``d.qq['ro']`` as stored in the output.</span>
+<span class="sd">        The first axis must be the vertical one (size ``ix``).</span>
+<span class="sd">    se1 : numpy.ndarray</span>
+<span class="sd">        Entropy **perturbation**, same shape as ``ro1``</span>
+<span class="sd">    var : str</span>
+<span class="sd">        Variable name; pr, te, en, op, or dprdro</span>
+<span class="sd">    ct0 : float</span>
+<span class="sd">        Switching threshold, ``eos_def.F90``'s ``ct0``.  Change it only to</span>
+<span class="sd">        experiment; the code itself compiles it in as 3e-3.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    qq : numpy.ndarray</span>
+<span class="sd">        For ``pr``, ``te`` and ``en``: the **perturbation**, matching what</span>
+<span class="sd">        ``remap_calc.F90`` writes into the output files (add ``d.p.pr0`` etc.</span>
+<span class="sd">        for the total).  For ``op`` and ``dprdro``: the value itself, since</span>
+<span class="sd">        neither has a linearized perturbation form.  ``op`` is never switched</span>
+<span class="sd">        (the table is the only source); ``dprdro`` switches to the background</span>
+<span class="sd">        profile ``d.p.dprdro``.</span>
+<span class="sd">    """</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+    <span class="n">ro1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ro1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">se1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">se1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ro1</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">se1</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"ro1 and se1 must have the same shape, got </span><span class="si">{</span><span class="n">ro1</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">se1</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">background</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""鉛直1D の背景量を ro1 の形へ broadcast する。"""</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ro1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"eos_switch needs arrays whose first axis is the vertical one; "</span>
+                <span class="s2">"for a single point, index the background yourself and use eos_table"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">ro1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"the first axis of ro1 (size </span><span class="si">{</span><span class="n">ro1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) must be the vertical one "</span>
+                <span class="sa">f</span><span class="s2">"(background '</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">' has size </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">)"</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">a</span><span class="o">.</span><span class="n">size</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ro1</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">ro0</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="s2">"ro0"</span><span class="p">)</span>
+    <span class="n">se0</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="s2">"se0"</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">eos_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro1</span> <span class="o">+</span> <span class="n">ro0</span><span class="p">,</span> <span class="n">se1</span> <span class="o">+</span> <span class="n">se0</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
+
+    <span class="c1"># 不透明度には線形化した対応物が無く、R2D2 も常に表を引く</span>
+    <span class="c1"># (rte_multiray.F90, rte_io.F90, remap_calc.F90)。</span>
+    <span class="k">if</span> <span class="n">var</span> <span class="o">==</span> <span class="s2">"op"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">table</span>
+
+    <span class="c1"># ct = max(|ro1|/ro0, |se1|/se0)、feos は 0 か 1 のどちらか。</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ro1</span><span class="p">)</span> <span class="o">/</span> <span class="n">ro0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">se1</span><span class="p">)</span> <span class="o">/</span> <span class="n">se0</span><span class="p">)</span>
+    <span class="n">feos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ct</span> <span class="o">&gt;</span> <span class="n">ct0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="c1"># dprdro の線形側は背景プロファイルそのものである (cfl.F90)。</span>
+    <span class="k">if</span> <span class="n">var</span> <span class="o">==</span> <span class="s2">"dprdro"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">table</span> <span class="o">*</span> <span class="n">feos</span> <span class="o">+</span> <span class="n">background</span><span class="p">(</span><span class="s2">"dprdro"</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">feos</span><span class="p">)</span>
+
+    <span class="n">linear</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="s2">"d"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"dro"</span><span class="p">)</span> <span class="o">*</span> <span class="n">ro1</span> <span class="o">+</span> <span class="n">background</span><span class="p">(</span><span class="s2">"d"</span> <span class="o">+</span> <span class="n">var</span> <span class="o">+</span> <span class="s2">"dse"</span><span class="p">)</span> <span class="o">*</span> <span class="n">se1</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">table</span> <span class="o">-</span> <span class="n">background</span><span class="p">(</span><span class="n">var</span> <span class="o">+</span> <span class="s2">"0"</span><span class="p">))</span> <span class="o">*</span> <span class="n">feos</span> <span class="o">+</span> <span class="n">linear</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">feos</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -451,7 +627,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

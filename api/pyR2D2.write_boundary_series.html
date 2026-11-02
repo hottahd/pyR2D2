@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>write_boundary_series &mdash; pyR2D2 0.4.1.dev48 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="read_photosphere" href="pyR2D2.read_photosphere.html" />
+    <link rel="prev" title="write_initial_state" href="pyR2D2.write_initial_state.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyR2D2
+              <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#classes">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.write">pyR2D2.write Package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyR2D2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">pyR2D2 API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../pyR2D2.package.html">pyR2D2 Package</a></li>
+      <li class="breadcrumb-item active">write_boundary_series</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pyR2D2.write_boundary_series.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="write-boundary-series">
+<h1>write_boundary_series<a class="headerlink" href="#write-boundary-series" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyR2D2.write_boundary_series">
+<span class="sig-prename descclassname"><span class="pre">pyR2D2.</span></span><span class="sig-name descname"><span class="pre">write_boundary_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyR2D2/data_io/compressed.html#write_boundary_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyR2D2.write_boundary_series" title="Link to this definition"></a></dt>
+<dd><p>R2D2plus の境界値の時系列ファイル (<code class="docutils literal notranslate"><span class="pre">r2d2plus-z</span></code>、<code class="docutils literal notranslate"><span class="pre">kind</span> <span class="pre">=</span> <span class="pre">&quot;boundary_series&quot;</span></code>) を書く。</p>
+<p>R2D2plus の汎用境界条件の規則 <code class="docutils literal notranslate"><span class="pre">&quot;file&quot;</span></code> が読む。例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">boundary</span><span class="o">.</span><span class="n">params</span><span class="p">]</span>
+<span class="n">bottom</span><span class="o">.</span><span class="n">vz</span> <span class="o">=</span> <span class="s2">"file"</span>
+<span class="n">bottom</span><span class="o">.</span><span class="n">vz_file</span> <span class="o">=</span> <span class="s2">"/path/to/bottom_vz.z"</span>
+</pre></div>
+</div>
+<p>値はその壁の ghost 層すべてに使われ、時間方向にはステップ開始時刻で線形内挿
+される (範囲外は端の値で止める)。</p>
+<p><strong>[boundary.params] の変数名は C++ の成分名である</strong> (<code class="docutils literal notranslate"><span class="pre">ro,</span> <span class="pre">vx,</span> <span class="pre">vy,</span> <span class="pre">vz,</span> <span class="pre">bx,</span> <span class="pre">by,</span>
+<span class="pre">bz,</span> <span class="pre">se,</span> <span class="pre">ps</span></code>、<strong>C++ では z が鉛直</strong>)。pyR2D2 の 3D 配列 (Fortran の名前) とは
+速度と磁場の名前がずれる:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>pyR2D2 / Fortran の名前</p></th>
+<th class="head"><p>R2D2plus [boundary.params]</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vx</span></code> (鉛直)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vz</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vy</span></code> (第1水平)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vx</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vz</span></code> (第2水平)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vy</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bx</span></code>, <code class="docutils literal notranslate"><span class="pre">by</span></code>, <code class="docutils literal notranslate"><span class="pre">bz</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bz</span></code>, <code class="docutils literal notranslate"><span class="pre">bx</span></code>, <code class="docutils literal notranslate"><span class="pre">by</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ph</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ps</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ro</span></code>, <code class="docutils literal notranslate"><span class="pre">se</span></code> (同じ)</p></td>
+</tr>
+</tbody>
+</table>
+<p>つまり鉛直速度を与えるなら <code class="docutils literal notranslate"><span class="pre">d.qf.vx</span></code> 由来の値を <code class="docutils literal notranslate"><span class="pre">bottom.vz</span></code> に指定する。
+<strong>ro と se の値は背景からの摂動</strong> (<code class="docutils literal notranslate"><span class="pre">d.qf.ro</span></code>, <code class="docutils literal notranslate"><span class="pre">d.qf.se</span></code> と同じ量)。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><em>pathlib.Path</em></a>) – 書き出し先</p></li>
+<li><p><strong>times</strong> (<em>array_like</em><em>, </em><em>shape</em><em> (</em><em>nt</em><em>,</em><em>)</em>) – 時刻 [s]。狭義単調増加であること。</p></li>
+<li><p><strong>values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a><em>, </em><em>shape</em><em> (</em><em>n1</em><em>, </em><em>n2</em><em>, </em><em>nt</em><em>)</em>) – 境界値。<code class="docutils literal notranslate"><span class="pre">n1</span></code> = 第1水平 (pyR2D2 の <code class="docutils literal notranslate"><span class="pre">jx</span></code>、Fortran y = C++ x)、
+<code class="docutils literal notranslate"><span class="pre">n2</span></code> = 第2水平 (<code class="docutils literal notranslate"><span class="pre">kx</span></code>、Fortran z = C++ y)、領域全体の物理セルのみ。
+<strong>時刻は最後の軸</strong>。例えば <code class="docutils literal notranslate"><span class="pre">d.qf.vx[0]</span></code> (下端の面、形 <code class="docutils literal notranslate"><span class="pre">(jx,</span> <span class="pre">kx)</span></code>) を
+時刻ごとに集めて <code class="docutils literal notranslate"><span class="pre">np.stack(planes,</span> <span class="pre">axis=-1)</span></code> とすればよい。</p></li>
+<li><p><strong>attributes</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><em>dict</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">[attributes]</span></code> に書くスカラー</p></li>
+<li><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><em>int</em></a><em>, </em><em>optional</em>) – zstd の圧縮レベル (既定 3)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>path</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)">pathlib.Path</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>変数は <code class="docutils literal notranslate"><span class="pre">time</span></code> (float64, <code class="docutils literal notranslate"><span class="pre">[nt]</span></code>) と <code class="docutils literal notranslate"><span class="pre">value</span></code> (float64, order <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code>、
+<code class="docutils literal notranslate"><span class="pre">[n1,</span> <span class="pre">n2,</span> <span class="pre">nt]</span></code>、第1水平が最速) の 2 つ。XXH3-64 の計算に <code class="docutils literal notranslate"><span class="pre">xxhash</span></code> が要る。</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyR2D2.write_initial_state.html" class="btn btn-neutral float-left" title="write_initial_state" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyR2D2.read_photosphere.html" class="btn btn-neutral float-right" title="read_photosphere" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyR2D2 &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>pyR2D2 &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
@@ -15,14 +15,14 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=750e77fb"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="データ圧縮" href="data_compression.html" />
-    <link rel="prev" title="典型的計算例" href="typical_case.html" /> 
+    <link rel="next" title="pyR2D2 を使うための環境設定" href="environment.html" />
+    <link rel="prev" title="pyR2D2" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +34,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,19 +46,16 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pyR2D2</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pyr2d2-data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#euv-x-emission-measure">EUV・軟 X 線の強度 (emission measure)</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_compression.html">データ圧縮</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sphinx.html">Sphinx使用の覚書</a></li>
 <li class="toctree-l1"><a class="reference internal" href="paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">座標生成</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">pyR2D2 API Reference</a></li>
 </ul>
 
         </div>
@@ -67,7 +64,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">R2D2 Document</a>
+          <a href="index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -116,7 +113,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</sp
 <p>pyR2D2D2 provides a class <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> to handle data in an object-oriented manner. Instance can be created as follows:</p>
 <p>pyR2D2には <a class="reference internal" href="api/pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.Data</span></code></a> クラスが定義してあり、これをオブジェクト指向的に用いてデータを取り扱う。以下のようにしてインスタンスを作成する。</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyR2D2</span>
-<span class="n">datadir</span> <span class="o">=</span> <span class="s1">&#39;../run/d002/data&#39;</span>
+<span class="n">datadir</span> <span class="o">=</span> <span class="s1">'../run/d002/data'</span>
 <span class="n">d</span> <span class="o">=</span> <span class="n">pyR2D2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -125,7 +122,126 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</sp
 </pre></div>
 </div>
 <p>などとすると実行環境で、モジュール全体や各関数の簡単な説明を見ることができる。</p>
-<p>最終更新日：Jul 27, 2026</p>
+<p>最終更新日：Nov 02, 2026
+出力の番号と時刻
+————————–</p>
+<p>ランの出力は 4 つの族に分かれ、それぞれ番号と時刻を持つ。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>族</p></th>
+<th class="head"><p>読み手</p></th>
+<th class="head"><p>番号</p></th>
+<th class="head"><p>間隔</p></th>
+<th class="head"><p>時刻</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3D (<code class="docutils literal notranslate"><span class="pre">remap/qq</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.qf</span></code> など</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.nd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.dtout</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time/mhd</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>平均量など (<code class="docutils literal notranslate"><span class="pre">remap/vl</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.vc</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.nd_vl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.dtout_vl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time/vl</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>光学的深さ (<code class="docutils literal notranslate"><span class="pre">tau</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.qt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.nd_tau</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.dtout_tau</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time/tau</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>断面 (<code class="docutils literal notranslate"><span class="pre">slice</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.qs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.nd_slice</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">d.dtout_slice</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time/slice</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>R2D2plus の <code class="docutils literal notranslate"><span class="pre">output_cadence</span> <span class="pre">=</span> <span class="pre">2</span></code> のラン (2026-10-31 以降に始めたもの) では、4 つが別々の間隔と番号を持つ。
+それより前のラン (<code class="docutils literal notranslate"><span class="pre">d.output_cadence</span> <span class="pre">==</span> <span class="pre">1</span></code>。延長しても変わらない) では、vl は 3D と、slice は tau と同じ番号・
+時刻なので、<code class="docutils literal notranslate"><span class="pre">d.nd_vl</span> <span class="pre">==</span> <span class="pre">d.nd</span></code>、<code class="docutils literal notranslate"><span class="pre">d.nd_slice</span> <span class="pre">==</span> <span class="pre">d.nd_tau</span></code> になる。どちらのランでも、上の名前で書けば同じように動く。</p>
+<p>時刻は <code class="docutils literal notranslate"><span class="pre">dtout</span> <span class="pre">*</span> <span class="pre">n</span></code> で求めず、<code class="docutils literal notranslate"><span class="pre">time/</span></code> から読む (途中で間隔を変えたランもある)。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">time_read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">"vl"</span><span class="p">)</span>          <span class="c1"># remap/vl の番号 n の時刻 (kind は "mhd"・"vl"・"tau"・"slice")</span>
+<span class="n">steps</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="s2">"slice"</span><span class="p">)</span>            <span class="c1"># slice の全部の番号と時刻</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>        <span class="c1"># 時刻 t0 にいちばん近い slice の番号</span>
+</pre></div>
+</div>
+<p>今までの数え方の R2D2plus のランでは、3D を <code class="docutils literal notranslate"><span class="pre">three_d_every</span></code> 回に 1 回しか書かないことがある
+(<code class="docutils literal notranslate"><span class="pre">time/mhd</span></code> と <code class="docutils literal notranslate"><span class="pre">remap/vl</span></code> は毎回書く)。<code class="docutils literal notranslate"><span class="pre">d.qq_steps()</span></code> は 3D のある番号の一覧を返す
+(<code class="docutils literal notranslate"><span class="pre">param/runs/*/run.toml</span></code> の <code class="docutils literal notranslate"><span class="pre">three_d_every</span></code> と、手元にある 3D のファイルから求める)。
+<code class="docutils literal notranslate"><span class="pre">Data(...,</span> <span class="pre">verbose=True)</span></code> の表示も、4 つの族のランでは族ごとに 1 行、<code class="docutils literal notranslate"><span class="pre">three_d_every</span></code> を使ったランでは 3D のある番号の数を出す。</p>
+</section>
+<section id="euv-x-emission-measure">
+<h2>EUV・軟 X 線の強度 (emission measure)<a class="headerlink" href="#euv-x-emission-measure" title="Link to this heading"></a></h2>
+<p>R2D2plus の量の並び 2 のラン (restart の <code class="docutils literal notranslate"><span class="pre">meta.toml</span></code> に <code class="docutils literal notranslate"><span class="pre">vl_layout</span> <span class="pre">=</span> <span class="pre">2</span></code>。2026-10-31 以降に初期条件・<code class="docutils literal notranslate"><span class="pre">r2d2plus_run</span> <span class="pre">new</span></code>・
+<code class="docutils literal notranslate"><span class="pre">r2d2plus_upgrade</span></code> から始めた、出力の数え方 2 のラン。R2D2plus DEC-671) では、<code class="docutils literal notranslate"><span class="pre">remap/vl</span></code> に次のものが増える。
+<code class="docutils literal notranslate"><span class="pre">d.vc.read(n)</span></code> が一緒に読み、ファイルの無いランでは <code class="docutils literal notranslate"><span class="pre">None</span></code> になる。</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>属性</p></th>
+<th class="head"><p>形</p></th>
+<th class="head"><p>中身</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bxcxco</span></code> 〜 <code class="docutils literal notranslate"><span class="pre">bzczco</span></code>、<code class="docutils literal notranslate"><span class="pre">qrk</span></code>・<code class="docutils literal notranslate"><span class="pre">qrte</span></code>・<code class="docutils literal notranslate"><span class="pre">qart</span></code>・<code class="docutils literal notranslate"><span class="pre">qcond</span></code>・<code class="docutils literal notranslate"><span class="pre">qthin</span></code>・<code class="docutils literal notranslate"><span class="pre">qoth</span></code>、<code class="docutils literal notranslate"><span class="pre">keart</span></code>・<code class="docutils literal notranslate"><span class="pre">meart</span></code></p></td>
+<td><p>(ix, jx)</p></td>
+<td><p>B と電流の相関、項目別の加熱率 [erg cm^-3 s^-1]、人工拡散が変えた運動・磁気エネルギー (<code class="docutils literal notranslate"><span class="pre">vl_xy</span></code> の末尾)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fc</span></code></p></td>
+<td><p>(ix + 1, jx)</p></td>
+<td><p>熱伝導の鉛直流束 [erg cm^-2 s^-1] (<code class="docutils literal notranslate"><span class="pre">vl_flux</span></code> の末尾)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hist_te</span></code>・<code class="docutils literal notranslate"><span class="pre">hist_ro</span></code></p></td>
+<td><p>(ix, 100)・(ix, 80)</p></td>
+<td><p>高さごとの log10 T・log10(ρ/ρ0) の面積の割合 (各高さで和 1)。箱は <code class="docutils literal notranslate"><span class="pre">d.vc.hist_logte_edges</span></code>・<code class="docutils literal notranslate"><span class="pre">hist_logro_edges</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">em_x</span></code>・<code class="docutils literal notranslate"><span class="pre">em_y</span></code>・<code class="docutils literal notranslate"><span class="pre">em_z</span></code></p></td>
+<td><p>(jx, kx, 60)・(ix, kx, 60)・(ix, jx, 60)</p></td>
+<td><p>視線ごとの EM = Σ n_e² dl [cm^-5] を log10 T の箱 ([5, 8)、0.05 dex) に分けたもの。最後の文字が視線の向き
+(<code class="docutils literal notranslate"><span class="pre">em_x</span></code> は鉛直の視線で上から見た図)。Cartesian で熱伝導があり EOS 表に <code class="docutils literal notranslate"><span class="pre">ne</span></code> があるランだけ</p></td>
+</tr>
+</tbody>
+</table>
+<p>AIA・XRT の強度は、EM に応答関数を掛けて作る (<a class="reference internal" href="pyR2D2.module.html#module-pyR2D2.synth.euv" title="pyR2D2.synth.euv"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pyR2D2.synth.euv</span></code></a>)。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyR2D2.synth</span><span class="w"> </span><span class="kn">import</span> <span class="n">euv</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>                                   <span class="c1"># n は vl の番号 (d.nd_vl)</span>
+<span class="n">aia</span> <span class="o">=</span> <span class="n">euv</span><span class="o">.</span><span class="n">intensity</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">em_x</span><span class="p">,</span> <span class="s2">"aia"</span><span class="p">)</span>          <span class="c1"># {"A94": (jx, kx), "A131": ..., ...} [DN s^-1 pix^-1]</span>
+<span class="n">xrt</span> <span class="o">=</span> <span class="n">euv</span><span class="o">.</span><span class="n">intensity</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">em_x</span><span class="p">,</span> <span class="s2">"xrt"</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Al-poly"</span><span class="p">,</span> <span class="s2">"Be-thin"</span><span class="p">])</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">em_x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="n">d</span><span class="o">.</span><span class="n">vc</span><span class="o">.</span><span class="n">dem_logte_edges</span><span class="p">)</span>   <span class="c1"># DEM(T) [cm^-5 K^-1]</span>
+</pre></div>
+</div>
+<p>同梱の応答関数 (<code class="docutils literal notranslate"><span class="pre">pyR2D2/synth/data/</span></code>) は SSW の公開ファイルから作ったもの。表の頭に出どころが書いてある
+(<code class="docutils literal notranslate"><span class="pre">euv.load_response(&quot;aia&quot;).meta</span></code>)。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;aia&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">aia_get_response(/temp,</span> <span class="pre">/dn,</span> <span class="pre">/evenorm,</span> <span class="pre">/chiantifix)</span></code> (V10、時間変化の補正なし) と同じ手順。
+94・131・171・193・211・335 Å (304 Å は光学的に厚いので入れない)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;xrt&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">make_xrt_temp_resp</span></code> (CHIANTI 10、コロナの組成) と同じ手順。CCD とフィルターの汚染の厚さは表を作った日付のもの。</p></li>
+</ul>
+<p>応答関数は差し替えられる。<code class="docutils literal notranslate"><span class="pre">intensity(em,</span> <span class="pre">&quot;my_table.txt&quot;)</span></code> のようにファイルを渡すか、<a class="reference internal" href="api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable" title="pyR2D2.synth.euv.ResponseTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyR2D2.synth.euv.ResponseTable</span></code></a>
+を作って渡す。表は <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">logT</span> <span class="pre">ch1</span> <span class="pre">ch2</span> <span class="pre">...</span></code> の見出しと数の列のテキスト (<code class="docutils literal notranslate"><span class="pre">ResponseTable.save</span></code>)。
+観測した日付の AIA の劣化や XRT の汚染に合わせるときは、SSW のファイルを手元に落として作り直す。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># https://hesperia.gsfc.nasa.gov/ssw/sdo/aia/response/ の aia_V9_all_fullinst.genx, aia_V9_fullemiss.genx (790 MB),</span>
+<span class="c1"># aia_V9_chiantifix.genx, aia_V10_20201119_190000_response_table.txt を DIR に置く (読むのに sunpy が要る)</span>
+python<span class="w"> </span>-m<span class="w"> </span>pyR2D2.synth.euv<span class="w"> </span>aia<span class="w"> </span>--ssw<span class="w"> </span>DIR<span class="w"> </span>--out<span class="w"> </span>aia_20240101.txt<span class="w"> </span>--date<span class="w"> </span><span class="m">2024</span>-01-01
+<span class="c1"># https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/response/ の channels/xrt_channels_v0017.geny,</span>
+<span class="c1"># emiss/XRT_emiss_model.default_CHIANTI_20240306.geny, contam/ の xrt_contam_on_ccd.geny,</span>
+<span class="c1"># xrt_contam_on_filter.geny, n_DEHP.txt を DIR に置く</span>
+python<span class="w"> </span>-m<span class="w"> </span>pyR2D2.synth.euv<span class="w"> </span>xrt<span class="w"> </span>--ssw<span class="w"> </span>DIR<span class="w"> </span>--out<span class="w"> </span>xrt_20240101.txt<span class="w"> </span>--date<span class="w"> </span><span class="m">2024</span>-01-01
+</pre></div>
+</div>
+<p>EM の無いラン (古いラン、球座標など) や、箱を変えたいときは、3D 出力から作り直せる。EOS 表に <code class="docutils literal notranslate"><span class="pre">ne</span></code> が要る
+(R2D2plus-input の <code class="docutils literal notranslate"><span class="pre">stratification_eos/add_electron_density.py</span></code> が足す。<code class="docutils literal notranslate"><span class="pre">d.p.read_eos_table</span></code> が読むと
+<code class="docutils literal notranslate"><span class="pre">d.p.log_ne_e</span></code> ができる)。</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">em</span> <span class="o">=</span> <span class="n">euv</span><span class="o">.</span><span class="n">em_from_state</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">los</span><span class="o">=</span><span class="s2">"x"</span><span class="p">)</span>         <span class="c1"># nd は 3D の番号。R2D2plus の vl_dem と float32 の精度で一致する</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -133,14 +249,14 @@ pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</sp
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="typical_case.html" class="btn btn-neutral float-left" title="典型的計算例" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_compression.html" class="btn btn-neutral float-right" title="データ圧縮" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="pyR2D2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="environment.html" class="btn btn-neutral float-right" title="pyR2D2 を使うための環境設定" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

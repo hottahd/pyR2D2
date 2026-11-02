@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>eos &mdash; R2D2 Document 0.2.1.dev3+dirty documentation</title>
+  <title>eos &mdash; pyR2D2 0.4.1.dev48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -15,13 +15,13 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5a6b2f01"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="get_best_unit" href="pyR2D2.util.get_best_unit.html" />
+    <link rel="next" title="eos_switch" href="pyR2D2.util.eos_switch.html" />
     <link rel="prev" title="define_n0" href="pyR2D2.util.define_n0.html" /> 
 </head>
 
@@ -34,7 +34,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            R2D2 Document
+            pyR2D2
               <img src="../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -46,18 +46,17 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../environment.html">R2D2を使うための環境設定</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../typical_case.html">典型的計算例</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../environment.html">pyR2D2 を使うための環境設定</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">pyR2D2 API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api_reference.html#packages">Packages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html">pyR2D2 Package</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.util">pyR2D2.util Package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#functions">Functions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id1">Classes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Class Inheritance Diagram</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../pyR2D2.package.html#id1">Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id2">Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../pyR2D2.package.html#id3">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../pyR2D2.package.html#module-pyR2D2.cpp_util">pyR2D2.cpp_util Package</a></li>
@@ -67,9 +66,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#modules">Modules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../sphinx.html">Sphinx使用の覚書</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../geometry.html">座標生成</a></li>
 </ul>
 
         </div>
@@ -78,7 +74,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">R2D2 Document</a>
+          <a href="../index.html">pyR2D2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -108,21 +104,32 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="pyR2D2.Data.html#pyR2D2.Data" title="pyR2D2.Data"><em>pyR2D2.Data</em></a><em>, </em><em>or</em><em>, </em><em>pyR2D2.Read</em>) – Instance of pyR2D2.Data or pyR2D2.Read classes</p></li>
-<li><p><strong>ro</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Density</p></li>
-<li><p><strong>se</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>)</em>) – Entropy</p></li>
-<li><p><strong>var</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Variable name, pr, te, en, op, dprodro</p></li>
+<li><p><strong>ro</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a>) – Density</p></li>
+<li><p><strong>se</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>)</em>) – Entropy</p></li>
+<li><p><strong>var</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><em>str</em></a>) – Variable name, pr, te, en, op, dprodro</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>qq</strong> – Corresponding variable</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)">float</a></p>
 </dd>
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>This method is very slow for large numpy array. Please consider using fortraun code.</p>
+<p>This method is very slow for large numpy array. Please consider using fortraun code.
+It also only accepts scalars; use <a class="reference internal" href="pyR2D2.util.eos_table.html#pyR2D2.util.eos_table" title="pyR2D2.util.eos_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos_table()</span></code></a> for arrays.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>This reads the table unconditionally, which is not what R2D2 does.</strong>
+The code switches to the linearized EOS whenever the relative amplitude
+<code class="docutils literal notranslate"><span class="pre">ct</span> <span class="pre">=</span> <span class="pre">max(|ro1|/ro0,</span> <span class="pre">|se1|/se0)</span></code> stays below <code class="docutils literal notranslate"><span class="pre">ct0</span> <span class="pre">=</span> <span class="pre">3e-3</span></code>, and in a
+deep-convection run that is everywhere.  Comparing a plain table lookup
+against the <code class="docutils literal notranslate"><span class="pre">pr</span></code>/<code class="docutils literal notranslate"><span class="pre">te</span></code> in the output files can be off by four orders of
+magnitude <em>of the signal amplitude</em>, not four decimal places.  Use
+<a class="reference internal" href="pyR2D2.util.eos_switch.html#pyR2D2.util.eos_switch" title="pyR2D2.util.eos_switch"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyR2D2.util.eos_switch()</span></code></a> to reproduce what the code actually did.</p>
 </div>
 </dd></dl>
 
@@ -133,13 +140,13 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="pyR2D2.util.define_n0.html" class="btn btn-neutral float-left" title="define_n0" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyR2D2.util.get_best_unit.html" class="btn btn-neutral float-right" title="get_best_unit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyR2D2.util.eos_switch.html" class="btn btn-neutral float-right" title="eos_switch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2024, Hideyuki Hotta.</p>
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

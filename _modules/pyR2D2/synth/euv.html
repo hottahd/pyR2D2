@@ -1,0 +1,840 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR2D2.synth.euv &mdash; pyR2D2 0.4.1.dev48 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=bd887c6c" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=750e77fb"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #30476E" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyR2D2
+              <img src="../../../_static/R2D2_logo_red.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyr2d2.html">pyR2D2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../environment.html">pyR2D2 を使うための環境設定</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_compression.html">データ圧縮</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../paraview.html">Paraviewを用いた3Dデータ表示</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_reference.html">pyR2D2 API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #30476E" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyR2D2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyR2D2.synth.euv</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyR2D2.synth.euv</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""</span>
+<span class="sd">EUV・軟 X 線の強度を emission measure (EM) と応答関数から作る (R2D2plus DEC-671)。</span>
+
+<span class="sd">R2D2plus の量の並び 2 のランは ``remap/vl/vl_dem.dac`` に、視線ごとの EM = Σ n_e² dl [cm^-5] を</span>
+<span class="sd">log10 T の箱 ([5, 8)、0.05 dex、60 箱) に分けて書く (:py:meth:`pyR2D2.OnTheFly.read_dem`)。</span>
+<span class="sd">強度は EM に装置の温度応答 R(T) [DN cm^5 s^-1 pix^-1] を掛けて足したもの::</span>
+
+<span class="sd">    I = Σ_箱 EM_箱 × (箱の中の R の平均)   [DN s^-1 pix^-1]</span>
+
+<span class="sd">使い方::</span>
+
+<span class="sd">    d = pyR2D2.Data(run)</span>
+<span class="sd">    d.vc.read(n)                                   # em_x (鉛直の視線), em_y, em_z</span>
+<span class="sd">    img = pyR2D2.synth.euv.intensity(d.vc.em_x, "aia")     # {"A94": (jx, kx), ...}</span>
+<span class="sd">    xrt = pyR2D2.synth.euv.intensity(d.vc.em_x, "xrt", channels=["Al-poly"])</span>
+
+<span class="sd">応答関数は :class:`ResponseTable` で、表を差し替えられる (``intensity(em, "my_table.txt")`` や</span>
+<span class="sd">``ResponseTable`` を直接渡す)。同梱の表 (``pyR2D2/synth/data/``) は SSW の公開ファイルから</span>
+<span class="sd">:func:`aia_response_from_ssw` と :func:`xrt_response_from_ssw` で作ったもの:</span>
+
+<span class="sd">- ``aia``: ``aia_get_response(/temp, /dn, /evenorm, /chiantifix)`` (V10、時間変化の補正なし) と同じ手順。</span>
+<span class="sd">  94・131・171・193・211・335 Å。304 Å は光学的に厚いので入れない。</span>
+<span class="sd">- ``xrt``: ``make_xrt_temp_resp(make_xrt_wave_resp(contam_time=...), /chianti_default)`` と同じ手順。</span>
+<span class="sd">  CCD と焦点面フィルターの汚染 (DEHP) の厚さは表の作った日付のもの (表の頭の ``meta`` に記録)。</span>
+<span class="sd">  観測と比べるときは、その日付で作り直す (``python -m pyR2D2.synth.euv xrt --date ...``)。</span>
+
+<span class="sd">EM が無いラン (古いラン、球座標など) は :func:`em_from_state` で 3D 出力から作り直せる</span>
+<span class="sd">(EOS 表に ``ne`` が要る。R2D2plus-input の ``stratification_eos/add_electron_density.py``)。</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_dt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1">#: R2D2plus の vl_dem.dac の箱の境界 (log10 T、[5, 8) を 0.05 dex、60 箱)</span>
+<span class="n">DEM_LOGTE_EDGES</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">+</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">61</span><span class="p">)</span>
+
+<span class="c1">#: AIA の光学的に薄いチャンネル (304 Å は除く)</span>
+<span class="n">AIA_CHANNELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"A94"</span><span class="p">,</span> <span class="s2">"A131"</span><span class="p">,</span> <span class="s2">"A171"</span><span class="p">,</span> <span class="s2">"A193"</span><span class="p">,</span> <span class="s2">"A211"</span><span class="p">,</span> <span class="s2">"A335"</span><span class="p">)</span>
+
+<span class="c1">#: XRT の単独フィルター (SSW の xrt_channels の名前)。組み合わせ ("Al-poly/Ti-poly" など) も作れる</span>
+<span class="n">XRT_CHANNELS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"Al-mesh"</span><span class="p">,</span> <span class="s2">"Al-poly"</span><span class="p">,</span> <span class="s2">"C-poly"</span><span class="p">,</span> <span class="s2">"Ti-poly"</span><span class="p">,</span> <span class="s2">"Be-thin"</span><span class="p">,</span> <span class="s2">"Be-med"</span><span class="p">,</span> <span class="s2">"Al-med"</span><span class="p">,</span> <span class="s2">"Al-thick"</span><span class="p">,</span> <span class="s2">"Be-thick"</span><span class="p">)</span>
+
+<span class="n">_DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"data"</span>
+<span class="c1">#: 同梱の表 (名前 → ファイル)</span>
+<span class="n">BUNDLED</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"aia"</span><span class="p">:</span> <span class="s2">"aia_response.txt"</span><span class="p">,</span> <span class="s2">"xrt"</span><span class="p">:</span> <span class="s2">"xrt_response.txt"</span><span class="p">}</span>
+
+<span class="n">_FORMAT_LINE</span> <span class="o">=</span> <span class="s2">"# pyR2D2-response-table 1"</span>
+
+
+<div class="viewcode-block" id="ResponseTable">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResponseTable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    温度応答の表 R(log10 T) をチャンネルごとに持つ。</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logt : array (n,)</span>
+<span class="sd">        log10 T [K] (増加順)</span>
+<span class="sd">    responses : dict of str to array (n,)</span>
+<span class="sd">        チャンネル名 → 応答 (単位は ``units``)</span>
+<span class="sd">    units : str</span>
+<span class="sd">        応答の単位。既定は ``"DN cm^5 s^-1 pix^-1"``</span>
+<span class="sd">    meta : dict, optional</span>
+<span class="sd">        出どころなどの記録 (保存すると表の頭に JSON で残る)</span>
+
+<span class="sd">    表の形式 (テキスト)::</span>
+
+<span class="sd">        # pyR2D2-response-table 1</span>
+<span class="sd">        # units: DN cm^5 s^-1 pix^-1</span>
+<span class="sd">        # meta: {"source": ..., ...}</span>
+<span class="sd">        # logT A94 A131 ...</span>
+<span class="sd">        5.00 1.2e-28 ...</span>
+
+<span class="sd">    ``#`` 以外の行は空白区切りの数。``.npz`` (キー ``logt`` と各チャンネル、任意で ``units``・``meta``) も読める。</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="ResponseTable.__init__">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logt</span><span class="p">,</span> <span class="n">responses</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">"DN cm^5 s^-1 pix^-1"</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">logt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"logt must be one-dimensional and increasing"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ch</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">responses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> values for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2"> temperatures"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ch</span><span class="p">)]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">meta</span> <span class="ow">or</span> <span class="p">{})</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""チャンネル名の list"""</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"ResponseTable(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="si">}</span><span class="s2">, logT </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">..</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="si">!r}</span><span class="s2">, source=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'source'</span><span class="p">,</span><span class="w"> </span><span class="s1">'?'</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)"</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ResponseTable.bin_mean">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable.bin_mean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bin_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">logte_edges</span><span class="o">=</span><span class="n">DEM_LOGTE_EDGES</span><span class="p">,</span> <span class="n">nsub</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        log10 T の箱ごとの応答の平均 (箱の中を log10 T で等分した ``nsub`` 点の平均、表の外は 0)。</span>
+
+<span class="sd">        箱の中の DEM の形は分からないので、log10 T について一様と見なしている。</span>
+<span class="sd">        """</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">logte_edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">frac</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nsub</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">nsub</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">edges</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">frac</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">channel</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResponseTable.save">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""テキスト (``.npz`` で終わる名前なら npz) で保存する。"""</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".npz"</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">logt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">),</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ch</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"channel name </span><span class="si">{</span><span class="n">ch</span><span class="si">!r}</span><span class="s2"> contains a space"</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_FORMAT_LINE</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"# units: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"# meta: </span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+            <span class="s2">"# logT "</span> <span class="o">+</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logt</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> "</span> <span class="o">+</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">ch</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.6e</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">))</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResponseTable.load">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.ResponseTable.html#pyR2D2.synth.euv.ResponseTable.load">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""テキストか ``.npz`` の表を読む。"""</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".npz"</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">z</span><span class="p">:</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="s2">"units"</span><span class="p">])</span> <span class="k">if</span> <span class="s2">"units"</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">files</span> <span class="k">else</span> <span class="s2">"DN cm^5 s^-1 pix^-1"</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="s2">"meta"</span><span class="p">]))</span> <span class="k">if</span> <span class="s2">"meta"</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">files</span> <span class="k">else</span> <span class="p">{}</span>
+                <span class="n">responses</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">z</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">files</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"logt"</span><span class="p">,</span> <span class="s2">"units"</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">)}</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="s2">"logt"</span><span class="p">],</span> <span class="n">responses</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="n">units</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="s2">"DN cm^5 s^-1 pix^-1"</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">):</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"units:"</span><span class="p">):</span>
+                    <span class="n">units</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">"units:"</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">body</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"meta:"</span><span class="p">):</span>
+                    <span class="n">meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">"meta:"</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">elif</span> <span class="n">body</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"logT"</span><span class="p">]:</span>
+                    <span class="n">names</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">continue</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">()])</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: no '# logT &lt;channels&gt;' header line"</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: rows do not have </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> columns"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="n">a</span><span class="p">[:,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">)},</span> <span class="n">units</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="load_response">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.load_response.html#pyR2D2.synth.euv.load_response">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">"aia"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    応答の表を返す。``"aia"``・``"xrt"`` は同梱の表、文字列や Path はファイル、</span>
+<span class="sd">    :class:`ResponseTable` はそのまま。</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">ResponseTable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">BUNDLED</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ResponseTable</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">_DATA_DIR</span> <span class="o">/</span> <span class="n">BUNDLED</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ResponseTable</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">response</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="intensity">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.intensity.html#pyR2D2.synth.euv.intensity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">intensity</span><span class="p">(</span><span class="n">em</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">"aia"</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logte_edges</span><span class="o">=</span><span class="n">DEM_LOGTE_EDGES</span><span class="p">,</span> <span class="n">nsub</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    箱ごとの EM から強度を作る。</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    em : array (..., nbin)</span>
+<span class="sd">        log10 T の箱ごとの EM [cm^-5] (最後の軸が箱)。``d.vc.em_x`` など</span>
+<span class="sd">    response : str, Path or ResponseTable</span>
+<span class="sd">        応答の表 (:func:`load_response`)。既定は同梱の AIA</span>
+<span class="sd">    channels : list of str, optional</span>
+<span class="sd">        作るチャンネル。既定は表の全部</span>
+<span class="sd">    logte_edges : array (nbin + 1,)</span>
+<span class="sd">        箱の境界。既定は R2D2plus の vl_dem.dac のもの</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict of str to array (...)</span>
+<span class="sd">        チャンネル名 → 強度 (単位は応答 × cm^-5。既定の表では DN s^-1 pix^-1)</span>
+<span class="sd">    """</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">load_response</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">)</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">logte_edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">edges</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"em has </span><span class="si">{</span><span class="n">em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> bins on its last axis, logte_edges gives </span><span class="si">{</span><span class="n">edges</span><span class="o">.</span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">channels</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">bin_mean</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">nsub</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">em</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">r</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="em_from_state">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.em_from_state.html#pyR2D2.synth.euv.em_from_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">em_from_state</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">los</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">logte_edges</span><span class="o">=</span><span class="n">DEM_LOGTE_EDGES</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    3D 出力 (``remap/qq``) から箱ごとの EM を作り直す (R2D2plus の vl_dem.dac と同じ定義)。</span>
+
+<span class="sd">    n_e と T は EOS 表 (ρ, s) から引く (表と線形の合成はしない。R2D2plus と同じ)。</span>
+<span class="sd">    表に ``ne`` が要る (``data.p.read_eos_table`` が読んだ表に ``ne`` があると ``log_ne_e`` ができる)。</span>
+<span class="sd">    箱の外の温度は数えない。セルの幅は margin 込みの座標 (``p.xg``・``yg``・``zg``) の</span>
+<span class="sd">    中心差分 0.5 (c[i+1] - c[i-1]) で、物理セルの両端も同じ (R2D2plus の write_hist_dem と同じ)。</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pyR2D2.Data</span>
+<span class="sd">    n : int</span>
+<span class="sd">        3D 出力の番号 (``nd``。vl の番号 ``nd_vl`` とは違うことがある)</span>
+<span class="sd">    los : {"x", "y", "z"}</span>
+<span class="sd">        視線の向き (pyR2D2 の軸、x が鉛直)。戻り値の形は x: (jx, kx, nbin)、y: (ix, kx, nbin)、</span>
+<span class="sd">        z: (ix, jx, nbin) で、:py:meth:`pyR2D2.OnTheFly.read_dem` の ``em_x``・``em_y``・``em_z`` と同じ</span>
+<span class="sd">    logte_edges : array</span>
+<span class="sd">        箱の境界 (等間隔でなくてよい)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray (float64)</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyR2D2.util.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">eos_table</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">p</span>
+    <span class="k">if</span> <span class="s2">"log_ne_e"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"the EoS table has no electron density ne; read a table with ne via "</span>
+            <span class="s2">"data.p.read_eos_table(path) (R2D2plus-input stratification_eos/add_electron_density.py)"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">geometry</span> <span class="o">!=</span> <span class="s2">"Cartesian"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"em_from_state supports Cartesian runs only (this run is </span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">geometry</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">"ro"</span><span class="p">,</span> <span class="s2">"se"</span><span class="p">])</span>
+    <span class="n">ro</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">ro</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">ro0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">se</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qf</span><span class="o">.</span><span class="n">se</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">se0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">te</span> <span class="o">=</span> <span class="n">eos_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="s2">"te"</span><span class="p">)</span>
+    <span class="n">ne</span> <span class="o">=</span> <span class="n">eos_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ro</span><span class="p">,</span> <span class="n">se</span><span class="p">,</span> <span class="s2">"ne"</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">ro</span><span class="p">,</span> <span class="n">se</span>
+
+    <span class="n">edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">logte_edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">nb</span> <span class="o">=</span> <span class="n">edges</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">te</span><span class="p">),</span> <span class="n">side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">ok</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">b</span> <span class="o">&lt;</span> <span class="n">nb</span><span class="p">)</span>
+    <span class="n">ix</span><span class="p">,</span> <span class="n">jx</span><span class="p">,</span> <span class="n">kx</span> <span class="o">=</span> <span class="n">te</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">del</span> <span class="n">te</span>
+    <span class="n">ne2</span> <span class="o">=</span> <span class="n">ne</span> <span class="o">*</span> <span class="n">ne</span>
+    <span class="k">del</span> <span class="n">ne</span>
+
+    <span class="k">if</span> <span class="n">los</span> <span class="o">==</span> <span class="s2">"x"</span><span class="p">:</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">_cell_width</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">xg</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="n">ix</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">jx</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">kx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">kx</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">jx</span><span class="p">,</span> <span class="n">kx</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">los</span> <span class="o">==</span> <span class="s2">"y"</span><span class="p">:</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">_cell_width</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">yg</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="n">jx</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ix</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">kx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">kx</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">kx</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">los</span> <span class="o">==</span> <span class="s2">"z"</span><span class="p">:</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">_cell_width</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">zg</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span> <span class="n">kx</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ix</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">jx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">jx</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">jx</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"los must be 'x', 'y' or 'z', not </span><span class="si">{</span><span class="n">los</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">ne2</span> <span class="o">*</span> <span class="n">dl</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">nb</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="n">ok</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">[</span><span class="n">ok</span><span class="p">],</span> <span class="n">minlength</span><span class="o">=</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nb</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">em</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="n">nb</span><span class="p">,))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cell_width</span><span class="p">(</span><span class="n">coord_with_margin</span><span class="p">,</span> <span class="n">margin</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    セルの幅 0.5 (c[i+1] - c[i-1]) を margin 込みの座標から作る (R2D2plus の write_hist_dem と同じ)。</span>
+<span class="sd">    物理セルの両端も margin の座標を使った中心差分になる。</span>
+<span class="sd">    """</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">coord_with_margin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">margin</span> <span class="ow">or</span> <span class="n">margin</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"coordinate with margin has </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2"> points, expected </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> + 2 x </span><span class="si">{</span><span class="n">margin</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">margin</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># 応答の表を SSW の公開ファイルから作る</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<span class="c1">#: SSW の AIA の応答のファイルの置き場</span>
+<span class="n">SSW_AIA_URL</span> <span class="o">=</span> <span class="s2">"https://hesperia.gsfc.nasa.gov/ssw/sdo/aia/response/"</span>
+<span class="c1">#: SSW の XRT の応答のファイルの置き場</span>
+<span class="n">SSW_XRT_URL</span> <span class="o">=</span> <span class="s2">"https://hesperia.gsfc.nasa.gov/ssw/hinode/xrt/idl/response/"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_genx</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sunpy.io.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_genx</span>
+
+    <span class="k">return</span> <span class="n">read_genx</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_aia_response_table_rows</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""aia_V*_response_table.txt を行の dict の list で読む。"""</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">w</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">rows</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_utc</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"Z"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S.</span><span class="si">%f</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"cannot read the time </span><span class="si">{</span><span class="n">s</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="aia_response_from_ssw">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.aia_response_from_ssw.html#pyR2D2.synth.euv.aia_response_from_ssw">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">aia_response_from_ssw</span><span class="p">(</span>
+    <span class="n">ssw_dir</span><span class="p">,</span>
+    <span class="n">channels</span><span class="o">=</span><span class="n">AIA_CHANNELS</span><span class="p">,</span>
+    <span class="n">evenorm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">chiantifix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">"V10"</span><span class="p">,</span>
+    <span class="n">response_table</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">blend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    AIA の温度応答を SSW の公開ファイルから作る (``aia_get_response(/temp, /dn, ...)`` と同じ手順)。</span>
+
+<span class="sd">    要るファイル (``ssw_dir`` に置く、:py:data:`SSW_AIA_URL` から取れる)::</span>
+
+<span class="sd">        aia_V9_all_fullinst.genx      有効面積 (V10 も V8 と同じ中身。IDL の V10 も V9 の名前を読む)</span>
+<span class="sd">        aia_V9_fullemiss.genx         CHIANTI の放射率 (790 MB)</span>
+<span class="sd">        aia_V9_chiantifix.genx        94・131 Å の欠けた線の経験的な補正 (chiantifix のとき)</span>
+<span class="sd">        aia_V10_20201119_190000_response_table.txt   EVE の規格化と時間変化 (evenorm・date のとき)</span>
+
+<span class="sd">    手順 (SSW の aia_bp_blend_channels・aia_bp_parse_effarea・aia_bp_corrections・aia_bp_make_tresp・</span>
+<span class="sd">    aia_bp_parse_tresp):</span>
+
+<span class="sd">    1. ``blend``: 94←304、131←335、335←131 のクロストークを有効面積に足す (IDL の ``/noblend`` は ``blend=False``)</span>
+<span class="sd">    2. DN へ: × max(12398/λ × elecperev, 1) / elecperdn</span>
+<span class="sd">    3. ``evenorm``: × (表の最初の期間の有効面積) / (有効波長での有効面積)</span>
+<span class="sd">    4. ``date``: × その日付の期間の比 × (1 + p1 dt + p2 dt² + p3 dt³) (dt は期間の始めからの日数)</span>
+<span class="sd">    5. R(T) = Σ_λ 有効面積(λ) × 放射率(λ, T) × platescale × Δλ</span>
+<span class="sd">    6. ``chiantifix``: 94・131 Å に経験的な差 (``date`` のときは 4 の比を掛けたもの) を足す</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ResponseTable</span>
+<span class="sd">    """</span>
+    <span class="n">ssw_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">)</span>
+    <span class="n">inst</span> <span class="o">=</span> <span class="n">_read_genx</span><span class="p">(</span><span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"aia_V9_all_fullinst.genx"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">full</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">inst</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2">_FULL"</span><span class="p">]</span>
+
+    <span class="c1"># 1. クロストーク (aia_bp_blend_channels)。元の (混ぜる前の) 成分から作る</span>
+    <span class="n">cross_of</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"A94"</span><span class="p">:</span> <span class="s2">"A304"</span><span class="p">,</span> <span class="s2">"A131"</span><span class="p">:</span> <span class="s2">"A335"</span><span class="p">,</span> <span class="s2">"A304"</span><span class="p">:</span> <span class="s2">"A94"</span><span class="p">,</span> <span class="s2">"A335"</span><span class="p">:</span> <span class="s2">"A131"</span><span class="p">}</span>
+    <span class="n">ea_cm2</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">|</span> <span class="p">{</span><span class="s2">"A304"</span><span class="p">}:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">full</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+        <span class="n">ea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"EFFAREA"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">blend</span> <span class="ow">and</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">cross_of</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">full</span><span class="p">(</span><span class="n">cross_of</span><span class="p">[</span><span class="n">ch</span><span class="p">])</span>
+            <span class="n">ea</span> <span class="o">=</span> <span class="n">ea</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">"ENT_FILTER"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"PRIMARY"</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"SECONDARY"</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"CONTAM"</span><span class="p">]</span>
+                <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"CCD"</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="s2">"GEOAREA"</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"FP_FILTER"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">ea_cm2</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">ea</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="n">channels</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">"WAVE"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">platescale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inst</span><span class="p">[</span><span class="n">channels</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">"PLATESCALE"</span><span class="p">])</span>
+
+    <span class="c1"># 3, 4. EVE の規格化と時間変化 (aia_bp_corrections)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">}</span>
+    <span class="n">tscale</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="mf">1.0</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">}</span>
+    <span class="n">table_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">evenorm</span> <span class="ow">or</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">response_table</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cands</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ssw_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">"aia_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">_*_response_table.txt"</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cands</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no aia_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">_*_response_table.txt in </span><span class="si">{</span><span class="n">ssw_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">response_table</span> <span class="o">=</span> <span class="n">cands</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">response_table</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">_aia_response_table_rows</span><span class="p">(</span><span class="n">response_table</span><span class="p">)</span>
+        <span class="n">when</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_parse_utc</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="n">mine</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"WAVELNTH"</span><span class="p">]</span> <span class="o">==</span> <span class="n">ch</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">and</span> <span class="n">r</span><span class="p">[</span><span class="s2">"WAVE_STR"</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_THIN"</span><span class="p">)]</span>
+            <span class="n">mine</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">_parse_utc</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"T_START"</span><span class="p">]))</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="n">mine</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">evenorm</span><span class="p">:</span>
+                <span class="n">nom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="s2">"EFF_WVLN"</span><span class="p">]),</span> <span class="n">wave</span><span class="p">,</span> <span class="n">ea_cm2</span><span class="p">[</span><span class="n">ch</span><span class="p">])</span>
+                <span class="n">scale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="s2">"EFF_AREA"</span><span class="p">])</span> <span class="o">/</span> <span class="n">nom</span>
+            <span class="k">if</span> <span class="n">when</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">pre</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">mine</span> <span class="k">if</span> <span class="n">_parse_utc</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"T_START"</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">when</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pre</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> is before the first epoch of </span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">use</span> <span class="o">=</span> <span class="n">pre</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">when</span> <span class="o">-</span> <span class="n">_parse_utc</span><span class="p">(</span><span class="n">use</span><span class="p">[</span><span class="s2">"T_START"</span><span class="p">]))</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mf">86400.0</span>
+                <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">use</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"EFFA_P1"</span><span class="p">,</span> <span class="s2">"EFFA_P2"</span><span class="p">,</span> <span class="s2">"EFFA_P3"</span><span class="p">))</span>
+                <span class="n">tscale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">use</span><span class="p">[</span><span class="s2">"EFF_AREA"</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="s2">"EFF_AREA"</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">p1</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">*</span> <span class="n">dt</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">p3</span> <span class="o">*</span> <span class="n">dt</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># 5. 放射率との積分 (aia_bp_make_tresp)</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">_read_genx</span><span class="p">(</span><span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"aia_V9_fullemiss.genx"</span><span class="p">)[</span><span class="s2">"TOTAL"</span><span class="p">]</span>
+    <span class="n">ewave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"WAVE"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">logt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"LOGTE"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">emiss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"EMISSIVITY"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">emiss</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">logt</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">ewave</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="n">emiss</span> <span class="o">=</span> <span class="n">emiss</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">dw</span> <span class="o">=</span> <span class="n">ewave</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ewave</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">responses</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">full</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+        <span class="n">evperphot</span> <span class="o">=</span> <span class="mf">12398.0</span> <span class="o">/</span> <span class="n">wave</span>
+        <span class="n">elecperphot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">evperphot</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"ELECPEREV"</span><span class="p">]),</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">ea_dn</span> <span class="o">=</span> <span class="n">ea_cm2</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">*</span> <span class="n">elecperphot</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">"ELECPERDN"</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">*</span> <span class="n">tscale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span>
+        <span class="n">iresp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ewave</span><span class="p">,</span> <span class="n">wave</span><span class="p">,</span> <span class="n">ea_dn</span><span class="p">)</span>
+        <span class="n">iresp</span><span class="p">[(</span><span class="n">ewave</span> <span class="o">&lt;</span> <span class="n">wave</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">|</span> <span class="p">(</span><span class="n">ewave</span> <span class="o">&gt;</span> <span class="n">wave</span><span class="o">.</span><span class="n">max</span><span class="p">())]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">responses</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">iresp</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">@</span> <span class="n">emiss</span><span class="p">)</span> <span class="o">*</span> <span class="n">platescale</span> <span class="o">*</span> <span class="n">dw</span>
+
+    <span class="c1"># 6. chiantifix (aia_bp_parse_tresp)</span>
+    <span class="k">if</span> <span class="n">chiantifix</span><span class="p">:</span>
+        <span class="n">fix</span> <span class="o">=</span> <span class="n">_read_genx</span><span class="p">(</span><span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"aia_V9_chiantifix.genx"</span><span class="p">)</span>
+        <span class="n">fix_ch</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">fix</span><span class="p">[</span><span class="s2">"CHANNELS"</span><span class="p">])]</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">fix</span><span class="p">[</span><span class="s2">"EMPIRICAL_MINUS_RAW"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">flogt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">fix</span><span class="p">[</span><span class="s2">"LOGTE"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">diff</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">flogt</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">if</span> <span class="n">flogt</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">logt</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">flogt</span> <span class="o">-</span> <span class="n">logt</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"chiantifix logT grid differs from the emissivity grid"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">fix_ch</span><span class="p">:</span>
+                <span class="n">responses</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">responses</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">+</span> <span class="n">diff</span><span class="p">[:,</span> <span class="n">fix_ch</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">upper</span><span class="p">())]</span> <span class="o">*</span> <span class="n">tscale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span>
+
+    <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"SSW AIA response (aia_get_response /temp /dn"</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s2">" /evenorm"</span> <span class="k">if</span> <span class="n">evenorm</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s2">" /chiantifix"</span> <span class="k">if</span> <span class="n">chiantifix</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">" timedepend_date=</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s2">""</span> <span class="k">if</span> <span class="n">blend</span> <span class="k">else</span> <span class="s2">" /noblend"</span><span class="p">)</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s2">"), version </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"files"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"aia_V9_all_fullinst.genx"</span><span class="p">,</span> <span class="s2">"aia_V9_fullemiss.genx"</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">([</span><span class="s2">"aia_V9_chiantifix.genx"</span><span class="p">]</span> <span class="k">if</span> <span class="n">chiantifix</span> <span class="k">else</span> <span class="p">[])</span>
+        <span class="o">+</span> <span class="p">([</span><span class="n">table_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">table_name</span> <span class="k">else</span> <span class="p">[]),</span>
+        <span class="s2">"url"</span><span class="p">:</span> <span class="n">SSW_AIA_URL</span><span class="p">,</span>
+        <span class="s2">"made_by"</span><span class="p">:</span> <span class="s2">"pyR2D2.synth.euv.aia_response_from_ssw"</span><span class="p">,</span>
+        <span class="s2">"made_on"</span><span class="p">:</span> <span class="n">_dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">"evenorm"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">evenorm</span><span class="p">),</span>
+        <span class="s2">"chiantifix"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">chiantifix</span><span class="p">),</span>
+        <span class="s2">"blend"</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">blend</span><span class="p">),</span>
+        <span class="s2">"date"</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">),</span>
+        <span class="s2">"eve_scale"</span><span class="p">:</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="n">scale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">},</span>
+        <span class="s2">"time_scale"</span><span class="p">:</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="n">tscale</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">},</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ResponseTable</span><span class="p">(</span><span class="n">logt</span><span class="p">,</span> <span class="n">responses</span><span class="p">,</span> <span class="s2">"DN cm^5 s^-1 pix^-1"</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_readsav</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">readsav</span>
+
+    <span class="k">return</span> <span class="n">readsav</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_s</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">v</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+
+<span class="c1">#: SSW xrt_chan2fw の (フィルターホイール 1、2) の位置</span>
+<span class="n">_XRT_FW</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"Open"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"Al-mesh"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"Al-poly"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"C-poly"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"Ti-poly"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="s2">"Be-thin"</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"Be-med"</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"Al-med"</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">"Al-thick"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">"Be-thick"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="s2">"Al-poly/Al-mesh"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">"Al-poly/Ti-poly"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">"Al-poly/Al-thick"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">"Al-poly/Be-thick"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="s2">"C-poly/Ti-poly"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">"C-poly/Al-thick"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">_ANYTIM_EPOCH</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1979</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_anytim</span><span class="p">(</span><span class="n">when</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""SSW anytim の秒 (1979-01-01 からの秒、閏秒なし)。"""</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">when</span> <span class="o">-</span> <span class="n">_ANYTIM_EPOCH</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="xrt_contamination">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.xrt_contamination.html#pyR2D2.synth.euv.xrt_contamination">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">xrt_contamination</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    XRT の汚染 (DEHP) の厚さ [Å] (CCD、焦点面フィルター) を SSW xrt_time2contam と同じく作る。</span>
+
+<span class="sd">    ``contam/xrt_contam_on_ccd.geny`` と ``contam/xrt_contam_on_filter.geny`` を時刻で線形に補間し、</span>
+<span class="sd">    四捨五入する。データの最後の時刻より後は作れない (ValueError)。</span>
+<span class="sd">    """</span>
+    <span class="n">ssw_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">)</span>
+    <span class="n">when</span> <span class="o">=</span> <span class="n">_parse_utc</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">))</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">_dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">date</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">_anytim</span><span class="p">(</span><span class="n">when</span><span class="p">)</span>
+    <span class="n">ccd</span> <span class="o">=</span> <span class="n">_readsav</span><span class="p">(</span><span class="n">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="s2">"xrt_contam_on_ccd.geny"</span><span class="p">))</span>
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">_readsav</span><span class="p">(</span><span class="n">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="s2">"xrt_contam_on_filter.geny"</span><span class="p">))</span>
+    <span class="n">tc</span><span class="p">,</span> <span class="n">thc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ccd</span><span class="p">[</span><span class="s2">"p1"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ccd</span><span class="p">[</span><span class="s2">"p2"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">tc</span><span class="o">.</span><span class="n">max</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">when</span><span class="si">}</span><span class="s2"> is after the last CCD contamination time in xrt_contam_on_ccd.geny "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">_ANYTIM_EPOCH</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tc</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span><span class="si">}</span><span class="s2">); fetch a newer file"</span>
+        <span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tc</span><span class="p">,</span> <span class="n">thc</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">tf</span><span class="p">,</span> <span class="n">thf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="s2">"p1"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="s2">"p2"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># (6, 2, ntime)</span>
+    <span class="n">fw1</span><span class="p">,</span> <span class="n">fw2</span> <span class="o">=</span> <span class="n">_XRT_FW</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">thf</span><span class="p">[</span><span class="n">fw1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">f2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">thf</span><span class="p">[</span><span class="n">fw2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">c</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">f1</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">f2</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ssw_dir</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"contam"</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"channels"</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">ssw_dir</span> <span class="o">/</span> <span class="s2">"emiss"</span> <span class="o">/</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">p</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not found under </span><span class="si">{</span><span class="n">ssw_dir</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dehp_transmission</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">thick</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""DEHP の 1 層の透過率 (SSW multifilt と同じ薄膜の式、垂直入射)。波長 [Å] と透過率を返す。"""</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="s2">"n_DEHP.txt"</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">10.0</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="p">(</span><span class="n">wave</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave</span> <span class="o">&lt;=</span> <span class="mf">400.0</span><span class="p">)</span>
+    <span class="n">wave</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">wave</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="n">keep</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">thick</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wave</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">wave</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">beta</span>
+    <span class="n">kl</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">index</span> <span class="o">/</span> <span class="n">wave</span> <span class="o">*</span> <span class="n">thick</span>
+    <span class="n">kl</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">kl</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">)</span>
+    <span class="n">m00</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">kl</span><span class="p">)</span>
+    <span class="n">m01</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">kl</span><span class="p">)</span> <span class="o">/</span> <span class="n">index</span>
+    <span class="n">m10</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">index</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">kl</span><span class="p">)</span>
+    <span class="n">m11</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">kl</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">m00</span> <span class="o">+</span> <span class="n">m01</span> <span class="o">+</span> <span class="n">m10</span> <span class="o">+</span> <span class="n">m11</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wave</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<div class="viewcode-block" id="xrt_response_from_ssw">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.xrt_response_from_ssw.html#pyR2D2.synth.euv.xrt_response_from_ssw">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">xrt_response_from_ssw</span><span class="p">(</span>
+    <span class="n">ssw_dir</span><span class="p">,</span>
+    <span class="n">channels</span><span class="o">=</span><span class="n">XRT_CHANNELS</span><span class="p">,</span>
+    <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">contam_thick</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">emiss_file</span><span class="o">=</span><span class="s2">"XRT_emiss_model.default_CHIANTI_20240306.geny"</span><span class="p">,</span>
+    <span class="n">channels_file</span><span class="o">=</span><span class="s2">"xrt_channels_v0017.geny"</span><span class="p">,</span>
+    <span class="n">port</span><span class="o">=</span><span class="s2">"R"</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    XRT の温度応答を SSW の公開ファイルから作る</span>
+<span class="sd">    (``make_xrt_temp_resp(make_xrt_wave_resp(contam_time=date), /chianti_default)`` と同じ手順)。</span>
+
+<span class="sd">    要るファイル (``ssw_dir`` か、その ``channels/``・``emiss/``・``contam/`` に置く。</span>
+<span class="sd">    :py:data:`SSW_XRT_URL` から取れる)::</span>
+
+<span class="sd">        channels/xrt_channels_v0017.geny         各チャンネルの透過率・鏡・CCD</span>
+<span class="sd">        emiss/XRT_emiss_model.default_CHIANTI_20240306.geny   CHIANTI 10 (コロナの組成) のスペクトル</span>
+<span class="sd">        contam/xrt_contam_on_ccd.geny, contam/xrt_contam_on_filter.geny, contam/n_DEHP.txt   汚染</span>
+
+<span class="sd">    手順 (SSW の make_xrt_ea・make_xrt_sr・make_xrt_contam・multifilt・make_xrt_temp_resp):</span>
+
+<span class="sd">    1. 汚染の厚さ: ``date`` から (:func:`xrt_contamination`)、または ``contam_thick`` = (CCD, フィルター) [Å]</span>
+<span class="sd">    2. 有効面積 = 透過率 × DEHP(CCD) × DEHP(フィルター) × 開口面積</span>
+<span class="sd">    3. 分光応答 = 有効面積 × (hc/λ) × (画素 / 焦点距離)² / 3.65 eV / gain (既定は R 側の読み出し)</span>
+<span class="sd">    4. R(T) = Σ_λ スペクトル(λ, T) × 分光応答(λ) × Δλ</span>
+
+<span class="sd">    IDL は分光応答をスペクトルの波長へ 2 次で補間する (``interpol, /quad``) が、ここは線形。</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ResponseTable</span>
+<span class="sd">    """</span>
+    <span class="n">ssw_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">contam_thick</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"give either date or contam_thick"</span><span class="p">)</span>
+    <span class="n">chans</span> <span class="o">=</span> <span class="n">_readsav</span><span class="p">(</span><span class="n">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">channels_file</span><span class="p">))[</span><span class="s2">"p0"</span><span class="p">]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">_s</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">chans</span><span class="p">[</span><span class="s2">"NAME"</span><span class="p">]]</span>
+    <span class="n">em</span> <span class="o">=</span> <span class="n">_readsav</span><span class="p">(</span><span class="n">_find</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">emiss_file</span><span class="p">))[</span><span class="s2">"p0"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">swave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"WAVE"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:</span> <span class="nb">int</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"WLENGTH"</span><span class="p">])]</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"TEMP"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:</span> <span class="nb">int</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"TLENGTH"</span><span class="p">])]</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"SPEC"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:</span> <span class="nb">int</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"TLENGTH"</span><span class="p">]),</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"WLENGTH"</span><span class="p">])]</span>  <span class="c1"># (T, λ)</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">swave</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">swave</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">swave</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">swave</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">swave</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]])</span>
+    <span class="n">dsw</span> <span class="o">=</span> <span class="p">(</span><span class="n">w0</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">-</span> <span class="n">w0</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="n">h</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="mf">4.136e-15</span><span class="p">,</span> <span class="mf">2.998e18</span>
+    <span class="n">responses</span><span class="p">,</span> <span class="n">thick</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ch</span><span class="si">}</span><span class="s2"> is not in </span><span class="si">{</span><span class="n">channels_file</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="n">rec</span> <span class="o">=</span> <span class="n">chans</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">ch</span><span class="p">)]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s2">"LENGTH"</span><span class="p">])</span>
+        <span class="n">wave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s2">"WAVE"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="s2">"TRANS"</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)[:</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tc</span><span class="p">,</span> <span class="n">tf</span> <span class="o">=</span> <span class="n">xrt_contamination</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tc</span><span class="p">,</span> <span class="n">tf</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">contam_thick</span><span class="p">)</span>
+        <span class="n">thick</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">tf</span><span class="p">)</span>
+        <span class="n">cw</span><span class="p">,</span> <span class="n">ct</span> <span class="o">=</span> <span class="n">_dehp_transmission</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">tc</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ft</span> <span class="o">=</span> <span class="n">_dehp_transmission</span><span class="p">(</span><span class="n">ssw_dir</span><span class="p">,</span> <span class="n">tf</span><span class="p">)</span>
+        <span class="n">inside</span> <span class="o">=</span> <span class="p">(</span><span class="n">wave</span> <span class="o">&gt;=</span> <span class="n">cw</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wave</span> <span class="o">&lt;=</span> <span class="n">cw</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">wave</span><span class="p">,</span> <span class="n">trans</span> <span class="o">=</span> <span class="n">wave</span><span class="p">[</span><span class="n">inside</span><span class="p">],</span> <span class="n">trans</span><span class="p">[</span><span class="n">inside</span><span class="p">]</span>
+        <span class="n">geom</span><span class="p">,</span> <span class="n">ccd</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s2">"GEOM"</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">rec</span><span class="p">[</span><span class="s2">"CCD"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ea</span> <span class="o">=</span> <span class="n">trans</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">cw</span><span class="p">,</span> <span class="n">ft</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">cw</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">geom</span><span class="p">[</span><span class="s2">"APERTURE_AREA"</span><span class="p">])</span>
+        <span class="n">pix</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccd</span><span class="p">[</span><span class="s2">"PIXEL_SIZE"</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1e4</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccd</span><span class="p">[</span><span class="s2">"GAIN_R"</span><span class="p">]</span> <span class="k">if</span> <span class="n">port</span> <span class="o">==</span> <span class="s2">"R"</span> <span class="k">else</span> <span class="n">ccd</span><span class="p">[</span><span class="s2">"GAIN_L"</span><span class="p">])</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">ea</span> <span class="o">*</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="n">wave</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pix</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">geom</span><span class="p">[</span><span class="s2">"FOC_LEN"</span><span class="p">]))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">ccd</span><span class="p">[</span><span class="s2">"EV_PER_EL"</span><span class="p">])</span> <span class="o">/</span> <span class="n">gain</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="p">(</span><span class="n">swave</span> <span class="o">&gt;=</span> <span class="n">wave</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">swave</span> <span class="o">&lt;=</span> <span class="n">wave</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">swave</span><span class="p">[</span><span class="n">ss</span><span class="p">],</span> <span class="n">wave</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>
+        <span class="n">responses</span><span class="p">[</span><span class="n">ch</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[:,</span> <span class="n">ss</span><span class="p">]</span> <span class="o">@</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">dsw</span><span class="p">[</span><span class="n">ss</span><span class="p">])</span>
+
+    <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"SSW XRT response (make_xrt_wave_resp + make_xrt_temp_resp)"</span><span class="p">,</span>
+        <span class="s2">"files"</span><span class="p">:</span> <span class="p">[</span><span class="n">channels_file</span><span class="p">,</span> <span class="n">emiss_file</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="p">[</span><span class="s2">"xrt_contam_on_ccd.geny"</span><span class="p">,</span> <span class="s2">"xrt_contam_on_filter.geny"</span><span class="p">,</span> <span class="s2">"n_DEHP.txt"</span><span class="p">]</span>
+        <span class="p">),</span>
+        <span class="s2">"url"</span><span class="p">:</span> <span class="n">SSW_XRT_URL</span><span class="p">,</span>
+        <span class="s2">"emission_model"</span><span class="p">:</span> <span class="n">_s</span><span class="p">(</span><span class="n">em</span><span class="p">[</span><span class="s2">"NAME"</span><span class="p">]),</span>
+        <span class="s2">"made_by"</span><span class="p">:</span> <span class="s2">"pyR2D2.synth.euv.xrt_response_from_ssw"</span><span class="p">,</span>
+        <span class="s2">"made_on"</span><span class="p">:</span> <span class="n">_dt</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">"date"</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">),</span>
+        <span class="s2">"contam_thick_angstrom"</span><span class="p">:</span> <span class="p">{</span><span class="n">ch</span><span class="p">:</span> <span class="p">{</span><span class="s2">"ccd"</span><span class="p">:</span> <span class="n">thick</span><span class="p">[</span><span class="n">ch</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"filter"</span><span class="p">:</span> <span class="n">thick</span><span class="p">[</span><span class="n">ch</span><span class="p">][</span><span class="mi">1</span><span class="p">]}</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">},</span>
+        <span class="s2">"readout_port"</span><span class="p">:</span> <span class="n">port</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">ResponseTable</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">temp</span><span class="p">),</span> <span class="n">responses</span><span class="p">,</span> <span class="s2">"DN cm^5 s^-1 pix^-1"</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../api/pyR2D2.synth.euv.main.html#pyR2D2.synth.euv.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``python -m pyR2D2.synth.euv aia|xrt --ssw DIR --out FILE ...`` で応答の表を作る。"""</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">"python -m pyR2D2.synth.euv"</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="s2">"cmd"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">"aia"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">"AIA temperature response from SSW files (</span><span class="si">{</span><span class="n">SSW_AIA_URL</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--ssw"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"directory with the SSW AIA response files"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--out"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"output table (.txt or .npz)"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--channels"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AIA_CHANNELS</span><span class="p">))</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--no-evenorm"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--no-chiantifix"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--no-blend"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"no crosstalk between channels (IDL /noblend)"</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--date"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"apply the time-dependent degradation at this UTC time (YYYY-MM-DD[THH:MM:SS])"</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">"xrt"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">"XRT temperature response from SSW files (</span><span class="si">{</span><span class="n">SSW_XRT_URL</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--ssw"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"directory with the SSW XRT response files"</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--out"</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"output table (.txt or .npz)"</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--channels"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">XRT_CHANNELS</span><span class="p">))</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--date"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"contamination at this UTC time (YYYY-MM-DD[THH:MM:SS])"</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--contam-thick"</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"CCD,filter DEHP thickness in Angstrom, e.g. 0,0 for a clean instrument"</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">chans</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span> <span class="o">==</span> <span class="s2">"aia"</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">aia_response_from_ssw</span><span class="p">(</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">ssw</span><span class="p">,</span> <span class="n">chans</span><span class="p">,</span> <span class="n">evenorm</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_evenorm</span><span class="p">,</span> <span class="n">chiantifix</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_chiantifix</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+            <span class="n">blend</span><span class="o">=</span><span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">no_blend</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">thick</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">contam_thick</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">contam_thick</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)]</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">xrt_response_from_ssw</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">ssw</span><span class="p">,</span> <span class="n">chans</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">contam_thick</span><span class="o">=</span><span class="n">thick</span><span class="p">)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Hideyuki Hotta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      Version: 
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      
+      <dl>
+        <dt>Versions</dt>
+        
+      </dl>
+      
+      <br>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
