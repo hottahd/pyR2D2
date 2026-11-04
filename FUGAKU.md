@@ -4,6 +4,19 @@
 > spack の GCC 15 で組み、`libstdc++` を静的に取り込む (41a2083)。手順と罠の正本は R2D2plus の
 > `docs/process/environment.md` の富岳の項。以下の「ログを残していない」「未整備」は 10/05 時点の記述で、
 > 計算ノード (aarch64) 向けのビルドは今も未整備。
+>
+> **2026-11-01 追記 (入れ直しは AI がしてよい)**: 富岳のログインノードの `~/.venv` に pyR2D2 のホイールを入れ直すのは
+> Claude・Codex がしてよい (堀田「富岳では堀田が入れる決まりがいつの間にかできているけどclaude/codexがやっていいよ」。
+> R2D2plus d44ba22e で environment.md なども直した)。pyR2D2 を直して富岳でも使うときは、push の後に最後まで行う。
+>
+> 1. `git archive` で `/vol0600/data/hp200137/u10094/claude/pyr2d2_<テーマ>_<日付>/src` へ送る (ssh の名前は `fg`)。
+> 2. spack の GCC 15 (`/vol0004/apps/oss/spack-v1.0.1/opt/spack/linux-skylake_avx512/gcc-15.1.0-pmdm4gub…/bin`) を
+>    `CC`/`CXX` にし、`SETUPTOOLS_SCM_PRETEND_VERSION` を付け、`UV_CACHE_DIR`・`TMPDIR` を作業場所にして
+>    `~/.local/bin/uv build --wheel --python ~/.venv/bin/python` で組む。
+> 3. `readelf -d` で `libstdc++` が NEEDED に無いことを確かめる。
+> 4. `uv pip install --python ~/.venv/bin/python --reinstall --no-deps <ホイール>` で入れる。
+> 5. `env -i` で numpy・scipy・matplotlib の後に `import pyR2D2` できることを確かめる。
+> 6. 作業場所の src・一時物は消し、ホイールと build.log は残す。
 
 富岳で pyR2D2 をどう入れるか、という問いに対して、現時点でリポジトリから言えることと
 言えないことを分けて記録したもの。手順書ではなく、整備されていない箇所の洗い出しが目的。
@@ -19,7 +32,7 @@
 - `pyproject.toml` の `[tool.cibuildwheel.linux]` — 同趣旨のコメントと
   `manylinux-x86_64-image = "manylinux_2_28"` / `archs = ["x86_64"]`。
 
-`doc/source/quick_start.rst` や `doc/source/environment.rst` に出てくる富岳
+当時の `doc/source/quick_start.rst` や `doc/source/environment.rst` (2026-11-03 に R2D2 の説明は外した) に出てくる富岳
 (`SERVER=FUGAKU`、ジョブスクリプト `fg.sh`) は Fortran 本体の話で、pyR2D2 とは無関係。
 
 ## ログインノード (x86_64) で使うだけなら、ビルドは不要 (検証済み: 設定ファイルの確認のみ)
