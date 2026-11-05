@@ -6,7 +6,11 @@
 * ``data/restart/<slot>.tar``: restart の slot ごと (中のファイルの名前・大きさ・種類が元と一致することを確かめる)
 * ``data/time.zip``: ``data/time`` (``time/mhd``・``time/vl``・``time/tau``・``time/slice`` など下を全部。
   中の名前は ``time/<族>/t.dac.N``。全メンバーの CRC と、名前・大きさが元と一致することを確かめる)
-* ``rest.tar``: 残り全部 (``data/param/source`` と ``bin`` も入れる。ランの記録なので)
+* ``rest.tar``: 残り全部のうち、ソースとバイナリを除いたもの (データはグループで読めてよい)
+* ``rest_private.tar``: ソースとバイナリ (``data/param/source``・``bin``、``conversion/fortran_source``
+  など。:func:`_is_private`)。ランの記録なので捨てないが、**権限 600 で作る**
+  (堀田、2026-11-05「課題の中でもソースは読ませません。データは読んでもいいです」)。
+  Gfarm へ送った後も ``gfls -l`` で 600 を確かめ、違えば ``gfchmod 600`` する
 * ``archive_report.toml``: 上の照合の結果 (restart は slot ごとの中身の一覧と tar の SHA-256。
   ``r2d2plus-restore`` が戻すときに使う) と、``rest.tar`` に入れずにランから直接送る zip の一覧
 
@@ -41,6 +45,37 @@ def _is_bulk(rel):
         return True
     if parts[0] in ("slice", "tau") and len(parts) >= 2:
         return parts[1] == "zarr" or parts[1].startswith("qq")
+    return False
+
+
+# 中身を読まなくてもソースと分かる名前 (大文字小文字を区別する: .F と .f は別の拡張子)
+_PRIVATE_SUFFIXES = frozenset(
+    ".c .cc .cp .cpp .cxx .c++ .C .h .hh .hpp .hxx .h++ .H .inc .ipp .tpp .inl .cu .cuh "
+    ".f .F .for .FOR .ftn .fpp .f77 .F77 .f90 .F90 .f95 .F95 .f03 .F03 .f08 .F08 .mod .o .a .so".split()
+)
+_PRIVATE_NAMES = frozenset({"Makefile", "makefile", "GNUmakefile", "CMakeLists.txt", "CMakePresets.json"})
+
+
+def _is_private(rel, path=None):
+    """ソース・バイナリか (``rest_private.tar`` に分ける)。
+
+    ``rel`` はランからの相対パス (POSIX)。下のどれかに当たれば真。迷う名前は秘密の側に倒す:
+    分けすぎてもランの記録は ``rest_private.tar`` に残るが、漏れると読めてしまうため。
+
+    * ディレクトリの名前が ``bin``、または ``source`` を含む (``fortran_source`` など)
+    * ファイルの名前に ``source`` を含む (``*.r2d2plus_source.tar.zst`` など)
+    * ソースの拡張子、``Makefile`` など
+    * ``path`` を渡せば、ELF (実行ファイル) かも中身の先頭で確かめる
+    """
+    parts = rel.split("/")
+    if any(p == "bin" or "source" in p.lower() for p in parts):
+        return True
+    name = parts[-1]
+    if name in _PRIVATE_NAMES or os.path.splitext(name)[1] in _PRIVATE_SUFFIXES:
+        return True
+    if path is not None and not path.is_symlink() and path.is_file():
+        with open(path, "rb") as f:
+            return f.read(4) == b"\x7fELF"
     return False
 
 
@@ -98,8 +133,11 @@ def sha256(path, bufsize=1 << 24):
     return h.hexdigest()
 
 
-def _make_tar(tar_path, root, rels):
-    """``root`` の下の ``rels`` だけを (下を辿らずに) tar にし、中身の名前・種類・大きさを元と比べる。"""
+def _make_tar(tar_path, root, rels, private=False):
+    """``root`` の下の ``rels`` だけを (下を辿らずに) tar にし、中身の名前・種類・大きさを元と比べる。
+
+    ``private`` なら tar を権限 600 で作る (作っている途中も他人に読めない)。
+    """
     listing = tar_path.with_name(tar_path.name + ".list")
     listing.write_bytes(b"".join(r.encode() + b"\0" for r in rels))
     work = tar_path.with_name(tar_path.name + ".packing")
@@ -107,6 +145,7 @@ def _make_tar(tar_path, root, rels):
         subprocess.run(
             ["tar", "-cf", str(work), "-C", str(root), "--no-recursion", "--null", "-T", str(listing)],
             check=True,
+            umask=0o077 if private else -1,
         )
     finally:
         listing.unlink()
@@ -224,9 +263,14 @@ class Archiver:
             return rel.startswith("data/") and _is_bulk(rel[len("data/"):])
 
         rels = _walk(self.run, skip)
+        private = [r for r in rels if _is_private(r, self.run / r)]
+        hidden = set(private)
+        rels = [r for r in rels if r not in hidden]
         tar_path = self.out / "rest.tar"
         self.out.mkdir(parents=True, exist_ok=True)
         n = len(_make_tar(tar_path, self.run, rels))
+        # 前の版の rest.tar を残さず置き換えたので、ここでは秘密の側だけ作り直す
+        self._rest_private(private)
         self._record(
             part="rest", tar="rest.tar", entries=n, bytes=tar_path.stat().st_size,
             seconds=round(time.time() - t0, 1),
@@ -234,6 +278,27 @@ class Archiver:
             excluded="data/restart, data/time, data/remap/qq, data/slice/qq*, data/slice/zarr, data/tau/qq*, data/tau/zarr",
         )
         self.log(f"rest.tar: {n} entries, {tar_path.stat().st_size / 1e9:.3f} GB")
+
+    def _rest_private(self, rels):
+        """ソースとバイナリの tar (600)。無ければ作らず、前の回のものは消す。"""
+        tar_path = self.out / "rest_private.tar"
+        if not rels:
+            tar_path.unlink(missing_ok=True)
+            return
+        t0 = time.time()
+        n = len(_make_tar(tar_path, self.run, rels, private=True))
+        mode = tar_path.stat().st_mode & 0o777
+        if mode != 0o600:
+            raise RuntimeError(f"{tar_path}: mode {mode:o}, must be 600")
+        self._record(
+            part="rest_private", tar="rest_private.tar", entries=n, bytes=tar_path.stat().st_size,
+            mode="600", seconds=round(time.time() - t0, 1),
+            check="tar members (name, type, size) == source; mode 600",
+        )
+        self.log(
+            f"rest_private.tar (source and binaries, mode 600): {n} entries; "
+            f"{term.yellow('keep it 600 on Gfarm too')} (gfls -l; gfchmod 600)"
+        )
 
     def write_report(self, zips):
         path = self.out / "archive_report.toml"

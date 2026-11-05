@@ -174,7 +174,8 @@ HPCI(Gfarm)に移すときに、``r2d2plus-pack`` でまとめた残りを出力
 
 * ``data/restart/<slot>.tar``: restart を slot ごとに tar にする。中のファイルの名前・種類・大きさが元と一致することを確かめる。
 * ``data/time.zip``: ``data/time`` を zip にする。全メンバーの CRC (``testzip``) と、名前・大きさが元と一致することを確かめる。
-* ``rest.tar``: 残り全部を tar にする。``data/param/source`` と ``bin`` も入れる(ランの記録なので)。入れないのは restart・time と、3D・slice・tau の元のファイルと zip である。
+* ``rest.tar``: 残り全部を tar にする。入れないのは restart・time と、3D・slice・tau の元のファイルと zip、次の ``rest_private.tar`` に分けるものである。
+* ``rest_private.tar``: ソースとバイナリ(``data/param/source``・``bin``、``conversion/fortran_source``、``.cpp``・``.F90`` など、実行ファイル)を権限 600 で tar にする。データはグループで読めてよいが、ソースは読ませない(2026-11-05)。Gfarm へ送った後も ``gfls -l`` で 600 を確かめ、違えば ``gfchmod 600`` する。
 * ``archive_report.toml``: 照合の結果と、ランから直接送る zip の一覧を書く。restart は slot ごとに、中身の一覧(名前・種類・大きさ)と tar の SHA-256 も書く(``r2d2plus-restore`` が使う)。zip はステップごとに取り出せるよう、そのままの形で送る。
 * 走っているラン(status が ``running``)と、zip の無いステップの元のファイルが残っているランは止める(rest.tar から漏れるので、先に ``r2d2plus-pack`` を流す)。
 

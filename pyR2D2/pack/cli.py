@@ -69,7 +69,8 @@ def build_archive_parser():
         prog="r2d2plus-archive",
         description=(
             "Put the rest of a run into the form moved to HPCI: data/restart/<slot>.tar, data/time.zip "
-            "and rest.tar under OUT, each checked against the run. The run is not changed. "
+            "and rest.tar under OUT, each checked against the run. Source code and binaries go to "
+            "rest_private.tar (mode 600; keep it 600 on Gfarm), not to rest.tar. The run is not changed. "
             "Pack 3D, slice and tau with r2d2plus-pack first; their zips are sent from the run."
         ),
     )

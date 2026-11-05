@@ -175,6 +175,21 @@ def test_archive(runs, tmp_path):
     import tarfile, zipfile
     (packed / "param" / "source").mkdir(exist_ok=True)
     (packed / "param" / "source" / "src.tar.zst").write_text("x")
+    # ソース・バイナリの置かれ方いろいろ (rest.tar に入れず、600 の rest_private.tar へ)
+    (packed / "param" / "bin" / "abc").mkdir(parents=True)
+    (packed / "param" / "bin" / "abc" / "r2d2plus_run").write_text("x")
+    fsrc = packed.parent / "conversion" / "fortran_source" / "src"
+    fsrc.mkdir(parents=True)
+    (fsrc / "main.F90").write_text("x")
+    (packed.parent / "kit.cpp").write_text("x")
+    (packed.parent / "a.out").write_bytes(b"\x7fELF rest")
+    (packed.parent / "Makefile").write_text("x")
+    secret = {
+        "data/param/source", "data/param/source/src.tar.zst",
+        "data/param/bin", "data/param/bin/abc", "data/param/bin/abc/r2d2plus_run",
+        "conversion/fortran_source", "conversion/fortran_source/src", "conversion/fortran_source/src/main.F90",
+        "kit.cpp", "a.out", "Makefile",
+    }
     out = tmp_path / "archive"
     # まとめていない出力が残っていれば止める
     assert archive_main([str(packed.parent), str(out)]) == 1
@@ -202,15 +217,20 @@ def test_archive(runs, tmp_path):
     (packed / "time.zip").unlink()
     with tarfile.open(out / "rest.tar") as tf:
         names = {m.name for m in tf}
-    assert f"{fmt}/data/param/source/src.tar.zst" not in names  # run の相対で入る
-    assert "data/param/source/src.tar.zst" in names and "data/param/params.dac" in names
+    assert f"{fmt}/data/param/params.dac" not in names  # run の相対で入る
+    assert "data/param/params.dac" in names and "conversion" in names
+    assert not names & secret
+    assert not any(n.endswith((".cpp", ".F90")) or "/bin" in n or "source" in n for n in names)
+    with tarfile.open(out / "rest_private.tar") as tf:
+        assert {m.name for m in tf} == secret
+    assert (out / "rest_private.tar").stat().st_mode & 0o777 == 0o600
     assert not any(n.startswith(("data/restart", "data/time", "data/remap/qq", "data/tau/", "data/slice/zarr")) for n in names)
     assert not any(n.startswith("data/slice/qq") for n in names)
     assert "data/slice/params.dac" in names
     with open(out / "archive_report.toml", "rb") as f:
         rep = tomllib.load(f)
     assert "remap/qq/zarr/qq.00000000.zarr.zip" in rep["zips"]
-    assert {p["part"] for p in rep["part"]} == {"restart", "time", "rest"}
+    assert {p["part"] for p in rep["part"]} == {"restart", "time", "rest", "rest_private"}
 
     set_status(packed, "running")
     with pytest.raises(RuntimeError):
