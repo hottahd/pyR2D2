@@ -324,23 +324,25 @@ PYBIND11_MODULE(cpp_util, m)
         "eval_tau",
         &eval_tau,
         R"doc(
-    Evaluate the optical depth for given density, specific entropy, and spatial grids.
+    Evaluate the optical depth from the top of the given grid (0 at the top cell), with log(ro * opacity) linear in x.
+
     Parameters
     ----------
     ro_np : numpy.ndarray
-        3D array of density values.
+        3D float32 array of total density values (x is the first axis), not perturbations.
     se_np : numpy.ndarray
-        3D array of specific entropy values.
+        3D float32 array of total specific entropy values, not perturbations.
     x_np : numpy.ndarray
-        1D array of spatial grid points.
+        1D array of the x coordinates of the cells. Any float type; d.p.x can be given as it is.
     eos : EOS
         An instance of the EOS class for thermodynamic evaluations.
     i_bot : int, optional
-        The bottom index for the evaluation range (default is 0).
+        The bottom index for the evaluation range (default is 0). Cells below it have the value at i_bot.
+
     Returns
     -------
     numpy.ndarray
-        2D array of radiative transfer results at the top boundary.
+        3D float32 array of the optical depth, with the same shape as ro_np.
     )doc",
         py::arg("ro"),
         py::arg("se"),
@@ -352,22 +354,25 @@ PYBIND11_MODULE(cpp_util, m)
         "vertical_upward_rte",
         &vertical_upward_rte,
         R"doc(
-    Solve the vertical upward Radiative Transfer Equation (RTE) using the Feautrier method
-    for given density, specific entropy, and spatial grids.
+    Integrate the vertical upward Radiative Transfer Equation with its formal solution, with log(ro * opacity)
+    linear in x and log(S) linear in the optical depth. The source function S is sb * te**4 / pi. It goes between the
+    cell faces of the given grid, from I = S at the lowest face to the highest one (between the two top cells).
+
     Parameters
     ----------
     ro_np : numpy.ndarray
-        3D array of density values.
+        3D float32 array of total density values (x is the first axis), not perturbations.
     se_np : numpy.ndarray
-        3D array of specific entropy values.
+        3D float32 array of total specific entropy values, not perturbations.
     x_np : numpy.ndarray
-        1D array of spatial grid points.
+        1D array of the x coordinates of the cells. Any float type; d.p.x can be given as it is.
     eos : EOS
         An instance of the EOS class for thermodynamic evaluations.
+
     Returns
     -------
     numpy.ndarray
-        2D array of radiative transfer results at the top boundary.
+        2D float32 array of the intensity at the highest cell face.
     )doc",
         py::arg("ro"),
         py::arg("se"),

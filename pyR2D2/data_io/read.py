@@ -1151,6 +1151,8 @@ class RestrictedData(_BaseRemapReader):
     -----
     ``d.qr.read(n, keys, x0=..., x1=..., y0=..., y1=..., z0=..., z1=...)`` reads only the
     sub-volume at step ``n``. Then use ``d.qr.ro, ...`` (see Attributes).
+    The coordinates of the sub-volume are ``d.qr.info["x"]``, ``d.qr.info["y"]`` and ``d.qr.info["z"]``;
+    ``d.qr.x`` and so on are those of the whole domain.
 
     Note
     ----
