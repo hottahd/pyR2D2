@@ -13,7 +13,7 @@
 * ``data/param/run_note.toml`` (人が書くランのメモ。R2D2plus DEC-600。目的・所属プロジェクト・保存の扱い・結論に使った決定)
 
 ``run/dNNN`` (またはその ``data``) がシンボリックリンクで別のディスクを指すときは、指す先を「実体」の列に書く
-(R2D2plus-project ``docs/run_data.md``: 置き場の名前は 2 か所に固定し、データは容量に合わせて別のディスクに置く)。
+(Research-project ``docs/run_data.md``: 置き場の名前は 2 か所に固定し、データは容量に合わせて別のディスクに置く)。
 
 容量 (``data/`` の使用量) だけは全ファイルの stat が要るので、``du=False`` で省ける。
 """
@@ -77,7 +77,7 @@ COLUMNS = [
     ("ms/step", (), False),
     # ランのメモ (R2D2plus DEC-600、run_note.toml)。人が書く。目的・保存は上
     ("結論", (), False),
-    # 2026-10-25 に足した列 (R2D2plus-project docs/run_data.md)。run/dNNN をリンクにして別のディスクに置いたときのデータの実体
+    # 2026-10-25 に足した列 (Research-project docs/run_data.md)。run/dNNN をリンクにして別のディスクに置いたときのデータの実体
     ("実体", (), False),
 ]
 COLUMN_NAMES = [c[0] for c in COLUMNS]

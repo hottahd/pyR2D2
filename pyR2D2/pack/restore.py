@@ -33,7 +33,7 @@ from pyR2D2 import _term as term
 from .archive import _entries, _walk, sha256
 from .pack import _toml_value
 
-# r2d2plus-archive の出力を置く Gfarm の場所 (R2D2plus-project docs/run_data.md)。
+# r2d2plus-archive の出力を置く Gfarm の場所 (Research-project docs/run_data.md)。
 # Sync の work/<project>/run/<caseid> と同じく、<project>/run/<caseid> を後ろに付ける
 GFARM_ROOT = "gfarm:///home/hp200137/hpci000196/fugaku"
 
