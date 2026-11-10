@@ -7,6 +7,20 @@ import numpy as np
 import pyR2D2
 
 
+def _format_steps(steps, limit=6):
+    """Sorted numbers as ranges: ``[151, 152, ..., 510]`` -> ``"151-510"``."""
+    ranges = []
+    for n in steps:
+        if ranges and n == ranges[-1][1] + 1:
+            ranges[-1][1] = n
+        else:
+            ranges.append([n, n])
+    text = [f"{a}" if a == b else f"{a}-{b}" for a, b in ranges]
+    if len(text) > limit:
+        text = text[: limit // 2] + ["..."] + text[-(limit // 2):]
+    return ", ".join(text)
+
+
 class Data:
     """
     Class for managing R2D2 data
@@ -244,6 +258,8 @@ class Data:
 
         if not filepath.exists() or use_zip:
             zippath = self.datadir / "time.zip"
+            if not zippath.is_file():
+                self._raise_no_time(n, subdir, use_zip)
 
             with zipfile.ZipFile(zippath, "r") as zf:
                 # zip_time は time/<族>/…、r2d2plus-archive (2026-10-31 まで) は <族>/… で入れた
@@ -251,6 +267,8 @@ class Data:
                 arcname = f"time/{subdir}/{filename}"
                 if arcname not in names and f"{subdir}/{filename}" in names:
                     arcname = f"{subdir}/{filename}"
+                if arcname not in names:
+                    self._raise_no_time(n, subdir, use_zip)
                 data = zf.read(arcname)
                 self.time = np.frombuffer(
                     data,
@@ -265,6 +283,26 @@ class Data:
             print("### time is stored in self.time ###")
 
         return self.time
+
+    def _raise_no_time(self, n, family, use_zip=False):
+        """No time file for number ``n``: say which numbers the run has (imai, 2026-11-10).
+
+        A branched run starts at the number after the branch (e.g. 151), so ``time_read(150)``
+        asked for an output this run does not have; it is not a missing ``time.zip``.
+        """
+        from .pack.pack import time_steps
+
+        steps = sorted(time_steps(self.datadir, family))
+        where = f"{self.datadir / 'time.zip'}" if use_zip else f"{self.datadir / 'time' / family} or time.zip"
+        if not steps:
+            msg = f"No time files for {family!r} in {where}; this run has no {family} output."
+        else:
+            msg = (f"Output {n} ({family}) is not in this run: it has {family} outputs "
+                   f"{_format_steps(steps)} ({len(steps)} in all; looked in {where}).")
+            if n < steps[0]:
+                msg += (f" A run that branched from another one starts at {steps[0]};"
+                        " earlier outputs are in the parent run.")
+        raise FileNotFoundError(msg)
 
     def time_steps(self, kind="mhd"):
         """
