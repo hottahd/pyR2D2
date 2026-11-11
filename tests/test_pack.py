@@ -377,3 +377,30 @@ def test_restore_default_source():
     assert default_source("/x/run/d001", project="lowmass") == "gfarm:///home/hp200137/hpci000196/fugaku/lowmass/run/d001"
     with pytest.raises(ValueError):
         default_source("/x/somewhere/d001")
+
+
+def test_qt_read_keys_from_zarr(runs):
+    """d.qt.read(n, ["te"]) は keys (2026-11-11)。以前は zarr_flag に入り、新出力形式の zarr では
+    te が作られず前の値 (はじめは None) のまま残った。"""
+    fmt, orig, packed = runs
+    set_status(packed, "wall_limit")
+    assert Packer(packed).run(delete_original=True)
+    do = pyR2D2.Data(str(orig), verbose=False)
+    do.qt.read(1)
+    dp = pyR2D2.Data(str(packed), verbose=False)
+    assert not dp.qt._get_filepath_optical_depth(1).exists()  # 1 番は zarr からしか読めない
+
+    assert dp.qt.te is None
+    dp.qt.read(1, ["te"])
+    same(dp.qt.te, do.qt.te, "te from zarr, keys as the second argument")
+    dp.qt.read(0)
+    dp.qt.read(1, "te001")
+    same(dp.qt.te001, do.qt.te001, "te001 after reading 0")
+    dp.qt.read(1, keys=["pr01", "he", "rt"])
+    same(dp.qt.pr01, do.qt.pr01, "pr01")
+    same(dp.qt.rt, do.qt.rt, "rt")
+    np.testing.assert_array_equal(dp.qt.he, do.qt.he)
+    with pytest.raises(KeyError, match="'nosuch' is not in"):
+        dp.qt.read(1, ["nosuch"])
+    with pytest.raises(TypeError, match="keys given twice"):
+        dp.qt.read(1, ["te"], keys=["ro"])

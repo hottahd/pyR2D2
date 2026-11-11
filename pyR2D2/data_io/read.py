@@ -1563,7 +1563,12 @@ class OpticalDepth(_BaseReader):
             Whether to print verbose output, by default False
         keys : str or list or tuple, optional
             List of values to read. If 'all', all values are read. By default 'all'.
-            It works only when zarr_flag is True. If zarr_flag is False, all values are read regardless of keys.
+            It works only when the data come from zarr (``zarr_flag=True``, or no binary file for ``n``).
+            The binary file is always read whole. With zarr, attributes not in ``keys`` keep the
+            values of the previous read. ``pr`` and ``te`` of a run in the compressed format are not
+            in the zarr; they are made from ``ro`` and ``se`` (read for this).
+            ``d.qt.read(n, ["te"])`` is the same as ``d.qt.read(n, keys=["te"])``, as in
+            ``d.qf.read(n, keys)`` (before 2026-11-11 the list went to ``zarr_flag``).
         j0 : int, optional
             Starting index for the j dimension, by default None
         j1 : int, optional
@@ -1573,6 +1578,13 @@ class OpticalDepth(_BaseReader):
         k1 : int, optional
             Ending index + 1 for the k dimension, by default None
         """
+
+        # d.qf.read(n, keys) と同じく 2 番目に keys を書いた呼び方 (以前は zarr_flag に入り、
+        # keys は "all" のまま zarr を読んでいた)
+        if isinstance(zarr_flag, (str, list, tuple)):
+            if keys != "all":
+                raise TypeError("keys given twice: as the second argument and as keys=")
+            keys, zarr_flag = zarr_flag, False
 
         if j0 is None:
             j0 = 0
@@ -1605,6 +1617,24 @@ class OpticalDepth(_BaseReader):
             zarr_filepath = self._get_filepath_optical_depth_zarr(n)
             if not _zarr_zarrzip_exists(zarr_filepath):
                 raise FileNotFoundError(f"no tau output at n={n} (neither the binary file nor {zarr_filepath} exists)")
+
+            want = None
+            if names != "all":
+                # 新出力形式の zarr に無い pr, te (と he) は ro, se (height) から作る
+                have = set(pyR2D2.zarr_util.list_vars(zarr_filepath))
+                want = names
+                load_names = []
+                for key in names:
+                    base, tau = key.rstrip("01"), key[len(key.rstrip("01")):]
+                    if key in have:
+                        load_names.append(key)
+                    elif self._is_compressed() and base in ("pr", "te"):
+                        load_names += ["ro" + tau, "se" + tau]
+                    elif self._is_compressed() and base == "he" and "height" + tau in have:
+                        load_names.append("height" + tau)
+                    else:
+                        raise KeyError(f"{key!r} is not in {zarr_filepath} (it has {sorted(have)})")
+                names = list(dict.fromkeys(load_names))
 
             qq = pyR2D2.zarr_util.load(
                 zarr_filepath, names=names, i0=j0, i1=j1, j0=k0, j1=k1
